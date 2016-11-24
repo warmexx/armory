@@ -1,0 +1,24 @@
+## Interface: 70100
+## Title: ArmoryGuildBank
+## Title-deDE: ArmoryGuildBank [Armory Gildenbank]
+## Title-esES: ArmoryGuildBank [Banco de Hermandad]
+## Title-frFR: ArmoryGuildBank [Banque de Guilde]
+## Title-koKR: ArmoryGuildBank [길드은행 정보 열람]
+## Version: @project-version@
+## Notes: Provides guild bank information to Armory users
+## Notes-deDE: Ermöglicht Gildenbankinformationen für Armorynutzer
+## Notes-esES: Da información del banco de la hermandad a los usuarios de Armory
+## Notes-frFR: Fournit des renseignements de la banque de guilde aux utilisateurs de l'Armurerie
+## Notes-koKR: Armory사용자에게 길드은행의 정보를 추가로 제공합니다.
+## Notes-ruRU: Предоставляет доступ к информации о гильдейском банке пользователям Armory
+## Author: Warmexx [Neighbours]
+## Dependencies: Armory
+## SavedVariables: AgbDB, AgbDBRealms
+## X-Donate: PayPal:warmexx AT wow-neighbours DOT com
+## X-Website: http://www.wow-neighbours.com/
+## X-Category: Inventory
+## X-Part-Of: Armory
+
+Locales.xml
+Core.xml
+Frames.xml

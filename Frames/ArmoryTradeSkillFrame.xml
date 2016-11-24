@@ -1,0 +1,771 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\FrameXML\UI.xsd">
+  <Script file="ArmoryTradeSkillFrame.lua"/>
+
+  <Button name="ArmoryTradeSkillSkillButtonTemplate" mixin="ArmoryTradeSkillButtonMixin" hidden="false" virtual="true">
+    <Size x="293" y="16"/>
+    <NormalTexture file="Interface\Buttons\UI-MinusButton-UP">
+      <Size x="16" y="16"/>
+      <Anchors>
+        <Anchor point="LEFT" x="3" y="0"/>
+      </Anchors>
+    </NormalTexture>
+    <HighlightTexture parentKey="Highlight" file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD">
+      <Size x="16" y="16"/>
+      <Anchors>
+        <Anchor point="LEFT" x="3" y="0"/>
+      </Anchors>
+    </HighlightTexture>
+    <DisabledTexture file="Interface\Buttons\UI-PlusButton-Disabled">
+      <Size x="16" y="16"/>
+      <Anchors>
+        <Anchor point="LEFT" x="3" y="0"/>
+      </Anchors>
+    </DisabledTexture>
+    <ButtonText parentKey="Text" wordwrap="false">
+      <Size x="270" y="13"/>
+      <Anchors>
+        <Anchor point="LEFT" relativeKey="$parent.Highlight" relativePoint="RIGHT" x="2" y="1"/>
+      </Anchors>
+    </ButtonText>
+    <NormalFont style="GameFontHighlightLeft"/>
+
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString parentKey="SubText" inherits="GameFontNormalSmall" justifyH="LEFT"/>
+      </Layer>
+      <Layer level="ARTWORK">
+        <Texture parentKey="SelectedTexture" file="Interface\Buttons\UI-Listbox-Highlight2" hidden="true"/>
+      </Layer>
+      <Layer level="OVERLAY">
+        <FontString parentKey="Count" inherits="GameFontNormal">
+          <Size y="13"/>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Button parentKey="SkillUps">
+        <Size x="26" y="16"/>
+        <Anchors>
+          <Anchor point="RIGHT" x="-2" y="0"/>
+        </Anchors>
+        <Layers>
+          <Layer level="OVERLAY">
+            <Texture parentKey="Icon" file="Interface\TradeSkillFrame\UI-TradeSkill-Multiskill">
+              <Size x="16" y="16"/>
+              <Anchors>
+                <Anchor point="RIGHT" x="0" y="-1"/>
+              </Anchors>
+            </Texture>
+            <FontString parentKey="Text" inherits="GameFontNormal">
+              <Size x="0" y="13"/>
+              <Anchors>
+                <Anchor point="RIGHT" relativeKey="$parent.Icon" relativePoint="LEFT" x="0" y="1"/>
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+        <Scripts>
+          <OnLoad>
+            self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+          </OnLoad>
+          <OnClick>
+            self:GetParent():Click(button);
+          </OnClick>
+          <OnEnter>
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+            GameTooltip:AddLine(SKILLUP_TOOLTIP:format(self.Text:GetText()), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true);
+            GameTooltip:Show();
+            self:GetParent():OnMouseEnter();
+          </OnEnter>
+          <OnLeave>
+            GameTooltip:Hide();
+            self:GetParent():OnMouseLeave();
+          </OnLeave>
+        </Scripts>
+      </Button>
+      <Button parentKey="LockedIcon">
+        <Size x="26" y="16"/>
+        <Anchors>
+          <Anchor point="RIGHT" x="-2" y="0"/>
+        </Anchors>
+        <Layers>
+          <Layer level="OVERLAY">
+            <Texture parentKey="Icon" file="Interface\LFGFrame\UI-LFG-ICON-LOCK">
+              <Size x="16" y="16"/>
+              <Anchors>
+                <Anchor point="RIGHT" x="0" y="-1"/>
+              </Anchors>
+            </Texture>
+          </Layer>
+        </Layers>
+        <Scripts>
+          <OnLoad>
+            self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+          </OnLoad>
+          <OnClick>
+            self:GetParent():Click(button);
+          </OnClick>
+          <OnEnter>
+            self:GetParent():OnLockIconMouseEnter();
+            self:GetParent():OnMouseEnter();
+          </OnEnter>
+          <OnLeave>
+            GameTooltip:Hide();
+            self:GetParent():OnMouseLeave();
+          </OnLeave>
+        </Scripts>
+      </Button>
+      <StatusBar parentKey="SubSkillRankBar" drawLayer="BACKGROUND" minValue="0" maxValue="1" defaultValue="1">
+        <Size x="58" y="14"/>
+        <Anchors>
+          <Anchor point="RIGHT" x="0" y="0"/>
+        </Anchors>
+        <Layers>
+          <Layer level="ARTWORK">
+            <Texture parentKey="BorderLeft" file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder">
+              <Size x="9" y="18"/>
+              <Anchors>
+                <Anchor point="LEFT" x="-2" y="0"/>
+              </Anchors>
+              <TexCoords left="0.007843" right="0.043137" top="0.193548" bottom="0.774193"/>
+            </Texture>
+            <Texture parentKey="BorderRight" file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder">
+              <Size x="9" y="18"/>
+              <Anchors>
+                <Anchor point="RIGHT" x="2" y="0"/>
+              </Anchors>
+              <TexCoords left="0.043137" right="0.007843" top="0.193548" bottom="0.774193"/>
+            </Texture>
+            <Texture parentKey="BorderMid" file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder">
+              <Anchors>
+                <Anchor point="TOPLEFT" relativeKey="$parent.BorderLeft" relativePoint="TOPRIGHT"/>
+                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.BorderRight" relativePoint="BOTTOMLEFT"/>
+              </Anchors>
+              <TexCoords left="0.113726" right="0.1490196" top="0.193548" bottom="0.774193"/>
+            </Texture>
+            <FontString parentKey="Rank" inherits="GameFontHighlightSmall">
+              <Anchors>
+                <Anchor point="CENTER"/>
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+        <BarTexture file="Interface\PaperDollInfoFrame\UI-Character-Skills-Bar"/>
+        <BarColor r=".25" g=".25" b=".75"/>
+      </StatusBar>
+    </Frames>
+    <Scripts>
+      <OnLoad>
+        self.Count:ClearAllPoints();
+        self.Count:SetPoint("LEFT", self.Text, "RIGHT", 2, 0);
+      </OnLoad>
+      <OnClick>
+        if ( IsModifiedClick() ) then
+          HandleModifiedItemClick(Armory:GetTradeSkillRecipeLink(self:GetID()));
+        else
+          if ( self.isHeader ) then
+            self:GetParent():GetParent():OnHeaderButtonClicked(self, self.tradeSkillInfo, button);
+          else
+            self:GetParent():GetParent():OnRecipeButtonClicked(self, self.tradeSkillInfo, button);
+          end
+        end
+      </OnClick>
+      <OnEnter method="OnMouseEnter" />
+      <OnLeave method="OnMouseLeave" />
+    </Scripts>
+  </Button>
+
+  <Slider name="ArmoryHybridScrollBarTemplate" parentKey="scrollBar" virtual="true">
+    <Size x="20" y="0"/>
+    <Anchors>
+      <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="1" y="-14"/>
+      <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="1" y="12"/>
+    </Anchors>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture name="$parentBG" setAllPoints="true" hidden="true" parentKey="trackBG">
+          <Color r="0" g="0" b="0" a=".85"/>
+        </Texture>
+      </Layer>
+      <Layer level="ARTWORK">
+        <Texture name="$parentTop" parentKey="ScrollBarTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+          <Size x="27" y="48"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" x="-4" y="17"/>
+          </Anchors>
+          <TexCoords left="0" right="0.484375" top="0" bottom=".20"/>
+        </Texture>
+        <Texture name="$parentBottom" parentKey="ScrollBarBottom" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+          <Size x="27" y="64"/>
+          <Anchors>
+            <Anchor point="BOTTOMLEFT" x="-4" y="-15"/>
+          </Anchors>
+          <TexCoords left="0.515625" right="1.0" top="0.1440625" bottom="0.4140625"/>
+        </Texture>
+        <Texture name="$parentMiddle" parentKey="ScrollBarMiddle" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent.ScrollBarTop" relativePoint="BOTTOMLEFT"/>
+            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.ScrollBarBottom" relativePoint="TOPRIGHT"/>
+          </Anchors>
+          <TexCoords left="0" right="0.484375" top="0.1640625" bottom="1"/>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Button name="$parentScrollUpButton" parentKey="ScrollUpButton" inherits="UIPanelScrollUpButtonTemplate">
+        <Anchors>
+          <Anchor point="BOTTOM" relativePoint="TOP" x="0" y="-2"/>
+        </Anchors>
+        <Scripts>
+          <OnLoad function="HybridScrollFrameScrollUp_OnLoad"/>
+          <OnClick function ="HybridScrollFrameScrollButton_OnClick"/>
+        </Scripts>
+      </Button>
+      <Button name="$parentScrollDownButton" parentKey="ScrollDownButton" inherits="UIPanelScrollDownButtonTemplate">
+        <Anchors>
+          <Anchor point="TOP" relativePoint="BOTTOM" x="0" y="2"/>
+        </Anchors>
+        <Scripts>
+          <OnLoad function="HybridScrollFrameScrollDown_OnLoad"/>
+          <OnClick function="HybridScrollFrameScrollButton_OnClick"/>
+        </Scripts>
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnValueChanged function="HybridScrollFrame_OnValueChanged"/>
+    </Scripts>
+    <ThumbTexture name="$parentThumbTexture" inherits="HybridScrollBarButton" file="Interface\Buttons\UI-ScrollBar-Knob" parentKey="thumbTexture">
+      <Size x="18" y="24"/>
+      <TexCoords left="0.20" right="0.80" top="0.125" bottom="0.875"/>
+    </ThumbTexture>
+  </Slider>
+
+
+  <Button name="ArmoryTradeSkillReagentTemplate" parentArray="Reagents" inherits="LargeItemButtonTemplate" virtual="true">
+    <Scripts>
+      <OnClick>
+        self:GetParent():GetParent():OnReagentClicked(self);
+      </OnClick>
+      <OnEnter>
+        self:GetParent():GetParent():OnReagentMouseEnter(self);
+      </OnEnter>
+      <OnLeave>
+        GameTooltip:Hide();
+      </OnLeave>
+      <OnLoad>
+        -- Uses in Korean to fix Bug ID: 244689
+        if TRADESKILL_REAGENT_FONT then
+          self.Count:SetFontObject(TRADESKILL_REAGENT_FONT);
+        end
+      </OnLoad>
+    </Scripts>
+  </Button>
+
+  <Frame name="ArmoryTradeSkillFrame" mixin="ArmoryTradeSkillFrameMixin" movable="true" parent="ArmoryFrame" enableMouse="true" hidden="true">
+    <Size x="384" y="512"/>
+    <Anchors>
+      <Anchor point="TOPLEFT" relativeTo="ArmoryFrame" relativePoint="TOPRIGHT" x="32" y="11"/>
+    </Anchors>
+    <HitRectInsets>
+      <AbsInset left="0" right="34" top="0" bottom="75"/>
+    </HitRectInsets>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture file="Interface\Spellbook\Spellbook-Icon">
+          <Size x="60" y="60"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" x="7" y="-6"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+      <Layer level="BORDER">
+        <Texture parentKey="TopLeftTexture" file="Interface\PaperDollInfoFrame\UI-Character-General-TopLeft">
+          <Size x="256" y="256"/>
+          <Anchors>
+            <Anchor point="TOPLEFT"/>
+          </Anchors>
+        </Texture>
+        <Texture parentKey="TopRightTexture" name="ArmoryTradeSkillFrameTopRightTexture" file="Interface\PaperDollInfoFrame\UI-Character-General-TopRight">
+          <Size x="128" y="256"/>
+          <Anchors>
+            <Anchor point="TOPRIGHT"/>
+          </Anchors>
+        </Texture>
+        <Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomLeft">
+          <Size x="256" y="256"/>
+          <Anchors>
+            <Anchor point="BOTTOMLEFT"/>
+          </Anchors>
+        </Texture>
+        <Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomRight">
+          <Size x="128" y="256"/>
+          <Anchors>
+            <Anchor point="BOTTOMRIGHT"/>
+          </Anchors>
+        </Texture>
+        <FontString parentKey="TitleText" inherits="GameFontNormal" text="Trade Skills">
+          <Anchors>
+            <Anchor point="TOP" relativeTo="ArmoryTradeSkillFrame" relativePoint="TOP" x="0" y="-17"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+      <Layer level="ARTWORK">
+        <Texture parentKey="HorizontalBarLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+          <Size x="256" y="16"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" x="15" y="-221"/>
+          </Anchors>
+          <TexCoords left="0" right="1.0" top="0" bottom="0.25"/>
+        </Texture>
+        <Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+          <Size x="75" y="16"/>
+          <Anchors>
+            <Anchor point="LEFT" relativeKey="$parent.HorizontalBarLeft" relativePoint="RIGHT" x="0" y="0"/>
+          </Anchors>
+          <TexCoords left="0" right="0.29296875" top="0.25" bottom="0.5"/>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Frames>
+
+      <StatusBar parentKey="RankFrame" drawLayer="BACKGROUND" minValue="0" maxValue="1" defaultValue="0" enableMouse="false">
+        <Size x="265" y="14"/>
+        <Anchors>
+          <Anchor point="TOPLEFT" x="75" y="-36"/>
+        </Anchors>
+        <Layers>
+          <Layer level="ARTWORK">
+            <FontString parentKey="SkillRank" name="$parentSkillRank" inherits="WhiteNormalNumberFont" justifyH="CENTER">
+              <Anchors>
+                <Anchor point="TOP" relativeKey="$parent.TitleText" x="0" y="-2"/>
+              </Anchors>
+            </FontString>
+          </Layer>
+          <Layer level="BACKGROUND">
+            <Texture parentKey="Background">
+              <Color r="1.0" g="1.0" b="1.0" a="0.2"/>
+            </Texture>
+          </Layer>
+        </Layers>
+        <Frames>
+          <Button parentKey="Border">
+            <Size x="274" y="27"/>
+            <Anchors>
+              <Anchor point="LEFT" x="-5" y="0"/>
+            </Anchors>
+            <NormalTexture file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder" />
+          </Button>
+        </Frames>
+        <BarTexture file="Interface\PaperDollInfoFrame\UI-Character-Skills-Bar" />
+        <BarColor r="0.25" g="0.25" b="0.75" />
+      </StatusBar>
+ 
+      <EditBox parentKey="SearchBox" name="$parentEditBox" inherits="SearchBoxTemplate" autoFocus="false">
+        <Size x="128" y="20"/>
+        <Anchors>
+          <Anchor point="TOPRIGHT" relativeKey="$parent.RankFrame" relativePoint="BOTTOMRIGHT" x="2" y="-1"/>
+        </Anchors>
+        <Scripts>
+          <OnTextChanged>
+            self:GetParent():OnSearchTextChanged(self);
+          </OnTextChanged>
+          <OnEnter>
+            Armory:AddEnhancedTip(self, SEARCH, 1.0, 1.0, 1.0, ARMORY_TRADESKILL_SEARCH_TEXT_TOOLTIP, 1);
+          </OnEnter>
+          <OnLeave>
+            GameTooltip:Hide();
+          </OnLeave>
+        </Scripts>
+      </EditBox>
+
+      <Frame parentKey="ExpandButtonFrame" hidden="true">
+        <Size x="54" y="32"/>
+        <Anchors>
+          <Anchor point="TOPLEFT" x="15" y="-71"/>
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture parentKey="ExpandTabLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-ExpandTab-Left">
+              <Size x="8" y="32"/>
+              <Anchors>
+                <Anchor point="TOPLEFT"/>
+              </Anchors>
+            </Texture>
+            <Texture parentKey="ExpandTabMiddle" file="Interface\QuestFrame\UI-QuestLogSortTab-Middle">
+              <Size x="38" y="32"/>
+              <Anchors>
+                <Anchor point="LEFT" relativeKey="$parent.ExpandTabLeft" relativePoint="RIGHT" x="0" y="6"/>
+              </Anchors>
+            </Texture>
+            <Texture file="Interface\QuestFrame\UI-QuestLogSortTab-Right">
+              <Size x="8" y="32"/>
+              <Anchors>
+                <Anchor point="LEFT" relativeKey="$parent.ExpandTabMiddle" relativePoint="RIGHT"/>
+              </Anchors>
+            </Texture>
+          </Layer>
+        </Layers>
+        <Frames>
+          <Button parentKey="CollapseAllButton">
+            <Size x="40" y="22"/>
+            <Anchors>
+              <Anchor point="LEFT" relativeKey="$parent.ExpandTabLeft" relativePoint="RIGHT" x="0" y="3"/>
+            </Anchors>
+            <Layers>
+              <Layer level="BACKGROUND">
+                <FontString parentKey="SubText" inherits="GameFontNormalSmall" justifyH="LEFT"/>
+              </Layer>
+            </Layers>
+            <NormalTexture urgency="5" file="Interface\Buttons\UI-MinusButton-UP">
+              <Size x="16" y="16"/>
+              <Anchors>
+                <Anchor point="LEFT" x="3" y="0"/>
+              </Anchors>
+            </NormalTexture>
+            <HighlightTexture name="$parentHighlight" file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD">
+              <Size x="16" y="16"/>
+              <Anchors>
+                <Anchor point="LEFT" x="3" y="0"/>
+              </Anchors>
+            </HighlightTexture>
+            <DisabledTexture file="Interface\Buttons\UI-PlusButton-Disabled">
+              <Size x="16" y="16"/>
+              <Anchors>
+                <Anchor point="LEFT" x="3" y="0"/>
+              </Anchors>
+            </DisabledTexture>
+            <ButtonText name="$parentText">
+              <Size x="270" y="13"/>
+              <Anchors>
+                <Anchor point="LEFT" relativeTo="$parentHighlight" relativePoint="RIGHT" x="2" y="1"/>
+              </Anchors>
+            </ButtonText>
+            <NormalFont style="GameFontNormalLeft"/>
+            <HighlightFont style="GameFontHighlightLeft"/>
+            <DisabledFont style="GameFontDisableLeft"/>
+            <Scripts>
+              <OnLoad>
+                self:SetText(ALL);
+              </OnLoad>
+              <OnClick>
+                self:GetParent():GetParent():CollapseAllButtonClicked(self);
+              </OnClick>
+              <OnEnter>
+                self.SubText:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+              </OnEnter>
+              <OnLeave>
+                self.SubText:SetTextColor(self.r, self.g, self.b);
+              </OnLeave>
+            </Scripts>
+          </Button>
+        </Frames>
+      </Frame>
+
+      <Button parentKey="FilterButton" inherits="UIMenuButtonStretchTemplate" text="FILTER">
+        <Size x="70" y="22"/>
+        <Anchors>
+          <Anchor point="TOPRIGHT" relativeKey="$parent.SearchBox" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+        </Anchors>
+        <Layers>
+          <Layer level="ARTWORK">
+            <Texture parentKey="Icon" file="Interface\ChatFrame\ChatFrameExpandArrow">
+              <Size x="10" y="12"/>
+              <Anchors>
+                <Anchor point="RIGHT" relativeKey="$parent.Right" relativePoint="RIGHT" x="-5"/>
+              </Anchors>
+            </Texture>
+          </Layer>
+        </Layers>
+        <Scripts>
+          <OnClick>
+            ArmoryToggleDropDownMenu(1, nil, self:GetParent().FilterDropDown, self, 74, 15);
+          </OnClick>
+        </Scripts>
+      </Button>
+      <Frame name="ArmoryTradeSkillFilterDropDown" parentKey="FilterDropDown" inherits="ArmoryDropDownMenuTemplate">
+        <Scripts>
+          <OnLoad>
+            self.Text:SetJustifyH("CENTER");
+            self.Button:Show();
+          </OnLoad>
+        </Scripts>
+      </Frame>
+
+      <ScrollFrame parentKey="RecipeList" mixin="ArmoryTradeSkillRecipeListMixin" inherits="HybridScrollFrameTemplate">
+        <Size x="296" y="128"/>
+        <Anchors>
+          <Anchor point="TOPRIGHT" relativeTo="ArmoryTradeSkillFrame" relativePoint="TOPRIGHT" x="-64" y="-77"/>
+        </Anchors>
+        <Frames>
+          <Frame parentKey="FilterBar" hidden="true">
+            <Size x="293" y="16"/>
+            <Anchors>
+              <Anchor point="BOTTOM" relativePoint="TOP" x="0" y="1"/>
+            </Anchors>
+            <Layers>
+              <Layer level="ARTWORK">
+                <Texture file="Interface\Buttons\UI-Listbox-Highlight2">
+                  <Color r="0.6" g="0.75" b="1.0" a="0.5" />
+                </Texture>
+                <FontString parentKey="Text" inherits="GameFontHighlightSmall" justifyH="LEFT">
+                  <Size x="253" y="13"/>
+                  <Anchors>
+                    <Anchor point="LEFT" x="5" y="0"/>
+                  </Anchors>
+                </FontString>
+              </Layer>
+            </Layers>
+            <Frames>
+              <Button parentKey="ExitButton">
+                <Size x="17" y="17"/>
+                <Anchors>
+                  <Anchor point="RIGHT" x="-2" y="0"/>
+                </Anchors>
+                <Layers>
+                  <Layer level="ARTWORK">
+                    <Texture parentKey="Icon" file="Interface\FriendsFrame\ClearBroadcastIcon" alpha="0.5">
+                      <Size x="17" y="17"/>
+                      <Anchors>
+                        <Anchor point="TOPLEFT" x="0" y="0"/>
+                      </Anchors>
+                    </Texture>
+                  </Layer>
+                </Layers>
+                <Scripts>
+                  <OnEnter>
+                    self.Icon:SetAlpha(1.0);
+                  </OnEnter>
+                  <OnLeave>
+                    self.Icon:SetAlpha(0.5);
+                  </OnLeave>
+                  <OnMouseDown>
+                    self.Icon:SetPoint("TOPLEFT", 1, -1);
+                  </OnMouseDown>
+                  <OnMouseUp>
+                    self.Icon:SetPoint("TOPLEFT", 0, 0);
+                  </OnMouseUp>
+                  <OnClick>
+                    self:GetParent():GetParent():GetParent():ClearFilters();
+                  </OnClick>
+                </Scripts>
+              </Button>
+            </Frames>
+          </Frame>
+
+          <Slider name="ArmoryRecipeListScrollBar" parentKey="ScrollBar" inherits="ArmoryHybridScrollBarTemplate">
+            <KeyValues>
+              <KeyValue key="doNotHide" value="true" type="boolean" />
+            </KeyValues>
+            <Anchors>
+              <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="1" y="-14"/>
+              <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="1" y="12"/>
+            </Anchors>
+          </Slider>
+        </Frames>
+        <Scripts>
+          <OnLoad inherit="append" method="OnLoad" />
+        </Scripts>
+      </ScrollFrame>
+
+      <ScrollFrame name="$parentRecipeListDetailsFrame" parentKey="DetailsFrame" mixin="ArmoryTradeSkillDetailsMixin" inherits="UIPanelScrollFrameTemplate">
+        <Size x="297" y="195"/>
+        <Anchors>
+          <Anchor point="TOPLEFT" x="20" y="-234"/>
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture name="$parentTop" file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+              <Size x="30" y="123"/>
+              <Anchors>
+                <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-2" y="5"/>
+              </Anchors>
+              <TexCoords left="0" right="0.46875" top="0" bottom="0.9609375"/>
+            </Texture>
+            <Texture name="$parentBottom" file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+              <Size x="30" y="123"/>
+              <Anchors>
+                <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-2" y="-1"/>
+              </Anchors>
+              <TexCoords left="0.53125" right="1.0" top="0.03125" bottom="1.0"/>
+            </Texture>
+          </Layer>
+        </Layers>
+        <Scripts>
+          <OnLoad>
+            ScrollFrame_OnLoad(self);
+            self.scrollBarHideable = 1;
+          </OnLoad>
+        </Scripts>
+        <ScrollChild>
+          <Frame parentKey="Contents">
+            <Size x="297" y="150"/>
+            <Layers>
+              <Layer level="BACKGROUND">
+                <FontString parentKey="RecipeName" inherits="GameFontNormal" text="Skill Name" justifyH="LEFT">
+                  <Size x="244" y="0"/>
+                  <Anchors>
+                    <Anchor point="TOPLEFT" x="50" y="-5"/>
+                  </Anchors>
+                </FontString>
+
+                <FontString parentKey="Description" inherits="GameFontHighlightSmall" justifyH="LEFT">
+                  <Size x="290" y="0"/>
+                  <Anchors>
+                    <Anchor point="TOPLEFT" x="5" y="-50"/>
+                  </Anchors>
+                </FontString>
+
+                <FontString parentKey="RequirementLabel" inherits="GameFontHighlightSmall" text="REQUIRES_LABEL">
+                  <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.RecipeName" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+                  </Anchors>
+                </FontString>
+                <FontString parentKey="RequirementText" inherits="GameFontHighlightSmall" justifyV="TOP" justifyH="LEFT">
+                  <Size x="180" y="0"/>
+                  <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.RequirementLabel" relativePoint="TOPRIGHT" x="4" y="0"/>
+                  </Anchors>
+                </FontString>
+
+                <FontString parentKey="RecipeCooldown" name="ArmoryTradeSkillSkillCooldown" inherits="GameFontRedSmall">
+                  <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.RequirementLabel"/>
+                    <Anchor point="TOP" relativeKey="$parent.RequirementText" relativePoint="BOTTOM"/>
+                  </Anchors>
+                </FontString>
+
+                <Texture parentKey="HeaderLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-DetailHeaderLeft">
+                  <Size x="256" y="64"/>
+                  <Anchors>
+                    <Anchor point="TOPLEFT" x="0" y="3"/>
+                  </Anchors>
+                </Texture>
+                <Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-DetailHeaderRight">
+                  <Size x="64" y="64"/>
+                  <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.HeaderLeft" relativePoint="TOPRIGHT" x="0" y="0"/>
+                  </Anchors>
+                </Texture>
+               <FontString parentKey="ReagentLabel" inherits="GameFontNormalSmall" text="SPELL_REAGENTS">
+                  <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.Description" relativePoint="BOTTOMLEFT" x="0" y="-10"/>
+                  </Anchors>
+                </FontString>
+              </Layer>
+            </Layers>
+            <Frames>
+              <Button parentKey="ResultIcon">
+                <Size x="37" y="37"/>
+                <Anchors>
+                  <Anchor point="TOPLEFT" x="8" y="-3"/>
+                </Anchors>
+                <Layers>
+                  <Layer level="ARTWORK">
+                    <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT" hidden="false">
+                      <Anchors>
+                        <Anchor point="BOTTOMRIGHT" x="-5" y="2"/>
+                      </Anchors>
+                    </FontString>
+                  </Layer>
+                </Layers>
+                <Scripts>
+                  <OnClick>
+                    self:GetParent():GetParent():OnResultClicked(self);
+                  </OnClick>
+                  <OnEnter>
+                    self:GetParent():GetParent():OnResultMouseEnter(self);
+                  </OnEnter>
+                  <OnLeave>
+                    GameTooltip:Hide();
+                  </OnLeave>
+                </Scripts>
+              </Button>
+ 
+              <Button parentKey="Reagent1" inherits="ArmoryTradeSkillReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="reagentIndex" type="number" value="1"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeKey="$parent.ReagentLabel" relativePoint="BOTTOMLEFT" x="-2" y="-3"/>
+                </Anchors>
+              </Button>
+              <Button parentKey="Reagent2" inherits="ArmoryTradeSkillReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="reagentIndex" type="number" value="2"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="LEFT" relativeKey="$parent.Reagent1" relativePoint="RIGHT" x="0" y="0"/>
+                </Anchors>
+              </Button>
+              <Button parentKey="Reagent3" inherits="ArmoryTradeSkillReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="reagentIndex" type="number" value="3"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeKey="$parent.Reagent1" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+                </Anchors>
+              </Button>
+              <Button parentKey="Reagent4" inherits="ArmoryTradeSkillReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="reagentIndex" type="number" value="4"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="LEFT" relativeKey="$parent.Reagent3" relativePoint="RIGHT" x="0" y="0"/>
+                </Anchors>
+              </Button>
+              <Button parentKey="Reagent5" inherits="ArmoryTradeSkillReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="reagentIndex" type="number" value="5"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeKey="$parent.Reagent3" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+                </Anchors>
+              </Button>
+              <Button parentKey="Reagent6" inherits="ArmoryTradeSkillReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="reagentIndex" type="number" value="6"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="LEFT" relativeKey="$parent.Reagent5" relativePoint="RIGHT" x="0" y="0"/>
+                </Anchors>
+              </Button>
+              <Button parentKey="Reagent7" inherits="ArmoryTradeSkillReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="reagentIndex" type="number" value="7"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeKey="$parent.Reagent6" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+                </Anchors>
+              </Button>
+              <Button parentKey="Reagent8" inherits="ArmoryTradeSkillReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="reagentIndex" type="number" value="8"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="LEFT" relativeKey="$parent.Reagent7" relativePoint="RIGHT" x="0" y="0"/>
+                </Anchors>
+              </Button>              
+            </Frames>
+          </Frame>
+        </ScrollChild>
+      </ScrollFrame>
+
+      <Button name="ArmoryTradeSkillFrameCloseButton" inherits="UIPanelCloseButton">
+        <Anchors>
+          <Anchor point="TOPRIGHT" relativeTo="ArmoryTradeSkillFrame" relativePoint="TOPRIGHT" x="-29" y="-8"/>
+        </Anchors>
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnShow method="OnShow"/>
+      <OnHide method="OnHide"/>
+      <OnEvent method="OnEvent"/>
+      <OnMouseWheel>
+        return;
+      </OnMouseWheel>
+    </Scripts>
+  </Frame>
+</Ui>
