@@ -2,28 +2,28 @@
 
 externals:
     Libs/LibStub:
-        url: https://repos.wowace.com/wow/libstub/trunk
+        url: svn://svn.wowace.com/wow/libstub/mainline/trunk
         tag: latest
     Libs/CallbackHandler-1.0:
-        url: https://repos.wowace.com/wow/callbackhandler/trunk
+        url: svn://svn.wowace.com/wow/callbackhandler/mainline/trunk/CallbackHandler-1.0
         tag: latest
     Libs/LibDataBroker-1.1:
-        url: https://repos.wowace.com/wow/libdatabroker-1-1
+        url: git://github.com/tekkub/libdatabroker-1-1.git
         tag: latest
     Libs/ChatThrottleLib:
-        url: https://repos.wowace.com/wow/chatthrottlelib/trunk
+        url: svn://svn.wowace.com/wow/chatthrottlelib/mainline/trunk
         tag: latest
     Libs/LibCompress:
-        url: https://repos.wowace.com/wow/libcompress/trunk 
+        url: svn://svn.wowace.com/wow/libcompress/mainline/trunk
         tag: latest
     Libs/AceLocale-3.0:
-        url: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
+        url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceLocale-3.0
         tag: latest
     Libs/LibQTip-1.0:
-        url: https://repos.wowace.com/wow/libqtip-1-0/trunk
+        url: svn://svn.wowace.com/wow/libqtip-1-0/mainline/trunk
         tag: latest
     Libs/LibRecipes-2.0:
-        url: https://repos.wowace.com/wow/librecipes-2-0/trunk
+        url: https://repos.wowace.com/wow/librecipes-2-0
         tag: latest
 
 enable-nolib-creation: no
