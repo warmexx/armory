@@ -36,10 +36,12 @@ local container = "Artifacts";
 
 local selectedArtifact = nil;
 
-local function GetArtifactValue(key)
+local function GetArtifactValue(key, artifact)
+    artifact = artifact or selectedArtifact;
+
     local dbEntry = Armory.selectedDbBaseEntry;
-    if ( dbEntry and selectedArtifact ) then
-        return dbEntry:GetValue(container, selectedArtifact, key);
+    if ( dbEntry and artifact ) then
+        return dbEntry:GetValue(container, artifact, key);
     end
 end
 
@@ -129,80 +131,87 @@ function Armory:SetSelectedArtifact(id)
     end
 end
 
-function Armory:GetNumObtainedArtifacts()
+local obtained = {};
+function Armory:GetObtainedArtifacts()
+    table.wipe(obtained);
     local dbEntry = self.selectedDbBaseEntry;
-    local count = 0;
     if ( dbEntry ) then
         local artifacts = dbEntry:GetValue(container);
-        for _, value in pairs(artifacts) do
-            if ( type(value) ~= "string" ) then
-                count = count + 1;
+        if ( artifacts ) then
+            for id, value in pairs(artifacts) do
+                if ( type(value) ~= "string" ) then
+                    table.insert(obtained, id);
+                end
             end
         end
     end
-    return count;
+    return obtained;
+end
+
+function Armory:GetNumObtainedArtifacts()
+    return table.getn(self:GetObtainedArtifacts());
 end
 
 function Armory:GetArtifactInfoEx()
     return tonumber(selectedArtifact), GetArtifactValue("Info");
 end
 
-function Armory:GetArtifactArtInfo()
-    return GetArtifactValue("ArtInfo");
+function Armory:GetArtifactArtInfo(artifact)
+    return GetArtifactValue("ArtInfo", artifact);
 end
 
-function Armory:GetPointsRemaining()
-    return GetArtifactValue("PointsRemaining");
+function Armory:GetPointsRemaining(artifact)
+    return GetArtifactValue("PointsRemaining", artifact);
 end
 
-function Armory:GetTotalPurchasedRanks()
-   return GetArtifactValue("PurchasedRanks");
+function Armory:GetTotalPurchasedRanks(artifact)
+   return GetArtifactValue("PurchasedRanks", artifact);
 end
 
-function Armory:GetArtifactKnowledgeLevel()
-   return GetArtifactValue("KnowledgeLevel");
+function Armory:GetArtifactKnowledgeLevel(artifact)
+   return GetArtifactValue("KnowledgeLevel", artifact);
 end
 
-function Armory:GetArtifactKnowledgeMultiplier()
-   return GetArtifactValue("KnowledgeMultiplier");
+function Armory:GetArtifactKnowledgeMultiplier(artifact)
+   return GetArtifactValue("KnowledgeMultiplier", artifact);
 end
 
-function Armory:GetMetaPowerInfo()
-   return GetArtifactValue("MetaPower");
+function Armory:GetMetaPowerInfo(artifact)
+   return GetArtifactValue("MetaPower", artifact);
 end
 
-function Armory:GetPowers()
-   return GetArtifactValue("Powers");
+function Armory:GetPowers(artifact)
+   return GetArtifactValue("Powers", artifact);
 end
 
-function Armory:GetPowerInfo(id)
-   return GetArtifactValue("PowerInfo"..id);
+function Armory:GetPowerInfo(id, artifact)
+   return GetArtifactValue("PowerInfo"..id, artifact);
 end
 
-function Armory:GetPowerLinks(id)
-   return GetArtifactValue("PowerLinks"..id);
+function Armory:GetPowerLinks(id, artifact)
+   return GetArtifactValue("PowerLinks"..id, artifact);
 end
 
-function Armory:GetPowerHyperlink(id)
-    return GetArtifactValue("PowerLink"..id);
+function Armory:GetPowerHyperlink(id, artifact)
+    return GetArtifactValue("PowerLink"..id, artifact);
 end
 
-function Armory:IsPowerKnown(id)
-    return self:GetPowerInfo(id) and true or false;
+function Armory:IsPowerKnown(id, artifact)
+    return self:GetPowerInfo(id, artifact) and true or false;
 end
 
-function Armory:GetNumRelicSlots()
-    return GetArtifactValue("Relics") or 0;
+function Armory:GetNumRelicSlots(artifact)
+    return GetArtifactValue("Relics", artifact) or 0;
 end
 
-function Armory:GetRelicSlotType(index)
-    return GetArtifactValue("RelicType"..index);
+function Armory:GetRelicSlotType(index, artifact)
+    return GetArtifactValue("RelicType"..index, artifact);
 end
 
-function Armory:GetRelicInfo(index)
-    return GetArtifactValue("RelicInfo"..index);
+function Armory:GetRelicInfo(index, artifact)
+    return GetArtifactValue("RelicInfo"..index, artifact);
 end
 
-function Armory:GetPowersAffectedByRelic(index)
-    return GetArtifactValue("RelicPowers"..index);
+function Armory:GetPowersAffectedByRelic(index, artifact)
+    return GetArtifactValue("RelicPowers"..index, artifact);
 end

@@ -4,6 +4,9 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+==== v14.1.0 ====
+# Added comparison tooltip for artifact relics (use Alt instead of Shift on a relic item to compare with activated relics).
+
 ==== v14.0.0 ====
 # Added artifact power module. If enabled, shift right-clicking an artifact in Armory will open the power UI.
 # Inactive talents will now be stored as well as soon as they get activated.

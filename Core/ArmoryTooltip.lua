@@ -1060,6 +1060,13 @@ function Armory:AddEnhancedTip(frame, normalText, r, g, b, enhancedText, noNorma
 end
 
 function Armory:FilterTooltip(tooltip, ...)
+    local function Hide(fontString)
+        if ( fontString ) then
+            fontString:SetText(nil);
+            fontString:Hide();
+        end
+    end
+
     local name = tooltip:GetName();
     local textLeft, textRight;
     local text, pattern;
@@ -1071,20 +1078,35 @@ function Armory:FilterTooltip(tooltip, ...)
             for j = 1, select("#", ...) do
                 local pattern = select(j, ...);
                 if ( text:find(pattern) ) then
-                    textLeft:SetText(nil);
-                    textLeft:Hide();              
-                    textRight:SetText(nil);
-                    textRight:Hide();
+                    Hide(textLeft);
+                    Hide(textRight);
                     break;
                 end
             end
             if ( text == "" and i > 1 and (GetFontStringTextString( _G[name.."TextLeft"..i-1]) or "") == "" ) then
-                textLeft:SetText(nil);
-                textLeft:Hide();              
-                textRight:SetText(nil);
-                textRight:Hide();
+                Hide(textLeft);
+                Hide(textRight);
             end
         end
     end
     tooltip:Show();
+end
+
+function Armory:FindTooltipText(tooltip, pattern)
+    local function FindPattern(fontString)
+        if ( fontString ) then
+            local text = fontString:GetText();
+            if ( text and text:find(pattern) ) then
+                return text;
+            end
+        end
+    end
+
+    local name = tooltip:GetName();
+    for i = 1, tooltip:NumLines() do
+        local text = FindPattern(_G[name.."TextLeft"..i]) or FindPattern(_G[name.."TextRight"..i]);
+        if ( text ) then
+            return text;
+        end
+    end
 end

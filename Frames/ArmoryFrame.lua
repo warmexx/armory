@@ -984,6 +984,7 @@ function ArmoryComparisonFrame_OnUpdate(self, elapsed)
 end
 
 local compareSlots = {};
+local relicPattern = "^"..RELIC_TOOLTIP_TYPE:gsub("%%s", "(.+)").."$";
 function ArmoryShowCompareItem(tooltip, link)
     ArmoryComparisonTooltip1:Hide();
     ArmoryComparisonTooltip2:Hide();
@@ -992,38 +993,68 @@ function ArmoryShowCompareItem(tooltip, link)
         return;
     end
     
-    local equipLoc;
+    local equipLoc, subtype;
     if ( link:find("|H") ) then
-        if ( not IsEquippableItem(link) ) then
-            return;
-        end
-        _, _, _, _, _, _, _, _, equipLoc = GetItemInfo(link);
+        _, _, _, equipLoc, _, _, subtype = GetItemInfoInstant(link);
     else
         equipLoc = link;
     end
-    local slot = ARMORY_SLOTINFO[equipLoc];
 
-    if ( not slot ) then
+    local setItemFunc;
+    if ( subtype == LE_ITEM_GEM_ARTIFACTRELIC ) then
+        local relic = Armory:FindTooltipText(tooltip, relicPattern);
+        local relicSlotType = relic and relic:match(relicPattern);
+        if ( not relicSlotType ) then
+            return;
+        end
+
+        table.wipe(compareSlots);
+        for _, id in ipairs(Armory:GetObtainedArtifacts()) do
+            for i = 1, Armory:GetNumRelicSlots(id) do
+                if ( Armory:GetRelicSlotType(i, id) == relicSlotType ) then
+                    local relicLink = select(4, Armory:GetRelicInfo(i, id));
+                    if ( relicLink ) then
+                        table.insert(compareSlots, relicLink);
+                    end
+                end
+            end
+        end
+
+        setItemFunc = function(tooltip, link)
+            tooltip:SetHyperlink(link);
+        end
+
+    elseif ( not equipLoc ) then
         return;
-    elseif ( slot:match("Finger.Slot") ) then
-        compareSlots[1] = "Finger0Slot";
-        compareSlots[2] = "Finger1Slot";
-    elseif ( slot:match("Trinket.Slot") ) then
-        compareSlots[1] = "Trinket0Slot";
-        compareSlots[2] = "Trinket1Slot";
-    elseif ( slot == "MainHandSlot" or slot == "SecondaryHandSlot" ) then
-        compareSlots[1] = "SecondaryHandSlot";
-        compareSlots[2] = "MainHandSlot";
-    else
-        compareSlots[1] = slot;
-        compareSlots[2] = nil;
-    end
 
-    local slotId = GetInventorySlotInfo(compareSlots[1]);
-    local itemLink = Armory:GetInventoryItemLink("player", slotId);
-    if ( not itemLink ) then
-        compareSlots[1] = compareSlots[2];
-        compareSlots[2] = nil;
+    else
+        local slot = ARMORY_SLOTINFO[equipLoc];
+        if ( not slot ) then
+            return;
+        elseif ( slot:match("Finger.Slot") ) then
+            compareSlots[1] = "Finger0Slot";
+            compareSlots[2] = "Finger1Slot";
+        elseif ( slot:match("Trinket.Slot") ) then
+            compareSlots[1] = "Trinket0Slot";
+            compareSlots[2] = "Trinket1Slot";
+        elseif ( slot == "MainHandSlot" or slot == "SecondaryHandSlot" ) then
+            compareSlots[1] = "SecondaryHandSlot";
+            compareSlots[2] = "MainHandSlot";
+        else
+            compareSlots[1] = slot;
+            compareSlots[2] = nil;
+        end
+
+        local slotId = GetInventorySlotInfo(compareSlots[1]);
+        local itemLink = Armory:GetInventoryItemLink("player", slotId);
+        if ( not itemLink ) then
+            compareSlots[1] = compareSlots[2];
+            compareSlots[2] = nil;
+        end
+
+        setItemFunc = function(tooltip, slot)
+            Armory:SetInventoryItem("player", GetInventorySlotInfo(slot), nil, tooltip);
+        end
     end
     if ( not compareSlots[1] ) then
         return;
@@ -1048,17 +1079,23 @@ function ArmoryShowCompareItem(tooltip, link)
     else
         side = "right";
     end
+  
+    local setCompareItem = function(index)
+        local tooltip = _G["ArmoryComparisonTooltip"..index];
+        if ( tooltip and compareSlots[index] ) then
+            setItemFunc(tooltip, compareSlots[index]);
+            return tooltip:GetWidth();
+        end
+        return 0;
+    end
 
     -- see if we should slide the tooltip
     if ( tooltip:GetAnchorType() ) then
         local totalWidth = 0;
-        if ( compareSlots[1]  ) then
-            Armory:SetInventoryItem("player", GetInventorySlotInfo(compareSlots[1]), nil, ArmoryComparisonTooltip1);
-            totalWidth = totalWidth + ArmoryComparisonTooltip1:GetWidth();
-        end
-        if ( compareSlots[2]  ) then
-            Armory:SetInventoryItem("player", GetInventorySlotInfo(compareSlots[2]), nil, ArmoryComparisonTooltip2);
-            totalWidth = totalWidth + ArmoryComparisonTooltip2:GetWidth();
+        for i = 1, 2 do
+            if ( compareSlots[i] ) then
+                totalWidth = totalWidth + setCompareItem(i);
+            end
         end
 
         if ( (side == "left") and (totalWidth > leftPos) ) then
@@ -1078,7 +1115,7 @@ function ArmoryShowCompareItem(tooltip, link)
         else
             ArmoryComparisonTooltip1:SetPoint("TOPLEFT", tooltip:GetName(), "TOPRIGHT", 0, -10);
         end
-        Armory:SetInventoryItem("player", GetInventorySlotInfo(compareSlots[1]), nil, ArmoryComparisonTooltip1);
+        setCompareItem(1);
 
         if ( compareSlots[2] ) then
             ArmoryComparisonTooltip2:SetOwner(ArmoryComparisonTooltip1, "ANCHOR_NONE");
@@ -1089,7 +1126,7 @@ function ArmoryShowCompareItem(tooltip, link)
             else
                 ArmoryComparisonTooltip2:SetPoint("TOPLEFT", "ArmoryComparisonTooltip1", "TOPRIGHT", 0, 0);
             end
-            Armory:SetInventoryItem("player", GetInventorySlotInfo(compareSlots[2]), nil, ArmoryComparisonTooltip2);
+            setCompareItem(2);
         end
     end
 end
