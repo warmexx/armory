@@ -77,13 +77,13 @@ function Armory:GetSpecializationInfo(index, inspect, pet, dummy, sex)
     -- Provide backwards compatibility
     if ( not pet and not self:GetClassValue(unit, container, index) ) then
         local _, _, classID = self:UnitClass(unit);
-        -- As 7th value this will return a boolean while GetSpecializationInfo() will return a stat index
+        -- As 7th (now 6th?) value this will return a boolean while GetSpecializationInfo() will return a stat index
         return _G.GetSpecializationInfoForClassID(classID, index, sex);
     end
     return self:GetClassValue(unit, container, index);
 end
 
 function Armory:GetSpecializationRole(index, inspect, pet)
-	local _, _, _, _, _, role = self:GetSpecializationInfo(index, inspect, pet, nil, Armory:UnitSex((pet and "pet") or "player"));
+	local _, _, _, _, role = self:GetSpecializationInfo(index, inspect, pet, nil, Armory:UnitSex((pet and "pet") or "player"));
     return role;
 end

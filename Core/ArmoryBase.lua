@@ -40,7 +40,7 @@ if ( not Armory ) then
 
         title = ARMORY_TITLE,
         version = GetAddOnMetadata("Armory", "Version"),
-        dbVersion = 43,
+        dbVersion = 44,
         interface = _G.GetBuildInfo(),
     };
 end
@@ -609,6 +609,22 @@ function Armory:IsDbCompatible()
                 end
             end
             
+            upgraded = true;
+
+        -- convert from 43 to 44
+        elseif ( dbVersion == 43 ) then
+            for k, v in pairs(ArmoryShared) do
+                if ( v.Specializations ) then
+                    for i, data in ipairs(v.Specializations) do
+                        local info = { ArmoryDbEntry.Load(data) };
+                        if ( #info == 7 ) then
+                            table.remove(info, 5);
+                            v.Specializations[i] = ArmoryDbEntry.Save(unpack(info));
+                        end
+                    end
+                end
+            end
+
             upgraded = true;
         end
 

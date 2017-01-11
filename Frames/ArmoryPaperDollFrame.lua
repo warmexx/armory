@@ -662,7 +662,7 @@ function ArmoryPaperDollFrame_SetStat(statFrame, unit, statIndex)
 		spec = Armory:GetSpecialization();
 		local role = Armory:GetSpecializationRole(spec);
 		if ( spec ) then
-			primaryStat = select(7, Armory:GetSpecializationInfo(spec, nil, nil, nil, Armory:UnitSex("player")));
+			primaryStat = select(6, Armory:GetSpecializationInfo(spec, nil, nil, nil, Armory:UnitSex("player")));
 		end
         -- Strength
         if ( statIndex == LE_UNIT_STAT_STRENGTH ) then
@@ -1760,13 +1760,13 @@ function ArmoryPaperDollFrame_UpdateTalent(overlay)
         parent = "ArmoryPaperDollTalentOverlay";
 		currentSpec = GetSpecialization();
 		if ( currentSpec ) then
-			_, specialism, _, _, _, role = GetSpecializationInfo(currentSpec, nil, nil, nil, UnitSex("player"));
+			_, specialism, _, _, role = GetSpecializationInfo(currentSpec, nil, nil, nil, UnitSex("player"));
 		end
 	else
 		parent = "ArmoryPaperDollTalent";
 		currentSpec = Armory:GetSpecialization();
 		if ( currentSpec ) then
-			_, specialism, _, _, _, role = Armory:GetSpecializationInfo(currentSpec, nil, nil, nil, Armory:UnitSex("player"));
+			_, specialism, _, _, role = Armory:GetSpecializationInfo(currentSpec, nil, nil, nil, Armory:UnitSex("player"));
 		end
 	end
 

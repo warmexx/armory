@@ -217,7 +217,7 @@ function ArmoryTalentFrameSpec_OnShow(self)
     local spec = ArmoryTalentFrame.selectedSpec;
 
     if ( spec ~= nil and spec > 0 ) then
-        local id, name, description, icon, background, role = Armory:GetSpecializationInfo(spec, nil, nil, nil, Armory:UnitSex("player"));
+        local id, name, description, icon, role = Armory:GetSpecializationInfo(spec, nil, nil, nil, Armory:UnitSex("player"));
         if ( role ~= nil ) then
             self.specIcon:Show();
             SetPortraitToTexture(self.specIcon, icon);
