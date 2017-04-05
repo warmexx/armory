@@ -58,20 +58,22 @@ function Armory:UpdateGearSets()
         self:PrintDebug("UPDATE", container);
         
         local oldNum = dbEntry:GetNumValues(container);
-        local newNum = _G.GetNumEquipmentSets();
+        local newNum = C_EquipmentSet.GetNumEquipmentSets();
         
         if ( newNum == 0 ) then
             dbEntry:SetValue(container, nil);
         else
-            local name;
+            local equipmentSetIDs = C_EquipmentSet.GetEquipmentSetIDs();
+            local equipmentSetID;
             for i = 1, max(oldNum, newNum) do
                 if ( i > newNum ) then
                     dbEntry:SetValue(2, container, i, nil);
                 else
-                    name = _G.GetEquipmentSetInfo(i);
-                    dbEntry:SetValue(2, container, i, _G.GetEquipmentSetInfo(i));
-                    dbEntry:SetValue(3, container, i, "Items", unpack(_G.GetEquipmentSetItemIDs(name) or {}));
-                    dbEntry:SetValue(3, container, i, "Locations", unpack(_G.GetEquipmentSetLocations(name) or {}));
+                    equipmentSetID = equipmentSetIDs[i];
+
+                    dbEntry:SetValue(2, container, i, C_EquipmentSet.GetEquipmentSetInfo(equipmentSetID));
+                    dbEntry:SetValue(3, container, i, "Items", unpack(C_EquipmentSet.GetItemIDs(equipmentSetID) or {}));
+                    dbEntry:SetValue(3, container, i, "Locations", unpack(C_EquipmentSet.GetItemLocations(equipmentSetID) or {}));
                 end
             end
         end
