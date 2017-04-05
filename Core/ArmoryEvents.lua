@@ -111,7 +111,7 @@ local function EvalCalendar(cvar, numDays, callback)
         for eventIndex = 1, numEvents do
             local title, hour, minute, calendarType, sequenceType, eventType, texture,
                 modStatus, inviteStatus, invitedBy, difficulty, inviteType,
-                sequenceIndex, numSequenceDays, difficultyName = CalendarGetDayEvent(monthOffset, eventDate.day, eventIndex);
+                sequenceIndex, numSequenceDays, difficultyName = C_Calendar.GetDayEvent(monthOffset, eventDate.day, eventIndex);
             
             local done = callback(eventIndex, Armory:MakeDate(eventDate.day, eventDate.month, eventDate.year, hour, minute),
                                   title, calendarType, sequenceType, eventType, texture,
