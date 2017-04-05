@@ -56,6 +56,20 @@
     </Scripts>
   </Button>
 
+	<Button name="ArmoryLargeQuestRewardItemButtonTemplate" inherits="LargeItemButtonTemplate, ArmoryQuestInfoRewardItemCodeTemplate" virtual="true">
+		<Layers>
+			<Layer level="OVERLAY" textureSubLevel="1">
+				<Texture parentKey="IconBorder" file="Interface\Common\WhiteIconFrame" hidden="true">
+					<Size x="37" y="37"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Icon"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Button>
+
   <Frame name="ArmoryQuestLogFrame" parent="ArmoryQuestFrame" hidden="true">
     <Size>
       <AbsDimension x="384" y="486"/>
@@ -487,7 +501,7 @@
     </Layers>
     <Frames>
       <Button parentKey="HonorFrame" inherits="LargeItemButtonTemplate" hidden="true"/>
-      <Button parentArray="RewardButtons" name="$parentQuestInfoItem1" inherits="LargeItemButtonTemplate, ArmoryQuestInfoRewardItemCodeTemplate" hidden="true"/>
+      <Button parentArray="RewardButtons" name="$parentQuestInfoItem1" inherits="ArmoryLargeQuestRewardItemButtonTemplate" hidden="true"/>
       <Frame parentKey="MoneyFrame" name="ArmoryQuestInfoMoneyFrame" inherits="MoneyFrameTemplate">
         <Anchors>
           <Anchor point="LEFT" relativeKey="$parent.ItemReceiveText" relativePoint="RIGHT" x="15" y="0"/>
@@ -619,7 +633,7 @@
     </Frames>
     <Scripts>
       <OnLoad>
-        self.buttonTemplate = "LargeItemButtonTemplate, ArmoryQuestInfoRewardItemCodeTemplate";
+        self.buttonTemplate = "ArmoryLargeQuestRewardItemButtonTemplate";
         self.spellRewardPool = CreateFramePool("BUTTON", self, "QuestSpellTemplate, ArmoryQuestInfoRewardSpellCodeTemplate");
         self.followerRewardPool = CreateFramePool("BUTTON", self, "LargeQuestInfoRewardFollowerTemplate");
         self.spellHeaderPool = CreateFontStringPool(self, "BACKGROUND", 0, "QuestInfoSpellHeaderTemplate");
