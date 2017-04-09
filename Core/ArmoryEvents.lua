@@ -109,16 +109,8 @@ local function EvalCalendar(cvar, numDays, callback)
  
         local numEvents = CalendarGetNumDayEvents(monthOffset, eventDate.day);
         for eventIndex = 1, numEvents do
-            local title, hour, minute, calendarType, sequenceType, eventType, texture,
-                modStatus, inviteStatus, invitedBy, difficulty, inviteType,
-                sequenceIndex, numSequenceDays, difficultyName = C_Calendar.GetDayEvent(monthOffset, eventDate.day, eventIndex);
-            
-            local done = callback(eventIndex, Armory:MakeDate(eventDate.day, eventDate.month, eventDate.year, hour, minute),
-                                  title, calendarType, sequenceType, eventType, texture,
-                                  modStatus, inviteStatus, invitedBy, difficulty, inviteType,
-                                  sequenceIndex, numSequenceDays, difficultyName);
-
-            if ( done ) then
+            local event = C_Calendar.GetDayEvent(monthOffset, eventDate.day, eventIndex);
+            if ( event and callback(eventIndex, Armory:MakeDate(eventDate.day, eventDate.month, eventDate.year, hour, minute), event) ) then
                 RestoreCalendarState(state);
                 return;
             end
@@ -187,14 +179,12 @@ function Armory:UpdateEvents()
         dbEntry:ClearContainer(container);
         
         EvalCalendar("calendarShowLockouts", ARMORY_MAX_EVENT_DAYS, 
-            function(eventIndex, eventTime,
-                     title, calendarType, sequenceType, eventType, texture,
-                     modStatus, inviteStatus, invitedBy, difficulty, inviteType,
-                     sequenceIndex, numSequenceDays, difficultyName)
+            function(eventIndex, eventTime, event)
 
-                if ( calendarType ~= "HOLIDAY" and calendarType ~= "SYSTEM" ) then
+                if ( event.calendarType ~= "HOLIDAY" and event.calendarType ~= "SYSTEM" ) then
                     key = CreateKey(self:GetServerTimeAsLocalTime(eventTime), eventIndex);
-                    dbEntry:SetValue(2, container, key, title, calendarType, eventType, texture, modStatus, inviteStatus, invitedBy, difficulty, inviteType, difficultyName);
+                    dbEntry:SetValue(2, container, key, event.title, event.calendarType, event.eventType, event.texture, event.modStatus, 
+                        event.inviteStatus, event.invitedBy, event.difficulty, event.inviteType, event.difficultyName);
                 end
             end
         );
@@ -320,8 +310,8 @@ function Armory:GetRaidReset(name)
     local resetTime;
     
     EvalCalendar("calendarShowResets", 7, 
-        function(eventIndex, eventTime, title, calendarType)
-            if ( calendarType == "RAID_RESET" and title == name ) then
+        function(eventIndex, eventTime, event)
+            if ( event.calendarType == "RAID_RESET" and event.title == name ) then
                 resetTime = eventTime;
                 return true;
             end
