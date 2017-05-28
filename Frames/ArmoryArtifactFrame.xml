@@ -3,20 +3,37 @@
 ..\..\..\FrameXML\UI.xsd">
   <Script file="ArmoryArtifactFrame.lua"/>
 
-  <Frame name="ArmoryArtifactDependencyLineTemplate" parentArray="DependencyLines" virtual="true">
+  <Frame name="ArmoryArtifactDependencyLineTemplate" frameLevel="1200" parentArray="DependencyLines" mixin="ArmoryArtifactLineMixin" virtual="true">
     <Layers>
       <Layer level="OVERLAY" textureSubLevel="-3">
-        <Line parentKey="Background" file="Interface/Artifacts/_Artifacts-DependencyBar-BG" thickness="12" horizTile="true" alpha="0" />
+        <Line parentKey="Background" file="Interface/Artifacts/_Artifacts-DependencyBar-BG" thickness="12" hWrapMode="REPEAT" alpha="0" />
       </Layer>
       <Layer level="OVERLAY" textureSubLevel="-2">
-        <Line parentKey="Fill" file="Interface/Artifacts/_Artifacts-DependencyBar-Fill" thickness="12" horizTile="true" alpha="0" />
+        <Line parentKey="Fill" file="Interface/Artifacts/_Artifacts-DependencyBar-Fill" thickness="12" hWrapMode="REPEAT" alpha="0" />
       </Layer>
       <Layer level="OVERLAY" textureSubLevel="-1">
-        <Line parentKey="FillScroll1" file="Interface/Artifacts/_Artifacts-DependencyBar-FillScroll1" thickness="12" horizTile="true" alphaMode="ADD" alpha="0" />
-        <Line parentKey="FillScroll2" file="Interface/Artifacts/_Artifacts-DependencyBar-FillScroll2" thickness="12" horizTile="true" alphaMode="ADD" alpha="0" />
+        <Line parentKey="FillScroll1" file="Interface/Artifacts/_Artifacts-DependencyBar-FillScroll1" thickness="12" hWrapMode="REPEAT" alphaMode="ADD" alpha="0" />
+        <Line parentKey="FillScroll2" file="Interface/Artifacts/_Artifacts-DependencyBar-FillScroll2" thickness="12" hWrapMode="REPEAT" alphaMode="ADD" alpha="0" />
       </Layer>
     </Layers>
   </Frame>
+
+	<Frame name="ArmoryArtifactCurvedDependencyLineTemplate" frameLevel="1200" parentArray="CurvedDependencyLines" mixin="ArmoryArtifactLineMixin" virtual="true">
+		<KeyValues>
+			<KeyValue key="IsCurved" type="boolean" value="true"/>
+		</KeyValues>
+		<Layers>
+			<Layer level="OVERLAY" textureSubLevel="-3">
+				<Texture parentKey="Background" file="Interface/Artifacts/_Artifacts-DependencyBar-BG" hWrapMode="REPEAT" alpha="0" />
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="-2">
+				<Texture parentKey="Fill" file="Interface/Artifacts/_Artifacts-DependencyBar-Fill" hWrapMode="REPEAT" alpha="0" />
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="-1">
+				<Texture parentKey="FillScroll1" file="Interface/Artifacts/_Artifacts-DependencyBar-FillScroll1" hWrapMode="REPEAT" alphaMode="ADD" alpha="0" />
+			</Layer>
+		</Layers>
+	</Frame>
 
   <Button name="ArmoryArtifactsRelicSlotTemplate" virtual="true">
     <Size x="72" y="72" />
@@ -79,24 +96,53 @@
     <NormalTexture parentKey="NormalTexture" />
     <HighlightTexture parentKey="HighlightTexture" alphaMode="ADD" />
   </Button>
+<!--
+  <Frame name="ArmoryArtifactFloatingRankStringTemplate" parentArray="FloatingNumbers" virtual="true">
+		<Size x="37" y="37" />
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Glow" alphaMode="ADD" atlas="Artifacts-Anim-Orb">
+					<Size x="50" y="50" />
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Rune" alphaMode="ADD">
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.Rank"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>-->
   
-  <Button name="ArmoryArtifactPowerButtonTemplate" parentArray="PowerButtons" mixin="ArmoryArtifactPowerButtonMixin" virtual="true">
+  <Button name="ArmoryArtifactPowerButtonTemplate" mixin="ArmoryArtifactPowerButtonMixin" frameLevel="1500" virtual="true">
     <Size x="37" y="37" />
     <Layers>
       <Layer level="OVERLAY" textureSubLevel="2">
-        <Texture parentKey="Icon" mask="Interface\CharacterFrame\TempPortraitAlphaMask">
+        <Texture parentKey="Icon">
           <Anchors>
             <Anchor point="CENTER"/>
           </Anchors>
         </Texture>
       </Layer>
       <Layer level="OVERLAY" textureSubLevel="1">
-        <Texture parentKey="IconDesaturated" mask="Interface\CharacterFrame\TempPortraitAlphaMask" desaturated="true">
+        <Texture parentKey="IconDesaturated" desaturated="true">
           <Anchors>
             <Anchor point="TOPLEFT" relativeKey="$parent.Icon" />
             <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" />
           </Anchors>
         </Texture>
+
+				<MaskTexture parentKey="CircleMask" file="Interface\CharacterFrame\TempPortraitAlphaMask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<MaskedTextures>
+						<MaskedTexture childKey="Icon"/>
+						<MaskedTexture childKey="IconDesaturated"/>
+					</MaskedTextures>
+				</MaskTexture>
       </Layer>
       <Layer level="OVERLAY" textureSubLevel="4">
         <Texture parentKey="IconBorder">
@@ -165,8 +211,8 @@
     </Scripts>
   </Button>
   
-  <PlayerModel name="ArmoryArtifactsModelTemplate" useParentLevel="true" virtual="true">
-    <Size x="719" y="615" />
+  <PlayerModel name="ArmoryArtifactsModelTemplate" virtual="true">
+    <Size x="895" y="615" />
     <Anchors>
       <Anchor point="BOTTOMLEFT"/>
     </Anchors>
@@ -190,15 +236,12 @@
       <Layer level="BORDER" textureSubLevel="-5">
         <Texture parentKey="BackgroundBack" />
       </Layer>
-      <Layer level="BORDER" textureSubLevel="-4">
-        <Texture parentKey="BackgroundBackShadow" atlas="Artifacts-BG-Shadow" useAtlasSize="true" />
-      </Layer>
       <Layer level="OVERLAY" textureSubLevel="-6">
         <Texture parentKey="HeaderBackground" atlas="Artifacts-HeaderBG" />
       </Layer>
     </Layers>
     <Frames>
-      <Frame parentKey="TitleContainer" mixin="ArmoryArtifactTitleTemplateMixin" useParentLevel="true">
+      <Frame parentKey="TitleContainer" mixin="ArmoryArtifactTitleTemplateMixin" frameLevel="2000">
         <Anchors>
           <Anchor point="TOPLEFT" />
           <Anchor point="TOPRIGHT" />
@@ -250,8 +293,20 @@
           <OnEvent method="OnEvent" />
         </Scripts>
       </Frame>
-      <PlayerModel parentKey="AltModel" inherits="ArmoryArtifactsModelTemplate"/>
-      <PlayerModel parentKey="Model" inherits="ArmoryArtifactsModelTemplate">
+		  <ModelScene parentKey="Tier2ForgingScene" setAllPoints="true" inherits="ModelSceneMixinTemplate" frameLevel="300">
+				<Layers>
+					<Layer level="OVERLAY" textureSubLevel="-1">
+						<Texture parentKey="BackgroundMiddle" alpha="0">
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+								<Anchor point="BOTTOMRIGHT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</ModelScene>
+      <PlayerModel parentKey="AltModel" inherits="ArmoryArtifactsModelTemplate" frameLevel="500"/>
+      <PlayerModel parentKey="Model" inherits="ArmoryArtifactsModelTemplate" frameLevel="500">
         <Layers>
           <Layer level="OVERLAY" textureSubLevel="-7">
             <Texture parentKey="BackgroundFront" alpha=".5">
@@ -261,13 +316,269 @@
               </Anchors>
             </Texture>
           </Layer>
+				  <Layer level="OVERLAY" textureSubLevel="2">
+						<Texture parentKey="BackgroundBackShadow" atlas="Artifacts-BG-Shadow" useAtlasSize="true" />
+					</Layer>
         </Layers>
       </PlayerModel>
+			<Frame parentKey="CrestFrame" frameLevel="1000">
+				<Size x="100" y="100"/>
+				<Layers>
+					<!-- Animation Textures Start -->
+					<!--<Layer level="OVERLAY" textureSubLevel="-7">
+						<Texture parentKey="Cracks" atlas="Artifacts-Anim-CrackedGround" alpha="0" alphaMode="ADD">
+							<Size x="400" y="400"/>
+							<Anchors>
+								<Anchor point="CENTER" x="10" y="-10"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="Cracks2" atlas="Artifacts-Anim-CrackedGround" alpha="0" alphaMode="ADD">
+							<Size x="400" y="400"/>
+							<Anchors>
+								<Anchor point="CENTER" x="10" y="-10"/>
+							</Anchors>
+						</Texture>
+					</Layer>-->
+					<!--<Layer level="OVERLAY" textureSubLevel="-8">
+						<Texture parentKey="CrestRune1" hidden="false" alpha="0" alphaMode="BLEND" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestRune2" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestRune3" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestRune4" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestRune5" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestRune6" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestRune7" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestRune8" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestRune9" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestRune10" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestRune11" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestRune12" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestRune13" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestRune14" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
+							</Anchors>
+						</Texture>
+					</Layer>-->
+					<!--<Layer level="ARTWORK">
+						<Texture parentKey="CrestRuneGold" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-CrestRune-Gold" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestShine" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-PerkRing-Final-Shine">
+							<Size x="241" y="241"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY" textureSubLevel="4">
+						<Texture parentKey="Whirls" alpha="0" atlas="ArtifactsFX-Whirls" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="BigWhirls" alpha="0" alphaMode="ADD" atlas="ArtifactsFX-Whirls" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+							<Color r="1" g="0.83921568627451" b="0.45098039215686"/>
+						</Texture>
+						<Texture parentKey="SpinningGlows" alpha="0" alphaMode="ADD" atlas="ArtifactsFX-SpinningGlowys" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="SpinningGlows2" alpha="0" alphaMode="ADD" atlas="ArtifactsFX-SpinningGlowys" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="RingGlow" alpha="0" alphaMode="ADD" atlas="ArtifactsFX-YellowRing" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+						<Texture parentKey="RingBurst" alpha="0" alphaMode="ADD" atlas="ArtifactsFX-YellowRing" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="BigGlow" alpha="0" alphaMode="ADD" atlas="Artifacts-PerkRing-MainProc-Glow" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="DragonShake" alpha="0" alphaMode="ADD" atlas="Artifacts-PerkRing-GoldMedal" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="RelicRingBurstGlow" alpha="0" alphaMode="ADD">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.Icon" />
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY" textureSubLevel="6">
+						<Texture parentKey="StarBurst" alpha="0" alphaMode="ADD" atlas="ArtifactsFX-StarBurst" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="WhiteStarBurst" alpha="0" alphaMode="ADD" atlas="AftLevelup-WhiteStarBurst" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="PointBurstLeft" alpha="0" alphaMode="ADD" atlas="ArtifactsFX-PointSideBurstLeft" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="RIGHT" relativeKey="$parent.RankBorder" relativePoint="LEFT" x="14" y="0"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="PointBurstRight" alpha="0" alphaMode="ADD" atlas="ArtifactsFX-PointSideBurstRight" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="LEFT" relativeKey="$parent.RankBorder" relativePoint="RIGHT" x="-14" y="0"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="RelicTraitBurst" alpha="0" alphaMode="ADD">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.Icon" />
+							</Anchors>
+						</Texture>
+						<Texture parentKey="TraitGlow" alpha="0" alphaMode="ADD" atlas="Artifacts-PerkRing-WhiteGlow" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="YellowRing" alpha="0" atlas="ArtifactsFX-YellowRing" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="YellowRingStationary" alpha="0" atlas="ArtifactsFX-YellowRing" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="CrestSparks" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-Anim-Sparks" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestSparks2" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-Anim-Sparks" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestGlowies" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-Anim-Glowies" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestGlowies2" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-Anim-Glowies" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestGlowies3" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-Anim-Glowies" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestGlowies4" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-Anim-Glowies" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestGlowies5" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-Anim-Glowies" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="CrestGlowies6" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-Anim-Glowies" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>-->
+					<!-- Animation Textures -->
+				</Layers>
+			</Frame>
+			<ModelScene parentKey="Tier2ModelScene" inherits="ModelSceneMixinTemplate" frameLevel="700">
+				<Size x="350" y="350"/>
+				<Anchors>
+					<Anchor point="CENTER" relativeKey="$parent.CrestFrame" relativePoint="CENTER" x="0" y="0"/>
+				</Anchors>
+			</ModelScene>
+			<ModelScene parentKey="Tier2SlamEffectModelScene" inherits="ModelSceneMixinTemplate" hidden="true" frameLevel="700">
+				<Size x="500" y="500"/>
+				<Anchors>
+					<Anchor point="CENTER" relativeKey="$parent.Tier2ModelScene" relativePoint="CENTER" x="0" y="0"/>
+				</Anchors>
+			</ModelScene>
     </Frames>
+    <Scripts>
+      <OnLoad method="OnLoad" />
+    </Scripts>
   </Frame>
 
   <Frame name="ArmoryArtifactFrame" toplevel="true" movable="true" parent="UIParent" enableMouse="true" hidden="true" mixin="ArmoryArtifactFrameMixin">
-    <Size x="720" y="615"/>
+    <Size x="896" y="615"/>
     <Anchors>
       <Anchor point="TOPLEFT" x="35" y="-9"/>
     </Anchors>
@@ -277,7 +588,7 @@
       </Layer>
     </Layers>
     <Frames>
-      <Frame parentKey="BorderFrame" setAllPoints="true" frameLevel="1000">
+      <Frame parentKey="BorderFrame" setAllPoints="true" frameLevel="2200">
         <Layers>
           <Layer level="OVERLAY">
             <Texture parentKey="ForgeBottomLeftCorner" atlas="ForgeBorder-CornerBottomLeft" useAtlasSize="true">
@@ -335,13 +646,30 @@
       <Frame parentKey="ForgeBadgeFrame" setAllPoints="true" frameStrata="HIGH">
         <Layers>
           <Layer level="OVERLAY">
-            <Texture parentKey="ForgeClassBadgeIcon">
+            <Texture parentKey="ItemIcon">
               <Anchors>
                 <Anchor point="CENTER" relativePoint="TOPLEFT" x="20" y="-20" />
               </Anchors>
             </Texture>
+
+						<MaskTexture parentKey="CircleMask" file="Interface\CharacterFrame\TempPortraitAlphaMask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeKey="$parent.ItemIcon"/>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.ItemIcon"/>
+							</Anchors>
+							<MaskedTextures>
+								<MaskedTexture childKey="ItemIcon"/>
+							</MaskedTextures>
+						</MaskTexture>
           </Layer>
-          <Layer level="OVERLAY" textureSubLevel="2">
+          <Layer level="OVERLAY" textureSubLevel="1">
+						<Texture parentKey="ItemIconBorder" atlas="Artifacts-ItemIconBorder" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.ItemIcon"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY" textureSubLevel="3">
             <Texture parentKey="ForgeLevelBackground" file="Interface\Minimap\MiniMap-TrackingBorder">
               <Size x="64" y="64"/>
               <Anchors>
@@ -355,7 +683,7 @@
               <Color r="1.0" g="0.82" b="0"/>
             </FontString>
           </Layer>
-          <Layer level="OVERLAY" textureSubLevel="1">
+          <Layer level="OVERLAY" textureSubLevel="2">
             <Texture parentKey="ForgeLevelBackgroundBlack" alpha="0.7">
               <Size x="22" y="22"/>
               <Anchors>
@@ -366,7 +694,7 @@
           </Layer>
         </Layers>
       </Frame>
-      <Frame parentKey="ForgeLevelFrame">
+      <Frame parentKey="ForgeLevelFrame" frameStrata="HIGH">
         <Anchors>
           <Anchor point="TOPLEFT" relativeKey="$parent.ForgeBadgeFrame.ForgeLevelBackground" />
           <Anchor point="BOTTOMRIGHT" relativeKey="$parent.ForgeBadgeFrame.ForgeLevelBackground" />
@@ -381,7 +709,7 @@
       
       <Frame parentKey="PerksTab" setAllPoints="true" inherits="ArmoryArtifactPerksTabTemplate" />
       
-      <Button parentKey="CloseButton" inherits="UIPanelCloseButton" frameLevel="1500">
+      <Button parentKey="CloseButton" inherits="UIPanelCloseButton" frameLevel="2500">
         <Anchors>
           <Anchor point="TOPRIGHT" relativeKey="$parent.BorderFrame.ForgeTopRightCorner" x="-5" y="-6" />
         </Anchors>

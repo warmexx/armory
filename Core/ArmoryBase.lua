@@ -40,7 +40,7 @@ if ( not Armory ) then
 
         title = ARMORY_TITLE,
         version = GetAddOnMetadata("Armory", "Version"),
-        dbVersion = 44,
+        dbVersion = 45,
         interface = _G.GetBuildInfo(),
     };
 end
@@ -622,6 +622,18 @@ function Armory:IsDbCompatible()
                             v.Specializations[i] = ArmoryDbEntry.Save(unpack(info));
                         end
                     end
+                end
+            end
+
+            upgraded = true;
+
+        -- convert from 44 to 45
+        elseif ( dbVersion == 44 ) then
+            for realm in pairs(ArmoryDB) do
+                for character in pairs(ArmoryDB[realm]) do
+                    entry = ArmoryDB[realm][character];
+
+                    entry.Artifacts = nil;
                 end
             end
 
@@ -1701,6 +1713,7 @@ function Armory:BuildColoredListString(...)
 end
 
 function Armory:CopyTable(src, dest)
+    dest = dest or {};
     for k, v in pairs(src) do
         if ( type(v) == "table" ) then
             if ( type(dest[k]) == "table" ) then
@@ -1709,10 +1722,11 @@ function Armory:CopyTable(src, dest)
                 dest[k] = {};
             end
             self:CopyTable(v, dest[k]);
-        else
+        elseif ( type(v) ~= "function" ) then
             dest[k] = v;
         end
     end
+    return dest;
 end
 
 function Armory:FillTable(t, ...)
