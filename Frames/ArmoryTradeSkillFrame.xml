@@ -662,6 +662,21 @@
                   <Anchor point="TOPLEFT" x="8" y="-3"/>
                 </Anchors>
                 <Layers>
+                  <Layer level="OVERLAY">
+                    <Texture parentKey="IconBorder">
+                      <Size x="37" y="37"/>
+                      <Anchors>
+                        <Anchor point="CENTER" x="0"/>
+                      </Anchors>
+                    </Texture>
+                    <Texture parentKey="ResultBorder" atlas="tradeskills-iconborder">
+                      <Size x="41" y="41"/>
+                      <Anchors>
+                        <Anchor point="CENTER" x="0"/>
+                      </Anchors>
+                    </Texture>
+                  </Layer>
+
                   <Layer level="ARTWORK">
                     <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT" hidden="false">
                       <Anchors>
