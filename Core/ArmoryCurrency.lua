@@ -226,8 +226,7 @@ function Armory:CountCurrency(link)
         end
         for i = 1, dbEntry:GetNumValues(container) do
             local currencyName, isHeader, _, _, _, count, icon = dbEntry:GetValue(container, i);
-            local isPVPCurrency = icon and icon:find("PVPCurrency");
-            if ( currencyName and not isHeader and not isPVPCurrency and strtrim(currencyName) == strtrim(name) ) then
+            if ( currencyName and not isHeader and strtrim(currencyName) == strtrim(name) ) then
                 return count;
             end
         end
