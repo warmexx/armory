@@ -146,7 +146,7 @@ function ArmoryTokenFrame_Update()
                 button.categoryRight:Hide();
 				button.categoryMiddle:Hide();
                 button.expandIcon:Hide();
-                button.count:SetText(count);
+                button.count:SetText(BreakUpLargeNumbers(count));
                 button.icon:SetTexture(icon);
                 if ( isWatched ) then
                     button.check:Show();

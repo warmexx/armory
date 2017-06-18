@@ -209,9 +209,10 @@ function ArmoryConquestFrameButton_OnEnter(self)
     tooltip.SeasonWon:SetText(PVP_GAMES_WON..seasonWon);
     tooltip.SeasonGamesPlayed:SetText(PVP_GAMES_PLAYED..seasonPlayed);
 
-	local maxWidth = max(tooltip.Title:GetStringWidth(),tooltip.WeeklyBest:GetStringWidth(),
-                        tooltip.WeeklyGamesPlayed:GetStringWidth(),	tooltip.SeasonBest:GetStringWidth(),
-                        tooltip.SeasonGamesPlayed:GetStringWidth());
+	local maxWidth = 0;
+	for i, fontString in ipairs(tooltip.Content) do
+		maxWidth = math.max(maxWidth, fontString:GetStringWidth());
+	end
 
     tooltip:SetWidth(maxWidth + CONQUEST_TOOLTIP_PADDING);
     tooltip:SetPoint("TOPLEFT", self, "TOPRIGHT", 0, 0);

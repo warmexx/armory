@@ -7,6 +7,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 ==== alpha ====
 # Note: Artifact relics will be cleared
 # Adjustments have been made for patch 7.2.0
+# Adjustments have been made for patch 7.2.5
 
 
 ==== v14.1.0 ====

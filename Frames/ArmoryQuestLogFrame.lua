@@ -763,8 +763,9 @@ function ArmoryQuestInfo_ShowRewards()
             local spellBucket = spellBuckets[spellBucketType];
             if spellBucket then
                 for i, rewardSpellIndex in ipairs(spellBucket) do
-                    local texture, name, isTradeskillSpell, isSpellLearned, _, isBoostSpell, garrFollowerID = Armory:GetQuestLogRewardSpell(rewardSpellIndex);
-                    if ( i == 1 ) then
+                    local texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID = Armory:GetQuestLogRewardSpell(rewardSpellIndex);
+                    -- hideSpellLearnText is a quest flag
+                    if ( i == 1 and not hideSpellLearnText ) then
                         local header = rewardsFrame.spellHeaderPool:Acquire();
                         header:SetText(QUEST_INFO_SPELL_REWARD_TO_HEADER[spellBucketType]);
                         header:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
@@ -914,13 +915,16 @@ function ArmoryQuestInfo_ShowRewards()
             questItem = QuestInfo_GetRewardButton(rewardsFrame, index);
             questItem.type = "reward";
             questItem.objectType = "currency";
-            name, texture, numItems = Armory:GetQuestLogRewardCurrencyInfo(i);
+            local currencyID;
+            name, texture, numItems, currencyID = Armory:GetQuestLogRewardCurrencyInfo(i);
             if ( name and texture and numItems ) then
                 questItem:SetID(i)
                 questItem:Show();
                 -- For the tooltip
                 questItem.Name:SetText(name);
                 SetItemButtonCount(questItem, numItems, true);
+				local currencyColor = GetColorForCurrencyReward(currencyID, numItems);
+				questItem.Count:SetTextColor(currencyColor:GetRGB());
                 SetItemButtonTexture(questItem, texture);
                 SetItemButtonTextureVertexColor(questItem, 1.0, 1.0, 1.0);
                 SetItemButtonNameFrameVertexColor(questItem, 1.0, 1.0, 1.0);
