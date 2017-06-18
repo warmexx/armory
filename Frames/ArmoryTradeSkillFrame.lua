@@ -850,7 +850,7 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
 	if ( recipeInfo and recipeInfo.type == "recipe" ) then
         self.Contents.RecipeName:SetText(recipeInfo.name);
 
-        local recipeLink = C_TradeSkillUI.GetRecipeItemLink(self.selectedRecipeID);
+        local recipeLink = C_TradeSkillUI.GetRecipeItemLink(recipeInfo.recipeID);
         if ( recipeInfo.productQuality ) then
             self.Contents.RecipeName:SetTextColor(GetItemQualityColor(recipeInfo.productQuality));
         else
