@@ -414,7 +414,8 @@ local function GetProfessionLineValue(index)
         info.skillLineStartingRank, 
         info.disabled, 
         info.disabledReason, 
-        info.categoryID = dbEntry:GetValue(container, selectedSkill, itemContainer, professionLines[index], "Info");
+        info.categoryID,
+        info.productQuality = dbEntry:GetValue(container, selectedSkill, itemContainer, professionLines[index], "Info");
         
         info.cooldown, 
         info.isDayCooldown, 
@@ -683,7 +684,8 @@ local function GetTradeSkillLineInfo(info)
         info.skillLineStartingRank, 
         info.disabled, 
         info.disabledReason, 
-        info.categoryID;
+        info.categoryID,
+        info.productQuality;
 end
 
 local invSlotTypes = {};
