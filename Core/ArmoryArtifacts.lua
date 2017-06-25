@@ -208,7 +208,8 @@ function Armory:GetPowerHyperlink(id, artifact)
 end
 
 function Armory:IsPowerKnown(id, artifact)
-    return self:GetPowerInfo(id, artifact) and true or false;
+    local powerInfo = self:GetPowerInfo(id, artifact);
+    return powerInfo and powerInfo.currentRank > 0 or false;
 end
 
 function Armory:GetNumRelicSlots(artifact)
