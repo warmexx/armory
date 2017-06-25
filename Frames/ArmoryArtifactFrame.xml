@@ -339,7 +339,7 @@
 							</Anchors>
 						</Texture>
 					</Layer>-->
-					<!--<Layer level="OVERLAY" textureSubLevel="-8">
+					<Layer level="OVERLAY" textureSubLevel="-8">
 						<Texture parentKey="CrestRune1" hidden="false" alpha="0" alphaMode="BLEND" atlas="Artifacts-DeathKnightFrost-BG-Rune" useAtlasSize="true">
 							<Anchors>
 								<Anchor point="CENTER"/>
@@ -410,8 +410,8 @@
 								<Anchor point="CENTER" relativeKey="$parent.CrestRune1"/>
 							</Anchors>
 						</Texture>
-					</Layer>-->
-					<!--<Layer level="ARTWORK">
+					</Layer>
+					<Layer level="ARTWORK">
 						<Texture parentKey="CrestRuneGold" hidden="false" alpha="0" alphaMode="ADD" atlas="Artifacts-CrestRune-Gold" useAtlasSize="true">
 							<Anchors>
 								<Anchor point="CENTER"/>
@@ -424,7 +424,7 @@
 							</Anchors>
 						</Texture>
 					</Layer>
-					<Layer level="OVERLAY" textureSubLevel="4">
+					<!--<Layer level="OVERLAY" textureSubLevel="4">
 						<Texture parentKey="Whirls" alpha="0" atlas="ArtifactsFX-Whirls" useAtlasSize="true">
 							<Anchors>
 								<Anchor point="CENTER"/>

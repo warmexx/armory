@@ -179,11 +179,11 @@ local NUM_CURVED_LINE_SEGEMENTS = 20;
 local CURVED_LINE_RADIUS_SCALAR = 0.98;
 local CURVED_LINE_THICKNESS = 5;
 
--- local TIER_2_FORGING_MODEL_SCENE_ID = 55;
--- local TIER_2_FORGING_EFFECT_MODEL_ID = 382335;--"SPELLS\\EASTERN_PLAGUELANDS_BEAM_EFFECT.M2";
+local TIER_2_FORGING_MODEL_SCENE_ID = 55;
+local TIER_2_FORGING_EFFECT_MODEL_ID = 382335;--"SPELLS\\EASTERN_PLAGUELANDS_BEAM_EFFECT.M2";
 
--- local TIER_2_SLAM_EFFECT_MODEL_SCENE_ID = 57;
--- local TIER_2_SLAM_EFFECT_MODEL_ID = 1369310; --"SPELLS\\CFX_WARRIOR_THUNDERCLAP_CASTWORLD.M2"
+local TIER_2_SLAM_EFFECT_MODEL_SCENE_ID = 57;
+local TIER_2_SLAM_EFFECT_MODEL_ID = 1369310; --"SPELLS\\CFX_WARRIOR_THUNDERCLAP_CASTWORLD.M2"
 
 function ArmoryArtifactPerksMixin:OnLoad()
 	self.powerButtonPool = CreateFramePool("BUTTON", self, "ArmoryArtifactPowerButtonTemplate");
@@ -247,24 +247,24 @@ function ArmoryArtifactPerksMixin:RefreshBackground()
         local bgAtlas = ("%s-BG"):format(artifactArtInfo.textureKit);
         self.BackgroundBack:SetAtlas(bgAtlas);
         self.Model.BackgroundFront:SetAtlas(bgAtlas);
-		-- self.Tier2ForgingScene.BackgroundMiddle:SetAtlas(bgAtlas);
-		-- self.Tier2ForgingScene.BackgroundMiddle:Show();
+		self.Tier2ForgingScene.BackgroundMiddle:SetAtlas(bgAtlas);
+		self.Tier2ForgingScene.BackgroundMiddle:Show();
 
-		-- local crestAtlas = ("%s-BG-Rune"):format(artifactArtInfo.textureKit);
-		-- self.CrestFrame.CrestRune1:SetAtlas(crestAtlas, true);
-		-- self.CrestFrame.CrestRune2:SetAtlas(crestAtlas, true);
-		-- self.CrestFrame.CrestRune3:SetAtlas(crestAtlas, true);
-		-- self.CrestFrame.CrestRune4:SetAtlas(crestAtlas, true);
-		-- self.CrestFrame.CrestRune5:SetAtlas(crestAtlas, true);
-		-- self.CrestFrame.CrestRune6:SetAtlas(crestAtlas, true);
-		-- self.CrestFrame.CrestRune7:SetAtlas(crestAtlas, true);
-		-- self.CrestFrame.CrestRune8:SetAtlas(crestAtlas, true);
-		-- self.CrestFrame.CrestRune9:SetAtlas(crestAtlas, true);
-		-- self.CrestFrame.CrestRune10:SetAtlas(crestAtlas, true);
-		-- self.CrestFrame.CrestRune11:SetAtlas(crestAtlas, true);
-		-- self.CrestFrame.CrestRune12:SetAtlas(crestAtlas, true);
-		-- self.CrestFrame.CrestRune13:SetAtlas(crestAtlas, true);
-		-- self.CrestFrame.CrestRune14:SetAtlas(crestAtlas, true);
+		local crestAtlas = ("%s-BG-Rune"):format(artifactArtInfo.textureKit);
+		self.CrestFrame.CrestRune1:SetAtlas(crestAtlas, true);
+		self.CrestFrame.CrestRune2:SetAtlas(crestAtlas, true);
+		self.CrestFrame.CrestRune3:SetAtlas(crestAtlas, true);
+		self.CrestFrame.CrestRune4:SetAtlas(crestAtlas, true);
+		self.CrestFrame.CrestRune5:SetAtlas(crestAtlas, true);
+		self.CrestFrame.CrestRune6:SetAtlas(crestAtlas, true);
+		self.CrestFrame.CrestRune7:SetAtlas(crestAtlas, true);
+		self.CrestFrame.CrestRune8:SetAtlas(crestAtlas, true);
+		self.CrestFrame.CrestRune9:SetAtlas(crestAtlas, true);
+		self.CrestFrame.CrestRune10:SetAtlas(crestAtlas, true);
+		self.CrestFrame.CrestRune11:SetAtlas(crestAtlas, true);
+		self.CrestFrame.CrestRune12:SetAtlas(crestAtlas, true);
+		self.CrestFrame.CrestRune13:SetAtlas(crestAtlas, true);
+		self.CrestFrame.CrestRune14:SetAtlas(crestAtlas, true);
     else
 		self.textureKit = nil;
     end
@@ -365,35 +365,35 @@ function ArmoryArtifactPerksMixin:RefreshPowerTiers()
 			self.Tier2ModelScene:Show();
 			self.Tier2ModelScene:SetFromModelSceneID(artifactArtInfo.uiModelSceneID, true);
 		
-			-- local effect = self.Tier2ModelScene:GetActorByTag("effect");
-			-- if ( effect ) then
-			-- 	effect:SetModelByCreatureDisplayID(11686);
-			-- 	effect:ApplySpellVisualKit(artifactArtInfo.spellVisualKitID);
-			-- end
+			local effect = self.Tier2ModelScene:GetActorByTag("effect");
+			if ( effect ) then
+				effect:SetModelByCreatureDisplayID(11686);
+				effect:ApplySpellVisualKit(artifactArtInfo.spellVisualKitID);
+			end
 			
-			-- self.Tier2ForgingScene:Show();
-			-- self.Tier2ForgingScene:SetFromModelSceneID(TIER_2_FORGING_MODEL_SCENE_ID, true);
-			-- local forgingEffect = self.Tier2ForgingScene:GetActorByTag("effect");
-			-- if ( forgingEffect ) then
-			-- 	forgingEffect:SetModelByFileID(TIER_2_FORGING_EFFECT_MODEL_ID);
-			-- 	forgingEffect:SetAlpha(0.0);
-			-- 	self.Tier2ForgingScene.ForgingEffect = forgingEffect;
-			-- end
+			self.Tier2ForgingScene:Show();
+			self.Tier2ForgingScene:SetFromModelSceneID(TIER_2_FORGING_MODEL_SCENE_ID, true);
+			local forgingEffect = self.Tier2ForgingScene:GetActorByTag("effect");
+			if ( forgingEffect ) then
+				forgingEffect:SetModelByFileID(TIER_2_FORGING_EFFECT_MODEL_ID);
+				forgingEffect:SetAlpha(0.0);
+				self.Tier2ForgingScene.ForgingEffect = forgingEffect;
+			end
 			
-			-- self.Tier2SlamEffectModelScene:SetFromModelSceneID(TIER_2_SLAM_EFFECT_MODEL_SCENE_ID, true);
-			-- local slamEffect = self.Tier2SlamEffectModelScene:GetActorByTag("effect");
-			-- if ( slamEffect ) then
-			-- 	slamEffect:SetModelByFileID(TIER_2_SLAM_EFFECT_MODEL_ID);
-			-- end
+			self.Tier2SlamEffectModelScene:SetFromModelSceneID(TIER_2_SLAM_EFFECT_MODEL_SCENE_ID, true);
+			local slamEffect = self.Tier2SlamEffectModelScene:GetActorByTag("effect");
+			if ( slamEffect ) then
+				slamEffect:SetModelByFileID(TIER_2_SLAM_EFFECT_MODEL_ID);
+			end
 		else
 			self.CrestFrame:Hide();
 			self.Tier2ModelScene:Hide();
-			-- self.Tier2SlamEffectModelScene:Hide();
+			self.Tier2SlamEffectModelScene:Hide();
 		end
 	else
 		self.CrestFrame:Hide();
 		self.Tier2ModelScene:Hide();
-		-- self.Tier2SlamEffectModelScene:Hide();
+		self.Tier2SlamEffectModelScene:Hide();
 	end
 end
 
@@ -493,7 +493,7 @@ function ArmoryArtifactPerksMixin:Refresh(newItem)
 		
     if ( Armory:GetArtifactTier() == 2 or Armory:IsMaxedByRulesOrEffect() ) then
         self:ShowTier2();
-        --self.CrestFrame.CrestRune1:SetAlpha(1.0);
+        self.CrestFrame.CrestRune1:SetAlpha(1.0);
         self.Model.BackgroundFront:SetAlpha(self.Model.backgroundFrontTargetAlpha);
         if ( Armory:IsMaxedByRulesOrEffect() ) then
             local finalTier1Button = self:GetFinalPowerButtonByTier(1);
@@ -763,7 +763,7 @@ function ArmoryArtifactPerksMixin:ShowTier2()
 		end
 	end
 
-	--self.CrestFrame.CrestRune1:Show();
+	self.CrestFrame.CrestRune1:Show();
 	
 	self.Tier2ModelScene:Show();
 end
@@ -947,7 +947,7 @@ end
 function ArmoryArtifactPowerButtonMixin:GenerateRune()
 	local NUM_RUNE_TYPES = 11;
 	local runeIndex = math.random(1, NUM_RUNE_TYPES);
-	return ("Rune-%02d-light"):format(runeIndex)
+	return ("Rune-%02d-light"):format(runeIndex);
 end
 
 function ArmoryArtifactPowerButtonMixin:OnEnter()
@@ -1200,7 +1200,7 @@ function ArmoryArtifactPowerButtonMixin:IsMaxRank()
 end
 
 function ArmoryArtifactPowerButtonMixin:HasRanksFromCurrentTier()
-	if self.tier == C_ArtifactUI.GetArtifactTier() then
+	if ( self.tier == Armory:GetArtifactTier() ) then
 		return self.currentRank > 0;
 	else
 		return self.currentRank > self.maxRank - self.numMaxRankBonusFromTier;
