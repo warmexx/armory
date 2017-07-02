@@ -8,4 +8,4 @@
 
 local L = LibStub("AceLocale-3.0"):NewLocale("Armory", "enUS", true);
 
---@localization(locale="enUS", format="lua_additive_table")@
+--@localization(locale="enUS", format="lua_additive_table", handle-subnamespaces="none")@
