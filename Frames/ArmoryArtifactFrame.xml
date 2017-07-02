@@ -16,6 +16,18 @@
         <Line parentKey="FillScroll2" file="Interface/Artifacts/_Artifacts-DependencyBar-FillScroll2" thickness="12" hWrapMode="REPEAT" alphaMode="ADD" alpha="0" />
       </Layer>
     </Layers>
+		<Animations>
+			<AnimationGroup parentKey="ScrollAnim" setToFinalAlpha="true" looping="REPEAT">
+				<TextureCoordTranslation childKey="FillScroll1" duration="8" order="1" offsetU="1" offsetV="0" />
+				<TextureCoordTranslation childKey="FillScroll2" duration="8" order="1" offsetU="-1" offsetV="0" />
+			</AnimationGroup>
+			<AnimationGroup parentKey="FadeAnim" setToFinalAlpha="true">
+				<Alpha parentKey="Background" childKey="Background" duration=".25" order="0"/>
+				<Alpha parentKey="Fill" childKey="Fill" duration=".25" order="0"/>
+				<Alpha parentKey="FillScroll1" childKey="FillScroll1" duration=".25" order="0"/>
+				<Alpha parentKey="FillScroll2" childKey="FillScroll2" duration=".25" order="0"/>
+			</AnimationGroup>
+		</Animations>
   </Frame>
 
 	<Frame name="ArmoryArtifactCurvedDependencyLineTemplate" frameLevel="1200" parentArray="CurvedDependencyLines" mixin="ArmoryArtifactLineMixin" virtual="true">
@@ -33,6 +45,16 @@
 				<Texture parentKey="FillScroll1" file="Interface/Artifacts/_Artifacts-DependencyBar-FillScroll1" hWrapMode="REPEAT" alphaMode="ADD" alpha="0" />
 			</Layer>
 		</Layers>
+		<Animations>
+			<AnimationGroup parentKey="ScrollAnim" setToFinalAlpha="true" looping="REPEAT">
+				<TextureCoordTranslation childKey="FillScroll1" duration="8" order="1" offsetU="1" offsetV="0" />
+			</AnimationGroup>
+			<AnimationGroup parentKey="FadeAnim" setToFinalAlpha="true">
+				<Alpha parentKey="Background" childKey="Background" duration=".25" order="0"/>
+				<Alpha parentKey="Fill" childKey="Fill" duration=".25" order="0"/>
+				<Alpha parentKey="FillScroll1" childKey="FillScroll1" duration=".25" order="0"/>
+			</AnimationGroup>
+		</Animations>
 	</Frame>
 
   <Button name="ArmoryArtifactsRelicSlotTemplate" virtual="true">

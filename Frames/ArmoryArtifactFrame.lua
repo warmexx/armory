@@ -341,6 +341,7 @@ function ArmoryArtifactPerksMixin:RefreshFinalPowerForTier(tier, isUnlocked)
 		if ( isUnlocked ) then
 			if ( self.wasFinalPowerButtonUnlockedByTier[tier] == false ) then
 				self.wasFinalPowerButtonUnlockedByTier[tier] = true;
+                finalTierButton:Show();
 			end
 		else
 			finalTierButton:Hide();
@@ -482,6 +483,7 @@ function ArmoryArtifactPerksMixin:Refresh(newItem)
         self.wasFinalPowerButtonUnlockedByTier = {};
     elseif ( self.hasBoughtAnyPowers ~= hasBoughtAnyPowers ) then
         self:HideAllLines();
+        
         self.hasBoughtAnyPowers = hasBoughtAnyPowers;
         if ( hasBoughtAnyPowers ) then
             reveal = true;
@@ -1323,6 +1325,10 @@ end
 
 ArmoryArtifactLineMixin = {};
 
+ArmoryArtifactLineMixin.LINE_FADE_ANIM_TYPE_CONNECTED = 1;
+ArmoryArtifactLineMixin.LINE_FADE_ANIM_TYPE_UNLOCKED = 2;
+ArmoryArtifactLineMixin.LINE_FADE_ANIM_TYPE_LOCKED = 3;
+
 function ArmoryArtifactLineMixin:SetState(lineState)
 	self.lineState = lineState;
 	if ( lineState == LINE_STATE_CONNECTED ) then
@@ -1340,14 +1346,62 @@ function ArmoryArtifactLineMixin:SetConnected()
 	if ( self.FillScroll2 ) then
 		self.FillScroll2:SetVertexColor(self.connectedColor:GetRGB());
 	end
+
+	self:PlayLineFadeAnim(self.LINE_FADE_ANIM_TYPE_CONNECTED);
 end
 
 function ArmoryArtifactLineMixin:SetDisconnected()
 	self.Fill:SetVertexColor(self.disconnectedColor:GetRGB());
+
+	self:PlayLineFadeAnim(self.LINE_FADE_ANIM_TYPE_UNLOCKED);
 end
 
 function ArmoryArtifactLineMixin:SetLocked()
 	self.Fill:SetVertexColor(self.connectedColor:GetRGB());
+
+	self:PlayLineFadeAnim(self.LINE_FADE_ANIM_TYPE_LOCKED);
+end
+
+function ArmoryArtifactLineMixin:PlayLineFadeAnim(lineAnimType)
+	self.FadeAnim:Finish();
+
+	self.FadeAnim.Background:SetFromAlpha(self.Background:GetAlpha());
+	self.FadeAnim.Fill:SetFromAlpha(self.Fill:GetAlpha());
+	self.FadeAnim.FillScroll1:SetFromAlpha(self.FillScroll1:GetAlpha());
+	if ( self.FillScroll2 ) then
+		self.FadeAnim.FillScroll2:SetFromAlpha(self.FillScroll2:GetAlpha());
+	end
+
+	if ( lineAnimType == self.LINE_FADE_ANIM_TYPE_CONNECTED ) then
+		self.ScrollAnim:Play();
+
+		self.FadeAnim.Background:SetToAlpha(0.0);
+		self.FadeAnim.Fill:SetToAlpha(1.0);
+		self.FadeAnim.FillScroll1:SetToAlpha(1.0);
+		if ( self.FillScroll2 ) then
+			self.FadeAnim.FillScroll2:SetToAlpha(1.0);
+		end
+	elseif ( lineAnimType == self.LINE_FADE_ANIM_TYPE_UNLOCKED ) then
+		self.ScrollAnim:Stop();
+
+		self.FadeAnim.Background:SetToAlpha(1.0);
+		self.FadeAnim.Fill:SetToAlpha(1.0);
+		self.FadeAnim.FillScroll1:SetToAlpha(0.0);
+		if ( self.FillScroll2 ) then
+			self.FadeAnim.FillScroll2:SetToAlpha(0.0);
+		end
+
+	elseif ( lineAnimType == self.LINE_FADE_ANIM_TYPE_LOCKED ) then
+		self.ScrollAnim:Stop();
+
+		self.FadeAnim.Background:SetToAlpha(0.85);
+		self.FadeAnim.Fill:SetToAlpha(0.0);
+		self.FadeAnim.FillScroll1:SetToAlpha(0.0);
+		if ( self.FillScroll2 ) then
+			self.FadeAnim.FillScroll2:SetToAlpha(0.0);
+		end
+	end
+	self.FadeAnim:Play();
 end
 
 function ArmoryArtifactLineMixin:SetEndPoints(fromButton, toButton)
@@ -1407,6 +1461,9 @@ function ArmoryArtifactLineMixin:SetVertexOffset(vertexIndex, x, y)
 end
 
 function ArmoryArtifactLineMixin:SetAlpha(alpha)
+    self.ScrollAnim:Stop();
+    self.FadeAnim:Stop();
+
 	self.Background:SetAlpha(alpha);
 	self.Fill:SetAlpha(alpha);
 	self.FillScroll1:SetAlpha(alpha);
