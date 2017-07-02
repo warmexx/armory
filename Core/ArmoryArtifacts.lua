@@ -164,11 +164,11 @@ function Armory:GetArtifactArtInfo(artifact)
 end
 
 function Armory:GetArtifactTier(artifact)
-   return GetArtifactValue("Tier", artifact);
+    return GetArtifactValue("Tier", artifact);
 end
 
 function Armory:IsMaxedByRulesOrEffect(artifact)
-   return GetArtifactValue("IsMaxedByRulesOrEffect", artifact);
+    return GetArtifactValue("IsMaxedByRulesOrEffect", artifact);
 end
 
 function Armory:GetPointsRemaining(artifact)
@@ -176,23 +176,23 @@ function Armory:GetPointsRemaining(artifact)
 end
 
 function Armory:GetTotalPurchasedRanks(artifact)
-   return GetArtifactValue("PurchasedRanks", artifact);
+    return GetArtifactValue("PurchasedRanks", artifact);
 end
 
 function Armory:GetArtifactKnowledgeLevel(artifact)
-   return GetArtifactValue("KnowledgeLevel", artifact);
+    return GetArtifactValue("KnowledgeLevel", artifact);
 end
 
 function Armory:GetArtifactKnowledgeMultiplier(artifact)
-   return GetArtifactValue("KnowledgeMultiplier", artifact);
+    return GetArtifactValue("KnowledgeMultiplier", artifact);
 end
 
 function Armory:GetMetaPowerInfo(artifact)
-   return GetArtifactValue("MetaPower", artifact);
+    return GetArtifactValue("MetaPower", artifact);
 end
 
 function Armory:GetPowers(artifact)
-   return GetArtifactValue("Powers", artifact);
+    return GetArtifactValue("Powers", artifact);
 end
 
 function Armory:GetPowerInfo(id, artifact)
@@ -200,7 +200,7 @@ function Armory:GetPowerInfo(id, artifact)
 end
 
 function Armory:GetPowerLinks(id, artifact)
-   return GetArtifactValue("PowerLinks"..id, artifact);
+    return GetArtifactValue("PowerLinks"..id, artifact);
 end
 
 function Armory:GetPowerHyperlink(id, artifact)
