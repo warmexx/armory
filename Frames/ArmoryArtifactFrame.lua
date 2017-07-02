@@ -783,7 +783,7 @@ ArmoryArtifactTitleTemplateMixin = {};
 function ArmoryArtifactTitleTemplateMixin:RefreshTitle()
     local artifactArtInfo = Armory:GetArtifactArtInfo();
     self.ArtifactName:SetText(artifactArtInfo.titleName);
-    self.ArtifactName:SetVertexColor(artifactArtInfo.titleColor.r, artifactArtInfo.titleColor.g, artifactArtInfo.titleColor.b);
+    self.ArtifactName:SetVertexColor(artifactArtInfo.titleColor:GetRGB());
 
     if ( artifactArtInfo and artifactArtInfo.textureKit ) then
         local headerAtlas = ("%s-Header"):format(artifactArtInfo.textureKit);
@@ -1379,11 +1379,11 @@ function ArmoryArtifactLineMixin:SetEndPoints(fromButton, toButton)
 end
 
 function ArmoryArtifactLineMixin:SetConnectedColor(color)
-	self.connectedColor = CreateColor(color.r, color.g, color.b, color.a);
+	self.connectedColor = color;
 end
 
 function ArmoryArtifactLineMixin:SetDisconnectedColor(color)
-	self.disconnectedColor = CreateColor(color.r, color.g, color.b, color.a);
+	self.disconnectedColor = color;
 end
 
 function ArmoryArtifactLineMixin:CalculateTiling(length)

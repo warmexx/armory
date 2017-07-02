@@ -160,7 +160,18 @@ function Armory:GetArtifactInfoEx()
 end
 
 function Armory:GetArtifactArtInfo(artifact)
-    return GetArtifactValue("ArtInfo", artifact);
+    local data = GetArtifactValue("ArtInfo", artifact);
+    if ( type(data) ~= "table" ) then
+        return;
+    end
+
+    local artifactArtInfo = self:CopyTable(data);
+
+    artifactArtInfo.barConnectedColor = CreateColor(data.barConnectedColor.r, data.barConnectedColor.g, data.barConnectedColor.b, data.barConnectedColor.a);
+    artifactArtInfo.barDisconnectedColor = CreateColor(data.barDisconnectedColor.r, data.barDisconnectedColor.g, data.barDisconnectedColor.b, data.barDisconnectedColor.a);
+    artifactArtInfo.titleColor = CreateColor(data.titleColor.r, data.titleColor.g, data.titleColor.b, data.titleColor.a);
+   
+   return artifactArtInfo;
 end
 
 function Armory:GetArtifactTier(artifact)
@@ -203,10 +214,10 @@ function Armory:GetPowerInfo(id, artifact)
 
     local powerInfo = self:CopyTable(data);
 	
-    if ( powerInfo.offset ) then
-        powerInfo.offset = CreateVector2D(powerInfo.offset.x, powerInfo.offset.y);
+    if ( data.offset ) then
+        powerInfo.offset = CreateVector2D(data.offset.x, data.offset.y);
     end
-    powerInfo.position = CreateVector2D(powerInfo.position.x, powerInfo.position.y);
+    powerInfo.position = CreateVector2D(data.position.x, data.position.y);
 
     return powerInfo;
 end
