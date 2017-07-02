@@ -30,7 +30,7 @@ local Armory, _ = Armory;
 
 ARMORY_MAX_LINE_TABS = 10;
 
-ARMORYFRAME_MAINFRAMES = { "ArmoryFrame", "ArmoryLookupFrame", "ArmoryFindFrame" };
+ARMORYFRAME_MAINFRAMES = { "ArmoryFrame", "ArmoryLookupFrame", "ArmoryFindFrame", "ArmoryArtifactFrame" };
 ARMORYFRAME_SUBFRAMES = { "ArmoryPaperDollFrame", "ArmoryPetFrame", "ArmoryTalentFrame", "ArmoryPVPFrame", "ArmoryOtherFrame" };
 ARMORYFRAME_CHILDFRAMES = { "ArmoryTradeSkillFrame", "ArmoryInventoryFrame", "ArmoryQuestFrame", "ArmorySpellBookFrame", "ArmoryAchievementFrame", "ArmorySocialFrame" };
 

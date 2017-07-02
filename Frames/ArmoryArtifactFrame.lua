@@ -49,6 +49,8 @@ function ArmoryArtifactFrameMixin:OnLoad()
     self:RegisterEvent("ARTIFACT_XP_UPDATE");
     self:RegisterEvent("ARTIFACT_RELIC_INFO_RECEIVED");
     --self:RegisterEvent("ARTIFACT_MAX_RANKS_UPDATE");
+
+    table.insert(UISpecialFrames, "ArmoryArtifactFrame");
 end
 
 function ArmoryArtifactFrameMixin:OnShow()
