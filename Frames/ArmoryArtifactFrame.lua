@@ -433,34 +433,6 @@ function ArmoryArtifactPerksMixin:HideUnusedWidgets(widgetTable, numUsed, custom
     end
 end
 
-local function Reveal(self, powerButton, distance, tier)
-    for linkedPowerID, linkedLineContainer in pairs(powerButton.links) do
-        if ( not linkedLineContainer.revealed ) then
-            linkedLineContainer.revealed = true;
-
-            local linkedPowerButton = self.powerIDToPowerButton[linkedPowerID];
-            
-            if ( linkedPowerButton.hasSpentAny ) then
-                Reveal(self, linkedPowerButton, distance, tier);
-            else 
-                local distanceToLink = powerButton:CalculateDistanceTo(linkedPowerButton);
-                local totalDistance = distance + distanceToLink;
-
-                Reveal(self, linkedPowerButton, totalDistance, tier);
-
-                linkedLineContainer:SetAlpha(0, 0);
-            end
-        end
-    end
-end
-
-function ArmoryArtifactPerksMixin:Reveal(tier)
-    if (self:GetStartingPowerButtonByTier(tier) and not self.revealed[tier] ) then
-        self.revealed[tier] = true;
-        Reveal(self, self:GetStartingPowerButtonByTier(tier), 0, tier);
-    end
-end
-
 local function HasPurchasedAnything()
 	return Armory:GetTotalPurchasedRanks() > 0 or Armory:IsMaxedByRulesOrEffect();
 end
@@ -469,14 +441,11 @@ function ArmoryArtifactPerksMixin:Refresh(newItem)
     self.newItem = self.newItem or newItem;
 
     if ( newItem ) then
-        self.revealed = {};
-
         self:HideAllLines();
         self:RefreshBackground();
         self:RefreshModel();
     end
 
-    local reveal = false;
     local hasBoughtAnyPowers = HasPurchasedAnything();
     if ( newItem ) then
         self.hasBoughtAnyPowers = hasBoughtAnyPowers;
@@ -485,9 +454,6 @@ function ArmoryArtifactPerksMixin:Refresh(newItem)
         self:HideAllLines();
         
         self.hasBoughtAnyPowers = hasBoughtAnyPowers;
-        if ( hasBoughtAnyPowers ) then
-            reveal = true;
-        end
     end
 
 	local finalTier2WasUnlocked = self.wasFinalPowerButtonUnlockedByTier[2];
@@ -496,10 +462,6 @@ function ArmoryArtifactPerksMixin:Refresh(newItem)
     self.TitleContainer:SetPointsRemaining(Armory:GetPointsRemaining());
     
     self.newItem = nil;
-
-    if ( reveal ) then
-        self:Reveal(1);
-    end
 
     if ( Armory:GetArtifactTier() == 2 or Armory:IsMaxedByRulesOrEffect() ) then
         self:ShowTier2();
@@ -516,8 +478,6 @@ function ArmoryArtifactPerksMixin:Refresh(newItem)
                 finalTier2Button:Show();
             end
         end
-
-        self:Reveal(2);
     end
 end
 
