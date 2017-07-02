@@ -450,8 +450,8 @@ local function Reveal(self, powerButton, distance, tier)
 end
 
 function ArmoryArtifactPerksMixin:Reveal(tier)
-    if (self:GetStartingPowerButtonByTier(tier) and not self.revealed ) then
-        self.revealed = true;
+    if (self:GetStartingPowerButtonByTier(tier) and not self.revealed[tier] ) then
+        self.revealed[tier] = true;
         Reveal(self, self:GetStartingPowerButtonByTier(tier), 0, tier);
     end
 end
@@ -464,7 +464,7 @@ function ArmoryArtifactPerksMixin:Refresh(newItem)
     self.newItem = self.newItem or newItem;
 
     if ( newItem ) then
-        self.revealed = nil;
+        self.revealed = {};
 
         self:HideAllLines();
         self:RefreshBackground();
@@ -490,7 +490,11 @@ function ArmoryArtifactPerksMixin:Refresh(newItem)
     self.TitleContainer:SetPointsRemaining(Armory:GetPointsRemaining());
     
     self.newItem = nil;
-		
+
+    if ( reveal ) then
+        self:Reveal(1);
+    end
+
     if ( Armory:GetArtifactTier() == 2 or Armory:IsMaxedByRulesOrEffect() ) then
         self:ShowTier2();
         self.CrestFrame.CrestRune1:SetAlpha(1.0);
@@ -506,10 +510,8 @@ function ArmoryArtifactPerksMixin:Refresh(newItem)
                 finalTier2Button:Show();
             end
         end
-    end
 
-    if ( reveal ) then
-        self:Reveal(1);
+        self:Reveal(2);
     end
 end
 
