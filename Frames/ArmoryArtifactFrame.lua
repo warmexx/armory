@@ -434,17 +434,21 @@ end
 
 local function Reveal(self, powerButton, distance, tier)
     for linkedPowerID, linkedLineContainer in pairs(powerButton.links) do
-        local linkedPowerButton = self.powerIDToPowerButton[linkedPowerID];
-        
-        if ( linkedPowerButton.hasSpentAny ) then
-            Reveal(self, linkedPowerButton, distance, tier);
-        else 
-            local distanceToLink = powerButton:CalculateDistanceTo(linkedPowerButton);
-            local totalDistance = distance + distanceToLink;
+        if ( not linkedLineContainer.revealed ) then
+            linkedLineContainer.revealed = true;
 
-            Reveal(self, linkedPowerButton, totalDistance, tier);
+            local linkedPowerButton = self.powerIDToPowerButton[linkedPowerID];
+            
+            if ( linkedPowerButton.hasSpentAny ) then
+                Reveal(self, linkedPowerButton, distance, tier);
+            else 
+                local distanceToLink = powerButton:CalculateDistanceTo(linkedPowerButton);
+                local totalDistance = distance + distanceToLink;
 
-            linkedLineContainer:SetAlpha(0, 0);
+                Reveal(self, linkedPowerButton, totalDistance, tier);
+
+                linkedLineContainer:SetAlpha(0, 0);
+            end
         end
     end
 end
