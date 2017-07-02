@@ -101,6 +101,13 @@ function ArmoryArtifactFrameMixin:ShowArtifact(link)
     end
 end
 
+function ArmoryArtifactFrameMixin:SetupPerArtifactData()
+    local _, _, icon = Armory:GetArtifactInfoEx();
+    if icon then
+        self.ForgeBadgeFrame.ItemIcon:SetTexture(icon);
+    end
+end
+
 local function MetaPowerTooltipHelper(...)
     local hasAddedAny = false;
     for i = 1, select("#", ...), 3 do
@@ -161,13 +168,6 @@ function ArmoryArtifactFrameMixin:OnKnowledgeEnter(knowledgeFrame)
     GameTooltip:Show();
 end
 
-function ArmoryArtifactFrameMixin:SetupPerArtifactData()
-    local _, _, icon = Armory:GetArtifactInfoEx();
-    if icon then
-        self.ForgeBadgeFrame.ItemIcon:SetTexture(icon);
-    end
-end
-
 
 ----------------------------------------------------------
 -- ArmoryArtifactPerks Mixin
@@ -181,9 +181,6 @@ local CURVED_LINE_THICKNESS = 5;
 
 local TIER_2_FORGING_MODEL_SCENE_ID = 55;
 local TIER_2_FORGING_EFFECT_MODEL_ID = 382335;--"SPELLS\\EASTERN_PLAGUELANDS_BEAM_EFFECT.M2";
-
---local TIER_2_SLAM_EFFECT_MODEL_SCENE_ID = 57;
---local TIER_2_SLAM_EFFECT_MODEL_ID = 1369310; --"SPELLS\\CFX_WARRIOR_THUNDERCLAP_CASTWORLD.M2"
 
 function ArmoryArtifactPerksMixin:OnLoad()
 	self.powerButtonPool = CreateFramePool("BUTTON", self, "ArmoryArtifactPowerButtonTemplate");
@@ -380,21 +377,13 @@ function ArmoryArtifactPerksMixin:RefreshPowerTiers()
 				forgingEffect:SetAlpha(0.0);
 				self.Tier2ForgingScene.ForgingEffect = forgingEffect;
 			end
-			
-			-- self.Tier2SlamEffectModelScene:SetFromModelSceneID(TIER_2_SLAM_EFFECT_MODEL_SCENE_ID, true);
-			-- local slamEffect = self.Tier2SlamEffectModelScene:GetActorByTag("effect");
-			-- if ( slamEffect ) then
-			-- 	slamEffect:SetModelByFileID(TIER_2_SLAM_EFFECT_MODEL_ID);
-			-- end
 		else
 			self.CrestFrame:Hide();
 			self.Tier2ModelScene:Hide();
-			--self.Tier2SlamEffectModelScene:Hide();
 		end
 	else
 		self.CrestFrame:Hide();
 		self.Tier2ModelScene:Hide();
-		--self.Tier2SlamEffectModelScene:Hide();
 	end
 end
 
