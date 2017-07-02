@@ -380,20 +380,20 @@ function ArmoryArtifactPerksMixin:RefreshPowerTiers()
 				self.Tier2ForgingScene.ForgingEffect = forgingEffect;
 			end
 			
-			self.Tier2SlamEffectModelScene:SetFromModelSceneID(TIER_2_SLAM_EFFECT_MODEL_SCENE_ID, true);
-			local slamEffect = self.Tier2SlamEffectModelScene:GetActorByTag("effect");
-			if ( slamEffect ) then
-				slamEffect:SetModelByFileID(TIER_2_SLAM_EFFECT_MODEL_ID);
-			end
+			-- self.Tier2SlamEffectModelScene:SetFromModelSceneID(TIER_2_SLAM_EFFECT_MODEL_SCENE_ID, true);
+			-- local slamEffect = self.Tier2SlamEffectModelScene:GetActorByTag("effect");
+			-- if ( slamEffect ) then
+			-- 	slamEffect:SetModelByFileID(TIER_2_SLAM_EFFECT_MODEL_ID);
+			-- end
 		else
 			self.CrestFrame:Hide();
 			self.Tier2ModelScene:Hide();
-			self.Tier2SlamEffectModelScene:Hide();
+			--self.Tier2SlamEffectModelScene:Hide();
 		end
 	else
 		self.CrestFrame:Hide();
 		self.Tier2ModelScene:Hide();
-		self.Tier2SlamEffectModelScene:Hide();
+		--self.Tier2SlamEffectModelScene:Hide();
 	end
 end
 

@@ -565,12 +565,12 @@
 					<Anchor point="CENTER" relativeKey="$parent.CrestFrame" relativePoint="CENTER" x="0" y="0"/>
 				</Anchors>
 			</ModelScene>
-			<ModelScene parentKey="Tier2SlamEffectModelScene" inherits="ModelSceneMixinTemplate" hidden="true" frameLevel="700">
+			<!--<ModelScene parentKey="Tier2SlamEffectModelScene" inherits="ModelSceneMixinTemplate" hidden="true" frameLevel="700">
 				<Size x="500" y="500"/>
 				<Anchors>
 					<Anchor point="CENTER" relativeKey="$parent.Tier2ModelScene" relativePoint="CENTER" x="0" y="0"/>
 				</Anchors>
-			</ModelScene>
+			</ModelScene>-->
     </Frames>
     <Scripts>
       <OnLoad method="OnLoad" />
