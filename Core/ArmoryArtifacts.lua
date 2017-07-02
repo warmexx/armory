@@ -196,7 +196,19 @@ function Armory:GetPowers(artifact)
 end
 
 function Armory:GetPowerInfo(id, artifact)
-   return GetArtifactValue("PowerInfo"..id, artifact);
+    local data = GetArtifactValue("PowerInfo"..id, artifact);
+    if ( type(data) ~= "table" ) then
+        return;
+    end
+
+    local powerInfo = self:CopyTable(data);
+	
+    if ( powerInfo.offset ) then
+        powerInfo.offset = CreateVector2D(powerInfo.offset.x, powerInfo.offset.y);
+    end
+    powerInfo.position = CreateVector2D(powerInfo.position.x, powerInfo.position.y);
+
+    return powerInfo;
 end
 
 function Armory:GetPowerLinks(id, artifact)

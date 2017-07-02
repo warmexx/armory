@@ -1232,7 +1232,6 @@ function ArmoryArtifactPowerButtonMixin:SetupButton(powerID, anchorRegion, textu
     self:ClearAllPoints();
 	local xOffset, yOffset = 0, 0;
 	if ( powerInfo.offset ) then
-        powerInfo.offset = CreateVector2D(powerInfo.offset.x, powerInfo.offset.y);
 		powerInfo.offset:ScaleBy(85);
 		xOffset, yOffset = powerInfo.offset:GetXY();
 	end
