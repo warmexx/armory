@@ -40,7 +40,7 @@ if ( not Armory ) then
 
         title = ARMORY_TITLE,
         version = GetAddOnMetadata("Armory", "Version"),
-        dbVersion = 45,
+        dbVersion = 46,
         interface = _G.GetBuildInfo(),
     };
 end
@@ -634,6 +634,22 @@ function Armory:IsDbCompatible()
                     entry = ArmoryDB[realm][character];
 
                     entry.Artifacts = nil;
+                end
+            end
+
+            upgraded = true;
+
+        -- convert from 45 to 46
+        elseif ( dbVersion == 45 ) then
+            for realm in pairs(ArmoryDB) do
+                for character in pairs(ArmoryDB[realm]) do
+                    entry = ArmoryDB[realm][character];
+
+                    if ( entry.Factions ) then
+                        for i, v in ipairs(entry.Factions) do
+                            entry.Factions[i] = { Info = v }
+                        end
+                    end 
                 end
             end
 

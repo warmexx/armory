@@ -30,10 +30,12 @@ local Armory, _ = Armory;
 
 ARMORY_NUM_FACTIONS_DISPLAYED = 15;
 ARMORY_REPUTATIONFRAME_FACTIONHEIGHT = 26;
+ARMORY_MAX_REPUTATION_REACTION = 8;
 
 function ArmoryReputationFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("UPDATE_FACTION");
+    self.paragonFramesPool = CreateFramePool("FRAME", self, "ArmoryReputationParagonFrameTemplate");
 end
 
 function ArmoryReputationFrame_OnEvent(self, event, ...)
@@ -153,9 +155,11 @@ function ArmoryReputationFrame_SetRowType(factionRow, rowType, hasRep)    --rowT
 end
 
 function ArmoryReputationFrame_Update()
+    ArmoryReputationFrame.paragonFramesPool:ReleaseAll();
+
     local numFactions = Armory:GetNumFactions();
     local factionIndex, factionRow, factionTitle, factionStanding, factionBar, factionButton, factionLeftLine, factionBottomLine, factionBackground;
-    local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild;
+    local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID;
     local atWarIndicator, rightBarTexture;
 
     local previousBigTexture = ArmoryReputationFrameTopTreeTexture;    --In case we have a line going off the panel to the top
@@ -185,7 +189,7 @@ function ArmoryReputationFrame_Update()
         factionStanding = _G["ArmoryReputationBar"..i.."ReputationBarFactionStanding"];
         factionBackground = _G["ArmoryReputationBar"..i.."Background"];
         if ( factionIndex <= numFactions ) then
-            name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild = Armory:GetFactionInfo(factionIndex);
+            name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID = Armory:GetFactionInfo(factionIndex);
             factionTitle:SetText(name);
             if ( isCollapsed ) then
                 factionButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up");
@@ -196,11 +200,26 @@ function ArmoryReputationFrame_Update()
             factionRow.isCollapsed = isCollapsed;
             
             local factionStandingtext;
-            local isCappedFriendship;
+
+            if ( factionID and Armory:IsFactionParagon(factionID) ) then
+                local paragonFrame = ArmoryReputationFrame.paragonFramesPool:Acquire();
+                paragonFrame.factionID = factionID;
+                paragonFrame.standingID = standingID;
+                paragonFrame:SetPoint("RIGHT", factionRow, 11, 0);
+                local currentValue, threshold, rewardQuestID, hasRewardPending = Armory:GetFactionParagonInfo(factionID);
+                paragonFrame.Glow:SetShown(hasRewardPending);
+                paragonFrame.Check:SetShown(hasRewardPending);
+                paragonFrame:Show();
+            end
+            local isCapped;
+            if ( standingID == ARMORY_MAX_REPUTATION_REACTION ) then
+                isCapped = true;
+            end
+            
             -- description contains friendship
             if ( description ) then
                 factionStandingtext = description;
-                isCappedFriendship = (barValue == barMax);
+                isCapped = (barValue == barMax);
             else
                 factionStandingtext = GetText("FACTION_STANDING_LABEL"..standingID, gender);
             end
@@ -212,11 +231,12 @@ function ArmoryReputationFrame_Update()
             barMin = 0;
 
             factionRow.standingText = factionStandingtext;
-            if ( isCappedFriendship ) then
+            if ( isCapped ) then
                 factionRow.standingProgress = nil;
             else
-                factionRow.standingProgress = HIGHLIGHT_FONT_COLOR_CODE.." "..barValue.." / "..barMax..FONT_COLOR_CODE_CLOSE;
+                factionRow.standingProgress = HIGHLIGHT_FONT_COLOR_CODE.." "..format(REPUTATION_PROGRESS_FORMAT, BreakUpLargeNumbers(barValue), BreakUpLargeNumbers(barMax))..FONT_COLOR_CODE_CLOSE;
             end
+            factionBar:SetFillStyle("STANDARD_NO_RANGE_FILL");
             factionBar:SetMinMaxValues(0, barMax);
             factionBar:SetValue(barValue);
             local color = FACTION_BAR_COLORS[standingID];
@@ -433,4 +453,56 @@ function ArmoryReputationBar_OnLeave(self)
         self.tooltip = nil;
     end
 	GameTooltip:Hide();
+end
+
+function ArmoryReputationParagonFrame_SetupParagonTooltip(frame, factionID, standingID)
+	ArmoryReputationParagonTooltip.owner = frame;
+	ArmoryReputationParagonTooltip.factionID = factionID;
+	ArmoryReputationParagonTooltip.standingID = standingID;
+
+	local factionName = GetFactionInfoByID(factionID);
+	local gender = Armory:UnitSex("player");
+	local factionStandingtext = GetText("FACTION_STANDING_LABEL"..standingID, gender);
+
+	ArmoryReputationParagonTooltip:SetText(factionStandingtext);
+	local currentValue, threshold, rewardQuestID, hasRewardPending = Armory:GetFactionParagonInfo(factionID);
+	local description = PARAGON_REPUTATION_TOOLTIP_TEXT:format(factionName);
+	ArmoryReputationParagonTooltip:AddLine(description, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b, 1);
+    GameTooltip_InsertFrame(ArmoryReputationParagonTooltip, ArmoryReputationParagonTooltipStatusBar);
+    ArmoryReputationParagonTooltipStatusBar.Bar:SetMinMaxValues(0, threshold);
+    local value = mod(currentValue, threshold);
+    -- show overflow if reward is pending
+    if ( hasRewardPending ) then
+        value = value + threshold;
+    end
+    ArmoryReputationParagonTooltipStatusBar.Bar:SetValue(value);
+    ArmoryReputationParagonTooltipStatusBar.Bar.Label:SetFormattedText(REPUTATION_PROGRESS_FORMAT, value, threshold);
+	GameTooltip_AddQuestRewardsToTooltip(ArmoryReputationParagonTooltip, rewardQuestID);
+	ArmoryReputationParagonTooltip:Show();
+end
+
+function ArmoryReputationParagonFrame_OnEnter(self)
+	ArmoryReputationParagonTooltip:SetParent(self);
+	ArmoryReputationParagonTooltip:SetFrameStrata("TOOLTIP");
+	ArmoryReputationParagonTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	ArmoryReputationParagonFrame_SetupParagonTooltip(self, self.factionID, self.standingID);
+end
+
+function ArmoryReputationParagonFrame_OnLeave(self)
+    ArmoryReputationParagonTooltip:Hide();
+end
+
+function ArmoryReputationParagonFrame_OnUpdate(self)
+	if ( self.Glow:IsShown() ) then
+		local alpha;
+		local time = GetTime();
+		local value = time - floor(time);
+		local direction = mod(floor(time), 2);
+		if ( direction == 0 ) then
+			alpha = value;
+		else
+			alpha = 1 - value;
+		end
+		self.Glow:SetAlpha(alpha);
+	end
 end

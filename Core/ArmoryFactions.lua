@@ -48,7 +48,7 @@ local function GetFactionLines()
         local childCollapsed = false;
 
         for i = 1, count do
-            local name, _, _, _, _, _, _, _, isHeader, _, _, _, isChild = dbEntry:GetValue(container, i);
+            local name, _, _, _, _, _, _, _, isHeader, _, _, _, isChild = dbEntry:GetValue(container, i, "Info");
             local isCollapsed = Armory:GetHeaderLineState(container, name);
             if ( isHeader and not isChild ) then
                 table.insert(factionLines, i);
@@ -71,13 +71,28 @@ local function GetFactionLines()
     return factionLines;
 end
 
+local function GetFactionLineValue(index, key, subkey)
+    local dbEntry = Armory.selectedDbBaseEntry;
+    local numLines = Armory:GetNumFactions();
+    if ( dbEntry and index > 0 and index <= numLines ) then
+        local factionID = dbEntry:GetValue(container, factionLines[index], "Data");
+        if ( subkey ) then
+            return dbEntry:GetValue(container, factionID, key, subkey);
+        elseif ( key ) then
+            return dbEntry:GetValue(container, factionID, key);
+        else
+            return dbEntry:GetValue(container, factionLines[index], "Info");
+        end
+    end
+end
+
 local function UpdateFactionHeaderState(index, isCollapsed)
     local dbEntry = Armory.selectedDbBaseEntry;
 
     if ( dbEntry ) then
         if ( index == 0 ) then
             for i = 1, dbEntry:GetNumValues(container) do
-                local name, _, _, _, _, _, _, _, isHeader = dbEntry:GetValue(container, i);
+                local name, _, _, _, _, _, _, _, isHeader = dbEntry:GetValue(container, i, "Info");
                 if ( isHeader ) then
                     Armory:SetHeaderLineState(container, name, isCollapsed);
                 end
@@ -85,7 +100,7 @@ local function UpdateFactionHeaderState(index, isCollapsed)
         else
             local numLines = Armory:GetNumFactions();
             if ( index > 0 and index <= numLines ) then
-                local name = dbEntry:GetValue(container, factionLines[index]);
+                local name = dbEntry:GetValue(container, factionLines[index], "Info");
                 Armory:SetHeaderLineState(container, name, isCollapsed);
             end
         end
@@ -123,6 +138,8 @@ function Armory:UpdateFactions()
 
         self:PrintDebug("UPDATE", container);
 
+        local _, numFactions = _G.GetNumFactions();
+  
         -- store the complete (expanded) list
         local funcNumLines = _G.GetNumFactions;
         local funcGetLineInfo = function(index)
@@ -148,8 +165,19 @@ function Armory:UpdateFactions()
         end;
         local funcExpand = _G.ExpandFactionHeader;
         local funcCollapse = _G.CollapseFactionHeader;
+        local funcAdditionalInfo = function(index)
+            local factionID = select(14, _G.GetFactionInfo(index));
+			if ( factionID and C_Reputation.IsFactionParagon(factionID) ) then
+                local id = tostring(factionID);
+                local info = dbEntry:SelectContainer(container, id);
+				
+                info.Paragon = dbEntry.Save(C_Reputation.GetFactionParagonInfo(factionID));
+                
+                return id;
+            end
+        end;
 
-        if ( retries < 1 and not dbEntry:SetExpandableListValues(container, funcNumLines, funcGetLineState, funcGetLineInfo, funcExpand, funcCollapse) ) then
+        if ( retries < 1 and not dbEntry:SetExpandableListValues(container, funcNumLines, funcGetLineState, funcGetLineInfo, funcExpand, funcCollapse, funcAdditionalInfo) ) then
             retries = retries + 1;
             self:PrintDebug("Update failed; executing again...", retries);
             self:ExecuteDelayed(5, function() Armory:UpdateFactions() end);
@@ -184,9 +212,13 @@ function Armory:GetFactionInfo(index)
     local dbEntry = self.selectedDbBaseEntry;
     local numLines = self:GetNumFactions();
     if ( dbEntry and index > 0 and index <= numLines ) then
-        local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild = dbEntry:GetValue(container, factionLines[index]);
+        local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild = GetFactionLineValue(index);
+        local factionID = dbEntry:GetValue(container, factionLines[index], "Data");
+        if ( factionID ) then
+            factionID = tonumber(factionID);
+        end
         isCollapsed = self:GetHeaderLineState(container, name);
-        return name, description, standingID or 1, barMin or 0, barMax or 0, barValue or 0, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild;
+        return name, description, standingID or 1, barMin or 0, barMax or 0, barValue or 0, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID;
     end
 end
 
@@ -204,11 +236,27 @@ function Armory:GetFactionStanding(factionName)
     if ( dbEntry ) then
         local count = dbEntry:GetNumValues(container);
         for i = 1, count do
-            local name, _, standingID = dbEntry:GetValue(container, i);
+            local name, _, standingID = GetFactionLineValue(i);
             if ( name == factionName ) then
                 return standingID, GetText("FACTION_STANDING_LABEL"..standingID, self:UnitSex("player"));
             end
         end
     end
     return 0, UNKNOWN;
+end
+
+function Armory:IsFactionParagon(factionID)
+    local dbEntry = self.selectedDbBaseEntry;
+    
+    if ( dbEntry ) then
+        return dbEntry:Contains(container, tostring(factionID), "Paragon");
+    end
+end
+
+function Armory:GetFactionParagonInfo(factionID)
+    local dbEntry = self.selectedDbBaseEntry;
+    
+    if ( dbEntry ) then
+        return dbEntry:GetValue(container, tostring(factionID), "Paragon");
+    end
 end
