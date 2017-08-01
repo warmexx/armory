@@ -11,4 +11,4 @@ if ( not L ) then
     return;
 end
 
---@localization(locale="deDE", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="none")@
+--@localization(locale="deDE", format="lua_additive_table", handle-unlocalized="english", namespace="Armory", handle-subnamespaces="none")@
