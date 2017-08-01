@@ -5,10 +5,13 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
 ==== alpha ====
+# Paragon progress has been added to the reputation frame
+# Manually moved base namespace translations to sub-namespace because CurseForge doesn't seem to fix it
+
+==== v14.2.0 ====
 # Note: Artifact relics will be cleared
 # Adjustments have been made for patch 7.2.0
 # Adjustments have been made for patch 7.2.5
-
 
 ==== v14.1.0 ====
 # Adjustments have been made for patch 7.1.5.
