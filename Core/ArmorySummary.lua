@@ -1088,7 +1088,7 @@ function Armory:DisplaySummary()
     end
     if ( self:GetConfigSummaryCurrency() ) then  
 		for name, icon in pairs(summary.Currencies) do
-            myColumn = column; index, column = self.summary:SetCell(index, myColumn, type(icon) == "string" and icon or "Interface\\Icons\\INV_Misc_QuestionMark", iconProvider);
+            myColumn = column; index, column = self.summary:SetCell(index, myColumn, icon or "Interface\\Icons\\INV_Misc_QuestionMark", iconProvider);
             self.summary:SetCellScript(index, myColumn, "OnEnter", CellShowTooltip, name); 
             self.summary:SetCellScript(index, myColumn, "OnLeave", CellHideTooltip); 
             self.summary:SetCellScript(index, myColumn, "OnMouseDown", OnColumnHeaderClick, name);

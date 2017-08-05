@@ -8,6 +8,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 # Paragon progress has been added to the reputation frame
 # Manually moved base namespace translations to sub-namespace because CurseForge doesn't seem to fix it
 # Any translations added in the meantime should be included now
+# Fixed currency icons in summary sheet
 
 ==== v14.2.0 ====
 # Note: Artifact relics will be cleared
