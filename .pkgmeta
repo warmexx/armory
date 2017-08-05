@@ -1,8 +1,5 @@
 ﻿package-as: Armory
 
-ignore:
-    .vscode
-
 externals:
     Libs/LibStub:
         url: https://repos.wowace.com/wow/libstub/trunk
