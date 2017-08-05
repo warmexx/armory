@@ -71,37 +71,39 @@ function Armory:UpdateArtifact()
         self:PrintDebug("UPDATE", container);
 
         local itemID, altItemID, _, icon, _, _, _, artifactAppearanceID, appearanceModID, itemAppearanceID, altItemAppearanceID, altOnTop = C_ArtifactUI.GetArtifactInfo();
-        local _, _, _, _, _, _, uiCameraID, altHandUICameraID, _, _, _, modelAlpha, modelDesaturation = C_ArtifactUI.GetAppearanceInfoByID(artifactAppearanceID);
+        if ( artifactAppearanceID ) then
+            local _, _, _, _, _, _, uiCameraID, altHandUICameraID, _, _, _, modelAlpha, modelDesaturation = C_ArtifactUI.GetAppearanceInfoByID(artifactAppearanceID);
 
-        itemID = tostring(itemID);
-        if ( altItemID ) then
-            dbEntry:SetValue(2, container, tostring(altItemID), itemID);
-        end
-        dbEntry:SetValue(3, container, itemID, "Info", altItemID, icon, artifactAppearanceID, appearanceModID, itemAppearanceID, altItemAppearanceID, altOnTop, uiCameraID, altHandUICameraID, modelAlpha, modelDesaturation);
-        dbEntry:SetValue(3, container, itemID, "ArtInfo", self:CopyTable(C_ArtifactUI.GetArtifactArtInfo()));
-        dbEntry:SetValue(3, container, itemID, "PointsRemaining", C_ArtifactUI.GetPointsRemaining());
-        dbEntry:SetValue(3, container, itemID, "PurchasedRanks", C_ArtifactUI.GetTotalPurchasedRanks());
-        dbEntry:SetValue(3, container, itemID, "KnowledgeLevel", C_ArtifactUI.GetArtifactKnowledgeLevel());
-        dbEntry:SetValue(3, container, itemID, "KnowledgeMultiplier", C_ArtifactUI.GetArtifactKnowledgeMultiplier());
-        dbEntry:SetValue(3, container, itemID, "MetaPower", C_ArtifactUI.GetMetaPowerInfo());
-        dbEntry:SetValue(3, container, itemID, "Powers", C_ArtifactUI.GetPowers());
-        dbEntry:SetValue(3, container, itemID, "Tier", C_ArtifactUI.GetArtifactTier());
-        dbEntry:SetValue(3, container, itemID, "IsMaxedByRulesOrEffect", C_ArtifactUI.IsMaxedByRulesOrEffect());
+            itemID = tostring(itemID);
+            if ( altItemID ) then
+                dbEntry:SetValue(2, container, tostring(altItemID), itemID);
+            end
+            dbEntry:SetValue(3, container, itemID, "Info", altItemID, icon, artifactAppearanceID, appearanceModID, itemAppearanceID, altItemAppearanceID, altOnTop, uiCameraID, altHandUICameraID, modelAlpha, modelDesaturation);
+            dbEntry:SetValue(3, container, itemID, "ArtInfo", self:CopyTable(C_ArtifactUI.GetArtifactArtInfo()));
+            dbEntry:SetValue(3, container, itemID, "PointsRemaining", C_ArtifactUI.GetPointsRemaining());
+            dbEntry:SetValue(3, container, itemID, "PurchasedRanks", C_ArtifactUI.GetTotalPurchasedRanks());
+            dbEntry:SetValue(3, container, itemID, "KnowledgeLevel", C_ArtifactUI.GetArtifactKnowledgeLevel());
+            dbEntry:SetValue(3, container, itemID, "KnowledgeMultiplier", C_ArtifactUI.GetArtifactKnowledgeMultiplier());
+            dbEntry:SetValue(3, container, itemID, "MetaPower", C_ArtifactUI.GetMetaPowerInfo());
+            dbEntry:SetValue(3, container, itemID, "Powers", C_ArtifactUI.GetPowers());
+            dbEntry:SetValue(3, container, itemID, "Tier", C_ArtifactUI.GetArtifactTier());
+            dbEntry:SetValue(3, container, itemID, "IsMaxedByRulesOrEffect", C_ArtifactUI.IsMaxedByRulesOrEffect());
 
-	    local powers = C_ArtifactUI.GetPowers();
-        for i, powerID in ipairs(powers) do
-            dbEntry:SetValue(3, container, itemID, "PowerInfo"..powerID, self:CopyTable(C_ArtifactUI.GetPowerInfo(powerID)));
-            dbEntry:SetValue(3, container, itemID, "PowerLinks"..powerID, C_ArtifactUI.GetPowerLinks(powerID));
-            dbEntry:SetValue(3, container, itemID, "PowerLink"..powerID, C_ArtifactUI.GetPowerHyperlink(powerID));
-        end
-        
-        local numRelicSlots = C_ArtifactUI.GetNumRelicSlots();
-        dbEntry:SetValue(3, container, itemID, "Relics", numRelicSlots);
-        for relicSlotIndex = 1, numRelicSlots do
-            dbEntry:SetValue(3, container, itemID, "RelicType"..relicSlotIndex, C_ArtifactUI.GetRelicSlotType(relicSlotIndex));
-            dbEntry:SetValue(3, container, itemID, "RelicInfo"..relicSlotIndex, C_ArtifactUI.GetRelicInfo(relicSlotIndex));
-            dbEntry:SetValue(3, container, itemID, "RelicPowers"..relicSlotIndex, C_ArtifactUI.GetPowersAffectedByRelic(relicSlotIndex));
-            dbEntry:SetValue(3, container, itemID, "RelicLockedReason"..relicSlotIndex, C_ArtifactUI.GetRelicLockedReason(relicSlotIndex));
+            local powers = C_ArtifactUI.GetPowers();
+            for i, powerID in ipairs(powers) do
+                dbEntry:SetValue(3, container, itemID, "PowerInfo"..powerID, self:CopyTable(C_ArtifactUI.GetPowerInfo(powerID)));
+                dbEntry:SetValue(3, container, itemID, "PowerLinks"..powerID, C_ArtifactUI.GetPowerLinks(powerID));
+                dbEntry:SetValue(3, container, itemID, "PowerLink"..powerID, C_ArtifactUI.GetPowerHyperlink(powerID));
+            end
+            
+            local numRelicSlots = C_ArtifactUI.GetNumRelicSlots();
+            dbEntry:SetValue(3, container, itemID, "Relics", numRelicSlots);
+            for relicSlotIndex = 1, numRelicSlots do
+                dbEntry:SetValue(3, container, itemID, "RelicType"..relicSlotIndex, C_ArtifactUI.GetRelicSlotType(relicSlotIndex));
+                dbEntry:SetValue(3, container, itemID, "RelicInfo"..relicSlotIndex, C_ArtifactUI.GetRelicInfo(relicSlotIndex));
+                dbEntry:SetValue(3, container, itemID, "RelicPowers"..relicSlotIndex, C_ArtifactUI.GetPowersAffectedByRelic(relicSlotIndex));
+                dbEntry:SetValue(3, container, itemID, "RelicLockedReason"..relicSlotIndex, C_ArtifactUI.GetRelicLockedReason(relicSlotIndex));
+            end
         end
         
         self:Unlock(container);
