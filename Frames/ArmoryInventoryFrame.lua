@@ -91,14 +91,6 @@ function ArmoryInventoryFrame_OnLoad(self)
 end
 
 function ArmoryInventoryFrame_OnEvent(self, event, ...)
-    local arg1 = ...;
-    local update = true;
-
-    -- make sure no Blizz id will match (e.g. -4 was introduced for tokens bag)
-    if ( arg1 and arg1 <= ARMORY_MAIL_CONTAINER ) then
-        arg1 = arg1 * 100;
-    end
-
     if ( not Armory:CanHandleEvents() ) then
         return;
     elseif ( event == "PLAYER_ENTERING_WORLD" ) then
@@ -112,7 +104,17 @@ function ArmoryInventoryFrame_OnEvent(self, event, ...)
             end
         end
         return;
-    elseif ( event == "BAG_UPDATE" and arg1 >= BACKPACK_CONTAINER and arg1 <= NUM_BAG_SLOTS ) then
+    end
+
+    local arg1 = ...;
+    local update = true;
+
+    -- make sure no Blizz id will match (e.g. -4 was introduced for tokens bag)
+    if ( arg1 and arg1 <= ARMORY_MAIL_CONTAINER ) then
+        arg1 = arg1 * 100;
+    end
+
+    if ( event == "BAG_UPDATE" and arg1 >= BACKPACK_CONTAINER and arg1 <= NUM_BAG_SLOTS ) then
         if ( self.mailOpen ) then
             Armory:Execute(ArmoryInventoryFrame_UpdateContainer(ARMORY_MAIL_CONTAINER));
         end
