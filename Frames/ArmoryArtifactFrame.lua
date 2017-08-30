@@ -783,6 +783,15 @@ function ArmoryArtifactTitleTemplateMixin:OnRelicSlotMouseEnter(relicSlot)
     elseif ( relicSlot.relicLink ) then
         GameTooltip:SetOwner(relicSlot, "ANCHOR_BOTTOMRIGHT", 0, 10);
         GameTooltip:SetHyperlink(relicSlot.relicLink);
+        local currentRank, canAddTalent, artifactLevelRequiredForNextRank = Armory:GetRelicSlotRankInfo(relicSlot.relicSlotIndex);
+        if ( canAddTalent ) then
+            GameTooltip:AddLine(" ");
+            GameTooltip:AddLine(ARTIFACT_RELIC_TALENT_AVAILABLE, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true);
+        elseif ( artifactLevelRequiredForNextRank ) then
+            GameTooltip:AddLine(" ");
+            GameTooltip:AddLine(ARTIFACT_RELIC_SLOT_NEXT_RANK:format(currentRank + 1, artifactLevelRequiredForNextRank), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true);
+        end
+        GameTooltip:Show();
     elseif ( relicSlot.relicType ) then
         GameTooltip:SetOwner(relicSlot, "ANCHOR_BOTTOMRIGHT", 0, 10);
         local slotName = _G["RELIC_SLOT_TYPE_" .. relicSlot.relicType:upper()];
@@ -846,6 +855,7 @@ function ArmoryArtifactTitleTemplateMixin:EvaluateRelics()
             relicSlot.Icon:SetAtlas("Relic-SlotBG", true);
             relicSlot.Glass:Hide();
 			relicSlot.relicLink = nil;
+            relicSlot.Rank:Hide();
         else
 			local relicName, relicIcon, relicType, relicLink = Armory:GetRelicInfo(i);
 
@@ -865,6 +875,20 @@ function ArmoryArtifactTitleTemplateMixin:EvaluateRelics()
                 relicSlot.Glass:Hide();
             end
 			relicSlot.relicLink = relicLink;
+
+            local currentRank, canAddTalent = Armory:GetRelicSlotRankInfo(i);
+            if ( currentRank ) then
+                relicSlot.Rank:Show();
+                relicSlot.Rank.Text:SetText(currentRank);
+                if ( canAddTalent ) then
+                    relicSlot.Rank.GlowAnim:Play();
+                else
+                    relicSlot.Rank.GlowAnim:Stop();
+                    relicSlot.Rank.Glow:SetAlpha(0);
+                end
+            else
+                relicSlot.Rank:Hide();
+            end
         end
 
         relicSlot.relicType = relicType;

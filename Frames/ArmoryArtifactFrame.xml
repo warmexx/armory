@@ -104,6 +104,18 @@
         </Texture>
       </Layer>
     </Layers>
+
+    <NormalTexture parentKey="NormalTexture" />
+    <HighlightTexture parentKey="HighlightTexture" alphaMode="ADD" />
+
+  	<Frames>
+			<Frame parentKey="Rank" inherits="ArtifactRelicRankTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" x="25" y="6"/>
+				</Anchors>
+			</Frame>
+		</Frames>
+
     <Scripts>
       <OnEnter>
         self:GetParent():OnRelicSlotMouseEnter(self);
@@ -115,8 +127,6 @@
         self:GetParent():OnRelicSlotClicked(self);
       </OnClick>
     </Scripts>
-    <NormalTexture parentKey="NormalTexture" />
-    <HighlightTexture parentKey="HighlightTexture" alphaMode="ADD" />
   </Button>
   
   <Button name="ArmoryArtifactPowerButtonTemplate" mixin="ArmoryArtifactPowerButtonMixin" frameLevel="1500" virtual="true">
@@ -232,6 +242,7 @@
       </OnEvent>
       <OnModelLoaded function="ArmoryArtifactsModelTemplate_OnModelLoaded" />
     </Scripts>
+		<ViewInsets left="88" right="88" top="0" bottom="0"/>
   </PlayerModel>
 
   <Frame name="ArmoryArtifactFrame" toplevel="true" movable="true" parent="UIParent" enableMouse="true" hidden="true" mixin="ArmoryArtifactFrameMixin">

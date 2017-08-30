@@ -103,6 +103,7 @@ function Armory:UpdateArtifact()
                 dbEntry:SetValue(3, container, itemID, "RelicInfo"..relicSlotIndex, C_ArtifactUI.GetRelicInfo(relicSlotIndex));
                 dbEntry:SetValue(3, container, itemID, "RelicPowers"..relicSlotIndex, C_ArtifactUI.GetPowersAffectedByRelic(relicSlotIndex));
                 dbEntry:SetValue(3, container, itemID, "RelicLockedReason"..relicSlotIndex, C_ArtifactUI.GetRelicLockedReason(relicSlotIndex));
+                dbEntry:SetValue(3, container, itemID, "RelicRankInfo"..relicSlotIndex, C_ArtifactUI.GetRelicSlotRankInfo(relicSlotIndex));
             end
         end
         
@@ -255,4 +256,8 @@ end
 
 function Armory:GetRelicLockedReason(index, artifact)
     return GetArtifactValue("RelicLockedReason"..index, artifact);
+end
+
+function Armory:GetRelicSlotRankInfo(index, artifact)
+    return GetArtifactValue("RelicRankInfo"..index, artifact);
 end
