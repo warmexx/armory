@@ -6,9 +6,9 @@
     <Scripts>
       <OnClick>
         if ( self:GetChecked() ) then
-          PlaySound("igMainMenuOptionCheckBoxOn");
+          PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
         else
-          PlaySound("igMainMenuOptionCheckBoxOff");
+          PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF);
         end
         ArmoryOptionsPanel_CheckButton_OnClick(self);
       </OnClick>
@@ -464,7 +464,7 @@
             self.tooltipText = Armory:Proper(ARMORY_CMD_RESET_FRAME_TEXT);
           </OnLoad>
           <OnClick>
-            PlaySound("gsTitleOptionOK");
+            PlaySound(SOUNDKIT.GS_TITLE_OPTION_OK);
             Armory:Reset(ARMORY_CMD_RESET_FRAME, true);
           </OnClick>
         </Scripts>
@@ -2098,7 +2098,7 @@
             self.tooltipText = Armory:Proper(ARMORY_CMD_CHECK_TEXT);
           </OnLoad>
           <OnClick>
-            PlaySound("gsTitleOptionOK");
+            PlaySound(SOUNDKIT.GS_TITLE_OPTION_OK);
             Armory:CheckMailItems();
           </OnClick>
         </Scripts>

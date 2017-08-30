@@ -2044,7 +2044,7 @@ function ArmoryGearSetFrame_OnShow(self)
     ArmoryFrame:SetAttribute("UIPanelLayout-defined", nil);
     ArmoryGearSetToggleButton:SetButtonState("PUSHED", 1);
     ArmoryGearSetFrame_Update();
-    PlaySound("igBackPackOpen");
+    PlaySound(SOUNDKIT.IG_BACKPACK_OPEN);
     ArmoryGearSetFrame:Raise();
 end
 
@@ -2052,7 +2052,7 @@ function ArmoryGearSetFrame_OnHide(self)
     ArmoryFrame:SetAttribute("UIPanelLayout-defined", nil);
     ArmoryGearSetToggleButton:SetButtonState("NORMAL");
     ArmoryPaperDollFrame_UpdateStats();
-    PlaySound("igBackPackClose");
+    PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE);
 end
 
 function ArmoryGearSetFrame_Update()
@@ -2104,7 +2104,7 @@ function ArmoryGearSetFrameEquipSet_OnClick(self)
     if ( selectedSet ) then
         local name = selectedSet.name;
         if ( name and name ~= "" ) then
-            PlaySound("igCharacterInfoTab");
+            PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
             local items = Armory:GetEquipmentSetItemIDs(selectedSet:GetID(), gearSetItems);
             ArmoryPaperDollItemSlotButton_Update(ArmoryHeadSlot, items[1]);
             ArmoryPaperDollItemSlotButton_Update(ArmoryNeckSlot, items[2]);
@@ -2132,7 +2132,7 @@ end
 
 function ArmoryGearSetButton_OnClick(self, button, down)
     if ( self.name and self.name ~= "" ) then
-        PlaySound("igMainMenuOptionCheckBoxOn");
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
         local dialog = ArmoryGearSetFrame;
         dialog.selectedSetName = self.name;
         ArmoryGearSetFrame_Update();

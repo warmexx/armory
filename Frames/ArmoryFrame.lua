@@ -47,7 +47,7 @@ function ArmoryFrame_ToggleArmory(tab)
             if ( subFrame:IsVisible() ) then
                 HideUIPanel(ArmoryFrame);
             else
-                PlaySound("igCharacterInfoTab");
+                PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
                 ArmoryFrame_ShowSubFrame(tab);
             end
         else
@@ -279,12 +279,12 @@ function ArmoryMailFrameUpdate()
 end
 
 function ArmoryFrame_OnShow(self)
-    PlaySound("igCharacterInfoOpen");
+    PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN);
     ArmoryFrame_Update(Armory:CurrentProfile());
 end
 
 function ArmoryFrame_OnHide(self)
-    PlaySound("igCharacterInfoClose");
+    PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE);
 end
 
 function ArmoryFrameTab_OnClick(self)
@@ -301,7 +301,7 @@ function ArmoryFrameTab_OnClick(self)
     elseif ( id == 5 ) then
         ArmoryFrame_ToggleArmory("ArmoryOtherFrame");
     end
-    PlaySound("igCharacterInfoTab");
+    PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
 end
 
 function ArmoryFrame_CheckTabBounds(tabName, totalTabWidth, maxTotalTabWidth, tabWidthCache)

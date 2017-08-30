@@ -670,7 +670,7 @@
         <Scripts>
           <OnClick>
             ArmoryAchievementFrameTab_OnClick(self);
-            PlaySound("igCharacterInfoTab");
+            PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
           </OnClick>
         </Scripts>
       </Button>
@@ -685,7 +685,7 @@
         <Scripts>
           <OnClick>
             ArmoryAchievementFrameTab_OnClick(self);
-            PlaySound("igCharacterInfoTab");
+            PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
           </OnClick>
         </Scripts>
       </Button>
@@ -698,7 +698,7 @@
         ArmoryAchievementFrame_OnEvent(self, event, ...);
       </OnEvent>
       <OnShow>
-        PlaySound("igCharacterInfoTab");
+        PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
         ArmoryAchievementFrame_OnShow(self);
       </OnShow>
       <OnMouseWheel>

@@ -551,11 +551,11 @@
         ArmoryInventoryFrame_OnEvent(self, event, ...);
       </OnEvent>
       <OnShow>
-        PlaySound("igBackPackOpen");
+        PlaySound(SOUNDKIT.IG_BACKPACK_OPEN);
         ArmoryInventoryFrame_OnShow(self);
       </OnShow>
       <OnHide>
-        PlaySound("igBackPackClose");
+        PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE);
       </OnHide>
       <OnMouseWheel>
         return;

@@ -121,7 +121,7 @@
         if ( self.sortType ) then
           ArmoryFindFrame_Sort(self.sortType);
         end
-        PlaySound("igMainMenuOptionCheckBoxOn");
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
       </OnClick>
     </Scripts>
     <ButtonText>

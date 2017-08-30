@@ -231,7 +231,7 @@
           <OnClick>
             local currentTab = self:GetParent():GetID();
             if ( AGB.currentTab ~= currentTab ) then
-              PlaySound("GuildBankOpenBag");
+              PlaySound(SOUNDKIT.GUILD_BANK_OPEN_BAG);
             end
             ArmoryIconGuildBankTab_OnClick(self, button, currentTab);
           </OnClick>
@@ -854,13 +854,13 @@
         ArmoryListGuildBankFrame_OnLoad(self);
       </OnLoad>
       <OnShow>
-        PlaySound("GuildVaultOpen");
+        PlaySound(SOUNDKIT.GUILD_VAULT_OPEN);
         self:SetScale(Armory:GetConfigFrameScale());
         ArmoryListGuildBankFrame_AllignCommonControls(self);
         ArmoryGuildBankFrame_OnShow(self);
       </OnShow>
       <OnHide>
-        PlaySound("GuildVaultClose");
+        PlaySound(SOUNDKIT.GUILD_VAULT_CLOSE);
       </OnHide>
       <OnMouseDown>
         if ( button == "LeftButton" ) then
@@ -1356,7 +1356,7 @@
         ArmoryGuildBankFrame_OnShow(self);
       </OnShow>
       <OnHide>
-        PlaySound("GuildVaultClose");
+        PlaySound(SOUNDKIT.GUILD_VAULT_CLOSE);
       </OnHide>
       <OnMouseDown>
         if ( button == "LeftButton" ) then

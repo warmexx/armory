@@ -45,7 +45,7 @@ function ArmoryQuestFrame_OnLoad(self)
 end
 
 function ArmoryQuestFrame_OnShow(self)
-    PlaySound("igQuestLogOpen");
+    PlaySound(SOUNDKIT.IG_QUEST_LOG_OPEN);
     ArmoryQuestFrameEditBox:SetText(Armory:GetQuestLogFilter());
     if ( Armory:GetNumQuestHistoryEntries() == 0 ) then
         ArmoryQuestFrameTab_OnClick(ArmoryQuestFrameTab1);
@@ -63,7 +63,7 @@ function ArmoryQuestFrame_OnShow(self)
 end
 
 function ArmoryQuestFrame_OnHide(self)
-    PlaySound("igQuestLogClose");
+    PlaySound(SOUNDKIT.IG_QUEST_LOG_CLOSE);
 end
 
 function ArmoryQuestFrameEditBox_OnTextChanged(self)

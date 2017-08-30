@@ -64,7 +64,7 @@ end
 function ArmorySocialFrameTab_OnClick(self)
     PanelTemplates_SetTab(ArmorySocialFrame, self:GetID());
     ArmorySocialFrame_ShowSubFrame();
-    PlaySound("igCharacterInfoTab");
+    PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
 end
 
 function ArmorySocialFrame_OnLoad(self)
@@ -79,7 +79,7 @@ function ArmorySocialFrame_OnLoad(self)
 end
 
 function ArmorySocialFrame_OnShow(self)
-    PlaySound("igCharacterInfoTab");
+    PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
     PanelTemplates_SetTab(self, PanelTemplates_GetSelectedTab(self));
     
     local tab;

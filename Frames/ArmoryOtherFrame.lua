@@ -57,7 +57,7 @@ end
 function ArmoryOtherFrameTab_OnClick(self)
     PanelTemplates_SetTab(ArmoryOtherFrame, self:GetID());
     ArmoryOtherFrame_ShowSubFrame();
-    PlaySound("igCharacterInfoTab");
+    PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
 end
 
 function ArmoryOtherFrame_OnLoad(self)

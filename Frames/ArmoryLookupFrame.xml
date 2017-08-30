@@ -610,7 +610,7 @@
             <Scripts>
               <OnClick>
                 ArmoryToggleDropDownMenu(1, nil, self:GetParent());
-                PlaySound("igMainMenuOptionCheckBoxOn");
+                PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
               </OnClick>
             </Scripts>
             <NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up">
@@ -682,12 +682,12 @@
         ArmoryLookupFrame_OnEvent(self, event, ...);
       </OnEvent>
       <OnShow>
-        PlaySound("igCharacterInfoTab");
+        PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
         self:SetScale(Armory:GetConfigFrameScale());
         ArmoryLookupFrame_OnShow(self);
       </OnShow>
       <OnHide>
-        PlaySound("igMainMenuClose");
+        PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE);
       </OnHide>
       <OnMouseDown>
         if ( button == "LeftButton" ) then

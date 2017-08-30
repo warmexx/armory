@@ -94,11 +94,11 @@ function ArmoryTradeSkillFrameMixin:OnEvent(event, ...)
 end
 
 function ArmoryTradeSkillFrameMixin:OnShow()
-	PlaySound("UI_ProfessionsWindow_Open");
+	PlaySound(SOUNDKIT.UI_PROFESSIONS_WINDOW_OPEN);
 end
 
 function ArmoryTradeSkillFrameMixin:OnHide()
-	PlaySound("UI_ProfessionsWindow_Close");
+	PlaySound(SOUNDKIT.UI_PROFESSIONS_WINDOW_CLOSE);
 end
 
 function ArmoryTradeSkillFrameMixin:Update()

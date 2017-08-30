@@ -81,7 +81,7 @@ function ArmoryStaticPopup_OnEvent(self, event, ...)
 end
 
 function ArmoryStaticPopup_OnShow(self)
-	PlaySound("igMainMenuOpen");
+	PlaySound(SOUNDKIT.IG_MAINMENU_OPEN);
 
 	local dialog = ArmoryStaticPopupDialogs[self.which];
 	local OnShow = dialog.OnShow;
@@ -96,7 +96,7 @@ function ArmoryStaticPopup_OnShow(self)
 end
 
 function ArmoryStaticPopup_OnHide(self)
-	PlaySound("igMainMenuClose");
+	PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE);
 	
 	local dialog = ArmoryStaticPopupDialogs[self.which];
 	local OnHide = dialog.OnHide;

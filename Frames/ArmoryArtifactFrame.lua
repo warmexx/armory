@@ -54,7 +54,7 @@ function ArmoryArtifactFrameMixin:OnLoad()
 end
 
 function ArmoryArtifactFrameMixin:OnShow()
-    PlaySound("igCharacterInfoOpen");
+    PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN);
     
     self:SetScale(Armory:GetConfigFrameScale());
     
@@ -64,7 +64,7 @@ function ArmoryArtifactFrameMixin:OnShow()
 end
 
 function ArmoryArtifactFrameMixin:OnHide()
-    PlaySound("igCharacterInfoClose");
+    PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE);
 end
 
 function ArmoryArtifactFrameMixin:OnEvent(event, ...)

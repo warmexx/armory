@@ -144,7 +144,7 @@
           </OnLoad>
           <OnClick>
             ArmoryQuestFrameTab_OnClick(self);
-            PlaySound("igCharacterInfoTab");
+            PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
           </OnClick>
         </Scripts>
       </Button>
@@ -163,7 +163,7 @@
           </OnLoad>
           <OnClick>
             ArmoryQuestFrameTab_OnClick(self);
-            PlaySound("igCharacterInfoTab");
+            PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
           </OnClick>
         </Scripts>
       </Button>

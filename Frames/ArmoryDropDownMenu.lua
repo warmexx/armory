@@ -590,7 +590,7 @@ function ArmoryDropDownMenuButton_OnClick(self)
 		return;
 	end
 
-	PlaySound("UChatScrollButton");
+	PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
 end
 
 function ArmoryHideDropDownMenu(level)

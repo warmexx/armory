@@ -273,19 +273,19 @@ end
 function ArmorySpellBookFrame_PlayOpenSound()
     if ( ArmorySpellBookFrame.bookType == BOOKTYPE_PET ) then
         -- Need to change to pet book open sound
-        PlaySound("igAbilityOpen");
+        PlaySound(SOUNDKIT.IG_ABILITY_OPEN);
     else
-        PlaySound("igSpellBookOpen");
+        PlaySound(SOUNDKIT.IG_SPELLBOOK_OPEN);
     end
 end
 
 function ArmorySpellBookFrame_PlayCloseSound()
     if ( not ArmorySpellBookFrame.suppressCloseSound ) then
         if ( ArmorySpellBookFrame.bookType == BOOKTYPE_SPELL ) then
-            PlaySound("igSpellBookClose");
+            PlaySound(SOUNDKIT.IG_SPELLBOOK_CLOSE);
         else
             -- Need to change to pet book close sound
-            PlaySound("igAbilityClose");
+            PlaySound(SOUNDKIT.IG_ABILITY_CLOSE);
         end
     end
 end
@@ -432,12 +432,12 @@ end
 function ArmorySpellBookPrevPageButton_OnClick(self)
     local pageNum = ArmorySpellBook_GetCurrentPage() - 1;
     if ( ArmorySpellBookFrame.bookType == BOOKTYPE_SPELL ) then
-        PlaySound("igAbiliityPageTurn");
+        PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN);
         ARMORY_SPELLBOOK_PAGENUMBERS[ArmorySpellBookFrame.selectedSkillLine] = pageNum;
     else
         ArmorySpellBookTitleText:SetText(ArmorySpellBookFrame.petTitle);
         -- Need to change to pet book pageturn sound
-        PlaySound("igAbiliityPageTurn");
+        PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN);
         ARMORY_SPELLBOOK_PAGENUMBERS[BOOKTYPE_PET][ArmorySpellBookFrame.selectedPetSkillLine] = pageNum;
     end
     ArmorySpellBook_UpdatePageArrows();
@@ -448,12 +448,12 @@ end
 function ArmorySpellBookNextPageButton_OnClick(self)
     local pageNum = ArmorySpellBook_GetCurrentPage() + 1;
     if ( ArmorySpellBookFrame.bookType == BOOKTYPE_SPELL ) then
-        PlaySound("igAbiliityPageTurn");
+        PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN);
         ARMORY_SPELLBOOK_PAGENUMBERS[ArmorySpellBookFrame.selectedSkillLine] = pageNum;
     else
         ArmorySpellBookTitleText:SetText(ArmorySpellBookFrame.petTitle);
         -- Need to change to pet book pageturn sound
-        PlaySound("igAbiliityPageTurn");
+        PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN);
         ARMORY_SPELLBOOK_PAGENUMBERS[BOOKTYPE_PET][ArmorySpellBookFrame.selectedPetSkillLine] = pageNum;
     end
     ArmorySpellBook_UpdatePageArrows();

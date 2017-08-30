@@ -29,14 +29,14 @@
 local Armory, _ = Armory;
 
 Armory.sounds = {
-    "AlarmClockWarning1",
-    "AlarmClockWarning2",
-    "AlarmClockWarning3",
-    "GM_ChatWarning",
-    "igCharacterInfoTab",
-    "LFG_Denied",
-    "ITEM_REPAIR",
-    "RaidWarning"
+    SOUNDKIT.ALARM_CLOCK_WARNING_1,
+    SOUNDKIT.ALARM_CLOCK_WARNING_2,
+    SOUNDKIT.ALARM_CLOCK_WARNING_3,
+    SOUNDKIT.GM_CHAT_WARNING,
+    SOUNDKIT.IG_CHARACTER_INFO_TAB,
+    SOUNDKIT.LFG_DENIED,
+    SOUNDKIT.ITEM_REPAIR,
+    SOUNDKIT.RAID_WARNING
 };
 
 Armory.options = {

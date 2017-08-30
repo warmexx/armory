@@ -1023,7 +1023,7 @@
         self:SetChecked(Armory:GetConfigUseOverlay());
       </OnShow>
       <OnClick>
-        PlaySound("igMainMenuOptionCheckBoxOn");
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
         Armory:SetConfigUseOverlay(self:GetChecked());
         if ( self:GetChecked() ) then
           ArmoryPaperDollOverlayFrame:Show();

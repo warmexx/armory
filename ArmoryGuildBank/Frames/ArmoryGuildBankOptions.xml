@@ -113,12 +113,12 @@
           </OnLoad>
           <OnClick>
             if ( self:GetChecked() ) then
-              PlaySound("igMainMenuOptionCheckBoxOn");
+              PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
               self:GetParent().colorText:Hide();
               self:GetParent().colorSwatch:Hide();
               self:GetParent().numberColor:Hide();
             else
-              PlaySound("igMainMenuOptionCheckBoxOff");
+              PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF);
               self:GetParent().colorText:Show();
               self:GetParent().colorSwatch:Show();
               self:GetParent().numberColor:Show();
