@@ -4,6 +4,9 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+==== v14.4.1 ====
+# Included latest LibRecipes
+
 ==== v14.4.0 ====
 # Adjustments have been made for patch 7.3.0
 
