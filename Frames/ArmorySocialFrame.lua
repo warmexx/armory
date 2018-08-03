@@ -41,6 +41,16 @@ ARMORY_SOCIALFRAME_IGNORE_HEIGHT = 16;
 ARMORY_EVENTS_TO_DISPLAY = 11;
 ARMORY_SOCIALFRAME_EVENT_HEIGHT = 34;
 
+local CalendarEventTypeNames =
+{
+	[Enum.CalendarEventType.Raid] = CALENDAR_TYPE_RAID,
+	[Enum.CalendarEventType.Dungeon] = CALENDAR_TYPE_DUNGEON,
+	[Enum.CalendarEventType.Pvp] = CALENDAR_TYPE_PVP,
+	[Enum.CalendarEventType.Meeting] = CALENDAR_TYPE_MEETING,
+	[Enum.CalendarEventType.Other] = CALENDAR_TYPE_OTHER,
+	[Enum.CalendarEventType.HeroicDeprecated] = CALENDAR_TYPE_DUNGEON,
+};
+
 local tabWidthCache = {};
 
 function ArmorySocialFrame_ShowSubFrame(frameName)
@@ -110,8 +120,11 @@ function ArmorySocialFrame_OnEvent(self, event, ...)
         Armory:Execute(ArmorySocialFrame_UpdateEvents);
     else
         -- CALENDAR_CLOSE_EVENT doesn't fire, maybe one day...
-        local _, presentMonth, _, presentYear = CalendarGetDate();
-        CalendarSetAbsMonth(presentMonth, presentYear);
+        local date = C_Calendar.GetDate();
+        local presentMonth = date.month;
+        local presentYear = date.year;
+    
+        C_Calendar.SetAbsMonth(presentMonth, presentYear);
     end
 end
 
@@ -125,7 +138,7 @@ function ArmorySocialFrame_UpdateFriends()
 end
 
 function ArmorySocialFrame_InitializeEvents()
-    OpenCalendar();
+    C_Calendar.OpenCalendar();
     if ( Armory:GetConfigCheckCooldowns() ) then
         Armory:CheckAvailableCooldowns();
     end
@@ -324,12 +337,12 @@ function ArmoryEventsList_GetEventDetail(eventIndex)
         eventColor = GetEventColor(calendarType, modStatus, inviteStatus);
         status = Armory:HexColor(inviteStatusInfo.color)..inviteStatusInfo.name..FONT_COLOR_CODE_CLOSE;
         if ( texture ) then
-            typeName = GetEventTextures(CalendarEventGetTextures(eventType))[texture];
+            typeName = GetEventTextures(C_Calendar.EventGetTextures(eventType))[texture];
         end
         if ( typeName ) then
-            typeName = format(CALENDAR_VIEW_EVENTTYPE, select(eventType, CalendarEventGetTypes()), typeName);
+            typeName = format(CALENDAR_VIEW_EVENTTYPE, CalendarEventTypeNames[eventType], typeName);
         else
-            typeName = select(eventType, CalendarEventGetTypes());
+            typeName = CalendarEventTypeNames[eventType];
         end
         if ( Armory:UnitName("player") == invitedBy ) then
             if ( calendarType == "GUILD_ANNOUNCEMENT" ) then

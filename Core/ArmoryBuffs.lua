@@ -103,7 +103,7 @@ local function GetBuffTimeLeft(unit, index, filter)
     local dbEntry = Armory.selectedDbBaseEntry;
 
     if ( dbEntry ) then
-        local _, _, _, _, _, duration, expirationTime, _, _, _, spellId = dbEntry:GetValue(container, filter, "Aura"..index);
+        local _, _, _, _, duration, expirationTime, _, _, _, spellId = dbEntry:GetValue(container, filter, "Aura"..index);
         local timeLeft;
 
         if ( duration and duration > 0 and expirationTime ) then

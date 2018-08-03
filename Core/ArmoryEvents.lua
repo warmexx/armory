@@ -63,7 +63,6 @@ local calendarState = {
     {cvar = "calendarShowBattlegrounds"},
     {cvar = "calendarShowDarkmoon"},
     {cvar = "calendarShowLockouts"},
-    {cvar = "calendarShowResets"},
     {cvar = "calendarShowWeeklyHolidays"},
 };
 
@@ -107,7 +106,7 @@ local function EvalCalendar(cvar, numDays, callback)
             monthOffset = monthOffset + 1;
         end
  
-        local numEvents = CalendarGetNumDayEvents(monthOffset, eventDate.day);
+        local numEvents = C_Calendar.GetNumDayEvents(monthOffset, eventDate.day);
         for eventIndex = 1, numEvents do
             local event = C_Calendar.GetDayEvent(monthOffset, eventDate.day, eventIndex);
             if ( event and callback(eventIndex, Armory:MakeDate(eventDate.day, eventDate.month, eventDate.year, hour, minute), event) ) then

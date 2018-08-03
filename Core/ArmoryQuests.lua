@@ -206,11 +206,11 @@ function Armory:UpdateQuests()
                 if ( _G.GetNumQuestLogRewardSpells() > 0 ) then
                     info.RewardSpells = {};
                     for i = 1, _G.GetNumQuestLogRewardSpells() do
-                        local texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID, spellID = _G.GetQuestLogRewardSpell(i);
+                        local texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID, genericUnlock, spellID = _G.GetQuestLogRewardSpell(i);
 		                local knownSpell = _G.IsSpellKnownOrOverridesKnown(spellID);
-		                local isFollowerCollected = garrFollowerID and C_Garrison.IsFollowerCollected(garrFollowerID);
+                        local isFollowerCollected = garrFollowerID and C_Garrison.IsFollowerCollected(garrFollowerID);
                         link = _G.GetQuestLogSpellLink(i);
-                        info.RewardSpells[i] = dbEntry.Save(texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID, spellID, knownSpell, isFollowerCollected, link);
+                        info.RewardSpells[i] = dbEntry.Save(texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID, genericUnlock, spellID, knownSpell, isFollowerCollected, link);
                         if ( not link ) then
                             dataMissing = true;
                         end
@@ -446,7 +446,7 @@ function Armory:GetQuestLogRewardTitle()
 end
 
 function Armory:GetQuestLogSpellLink(id)
-    local link = select(11, self:GetQuestLogRewardSpell(id));
+    local link = select(12, self:GetQuestLogRewardSpell(id));
     return link;
 end
 

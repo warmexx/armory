@@ -56,16 +56,11 @@ function Armory:SetHonorTalents()
         self:Lock(container);
 
         self:PrintDebug("UPDATE", container);
-    
-        local activeTalentGroup = _G.GetActiveSpecGroup() or 1;
-		for tier = 1, MAX_PVP_TALENT_TIERS do
-			for column = 1, MAX_PVP_TALENT_COLUMNS do
-				local id, _, _, selected, available = _G.GetPvpTalentInfo(tier, column, activeTalentGroup);
-				dbEntry:SetValue(3, container, tier, column, id, selected, available);
-			end
-		end
 
-        dbEntry:SetValue(2, container, "Unspent", _G.GetNumUnspentPvpTalents());
+        local spec = _G.GetSpecialization();
+
+        dbEntry:SetValue(3, container, spec, "Talents", C_SpecializationInfo.GetAllSelectedPvpTalentIDs());
+        dbEntry:SetValue(3, container, spec, "Unspent", _G.GetNumUnspentPvpTalents());
         
         self:Unlock(container);
     else
@@ -77,19 +72,19 @@ end
 -- Talents Interface
 ----------------------------------------------------------
  
-function Armory:GetNumUnspentPvpTalents()
-	local dbEntry = self.selectedDbBaseEntry;
-	return (dbEntry and dbEntry:GetValue(container, "Unspent")) or 0;
+function Armory:GetNumUnspentPvpTalents(spec)
+    local dbEntry = self.selectedDbBaseEntry;
+	return (dbEntry and dbEntry:GetValue(container, spec, "Unspent")) or 0;
 end
 
-function Armory:GetPvpTalentInfo(tier, column, talentGroup)
+function Armory:GetPvpTalentSlotInfo(index, spec)
 	local dbEntry = self.selectedDbBaseEntry;
 	if ( dbEntry ) then
-		local id, selected, available = dbEntry:GetValue(container, tier, column);
+        local talentID = dbEntry:GetValue(container, spec, "Talents", index);
         local name, iconTexture;
-        if ( id ) then
-            _, name, iconTexture = GetPvpTalentInfoByID(id);
+        if ( talentID ) then
+            _, name, iconTexture = GetPvpTalentInfoByID(talentID);
         end
-	    return id, name, iconTexture, selected, available;
+	    return talentID, name, iconTexture;
 	end
 end

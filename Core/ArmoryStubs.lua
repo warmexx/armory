@@ -29,10 +29,6 @@
 local Armory, _ = Armory;
 
 
-function Armory:CanPrestige()
-    return self:SetGetCharacterValue("CanPrestige", _G.CanPrestige());
-end
-
 function Armory:GetActiveSpecGroup(inspect)
     return self:SetGetCharacterValue("ActiveSpecGroup", _G.GetActiveSpecGroup()) or 1;
 end
@@ -162,18 +158,6 @@ function Armory:GetHitModifier()
     return self:SetGetCharacterValue("HitModifier", _G.GetHitModifier());
 end
 
-function Armory:GetHonorExhaustion()
-    return self:SetGetCharacterValue("HonorExhaustion", _G.GetHonorExhaustion());
-end
-
-function Armory:GetHonorLevelRewardPack()
-    return self:SetGetCharacterValue("HonorLevelRewardPack", _G.GetHonorLevelRewardPack());
-end
-
-function Armory:GetHonorRestState()
-    return self:SetGetCharacterValue("HonorRestState", _G.GetHonorRestState());
-end
-
 function Armory:GetInventoryAlertStatus(index)
     if ( index ) then
         return self:SetGetCharacterValue("InventoryAlertStatus"..index, _G.GetInventoryAlertStatus(index));
@@ -238,6 +222,10 @@ end
 
 function Armory:GetMeleeHaste()
     return self:SetGetCharacterValue("MeleeHaste", _G.GetMeleeHaste());
+end
+
+function Armory:GetMinItemLevel()
+    return self:SetGetCharacterValue("MinItemLevel", C_PaperDollInfo.GetMinItemLevel());
 end
 
 function Armory:GetMoney()
@@ -380,10 +368,6 @@ function Armory:GetPowerRegen()
     return self:SetGetCharacterValue("PowerRegen", _G.GetPowerRegen());
 end
 
-function Armory:GetPvpTalentUnlock()
-    return self:SetGetCharacterValue("PVPTalentUnlock", _G.GetPvpTalentUnlock());
-end
-
 function Armory:GetPVPGearStatRules()
     return self:SetGetCharacterValue("PVPGearStatRules", _G.GetPVPGearStatRules());
 end
@@ -517,6 +501,13 @@ end
 
 function Armory:GetSpellPenetration()
     return self:SetGetCharacterValue("SpellPenetration", _G.GetSpellPenetration());
+end
+
+function Armory:GetStaggerPercentage(unit)
+    if ( strlower(unit) == "pet" ) then
+        return self:SetGetPetValue("StaggerPercentage", C_PaperDollInfo.GetStaggerPercentage(unit));
+    end
+    return self:SetGetCharacterValue("StaggerPercentage", C_PaperDollInfo.GetStaggerPercentage(unit));
 end
 
 function Armory:GetSubZoneText()
@@ -1057,10 +1048,6 @@ function Armory:UnitPowerType(unit)
         return self:SetGetPetValue("PowerType", _G.UnitPowerType(unit));
     end
     return self:SetGetCharacterValue("PowerType", _G.UnitPowerType(unit));
-end
-
-function Armory:UnitPrestige(unit)
-    return self:SetGetCharacterValue("Prestige", _G.UnitPrestige("player"));
 end
 
 function Armory:UnitPVPName(unit)

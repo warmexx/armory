@@ -206,9 +206,9 @@ function ArmoryReputationFrame_Update()
                 paragonFrame.factionID = factionID;
                 paragonFrame.standingID = standingID;
                 paragonFrame:SetPoint("RIGHT", factionRow, 11, 0);
-                local currentValue, threshold, rewardQuestID, hasRewardPending = Armory:GetFactionParagonInfo(factionID);
-                paragonFrame.Glow:SetShown(hasRewardPending);
-                paragonFrame.Check:SetShown(hasRewardPending);
+                local currentValue, threshold, rewardQuestID, hasRewardPending, tooLowLevelForParagon = Armory:GetFactionParagonInfo(factionID);
+                paragonFrame.Glow:SetShown(not tooLowLevelForParagon and hasRewardPending);
+                paragonFrame.Check:SetShown(not tooLowLevelForParagon and hasRewardPending);
                 paragonFrame:Show();
             end
             local isCapped;
@@ -455,41 +455,42 @@ function ArmoryReputationBar_OnLeave(self)
 	GameTooltip:Hide();
 end
 
-function ArmoryReputationParagonFrame_SetupParagonTooltip(frame, factionID, standingID)
-	ArmoryReputationParagonTooltip.owner = frame;
-	ArmoryReputationParagonTooltip.factionID = factionID;
-	ArmoryReputationParagonTooltip.standingID = standingID;
+function ArmoryReputationParagonFrame_SetupParagonTooltip(frame)
+	EmbeddedItemTooltip.owner = frame;
+	EmbeddedItemTooltip.factionID = frame.factionID;
+	EmbeddedItemTooltip.standingID = frame.standingID;
 
-	local factionName = GetFactionInfoByID(factionID);
+	local factionName = GetFactionInfoByID(frame.factionID);
 	local gender = Armory:UnitSex("player");
-	local factionStandingtext = GetText("FACTION_STANDING_LABEL"..standingID, gender);
-
-	ArmoryReputationParagonTooltip:SetText(factionStandingtext);
-	local currentValue, threshold, rewardQuestID, hasRewardPending = Armory:GetFactionParagonInfo(factionID);
-	local description = PARAGON_REPUTATION_TOOLTIP_TEXT:format(factionName);
-	ArmoryReputationParagonTooltip:AddLine(description, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b, 1);
-    GameTooltip_InsertFrame(ArmoryReputationParagonTooltip, ArmoryReputationParagonTooltipStatusBar);
-    ArmoryReputationParagonTooltipStatusBar.Bar:SetMinMaxValues(0, threshold);
-    local value = mod(currentValue, threshold);
-    -- show overflow if reward is pending
-    if ( hasRewardPending ) then
-        value = value + threshold;
+	local factionStandingtext = GetText("FACTION_STANDING_LABEL"..frame.standingID, gender);
+    local currentValue, threshold, rewardQuestID, hasRewardPending, tooLowLevelForParagon = Armory:GetFactionParagonInfo(factionID);
+ 
+    if ( tooLowLevelForParagon ) then
+        EmbeddedItemTooltip:SetText(PARAGON_REPUTATION_TOOLTIP_TEXT_LOW_LEVEL);
+    else
+        EmbeddedItemTooltip:SetText(factionStandingtext);
+        local description = PARAGON_REPUTATION_TOOLTIP_TEXT:format(factionName);
+        EmbeddedItemTooltip:AddLine(description, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b, 1);
+        if ( not hasRewardPending and currentValue and threshold ) then
+            local value = mod(currentValue, threshold);
+            -- show overflow if reward is pending
+            if ( hasRewardPending ) then
+                value = value + threshold;
+            end
+            GameTooltip_ShowProgressBar(EmbeddedItemTooltip, 0, threshold, value, REPUTATION_PROGRESS_FORMAT:format(value, threshold));
+        end
+        GameTooltip_AddQuestRewardsToTooltip(EmbeddedItemTooltip, rewardQuestID);
     end
-    ArmoryReputationParagonTooltipStatusBar.Bar:SetValue(value);
-    ArmoryReputationParagonTooltipStatusBar.Bar.Label:SetFormattedText(REPUTATION_PROGRESS_FORMAT, value, threshold);
-	GameTooltip_AddQuestRewardsToTooltip(ArmoryReputationParagonTooltip, rewardQuestID);
-	ArmoryReputationParagonTooltip:Show();
+	EmbeddedItemTooltip:Show();
 end
 
 function ArmoryReputationParagonFrame_OnEnter(self)
-	ArmoryReputationParagonTooltip:SetParent(self);
-	ArmoryReputationParagonTooltip:SetFrameStrata("TOOLTIP");
-	ArmoryReputationParagonTooltip:SetOwner(self, "ANCHOR_RIGHT");
-	ArmoryReputationParagonFrame_SetupParagonTooltip(self, self.factionID, self.standingID);
+    EmbeddedItemTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	ArmoryReputationParagonFrame_SetupParagonTooltip(self);
 end
 
 function ArmoryReputationParagonFrame_OnLeave(self)
-    ArmoryReputationParagonTooltip:Hide();
+	EmbeddedItemTooltip:Hide();
 end
 
 function ArmoryReputationParagonFrame_OnUpdate(self)

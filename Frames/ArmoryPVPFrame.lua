@@ -54,7 +54,6 @@ function ArmoryPVPFrame_OnLoad(self)
     self:RegisterEvent("UPDATE_EXHAUSTION");
     self:RegisterEvent("HONOR_LEVEL_UPDATE");
     self:RegisterEvent("PLAYER_UPDATE_RESTING");
-    self:RegisterEvent("HONOR_PRESTIGE_UPDATE");
     self:RegisterEvent("PLAYER_PVP_TALENT_UPDATE");
 
     RequestRatedInfo();
@@ -78,7 +77,7 @@ function ArmoryPVPFrame_OnEvent(self, event, ...)
         if ( Armory.forceScan or not Armory:HonorTalentsExists() ) then
 			Armory:Execute(ArmoryPVPFrame_UpdateTalents);
         end
-    elseif ( event == "HONOR_XP_UPDATE" or event == "HONOR_LEVEL_UPDATE" or event == "HONOR_PRESTIGE_UPDATE" ) then
+    elseif ( event == "HONOR_XP_UPDATE" or event == "HONOR_LEVEL_UPDATE" ) then
         ArmoryPVPHonorXPBar_Update();
 		Armory:Execute(ArmoryPVPFrame_UpdateTalents);
     elseif ( event == "UPDATE_EXHAUSTION" or event == "PLAYER_UPDATE_RESTING" ) then
@@ -123,16 +122,11 @@ function ArmoryPVPFrame_Update(currentTab)
     ArmoryPVPHonorXPBar_Update();
     ArmoryPVPTalents_Update();
 
-    if ( Armory:GetPvpTalentInfo(1, 1) ) then
-        ArmoryPVPFrameTab1:Show();
-        ArmoryPVPFrameTab2:Show();
-        PanelTemplates_SetTab(ArmoryPVPFrame, currentTab);
-    else
-        ArmoryPVPFrameTab1:Hide();
-        ArmoryPVPFrameTab2:Hide();
-    end
+    ArmoryPVPFrameTab1:Show();
+    ArmoryPVPFrameTab2:Show();
+    PanelTemplates_SetTab(ArmoryPVPFrame, currentTab);
 
-    if ( currentTab == 2 and Armory:GetPvpTalentInfo(1, 1) ) then
+    if ( currentTab == 2 ) then
         ArmoryPVPFrameHonor:Hide();
         ArmoryConquestFrame:Hide();
         
@@ -251,7 +245,6 @@ function ArmoryPVPHonorRewardArtifactPowerMixin:SetTooltip()
     return true;
 end
 
-
 function ArmoryPVPHonorXPBar_OnLoad(self)
     self:SetScale(.85);
 end
@@ -263,7 +256,7 @@ function ArmoryPVPHonorXPBar_OnShow(self)
 end
 
 function ArmoryPVPHonorXPBar_CheckLockState(self)
-    if ( Armory:UnitLevel("player") < MAX_PLAYER_LEVEL_TABLE[LE_EXPANSION_LEVEL_CURRENT] ) then
+    if ( Armory:UnitLevel("player") < SHOW_PVP_TALENT_LEVEL ) then
         ArmoryPVPHonorXPBar_Lock(self);
     else
         ArmoryPVPHonorXPBar_Unlock(self);
@@ -301,111 +294,56 @@ function ArmoryPVPHonorXPBar_Update()
     local max = Armory:UnitHonorMax("player");
 
     local level = Armory:UnitHonorLevel("player");
-    local levelmax = GetMaxPlayerHonorLevel();
 
-    if ( level == levelmax ) then
-        -- Force the bar to full for the max level
-        frame.Bar:SetMinMaxValues(0, 1);
-        frame.Bar:SetValue(1);
-    else
-        frame.Bar:SetMinMaxValues(0, max);
-        frame.Bar:SetValue(current);
-    end
-
-    local exhaustionStateID = Armory:GetHonorRestState();
-    if ( exhaustionStateID == 1 ) then
-        frame.Bar:SetStatusBarAtlas("_honorsystem-bar-fill-rested");
-    else
-        frame.Bar:SetStatusBarAtlas("_honorsystem-bar-fill");
-    end
+    frame.Bar:SetMinMaxValues(0, max);
+    frame.Bar:SetValue(current);
+    frame.Bar:SetStatusBarAtlas("_honorsystem-bar-fill");
 
     if ( not frame.locked ) then
         frame.Level:SetText(Armory:UnitHonorLevel("player"));
         ArmoryPVPHonorXPBar_SetNextAvailable(frame);
-        ArmoryHonorExhaustionTick_Update(frame.Bar.ExhaustionTick);
     end
 end
 
 function ArmoryPVPHonorXPBar_SetNextAvailable(self)
     local showNext = false;
-    local showPrestige = false;
 
-    if ( Armory:CanPrestige() ) then
-        showPrestige = true;
-        ArmoryPVPHonorXPBar_SetPrestige(self.PrestigeReward);
-    else
-        showPrestige = false;
+    self.rewardInfo = ArmoryPVPHonorXPBar_GetNextReward();
 
-        self.rewardInfo = ArmoryPVPHonorXPBar_GetNextReward();
-
-        if ( self.rewardInfo ) then
-            self.rewardInfo:SetUpFrame(self.NextAvailable);
-            showNext = true;	
-        end
+    if ( self.rewardInfo ) then
+        self.rewardInfo:SetUpFrame(self.NextAvailable);
+        showNext = true;	
     end
 
     self.NextAvailable:SetShown(showNext);
-    self.PrestigeReward:SetShown(showPrestige);
-end
-
-function ArmoryPVPHonorXPBar_SetPrestige(self)
-    local newPrestigeLevel = Armory:UnitPrestige("player") + 1;
-
-    self.PortraitBg:SetAtlas("honorsystem-prestige-laurel-bg-"..Armory:UnitFactionGroup("player"), false);
-    self.Icon:SetTexture(GetPrestigeInfo(newPrestigeLevel) or 0);
-
-    self:Show();
-end
-
-
-local function CreateHackRewardInfo()
-    local rewardInfo;
-    local factionGroup = Armory:UnitFactionGroup("player");
-    local itemID;
-    if ( factionGroup == "Horde" ) then
-        itemID = 138996;
-    else
-        itemID = 138992;
-    end
-    rewardInfo = CreateFromMixins(PVPHonorRewardItemMixin);
-    rewardInfo:Set(itemID);
-    return rewardInfo;
+    self.PrestigeReward:SetShown(false);
 end
 
 function ArmoryPVPHonorXPBar_GetNextReward()
     local rewardInfo;
 
-    local talentID = Armory:GetPvpTalentUnlock();	
-    if ( talentID ) then
-        rewardInfo = CreateFromMixins(ArmoryPVPHonorRewardTalentMixin);
-        rewardInfo:Set(talentID);
-    -- TODO:  Remove this when we can figure this out in a better way
-    elseif ( Armory:UnitPrestige("player") == 1 and Armory:UnitHonorLevel("player") == 49 ) then
-        rewardInfo = CreateHackRewardInfo();
-    else
-        local rewardPackID = Armory:GetHonorLevelRewardPack();
-        if ( rewardPackID ) then
-            local items = GetRewardPackItems(rewardPackID);
-            local currencies = GetRewardPackCurrencies(rewardPackID);
-            local money = GetRewardPackMoney(rewardPackID);
-            local artifactPower = GetRewardPackArtifactPower(rewardPackID);
-            local title = GetRewardPackTitle(rewardPackID);
-            if ( items and #items > 0 ) then
-                rewardInfo = CreateFromMixins(PVPHonorRewardItemMixin);
-                rewardInfo:Set(items[1]);
-            elseif ( artifactPower and artifactPower > 0 ) then
-                rewardInfo = CreateFromMixins(ArmoryPVPHonorRewardArtifactPowerMixin);
-                rewardInfo:Set(artifactPower);
-            elseif ( currencies and #currencies > 0 ) then
-                rewardInfo = CreateFromMixins(PVPHonorRewardCurrencyMixin);
-                rewardInfo:Set(currencies[1].currencyType, currencies[1].quantity);
-            elseif ( money and money > 0 ) then
-                rewardInfo = CreateFromMixins(PVPHonorRewardMoneyMixin);
-                rewardInfo:Set(money);
-            elseif ( title and title > 0 ) then
-                rewardInfo = CreateFromMixins(PVPHonorRewardTitleMixin);
-                rewardInfo:Set(title);
-            end
+    local rewardPackID = nil;
+    if ( rewardPackID ) then
+        local items = GetRewardPackItems(rewardPackID);
+        local currencies = GetRewardPackCurrencies(rewardPackID);
+        local money = GetRewardPackMoney(rewardPackID);
+        local artifactPower = GetRewardPackArtifactPower(rewardPackID);
+        local title = GetRewardPackTitle(rewardPackID);
+        if ( items and #items > 0 ) then
+            rewardInfo = CreateFromMixins(PVPHonorRewardItemMixin);
+            rewardInfo:Set(items[1]);
+        elseif ( artifactPower and artifactPower > 0 ) then
+            rewardInfo = CreateFromMixins(ArmoryPVPHonorRewardArtifactPowerMixin);
+            rewardInfo:Set(artifactPower);
+        elseif ( currencies and #currencies > 0 ) then
+            rewardInfo = CreateFromMixins(PVPHonorRewardCurrencyMixin);
+            rewardInfo:Set(currencies[1].currencyType, currencies[1].quantity);
+        elseif ( money and money > 0 ) then
+            rewardInfo = CreateFromMixins(PVPHonorRewardMoneyMixin);
+            rewardInfo:Set(money);
+        elseif ( title and title > 0 ) then
+            rewardInfo = CreateFromMixins(PVPHonorRewardTitleMixin);
+            rewardInfo:Set(title);
         end
     end
 
@@ -420,16 +358,7 @@ function ArmoryPVPHonorXPBar_OnEnter(self)
         return;
     end
 
-    local level = Armory:UnitHonorLevel("player");
-    local levelmax = GetMaxPlayerHonorLevel();
-
-    if ( Armory:CanPrestige() ) then
-        self.OverlayFrame.Text:SetText(PVP_HONOR_PRESTIGE_AVAILABLE);
-    elseif ( level == levelmax ) then
-        self.OverlayFrame.Text:SetText(MAX_HONOR_LEVEL);
-    else
-        self.OverlayFrame.Text:SetText(HONOR_BAR:format(current, max));
-    end
+    self.OverlayFrame.Text:SetText(HONOR_BAR:format(current, max));
     self.OverlayFrame.Text:Show();
 end
 
@@ -442,76 +371,11 @@ function ArmoryHonorExhaustionTick_OnLoad(self)
 end
 
 function ArmoryHonorExhaustionTick_Update(self)
-	local fillBar = self:GetParent().ExhaustionLevelFillBar;
-    local level = Armory:UnitHonorLevel("player");
-    local levelmax = GetMaxPlayerHonorLevel();
-
-    local playerCurrXP = Armory:UnitHonor("player");
-    local playerMaxXP = Armory:UnitHonorMax("player");
-    local exhaustionCountdown = Armory:GetTimeToWellRested();
-    local exhaustionThreshold = Armory:GetHonorExhaustion();
-    local exhaustionStateID, exhaustionStateName, exhaustionStateMultiplier, exhaustionTickSet;
-    exhaustionStateID, exhaustionStateName, exhaustionStateMultiplier = Armory:GetHonorRestState();
-
-    if ( level == levelmax or not exhaustionThreshold or exhaustionTreshold == 0 ) then
-        self:Hide();
-		fillBar:Hide();
-        return;
-    else
-        exhaustionTickSet = max(((playerCurrXP + exhaustionThreshold) / playerMaxXP) * self:GetParent():GetWidth(), 0);
-        if (exhaustionTickSet > self:GetParent():GetWidth()) then
-            self:Hide();
-		    fillBar:Hide();
-        else
-            fillBar:SetWidth(exhaustionTickSet);
-            fillBar:Show();
-            self:Show();
-        end
-    end
-    
-    if ( exhaustionStateID == 1 ) then
-        local r, g, b = 1.0, 0.50, 0.0;
-		fillBar:SetVertexColor(r, g, b, self.fillBarAlpha);
-        self.Highlight:SetVertexColor(r, g, b, 1.0);
-    end
+	ArmoryPVPHonorXPBar_Update();
 end
 
 function ArmoryHonorExhaustionToolTipText()
-    GameTooltip_SetDefaultAnchor(GameTooltip, UIParent);	
-
-    local exhaustionStateID, exhaustionStateName, exhaustionStateMultiplier;
-    exhaustionStateID, exhaustionStateName, exhaustionStateMultiplier = Armory:GetHonorRestState();
-
-    local exhaustionCurrXP, exhaustionMaxXP;
-    local exhaustionThreshold = Armory:GetHonorExhaustion();
-
-    exhaustionStateMultiplier = exhaustionStateMultiplier * 100;
-    local exhaustionCountdown = nil;
-    if ( Armory:GetTimeToWellRested() ) then
-        exhaustionCountdown = Armory:GetTimeToWellRested() / 60;
-    end
-
-    local currXP = Armory:UnitHonor("player");
-    local nextXP = Armory:UnitHonorMax("player");
-    local percentXP = math.ceil(currXP / nextXP * 100);
-    local XPText = format( XP_TEXT, BreakUpLargeNumbers(currXP), BreakUpLargeNumbers(nextXP), percentXP );
-    local tooltipText = XPText..format(EXHAUST_HONOR_TOOLTIP1, exhaustionStateName, exhaustionStateMultiplier);
-    local append = nil;
-    if ( Armory:IsResting() ) then
-        if ( exhaustionThreshold and exhaustionCountdown ) then
-            append = format(EXHAUST_TOOLTIP4, exhaustionCountdown);
-        end
-    elseif ( (exhaustionStateID == 4) or (exhaustionStateID == 5) ) then
-        append = EXHAUST_TOOLTIP2;
-    end
-
-    if ( append ) then
-        tooltipText = tooltipText..append;
-    end
-
-    if ( SHOW_NEWBIE_TIPS ~= "1" ) then
-        GameTooltip:SetText(tooltipText);
-    end
+    return;
 end
 
 
@@ -520,13 +384,15 @@ end
 ----------------------------------------------------------
 
 function ArmoryPVPTalentsTalent_OnEnter(self)
-	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");	
-	Armory:SetPvpTalent(self:GetID());
+    if ( self.talentID ) then
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");	
+        Armory:SetPvpTalent(self.talentID);
+    end
 end
 
 function ArmoryPVPTalentsTalent_OnClick(self)
-	if ( IsModifiedClick("CHATLINK") ) then
-		local link = GetPvpTalentLink(self:GetID());
+	if ( self.talentID and IsModifiedClick("CHATLINK") ) then
+		local link = GetPvpTalentLink(self.talentID);
 		if ( link ) then
 			ChatEdit_InsertLink(link);
 		end
@@ -536,49 +402,25 @@ end
 function ArmoryPVPTalents_Update()
     local TalentFrame = ArmoryPVPTalents;
 
-	local numTalentSelections = 0;
-	for tier = 1, MAX_PVP_TALENT_TIERS do
-		local talentRow = TalentFrame["tier"..tier];
-		
-		for column = 1, MAX_PVP_TALENT_COLUMNS do
-			local talentID, name, iconTexture, selected, available = Armory:GetPvpTalentInfo(tier, column, ArmoryTalentFrame.talentGroup);
-			local button = talentRow["talent"..column];
-			button.tier = tier;
-			button.column = column;
+    local numTalentSelections = 0;
+    
+    for index = 1, #ArmoryPVPTalents.Slots do
+        local talentID, name, iconTexture = Armory:GetPvpTalentSlotInfo(index, ArmoryTalentFrame.selectedSpec); 
+        local button = ArmoryPVPTalents.Slots[index];
+        
+        button.Texture:Show();
+        button.talentID = talentID;
+        if ( name ) then
+            SetPortraitToTexture(button.Texture, iconTexture);
+            button.TalentName:SetText(name);
+            button.TalentName:Show();
+        else
+            button.Texture:SetAtlas("pvptalents-talentborder-empty");
+            button.TalentName:Hide();
+        end
+    end
 
-			if ( button and name ) then
-				button:SetID(talentID);
-
-				SetItemButtonTexture(button, iconTexture);
-				if ( button.name ~= nil ) then
-					button.name:SetText(name);
-				end
-
-				if ( button.knownSelection ~= nil ) then
-					if( selected ) then
-						button.knownSelection:Show();
-						button.knownSelection:SetDesaturated(false);
-					else
-						button.knownSelection:Hide();
-					end
-				end
-
-				if ( selected ) then
-				    SetDesaturation(button.icon, false);
-				    button.border:Show();
-				else
-				    SetDesaturation(button.icon, true);
-				    button.border:Hide();
-			    end
-
-	            button:Show();
-	        elseif ( button ) then
-	            button:Hide();
-	        end
-	    end
-	end
-
-    local numUnspentTalents = Armory:GetNumUnspentPvpTalents();
+    local numUnspentTalents = Armory:GetNumUnspentPvpTalents(ArmoryTalentFrame.selectedSpec);
     if ( numUnspentTalents > 0 ) then
         ArmoryPVPTalents.unspentText:SetFormattedText(PLAYER_UNSPENT_TALENT_POINTS, numUnspentTalents);
     else

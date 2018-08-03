@@ -106,7 +106,7 @@ function ArmoryTradeSkillFrameMixin:Update()
 
     if ( not (C_TradeSkillUI.IsTradeSkillLinked() or C_TradeSkillUI.IsTradeSkillGuild() or C_TradeSkillUI.IsNPCCrafting()) ) then
         Armory:UnregisterTradeSkillUpdateEvents();
-        currentSkill, modeChanged, hasCooldown = Armory:UpdateTradeSkill();
+        currentSkill, modeChanged = Armory:UpdateTradeSkill();
         Armory:RegisterTradeSkillUpdateEvents();
 
         if ( Armory.character == Armory.player ) then
@@ -122,7 +122,7 @@ function ArmoryTradeSkillFrameMixin:Update()
             ArmoryFrame_UpdateLineTabs();
         end
 
-        if ( hasCooldown and Armory:GetConfigEnableCooldownEvents() ) then
+        if ( Armory:GetConfigEnableCooldownEvents() ) then
             Armory:Execute(ArmorySocialFrame_UpdateEvents);
         end
     end

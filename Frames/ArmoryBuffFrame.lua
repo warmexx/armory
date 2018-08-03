@@ -93,7 +93,7 @@ function ArmoryBuffFrame_Update(unit)
 end
 
 function ArmoryAuraButton_Update(buttonName, index, filter, unit)
-    local name, rank, texture, count, debuffType, duration, expirationTime = Armory:UnitAura(unit, index, filter);
+    local name, texture, count, debuffType, duration, expirationTime = Armory:UnitAura(unit, index, filter);
 
     local buffName = buttonName..index;
     local buff = _G[buffName];

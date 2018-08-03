@@ -40,7 +40,7 @@ if ( not Armory ) then
 
         title = ARMORY_TITLE,
         version = GetAddOnMetadata("Armory", "Version"),
-        dbVersion = 46,
+        dbVersion = 47,
         interface = _G.GetBuildInfo(),
     };
 end
@@ -654,7 +654,28 @@ function Armory:IsDbCompatible()
             end
 
             upgraded = true;
+
+        -- convert from 46 to 47
+    elseif ( dbVersion == 46 ) then
+        for realm in pairs(ArmoryDB) do
+            for character in pairs(ArmoryDB[realm]) do
+                entry = ArmoryDB[realm][character];
+
+                entry.Artifacts = nil;
+                entry.Buffs = nil;
+                entry.CanPrestige = nil;
+                entry.HonorExhaustion = nil;
+                entry.HonorLevelRewardPack = nil;
+                entry.HonorRestState = nil;
+                entry.HonorTalents = nil;
+                entry.Prestige = nil;
+                entry.PVPTalentUnlock = nil;
+                entry.Quests = nil;
+            end
         end
+
+        upgraded = true;
+    end
 
         if ( upgraded ) then
             dbEntry:SetValue("DbVersion", dbVersion + 1);
@@ -1626,7 +1647,10 @@ function Armory:MinutesTime(timestamp, tens)
 end
 
 function Armory:GetServerTime()
-    local _, month, day, year = CalendarGetDate();
+    local date = C_Calendar.GetDate();
+    local month = date.month;
+    local day = date.monthDay;
+    local year = date.year;
     local hour, min = GetGameTime();
     local serverTime = self:MakeDate(day, month, year, hour, min);
     local localTime = self:MinutesTime();

@@ -597,7 +597,6 @@ function Armory:ClearTradeSkills()
 end
 
 local function StoreTradeSkillInfo(dbEntry, recipeID, index)
-    local success = true;
     local recipe = Armory.sharedDbEntry:SelectContainer(container, recipeContainer, tostring(recipeID));
     local reagents = Armory.sharedDbEntry:SelectContainer(container, reagentContainer);
 
@@ -605,11 +604,7 @@ local function StoreTradeSkillInfo(dbEntry, recipeID, index)
     recipe.Description = C_TradeSkillUI.GetRecipeDescription(recipeID);
     recipe.Tools = Armory:BuildColoredListString(C_TradeSkillUI.GetRecipeTools(recipeID));
     recipe.NumMade = dbEntry.Save(C_TradeSkillUI.GetRecipeNumItemsProduced(recipeID));
-    if ( C_TradeSkillUI.GetRecipeItemLink(recipeID) ) then
-        recipe.ItemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID);
-    else
-        success = false;
-    end
+    recipe.ItemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID);
     
     local numReagents = C_TradeSkillUI.GetRecipeNumReagents(recipeID);
     if ( numReagents > 0 ) then
@@ -621,8 +616,6 @@ local function StoreTradeSkillInfo(dbEntry, recipeID, index)
                 local _, id = Armory:GetLinkId(link);
                 reagents[id] = dbEntry.Save(reagentName, reagentTexture, link);
                 recipe.Reagents[i] = dbEntry.Save(id, reagentCount);
-            else
-                success = false;
             end
         end
     end
@@ -642,7 +635,7 @@ local function StoreTradeSkillInfo(dbEntry, recipeID, index)
 
     SetItemCache(dbEntry, nil, recipe.ItemLink);
        
-    return success, recipe, cooldown;
+    return recipe;
 end
 
 local function StoreSharedTradeSkillInfo(name)
@@ -691,9 +684,6 @@ end
 local invSlotTypes = {};
 local recipeIDs;
 local function UpdateTradeSkillExtended(dbEntry)
-    local hasCooldown;
-    local dataMissing;
-
     -- retrieve slot types (would be to time consuming if put in funcAdditionalInfo)
     Armory:FillTable(invSlots, C_TradeSkillUI.GetAllFilterableInventorySlots());
     table.wipe(invSlotTypes);
@@ -725,56 +715,44 @@ local function UpdateTradeSkillExtended(dbEntry)
     end;
     local funcAdditionalInfo = function(index)
         local info = TradeSkillFrame.RecipeList.dataList[index];
-        local success, recipe, cooldown = StoreTradeSkillInfo(dbEntry, info.recipeID, index);
-        dataMissing = not success;
-        if ( cooldown ) then
-            hasCooldown = true;
-        end
-        if ( invSlotTypes[info.recipeID] ) then
-            recipe.InvSlot = dbEntry.Save(unpack(invSlotTypes[info.recipeID]));
-        end
+        local spell = Spell:CreateFromSpellID(info.recipeID);
+        spell:ContinueOnSpellLoad(function()
+            local recipe = StoreTradeSkillInfo(dbEntry, info.recipeID, index);
+            if ( invSlotTypes[info.recipeID] ) then
+                recipe.InvSlot = dbEntry.Save(unpack(invSlotTypes[info.recipeID]));
+            end
+        end);
         return tostring(info.recipeID);
     end
     
     ClearItemCache(dbEntry);
 
     -- store the complete (expanded) list
-    local success = dbEntry:SetExpandableListValues(itemContainer, funcNumLines, funcGetLineState, funcGetLineInfo, nil, nil, funcAdditionalInfo);
+    dbEntry:SetExpandableListValues(itemContainer, funcNumLines, funcGetLineState, funcGetLineInfo, nil, nil, funcAdditionalInfo);
     
     table.wipe(invSlotTypes);
-
-    return (success and not dataMissing), hasCooldown;
 end
 
 local function UpdateTradeSkillSimple(dbEntry)
-    local failed, hasCooldown;
-
     dbEntry:ClearContainer(itemContainer);
 
     ClearItemCache(dbEntry);
     
-    local info;
-    local success, recipe, cooldown;
-    
     local index = 1;
     local recipeIDs = C_TradeSkillUI.GetAllRecipeIDs();
     for _, recipeID in ipairs(recipeIDs) do
-        info = C_TradeSkillUI.GetRecipeInfo(recipeID);
+        local info = C_TradeSkillUI.GetRecipeInfo(recipeID);
         if ( info.learned and IsRecipe(info.type) ) then
-            success, recipe, cooldown = StoreTradeSkillInfo(dbEntry, recipeID, index);
-            failed = failed or not success;
-            
+            local spell = Spell:CreateFromSpellID(recipeID);
+            spell:ContinueOnSpellLoad(function()
+                StoreTradeSkillInfo(dbEntry, recipeID, index);
+            end);
             dbEntry:SetValue(3, itemContainer, index, "Info", GetTradeSkillLineInfo(info));
             dbEntry:SetValue(3, itemContainer, index, "Data", tostring(recipeID));
-            
-            if ( cooldown ) then
-                hasCooldown = true;
-            end
+
             index = index + 1;
         end
     end
-    
-    return (not failed), hasCooldown;
 end
 
 function Armory:PullTradeSkillItems()
@@ -797,7 +775,7 @@ end
 
 function Armory:UpdateTradeSkill()
     local name, rank, maxRank;
-    local modeChanged, hasCooldown;
+    local modeChanged;
     local warned;
     
     if ( not self.playerDbBaseEntry ) then
@@ -831,18 +809,13 @@ function Armory:UpdateTradeSkill()
                 if ( GetNumTradeSkills() == 0 ) then
                     extended = true;
                 else
-                    success, hasCooldown = UpdateTradeSkillExtended(dbEntry);
+                    UpdateTradeSkillExtended(dbEntry);
                 end
                 RestoreTradeSkillsState(state);
                 modeChanged = not extended;
             else
-                success, hasCooldown = UpdateTradeSkillSimple(dbEntry);
+                UpdateTradeSkillSimple(dbEntry);
                 modeChanged = extended;
-            end
-            
-            if ( not success ) then
-                self:PrintWarning(ARMORY_TRADE_UPDATE_FAILED);
-                warned = true;
             end
 
             self:Unlock(itemContainer);

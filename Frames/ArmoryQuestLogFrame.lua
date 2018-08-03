@@ -261,7 +261,7 @@ function ArmoryQuestLog_GetQuestTag(questID, isComplete, frequency)
         questTag = FAILED;
     elseif ( isComplete and isComplete > 0 ) then
         questTag = COMPLETE;
-    elseif( questTagID and questTagID == QUEST_TAG_ACCOUNT ) then
+    elseif( questTagID and questTagID == Enum.QuestTag.Account ) then
         local factionGroup = GetQuestFactionGroup(questID);
         if( factionGroup ) then
             questTag = FACTION_ALLIANCE;
@@ -395,9 +395,10 @@ function ArmoryQuestInfo_Display(template, parentFrame)
     local elementsTable = template.elements;
     local lastFrame;
     for i = 1, #elementsTable, 3 do
-        local shownFrame, bottomShownFrame = elementsTable[i]();
+        local shownFrame, bottomShownFrame = elementsTable[i](parentFrame);
         if ( shownFrame ) then
             shownFrame:SetParent(parentFrame);
+            shownFrame:ClearAllPoints();
             if ( lastFrame ) then
                 shownFrame:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", elementsTable[i+1], elementsTable[i+2]);
             else
@@ -601,8 +602,10 @@ function ArmoryQuestInfo_ShowRewardText()
     return ArmoryQuestInfoRewardText;
 end
 
-function ArmoryQuestInfo_ShowSeal()
+function ArmoryQuestInfo_ShowSeal(parentFrame)
     local frame = ArmoryQuestInfoSealFrame;
+	-- Temporary anchor to ensure :IsTruncated will work for the seal text.
+	frame:SetPoint("CENTER", parentFrame or UIParent);
     if ( frame.sealInfo ) then
         frame.Text:SetText(frame.sealInfo.text);
         frame.Texture:SetAtlas(frame.sealInfo.sealAtlas, true);
@@ -638,7 +641,7 @@ function ArmoryQuestInfo_ShowRewards()
     local rewardsFrame = ArmoryQuestInfoFrame.rewardsFrame;
 
     for rewardSpellIndex = 1, numSpellRewards do
-        local texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID, spellID, knownSpell, isFollowerCollected = Armory:GetQuestLogRewardSpell(rewardSpellIndex);
+        local texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID, genericUnlock, spellID, knownSpell, isFollowerCollected = Armory:GetQuestLogRewardSpell(rewardSpellIndex);
 
         -- only allow the spell reward if user can learn it        
         if ( texture and not knownSpell and (not isBoostSpell or Armory:IsCharacterNewlyBoosted()) and (not garrFollowerID or not isFollowerCollected) ) then
@@ -743,7 +746,7 @@ function ArmoryQuestInfo_ShowRewards()
         local spellBuckets = {};
 
         for rewardSpellIndex = 1, numSpellRewards do
-            local texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID, spellID, knownSpell, isFollowerCollected = Armory:GetQuestLogRewardSpell(rewardSpellIndex);
+            local texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID, genericUnlock, spellID, knownSpell, isFollowerCollected = Armory:GetQuestLogRewardSpell(rewardSpellIndex);
             if ( texture and not knownSpell and (not isBoostSpell or Armory:IsCharacterNewlyBoosted()) and (not garrFollowerID or not isFollowerCollected) ) then
                 if ( isTradeskillSpell ) then
                     AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_TRADESKILL_SPELL, rewardSpellIndex);
@@ -751,10 +754,12 @@ function ArmoryQuestInfo_ShowRewards()
                     AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_ABILITY, rewardSpellIndex);
                 elseif ( garrFollowerID ) then
                     AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_FOLLOWER, rewardSpellIndex);            
-                elseif ( not isSpellLearned ) then
-                    AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_AURA, rewardSpellIndex);        
-                else
+                elseif ( isSpellLearned ) then
                     AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_SPELL, rewardSpellIndex);
+				elseif ( genericUnlock ) then
+					AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_UNLOCK, rewardSpellIndex);
+				else
+                    AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_AURA, rewardSpellIndex);        
                 end
             end
         end
@@ -916,8 +921,9 @@ function ArmoryQuestInfo_ShowRewards()
             questItem.type = "reward";
             questItem.objectType = "currency";
             local currencyID;
-            name, texture, numItems, currencyID = Armory:GetQuestLogRewardCurrencyInfo(i);
+            name, texture, numItems, currencyID, quality = Armory:GetQuestLogRewardCurrencyInfo(i);
             if ( name and texture and numItems ) then
+				name, texture, numItems, quality = CurrencyContainerUtil.GetCurrencyContainerInfo(currencyID, numItems, name, texture, quality); 
                 questItem:SetID(i)
                 questItem:Show();
                 -- For the tooltip
@@ -928,6 +934,7 @@ function ArmoryQuestInfo_ShowRewards()
                 SetItemButtonTexture(questItem, texture);
                 SetItemButtonTextureVertexColor(questItem, 1.0, 1.0, 1.0);
                 SetItemButtonNameFrameVertexColor(questItem, 1.0, 1.0, 1.0);
+                SetItemButtonQuality(questItem, quality, currencyID);
                 
                 if ( buttonIndex > 1 ) then
                     if ( mod(buttonIndex,2) == 1 ) then
@@ -982,6 +989,22 @@ function ArmoryQuestInfo_ShowRewards()
     rewardsFrame:Show();
     rewardsFrame:SetHeight(totalHeight);
     return rewardsFrame, lastFrame;
+end
+
+function ArmoryQuestInfoRewardItemCodeTemplate_OnEnter(self)
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+    if (self.objectType == "item") then
+        Armory:SetQuestLogItem(self.type, self:GetID());
+        ArmoryShowCompareItem(GameTooltip, select(2, Armory:GetItemFromTooltip(GameTooltip)));
+    elseif (self.objectType == "currency") then
+        Armory:SetQuestLogCurrency(self.type, self:GetID());
+    end
+end
+
+function ArmoryQuestInfoRewardItemCodeTemplate_OnClick(self, button)
+    if ( IsModifiedClick() and self.objectType == "item" ) then
+        HandleModifiedItemClick(Armory:GetQuestLogItemLink(self.type, self:GetID()));
+    end
 end
 
 ARMORY_QUEST_TEMPLATE_LOG = { 

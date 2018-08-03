@@ -32,8 +32,6 @@ local ARMORY_MAX_TALENT_SPECTABS = 4;
 
 function ArmoryTalentFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
-    self:RegisterEvent("PREVIEW_TALENT_POINTS_CHANGED");
-    self:RegisterEvent("PREVIEW_TALENT_PRIMARY_TREE_CHANGED");
     self:RegisterEvent("PLAYER_TALENT_UPDATE");
     self:RegisterEvent("PET_SPECIALIZATION_CHANGED");
     self:RegisterEvent("PLAYER_LEVEL_UP");
@@ -53,7 +51,7 @@ function ArmoryTalentFrame_OnEvent(self, event, unit)
         if ( Armory.forceScan or not Armory:TalentsExists() ) then
             Armory:Execute(ArmoryTalentFrame_UpdateTalents);
         end
-    elseif ( event == "PREVIEW_TALENT_POINTS_CHANGED" or event == "PREVIEW_TALENT_PRIMARY_TREE_CHANGED" or event == "PLAYER_TALENT_UPDATE" ) then
+    elseif ( event == "PLAYER_TALENT_UPDATE" ) then
         Armory:Execute(ArmoryTalentFrame_UpdateTalents);
     elseif ( event == "PET_SPECIALIZATION_CHANGED" ) then
         Armory:Execute(ArmoryTalentFrame_UpdateSpecs);

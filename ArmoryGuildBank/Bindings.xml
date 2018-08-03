@@ -1,7 +1,7 @@
 <!-- Our own little section in the Key Bindings menu -->
 <Bindings>
   <!-- See Localization.lua for constants -->
-  <Binding name="ARMORYGUILDBANK_TOGGLE" header="ARMORY" category="ADDONS">
+  <Binding name="ARMORYGUILDBANK_TOGGLE" header="ARMORYGUILDBANK" category="ADDONS">
     ArmoryGuildBankFrame_Toggle();
   </Binding>
 </Bindings>

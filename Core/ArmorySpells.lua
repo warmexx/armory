@@ -33,8 +33,7 @@ local container = "Spells";
 -- Spells Internals
 ----------------------------------------------------------
 
-local function GetSubSpellName(id, bookType)
-    local spellName, subSpellName = _G.GetSpellBookItemName(id, bookType);
+local function GetSubSpellName(id, bookType, subSpellName)
 	if ( subSpellName == "" ) then
 	    local isPassive = _G.IsPassiveSpell(id, bookType);
     	local specs = { _G.GetSpecsForSpell(id, bookType) };
@@ -93,31 +92,41 @@ local function SaveSpellBook(dbEntry, oldNum, newNum, bookType)
             dbEntry:SetValue(2, container, i, nil);
         else
             local slotType, spellID = _G.GetSpellBookItemInfo(i, bookType);
-            local attachedGlyph = spellID and _G.HasAttachedGlyph(spellID) and GetCurrentGlyphNameForSpell(spellID) or nil;            
-            local subSpellName = GetSubSpellName(i, bookType);
-            local spellName, texture, link, level;
+            if ( spellID ) then
+                local spell = Spell:CreateFromSpellID(spellID);
+                spell:ContinueOnSpellLoad(function()
+                    local attachedGlyph = _G.HasAttachedGlyph(spellID) and GetCurrentGlyphNameForSpell(spellID) or nil;   
+                    local subSpellName = GetSubSpellName(i, bookType, spell:GetSpellSubtext());
+                    local spellName, texture, link, level;
             
-            if ( bookType == BOOKTYPE_PET ) then
-                if ( slotType == "PETACTION" ) then
-                    spellName = _G.GetSpellBookItemName(i, bookType);
-                    texture = _G.GetSpellBookItemTexture(i, bookType);
-                    Armory:SetSharedValue(2, slotType, spellName, subSpellName, texture);
-                elseif ( spec and specSpells and IsSpecializationSpell(spellID, specSpells) ) then
-                    Armory:SetClassValue("pet", 3, container, spec, tostring(spellID), subSpellName or "");
-                elseif ( family ) then
-                    Armory:SetClassValue("player", 3, container, family, tostring(spellID), subSpellName or "");
-                end
-            else
-                if ( slotType == "FLYOUT" ) then
-                    spellID = nil;
-                    spellName = _G.GetSpellBookItemName(i, bookType);
-                    texture = _G.GetSpellBookItemTexture(i, bookType);
-                    link = _G.GetSpellLink(i, bookType);
-                    level = _G.GetSpellAvailableLevel(i, bookType);
-                elseif ( attachedGlyph ) then
-                    link = _G.GetSpellLink(i, bookType);
-                end
-                dbEntry:SetValue(2, container, i, spellID, subSpellName, slotType, spellName, texture, link, level, attachedGlyph);
+                    if ( bookType == BOOKTYPE_PET ) then
+                        if ( slotType == "PETACTION" ) then
+                            spellName = _G.GetSpellBookItemName(i, bookType);
+                            texture = _G.GetSpellBookItemTexture(i, bookType);
+                            Armory:SetSharedValue(2, slotType, spellName, subSpellName, texture);
+                        elseif ( spec and specSpells and IsSpecializationSpell(spellID, specSpells) ) then
+                            Armory:SetClassValue("pet", 3, container, spec, tostring(spellID), subSpellName or "");
+                        elseif ( family ) then
+                            Armory:SetClassValue("player", 3, container, family, tostring(spellID), subSpellName or "");
+                        end
+                    else
+                        if ( slotType == "FLYOUT" ) then
+                            spellID = nil;
+                            spellName = _G.GetSpellBookItemName(i, bookType);
+                            texture = _G.GetSpellBookItemTexture(i, bookType);
+                            level = _G.GetSpellAvailableLevel(i, bookType);
+                            local tradeSkillLink, tradeSkillSpellID = _G.GetSpellTradeSkillLink(i, bookType);
+                            if ( tradeSkillSpellID ) then
+                                link = tradeSkillLink;
+                            else
+                                link = _G.GetSpellLink(i, bookType);
+                            end
+                        elseif ( attachedGlyph ) then
+                            link = _G.GetSpellLink(i, bookType);
+                        end
+                        dbEntry:SetValue(2, container, i, spellID, subSpellName, slotType, spellName, texture, link, level, attachedGlyph);
+                    end
+                end);    
             end
         end
     end

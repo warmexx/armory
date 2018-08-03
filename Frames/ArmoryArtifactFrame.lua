@@ -204,8 +204,13 @@ function ArmoryArtifactPerksMixin:RefreshModel()
 	self.Model.backgroundFrontTargetAlpha = backgroundFrontTargetAlpha;
     self.Model.BackgroundFront:SetAlpha(backgroundFrontTargetAlpha);
 
-    self.Model:SetModelDrawLayer(altOnTop and "BORDER" or "ARTWORK");
-    self.AltModel:SetModelDrawLayer(altOnTop and "ARTWORK" or "BORDER");
+	local baseModelFrameLevel = 505;
+	local baseAltModelFrameLevel = 500;
+	if ( altOnTop ) then
+		baseModelFrameLevel, baseAltModelFrameLevel = baseAltModelFrameLevel, baseModelFrameLevel;
+	end
+
+	self.Model:SetFrameLevel(baseModelFrameLevel);
 
     if ( altItemID and altHandUICameraID ) then
         self.AltModel.uiCameraID = altHandUICameraID;
@@ -217,6 +222,7 @@ function ArmoryArtifactPerksMixin:RefreshModel()
         end
 
         self.AltModel:Show();
+		self.AltModel:SetFrameLevel(baseAltModelFrameLevel);
     else
         self.AltModel:Hide();
     end
@@ -231,11 +237,20 @@ function ArmoryArtifactsModelTemplate_OnModelLoaded(self)
     end
     self:SetLight(true, false, 0, 0, 0, .7, 1.0, 1.0, 1.0);
     self:SetViewTranslation(-88, 0);
-	self:SetViewInsets(88, 88, 0, 0);
 
-    self:SetDesaturation(self.desaturation or .5);
+	self:SetAnimation(animationSequence, 0);
 
-    self:SetAnimation(animationSequence, 0);
+	if C_ArtifactUI.IsArtifactDisabled() then
+		self:SetDesaturation(1);
+		self:SetParticlesEnabled(false);
+		self:SetPaused(true);
+	else	
+		if ( self.useShadowEffect ) then
+			self:SetShadowEffect(1);
+		else
+            self:SetDesaturation(self.desaturation or .5);
+        end
+    end
 end
 
 function ArmoryArtifactPerksMixin:RefreshBackground()
@@ -245,25 +260,16 @@ function ArmoryArtifactPerksMixin:RefreshBackground()
 
         local bgAtlas = ("%s-BG"):format(artifactArtInfo.textureKit);
         self.BackgroundBack:SetAtlas(bgAtlas);
+        local artifactDisabled = C_ArtifactUI.IsArtifactDisabled();
+		self.BackgroundBack:SetDesaturated(artifactDisabled);
         self.Model.BackgroundFront:SetAtlas(bgAtlas);
+		self.Model.BackgroundFront:SetDesaturated(artifactDisabled);
 		self.Tier2ForgingScene.BackgroundMiddle:SetAtlas(bgAtlas);
 		self.Tier2ForgingScene.BackgroundMiddle:Show();
 
 		local crestAtlas = ("%s-BG-Rune"):format(artifactArtInfo.textureKit);
-		self.CrestFrame.CrestRune1:SetAtlas(crestAtlas, true);
-		self.CrestFrame.CrestRune2:SetAtlas(crestAtlas, true);
-		self.CrestFrame.CrestRune3:SetAtlas(crestAtlas, true);
-		self.CrestFrame.CrestRune4:SetAtlas(crestAtlas, true);
-		self.CrestFrame.CrestRune5:SetAtlas(crestAtlas, true);
-		self.CrestFrame.CrestRune6:SetAtlas(crestAtlas, true);
-		self.CrestFrame.CrestRune7:SetAtlas(crestAtlas, true);
-		self.CrestFrame.CrestRune8:SetAtlas(crestAtlas, true);
-		self.CrestFrame.CrestRune9:SetAtlas(crestAtlas, true);
-		self.CrestFrame.CrestRune10:SetAtlas(crestAtlas, true);
-		self.CrestFrame.CrestRune11:SetAtlas(crestAtlas, true);
-		self.CrestFrame.CrestRune12:SetAtlas(crestAtlas, true);
-		self.CrestFrame.CrestRune13:SetAtlas(crestAtlas, true);
-		self.CrestFrame.CrestRune14:SetAtlas(crestAtlas, true);
+        self.CrestFrame.CrestRune1:SetAtlas(crestAtlas, true);
+        self.CrestFrame.CrestRune1:SetDesaturated(artifactDisabled);
     else
 		self.textureKit = nil;
     end
@@ -326,7 +332,7 @@ function ArmoryArtifactPerksMixin:RefreshPowers(newItem)
 
 	    local meetsTier = currentTier >= powerButton:GetTier();
 		powerButton:SetShown(meetsTier);
-		powerButton:SetLinksEnabled(meetsTier and not powerButton:IsFinal());
+        powerButton:SetLinksEnabled(meetsTier and not powerButton:IsFinal());
     end
 
     self:RefreshPowerTiers();
@@ -362,15 +368,6 @@ function ArmoryArtifactPerksMixin:RefreshPowerTiers()
 
 			local artifactArtInfo = Armory:GetArtifactArtInfo();
 
-			self.Tier2ModelScene:Show();
-			self.Tier2ModelScene:SetFromModelSceneID(artifactArtInfo.uiModelSceneID, true);
-		
-			local effect = self.Tier2ModelScene:GetActorByTag("effect");
-			if ( effect ) then
-				effect:SetModelByCreatureDisplayID(11686);
-				effect:ApplySpellVisualKit(artifactArtInfo.spellVisualKitID);
-			end
-			
 			self.Tier2ForgingScene:Show();
 			self.Tier2ForgingScene:SetFromModelSceneID(TIER_2_FORGING_MODEL_SCENE_ID, true);
 			local forgingEffect = self.Tier2ForgingScene:GetActorByTag("effect");
@@ -381,11 +378,9 @@ function ArmoryArtifactPerksMixin:RefreshPowerTiers()
 			end
 		else
 			self.CrestFrame:Hide();
-			self.Tier2ModelScene:Hide();
 		end
 	else
 		self.CrestFrame:Hide();
-		self.Tier2ModelScene:Hide();
 	end
 end
 
@@ -512,13 +507,19 @@ function ArmoryArtifactPerksMixin:GenerateCurvedLine(startButton, endButton, sta
 		spline:AddPoint(x, y);
 	end
 
+    local artifactDisabled = C_ArtifactUI.IsArtifactDisabled();
 	local previousEndPoint;
 	local previousLineContainer;
 	for i = 1, NUM_CURVED_LINE_SEGEMENTS do
 		self.numUsedCurvedLines = self.numUsedCurvedLines + 1;
 		local lineContainer = self:GetOrCreateCurvedDependencyLine(self.numUsedCurvedLines);
-		lineContainer:SetConnectedColor(artifactArtInfo.barConnectedColor);
-		lineContainer:SetDisconnectedColor(artifactArtInfo.barDisconnectedColor);
+		if ( artifactDisabled ) then
+			lineContainer:SetConnectedColor(DISABLED_FONT_COLOR);
+			lineContainer:SetDisconnectedColor(DISABLED_FONT_COLOR);
+		else
+            lineContainer:SetConnectedColor(artifactArtInfo.barConnectedColor);
+            lineContainer:SetDisconnectedColor(artifactArtInfo.barDisconnectedColor);
+        end
 		lineContainer:SetEndPoints(finalTier2Power);
 		lineContainer:SetState(state);
 
@@ -568,6 +569,7 @@ function ArmoryArtifactPerksMixin:RefreshDependencies(powers)
     self.numUsedLines = 0;
     self.numUsedCurvedLines = 0;
 
+    local artifactDisabled = C_ArtifactUI.IsArtifactDisabled();
     local artifactArtInfo = Armory:GetArtifactArtInfo();
     local lastTier2Power = nil;
 
@@ -605,9 +607,13 @@ function ArmoryArtifactPerksMixin:RefreshDependencies(powers)
                             else
                                 self.numUsedLines = self.numUsedLines + 1;
                                 local lineContainer = self:GetOrCreateDependencyLine(self.numUsedLines);
-                                lineContainer:SetConnectedColor(artifactArtInfo.barConnectedColor);
-                                lineContainer:SetDisconnectedColor(artifactArtInfo.barDisconnectedColor);
-
+                                if ( artifactDisabled ) then
+                                    lineContainer:SetConnectedColor(DISABLED_FONT_COLOR);
+                                    lineContainer:SetDisconnectedColor(DISABLED_FONT_COLOR);
+                                else
+                                    lineContainer:SetConnectedColor(artifactArtInfo.barConnectedColor);
+                                    lineContainer:SetDisconnectedColor(artifactArtInfo.barDisconnectedColor);
+                                end
                                 local fromCenter = CreateVector2D(fromButton:GetCenter());
                                 fromCenter:ScaleBy(fromButton:GetEffectiveScale());
 
@@ -708,6 +714,23 @@ function ArmoryArtifactPerksMixin:HideAllLines()
     self:HideUnusedWidgets(self.DependencyLines, 0, OnUnusedLineHidden);
 end
 
+function ArmoryArtifactPerksMixin:HideTier2()
+	for powerID, button in pairs(self.powerIDToPowerButton) do
+		if ( button:GetTier() == 2 and button ~= self:GetFinalPowerButtonByTier(2) ) then
+			button:Show();
+		end
+	end
+
+    self.CrestFrame.CrestRune1:Hide();
+
+	if ( self.CurvedDependencyLines ) then
+		for i = 1, self.numUsedCurvedLines do
+			local lineContainer = self.CurvedDependencyLines[i];
+			lineContainer:Hide();
+		end
+	end
+end
+
 function ArmoryArtifactPerksMixin:ShowTier2()
 	for powerID, button in pairs(self.powerIDToPowerButton) do
 		if ( button:GetTier() == 2 and button ~= self:GetFinalPowerButtonByTier(2) ) then
@@ -723,8 +746,6 @@ function ArmoryArtifactPerksMixin:ShowTier2()
 	end
 
 	self.CrestFrame.CrestRune1:Show();
-	
-	self.Tier2ModelScene:Show();
 end
 
 ----------------------------------------------------------
@@ -734,16 +755,41 @@ end
 ArmoryArtifactTitleTemplateMixin = {};
 
 function ArmoryArtifactTitleTemplateMixin:RefreshTitle()
-    local artifactArtInfo = Armory:GetArtifactArtInfo();
-    self.ArtifactName:SetText(artifactArtInfo.titleName);
-    self.ArtifactName:SetVertexColor(artifactArtInfo.titleColor:GetRGB());
+	local disabledFrame = self:GetParent().DisabledFrame;
 
-    if ( artifactArtInfo and artifactArtInfo.textureKit ) then
-        local headerAtlas = ("%s-Header"):format(artifactArtInfo.textureKit);
-        self.Background:SetAtlas(headerAtlas, true);
-        self.Background:Show();
-    else
-        self.Background:Hide();
+    local artifactArtInfo = Armory:GetArtifactArtInfo();
+    if ( C_ArtifactUI.IsArtifactDisabled() ) then
+		disabledFrame:Show();
+		disabledFrame.ArtifactName:SetText(artifactArtInfo.titleName);
+		disabledFrame.ArtifactName:SetVertexColor(0.588, 0.557, 0.463);
+
+		if ( artifactArtInfo and artifactArtInfo.textureKit ) then
+			local headerAtlas = ("%s-Header"):format(artifactArtInfo.textureKit);
+			disabledFrame.Background:SetAtlas(headerAtlas, true);
+			disabledFrame.Background:SetDesaturated(true);
+			disabledFrame.Background:Show();
+		else
+			disabledFrame.Background:Hide();
+		end
+
+		self.ArtifactName:Hide();
+		self.ArtifactPower:Hide();
+		self.Background:Hide();
+	else
+		self.ArtifactName:Show();
+        self.ArtifactName:SetText(artifactArtInfo.titleName);
+        self.ArtifactName:SetVertexColor(artifactArtInfo.titleColor:GetRGB());
+		self.ArtifactPower:Show();
+
+        if ( artifactArtInfo and artifactArtInfo.textureKit ) then
+            local headerAtlas = ("%s-Header"):format(artifactArtInfo.textureKit);
+            self.Background:SetAtlas(headerAtlas, true);
+            self.Background:Show();
+        else
+            self.Background:Hide();
+        end
+
+        disabledFrame:Hide();
     end
 end
 
@@ -752,6 +798,12 @@ function ArmoryArtifactTitleTemplateMixin:OnShow()
     self:EvaluateRelics();
 
     self:RegisterEvent("ARTIFACT_UPDATE");
+
+    if ( C_ArtifactUI.IsArtifactDisabled() ) then
+        self.PointsRemainingLabel:Hide();
+	else
+		self.PointsRemainingLabel:Show();
+	end
 end
 
 function ArmoryArtifactTitleTemplateMixin:OnHide()
@@ -783,14 +835,6 @@ function ArmoryArtifactTitleTemplateMixin:OnRelicSlotMouseEnter(relicSlot)
     elseif ( relicSlot.relicLink ) then
         GameTooltip:SetOwner(relicSlot, "ANCHOR_BOTTOMRIGHT", 0, 10);
         GameTooltip:SetHyperlink(relicSlot.relicLink);
-        local currentRank, canAddTalent, artifactLevelRequiredForNextRank = Armory:GetRelicSlotRankInfo(relicSlot.relicSlotIndex);
-        if ( canAddTalent ) then
-            GameTooltip:AddLine(" ");
-            GameTooltip:AddLine(ARTIFACT_RELIC_TALENT_AVAILABLE, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true);
-        elseif ( artifactLevelRequiredForNextRank ) then
-            GameTooltip:AddLine(" ");
-            GameTooltip:AddLine(ARTIFACT_RELIC_SLOT_NEXT_RANK:format(currentRank + 1, artifactLevelRequiredForNextRank), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true);
-        end
         GameTooltip:Show();
     elseif ( relicSlot.relicType ) then
         GameTooltip:SetOwner(relicSlot, "ANCHOR_BOTTOMRIGHT", 0, 10);
@@ -855,7 +899,6 @@ function ArmoryArtifactTitleTemplateMixin:EvaluateRelics()
             relicSlot.Icon:SetAtlas("Relic-SlotBG", true);
             relicSlot.Glass:Hide();
 			relicSlot.relicLink = nil;
-            relicSlot.Rank:Hide();
         else
 			local relicName, relicIcon, relicType, relicLink = Armory:GetRelicInfo(i);
 
@@ -875,20 +918,6 @@ function ArmoryArtifactTitleTemplateMixin:EvaluateRelics()
                 relicSlot.Glass:Hide();
             end
 			relicSlot.relicLink = relicLink;
-
-            local currentRank, canAddTalent = Armory:GetRelicSlotRankInfo(i);
-            if ( currentRank ) then
-                relicSlot.Rank:Show();
-                relicSlot.Rank.Text:SetText(currentRank);
-                if ( canAddTalent ) then
-                    relicSlot.Rank.GlowAnim:Play();
-                else
-                    relicSlot.Rank.GlowAnim:Stop();
-                    relicSlot.Rank.Glow:SetAlpha(0);
-                end
-            else
-                relicSlot.Rank:Hide();
-            end
         end
 
         relicSlot.relicType = relicType;
@@ -913,7 +942,9 @@ function ArmoryArtifactTitleTemplateMixin:EvaluateRelics()
 end
 
 function ArmoryArtifactTitleTemplateMixin:SetPointsRemaining(value)
-    self.PointsRemainingLabel:SetText(BreakUpLargeNumbers(value));
+    if ( not C_ArtifactUI.IsArtifactDisabled() ) then
+        self.PointsRemainingLabel:SetText(BreakUpLargeNumbers(value));
+    end
 end
 
 
@@ -980,72 +1011,96 @@ function ArmoryArtifactPowerButtonMixin:UpdatePowerType()
 end
 
 function ArmoryArtifactPowerButtonMixin:SetStyle(style)
+    local rankTextColor = CreateColor(0, 0, 0);
+	local iconVertexColor = CreateColor(1, 1, 1);
+	local iconAlpha = 1;
+	local iconBorderAlpha = 1;
+	local iconBorderDesaturatedAlpha = 0;
+
     self.style = style;
-    self.Icon:SetAlpha(1);
-    self.Icon:SetVertexColor(1, 1, 1);
     self.IconDesaturated:SetAlpha(1);
     self.IconDesaturated:SetVertexColor(1, 1, 1);
-    
-    self.IconBorder:SetAlpha(1);
-    self.IconBorder:SetVertexColor(1, 1, 1);
-    self.IconBorderDesaturated:SetAlpha(0);
-
     self.Rank:SetAlpha(1);
     self.RankBorder:SetAlpha(1);
-
+	self.IconBorder:SetVertexColor(1, 1, 1);
     self.LightRune:Hide();
+
+    local artifactDisabled = C_ArtifactUI.IsArtifactDisabled();
 
     if ( style == ARTIFACT_POWER_STYLE_RUNE ) then
         self.LightRune:Show();
+		self.LightRune:SetDesaturated(artifactDisabled);
 
-        self.Icon:SetAlpha(0);
-        self.IconBorder:SetAlpha(0);
+		iconAlpha = 0;
+		iconBorderAlpha = 0;
 
+		self.Rank:SetText(nil);
         self.Rank:SetAlpha(0);
         self.RankBorder:SetAlpha(0);
 
         self.IconDesaturated:SetAlpha(0);
     elseif ( style == ARTIFACT_POWER_STYLE_MAXED ) then
         self.Rank:SetText(self.currentRank);
-        self.Rank:SetTextColor(1, 0.82, 0);
+		rankTextColor:SetRGB(1, 0.82, 0);
         self.RankBorder:SetAtlas("Artifacts-PointsBox", true);
         self.RankBorder:Show();        
     elseif ( style == ARTIFACT_POWER_STYLE_CAN_UPGRADE ) then
         self.Rank:SetText(self.currentRank);
-        self.Rank:SetTextColor(0.1, 1, 0.1);
-        self.RankBorder:SetAtlas("Artifacts-PointsBoxGreen", true);
+		rankTextColor:SetRGB(0.1, 1, 0.1);
+		if ( artifactDisabled ) then
+			self.RankBorder:SetAtlas("Artifacts-PointsBox", true);
+		else
+            self.RankBorder:SetAtlas("Artifacts-PointsBoxGreen", true);
+        end
         self.RankBorder:Show();
     elseif ( style == ARTIFACT_POWER_STYLE_PURCHASED or style == ARTIFACT_POWER_STYLE_PURCHASED_READ_ONLY ) then
         self.Rank:SetText(self.currentRank);
-        self.Rank:SetTextColor(1, 0.82, 0);
+		rankTextColor:SetRGB(1, 0.82, 0);
         self.RankBorder:SetAtlas("Artifacts-PointsBox", true);
         self.RankBorder:Show();
     elseif ( style == ARTIFACT_POWER_STYLE_UNPURCHASED ) then
-        self.Icon:SetVertexColor(.6, .6, .6);
         self.IconBorder:SetVertexColor(.9, .9, .9);
+		iconVertexColor:SetRGB(.6, .6, .6);
 
         self.Rank:SetText(self.currentRank);
-        self.Rank:SetTextColor(1, 0.82, 0);
+		rankTextColor:SetRGB(1, 0.82, 0);
         self.RankBorder:SetAtlas("Artifacts-PointsBox", true);
         self.RankBorder:Show();
     elseif ( style == ARTIFACT_POWER_STYLE_UNPURCHASED_READ_ONLY or style == ARTIFACT_POWER_STYLE_UNPURCHASED_LOCKED ) then
         if ( self.isGoldMedal or self.isStart ) then
-            self.Icon:SetVertexColor(.4, .4, .4);
+			iconVertexColor:SetRGB(.4, .4, .4);
             self.IconBorder:SetVertexColor(.7, .7, .7);
             self.IconDesaturated:SetVertexColor(.4, .4, .4);
             self.RankBorder:Hide();
             self.Rank:SetText(nil);
-            self.IconBorderDesaturated:SetAlpha(.5);
-            self.Icon:SetAlpha(.5);
+			iconBorderDesaturatedAlpha = 0.5;
+			iconAlpha = .5;
         else
-            self.Icon:SetVertexColor(.15, .15, .15);
+			iconVertexColor:SetRGB(.15, .15, .15);
             self.IconBorder:SetVertexColor(.4, .4, .4);
             self.IconDesaturated:SetVertexColor(.15, .15, .15);
             self.RankBorder:Hide();
             self.Rank:SetText(nil);
-            self.Icon:SetAlpha(.2);
+			iconAlpha = .2;
         end
     end
+
+	if ( artifactDisabled ) then
+		rankTextColor = DISABLED_FONT_COLOR;
+		iconAlpha = 0;
+		if ( style ~= ARTIFACT_POWER_STYLE_RUNE ) then
+			iconBorderDesaturatedAlpha = 1;
+		end
+		self.IconBorder:Hide();
+	else
+		self.IconBorder:Show();
+	end
+
+	self.Rank:SetTextColor(rankTextColor:GetRGB());
+	self.Icon:SetVertexColor(iconVertexColor:GetRGB());
+	self.Icon:SetAlpha(iconAlpha);
+	self.IconBorder:SetAlpha(iconBorderAlpha);
+	self.IconBorderDesaturated:SetAlpha(iconBorderDesaturatedAlpha);
 end
 
 function ArmoryArtifactPowerButtonMixin:ApplyTemporaryRelicType(relicType, relicLink)
@@ -1254,7 +1309,19 @@ end
 
 function ArmoryArtifactPowerButtonMixin:EvaluateStyle()
     if ( not HasPurchasedAnything() and not self.prereqsMet ) then
-        self:SetStyle(ARTIFACT_POWER_STYLE_RUNE);    
+        self:SetStyle(ARTIFACT_POWER_STYLE_RUNE);
+    elseif ( C_ArtifactUI.IsArtifactDisabled() ) then
+		if ( self.isMaxRank ) then
+			self:SetStyle(ARTIFACT_POWER_STYLE_MAXED);			
+		elseif ( self.prereqsMet and Armory:GetPointsRemaining() >= self.cost ) then
+			self:SetStyle(ARTIFACT_POWER_STYLE_CAN_UPGRADE);
+		elseif ( self.currentRank > 0 ) then
+			self:SetStyle(ARTIFACT_POWER_STYLE_PURCHASED);
+		elseif ( self.prereqsMet ) then
+			self:SetStyle(ARTIFACT_POWER_STYLE_UNPURCHASED);
+		else
+			self:SetStyle(ARTIFACT_POWER_STYLE_UNPURCHASED_LOCKED);
+		end
     else
         if ( Armory:GetTotalPurchasedRanks() == 0 and Armory:GetNumObtainedArtifacts() <= 1 ) then
             self:SetStyle(ARTIFACT_POWER_STYLE_RUNE);
@@ -1347,8 +1414,20 @@ function ArmoryArtifactLineMixin:PlayLineFadeAnim(lineAnimType)
 		self.FadeAnim.FillScroll2:SetFromAlpha(self.FillScroll2:GetAlpha());
 	end
 
+	local artifactDisabled = C_ArtifactUI.IsArtifactDisabled();
+	if ( artifactDisabled ) then
+		self.FillScroll1:SetDesaturated(true);
+		if ( self.FillScroll2 ) then
+			self.FillScroll2:SetDesaturated(true);
+		end
+	end
+
 	if ( lineAnimType == self.LINE_FADE_ANIM_TYPE_CONNECTED ) then
-		self.ScrollAnim:Play();
+        if ( artifactDisabled ) then
+			self.ScrollAnim:Stop();
+		else
+            self.ScrollAnim:Play();
+        end
 
 		self.FadeAnim.Background:SetToAlpha(0.0);
 		self.FadeAnim.Fill:SetToAlpha(1.0);

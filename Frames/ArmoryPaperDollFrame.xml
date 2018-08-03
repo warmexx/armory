@@ -865,11 +865,6 @@
     </Scripts>
   </Frame>
 
-  <Frame name="UIPanelDialogTemplate" virtual="true">
-    <Frames>
-    </Frames>
-  </Frame>
-
   <Frame name="ArmoryGearSetFrame" enableMouse="true" parent="ArmoryPaperDollFrame" hidden="true" frameStrata="MEDIUM" toplevel="true">
     <Size x="261" y="155"/>
     <Anchors>

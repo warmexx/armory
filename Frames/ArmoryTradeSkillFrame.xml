@@ -666,13 +666,21 @@
                     <Texture parentKey="IconBorder">
                       <Size x="37" y="37"/>
                       <Anchors>
-                        <Anchor point="CENTER" x="0"/>
+                        <Anchor point="CENTER"/>
                       </Anchors>
                     </Texture>
                     <Texture parentKey="ResultBorder" atlas="tradeskills-iconborder">
                       <Size x="41" y="41"/>
                       <Anchors>
-                        <Anchor point="CENTER" x="0"/>
+                        <Anchor point="CENTER"/>
+                      </Anchors>
+                    </Texture>
+                  </Layer>
+                  <Layer level="OVERLAY" textureSubLevel="1">
+                    <Texture parentKey="IconOverlay" hidden="true">
+                      <Size x="47" y="47"/>
+                      <Anchors>
+                        <Anchor point="CENTER"/>
                       </Anchors>
                     </Texture>
                   </Layer>
@@ -751,7 +759,7 @@
                   <KeyValue key="reagentIndex" type="number" value="7"/>
                 </KeyValues>
                 <Anchors>
-                  <Anchor point="TOPLEFT" relativeKey="$parent.Reagent6" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+                  <Anchor point="TOPLEFT" relativeKey="$parent.Reagent5" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
                 </Anchors>
               </Button>
               <Button parentKey="Reagent8" inherits="ArmoryTradeSkillReagentTemplate">

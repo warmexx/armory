@@ -166,6 +166,9 @@ ARMORY_PAPERDOLL_STATINFO = {
 	["AVOIDANCE"] = {
 		updateFunc = function(statFrame, unit) ArmoryPaperDollFrame_SetAvoidance(statFrame, unit); end
 	},
+	["SPEED"] = {
+		updateFunc = function(statFrame, unit) ArmoryPaperDollFrame_SetSpeed(statFrame, unit); end
+	},
 
 	-- Attack
 	["ATTACK_DAMAGE"] = {
@@ -208,6 +211,9 @@ ARMORY_PAPERDOLL_STATINFO = {
     ["BLOCK"] = {
         updateFunc = function(statFrame, unit) ArmoryPaperDollFrame_SetBlock(statFrame, unit); end
     },
+	["STAGGER"] = {
+		updateFunc = function(statFrame, unit) ArmoryPaperDollFrame_SetStagger(statFrame, unit); end
+	},
 };
 
 ARMORY_PAPERDOLL_STATCATEGORIES = {
@@ -241,7 +247,8 @@ ARMORY_PAPERDOLL_STATCATEGORIES = {
 			"BONUS_ARMOR",
 			"LIFESTEAL",
 			"VERSATILITY",
-			"AVOIDANCE",
+            "AVOIDANCE",
+            "SPEED",
 		}
 	},
 
@@ -271,7 +278,8 @@ ARMORY_PAPERDOLL_STATCATEGORIES = {
 			"ARMOR", 
 			"DODGE",
 			"PARRY", 
-			"BLOCK",
+            "BLOCK",
+            "STAGGER",
 		}
 	},
 };
@@ -309,6 +317,7 @@ end
 function ArmoryPaperDollTradeSkillFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("SKILL_LINES_CHANGED");
+    self:RegisterEvent("TRIAL_STATUS_UPDATE");
 end
 
 function ArmoryPaperDollTradeSkillFrame_OnEvent(self, event, ...)
@@ -321,7 +330,7 @@ function ArmoryPaperDollTradeSkillFrame_OnEvent(self, event, ...)
         if ( Armory.forceScan or not Armory:ProfessionsExists() ) then
             Armory:Execute(ArmoryPaperDollTradeSkillFrame_UpdateSkills);
         end
-    elseif ( event == "SKILL_LINES_CHANGED" ) then
+    elseif ( event == "SKILL_LINES_CHANGED" or event == "TRIAL_STATUS_UPDATE" ) then
         Armory:Execute(ArmoryPaperDollTradeSkillFrame_UpdateSkills);
     end
 end
@@ -728,17 +737,43 @@ function ArmoryPaperDollFrame_SetStat(statFrame, unit, statIndex)
 end
 
 function ArmoryPaperDollFrame_SetArmor(statFrame, unit)
-    local baselineArmor, effectiveArmor, armor, posBuff, negBuff = Armory:UnitArmor(unit);
+    local baselineArmor, effectiveArmor, armor, bonusArmor = Armory:UnitArmor(unit);
     local level = Armory:UnitEffectiveLevel(unit);
     
     if ( level and effectiveArmor ) then
         PaperDollFrame_SetLabelAndText(statFrame, STAT_ARMOR, BreakUpLargeNumbers(effectiveArmor), false, effectiveArmor);
         local armorReduction = PaperDollFrame_GetArmorReduction(effectiveArmor, level);
+        local armorReductionAgainstTarget = PaperDollFrame_GetArmorReductionAgainstTarget(effectiveArmor);
 
 		statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, ARMOR).." "..BreakUpLargeNumbers(effectiveArmor)..FONT_COLOR_CODE_CLOSE;
 		statFrame.tooltip2 = format(STAT_ARMOR_TOOLTIP, armorReduction);
+        if ( armorReductionAgainstTarget ) then
+            statFrame.tooltip3 = format(STAT_ARMOR_TARGET_TOOLTIP, armorReductionAgainstTarget);
+        else
+            statFrame.tooltip3 = nil;
+        end
         statFrame:Show();
    else
+        statFrame:Hide();
+   end
+end
+
+function ArmoryPaperDollFrame_SetStagger(statFrame, unit)
+    local stagger, staggerAgainstTarget = Armory:GetStaggerPercentage(unit);
+    
+    if ( stagger ) then
+        PaperDollFrame_SetLabelAndText(statFrame, STAT_STAGGER, BreakUpLargeNumbers(stagger), true, stagger);
+
+        statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAGGER).." "..string.format("%.2F%%",stagger)..FONT_COLOR_CODE_CLOSE;
+        statFrame.tooltip2 = format(STAT_STAGGER_TOOLTIP, stagger);
+        if ( staggerAgainstTarget ) then
+            statFrame.tooltip3 = format(STAT_STAGGER_TARGET_TOOLTIP, staggerAgainstTarget);
+        else
+            statFrame.tooltip3 = nil;
+        end
+
+        statFrame:Show();
+    else
         statFrame:Hide();
    end
 end
@@ -765,7 +800,17 @@ function ArmoryPaperDollFrame_SetBlock(statFrame, unit)
     local chance = Armory:GetBlockChance();
     PaperDollFrame_SetLabelAndText(statFrame, STAT_BLOCK, chance, true, chance);
     statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, BLOCK_CHANCE).." "..string.format("%.2F", chance).."%"..FONT_COLOR_CODE_CLOSE;
-    statFrame.tooltip2 = format(CR_BLOCK_TOOLTIP, Armory:GetShieldBlock());
+
+    local shieldBlockArmor = Armory:GetShieldBlock();
+	local blockArmorReduction = PaperDollFrame_GetArmorReduction(shieldBlockArmor, Armory:UnitEffectiveLevel(unit));
+	local blockArmorReductionAgainstTarget = PaperDollFrame_GetArmorReductionAgainstTarget(shieldBlockArmor);
+
+	statFrame.tooltip2 = CR_BLOCK_TOOLTIP:format(blockArmorReduction);
+	if (blockArmorReductionAgainstTarget) then
+		statFrame.tooltip3 = format(STAT_BLOCK_TARGET_TOOLTIP, blockArmorReductionAgainstTarget);
+	else
+		statFrame.tooltip3 = nil;
+	end
     statFrame:Show();
 end
 
@@ -1309,13 +1354,17 @@ function ArmoryPaperDollFrame_SetItemLevel(statFrame, unit)
 	end
 
     local avgItemLevel, avgItemLevelEquipped = Armory:GetAverageItemLevel();
+    local minItemLevel = Armory:GetMinItemLevel();
+
+	local displayItemLevel = math.max(minItemLevel or 0, avgItemLevelEquipped);
+
     if ( avgItemLevel ) then
+        displayItemLevel = floor(displayItemLevel);
         avgItemLevel = floor(avgItemLevel);
         statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_AVERAGE_ITEM_LEVEL).." "..avgItemLevel;
         if ( avgItemLevelEquipped ) then
-            avgItemLevelEquipped = floor(avgItemLevelEquipped);
-            PaperDollFrame_SetLabelAndText(statFrame, STAT_AVERAGE_ITEM_LEVEL, avgItemLevelEquipped, false, avgItemLevelEquipped);
-            if ( avgItemLevelEquipped ~= avgItemLevel ) then
+            PaperDollFrame_SetLabelAndText(statFrame, STAT_AVERAGE_ITEM_LEVEL, displayItemLevel, false, displayItemLevel);
+            if ( displayItemLevel ~= avgItemLevel ) then
                 statFrame.tooltip = statFrame.tooltip .. "  " .. format(STAT_AVERAGE_ITEM_LEVEL_EQUIPPED, avgItemLevelEquipped);
             end
         else
@@ -1391,6 +1440,11 @@ function ArmoryMovementSpeed_OnUpdate(statFrame, elapsedTime)
 end
 
 function ArmoryPaperDollFrame_SetMovementSpeed(statFrame, unit)
+	if ( unit ~= "player" ) then
+		statFrame:Hide();
+		return;
+	end
+
     statFrame.Label:SetText(format(STAT_FORMAT, STAT_MOVEMENT_SPEED));
 
     statFrame.wasSwimming = nil;
@@ -1398,8 +1452,6 @@ function ArmoryPaperDollFrame_SetMovementSpeed(statFrame, unit)
     ArmoryMovementSpeed_OnUpdate(statFrame);
 
     statFrame:SetScript("OnEnter", ArmoryMovementSpeed_OnEnter);
-    -- TODO: Fix if we decide to show movement speed
-	--statFrame:SetScript("OnUpdate", ArmoryMovementSpeed_OnUpdate);
 end
 
 function ArmoryCharacterSpellBonusDamage_OnEnter(self)
@@ -1625,6 +1677,7 @@ function ArmoryPaperDollFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_XP_UPDATE");
     self:RegisterEvent("UPDATE_EXHAUSTION");
     self:RegisterEvent("SKILL_LINES_CHANGED");
+	self:RegisterEvent("TRIAL_STATUS_UPDATE");
     self:RegisterEvent("UPDATE_FACTION");
     self:RegisterEvent("EQUIPMENT_SETS_CHANGED");
     self:RegisterEvent("PLAYER_AVG_ITEM_LEVEL_UPDATE");
@@ -1690,7 +1743,7 @@ function ArmoryPaperDollFrame_OnEvent(self, event, unit)
         self:RegisterEvent("ZONE_CHANGED");
         self:RegisterEvent("ZONE_CHANGED_INDOORS");
         Armory:Execute(ArmoryPaperDollFrame_SetZone);
-    elseif ( (event == "UNIT_LEVEL" and unit == "player") or event == "SKILL_LINES_CHANGED" or event == "UPDATE_FACTION" ) then
+    elseif ( (event == "UNIT_LEVEL" and unit == "player") or event == "SKILL_LINES_CHANGED" or event == "TRIAL_STATUS_UPDATE" or event == "UPDATE_FACTION" ) then
         Armory:Execute(ArmoryPaperDollFrame_UpdateEquippable);
     elseif ( event == "EQUIPMENT_SETS_CHANGED" ) then
         Armory:Execute(ArmoryGearSets_Update);

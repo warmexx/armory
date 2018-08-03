@@ -1,4 +1,4 @@
-## Interface: 70300
+## Interface: 80000
 ## Title: Armory
 ## Title-frFR: Armory [Armurerie]
 ## Title-esES: Armory [Armería]

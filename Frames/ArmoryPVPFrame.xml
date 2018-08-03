@@ -78,33 +78,39 @@
     </Scripts>
   </Button>
 
-  <Button name="ArmoryPVPTalentButtonTemplate" inherits="ArmoryTalentButtonTemplate" virtual="true">
+  <Button name="ArmoryPvpTalentSlotTemplate" virtual="true">
+		<Size x="45" y="45"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Texture">
+					<Size x="33" y="33"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Border" atlas="pvptalents-talentborder" setAllPoints="true"/>
+				<FontString parentKey="TalentName" inherits="GameFontHighlightSmall" hidden="true">
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent.Border" relativePoint="RIGHT" x="1" y="1"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
     <Scripts>
-      <OnEnter function="ArmoryPVPTalentsTalent_OnEnter" />
-      <OnClick function="ArmoryPVPTalentsTalent_OnClick" />
+      <OnEnter function="ArmoryPVPTalentsTalent_OnEnter"/>
+      <OnClick function="ArmoryPVPTalentsTalent_OnClick"/>
+      <OnLeave function="GameTooltip_Hide"/>
     </Scripts>
   </Button>
 
-  <Frame name="ArmoryPVPTalentRowTemplate" virtual="true">
-    <Size x="629" y="45"/>
-    <Frames>
-      <Button name="$parentTalent1" inherits="ArmoryPVPTalentButtonTemplate" parentKey="talent1">
-        <Anchors>
-          <Anchor point="LEFT" x="-14" y="0"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentTalent2" inherits="ArmoryPVPTalentButtonTemplate" parentKey="talent2">
-        <Anchors>
-          <Anchor point="LEFT" x="93" y="0"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentTalent3" inherits="ArmoryPVPTalentButtonTemplate" parentKey="talent3">
-        <Anchors>
-          <Anchor point="LEFT" x="200" y="0"/>
-        </Anchors>
-      </Button>
-    </Frames>
-  </Frame>
+	<Button name="ArmoryPvpTalentTrinketSlotTemplate" inherits="ArmoryPvpTalentSlotTemplate" virtual="true">
+		<Size x="58" y="58"/>
+		<KeyValues>
+			<KeyValue key="isTrinket" value="true" type="boolean"/>
+		</KeyValues>
+	</Button>
 
   <Frame name="ArmoryPVPFrame" setAllPoints="true" enableMouse="true" movable="true" parent="ArmoryFrame" useParentLevel="true" hidden="true" id="4">
     <Anchors>
@@ -473,9 +479,9 @@
         <Layers>
           <Layer level="ARTWORK">
             <Texture parentKey="Frame" atlas="honorsystem-bar-frame-small" useAtlasSize="true">
-              <Anchor>
+              <Anchors>
                 <Anchor point="CENTER"/>
-              </Anchor>
+              </Anchors>
             </Texture>
             <FontString parentKey="Level" inherits="GameFontNormal" justifyH="CENTER">
               <Anchors>
@@ -494,9 +500,9 @@
               <Layer level="BACKGROUND">
                 <Texture parentKey="Background" atlas="honorsystem-bar-background">
                   <Size x="270" y="18"/>
-                  <Anchor>
+                  <Anchors>
                     <Anchor point="CENTER" relativeKey="$parent.Frame" relativePoint="CENTER"/>
-                  </Anchor>
+                  </Anchors>
                 </Texture>
               </Layer>
               <Layer level="BACKGROUND" textureSubLevel="1">
@@ -550,7 +556,7 @@
                 <Scripts>
                   <OnEnter>
                     GameTooltip:SetOwner(self, 'ANCHOR_RIGHT');
-                    GameTooltip:SetText(string.format(FEATURE_BECOMES_AVAILABLE_AT_LEVEL, MAX_PLAYER_LEVEL_TABLE[LE_EXPANSION_LEVEL_CURRENT]));
+                    GameTooltip:SetText(string.format(FEATURE_BECOMES_AVAILABLE_AT_LEVEL, SHOW_PVP_TALENT_LEVEL));
                     GameTooltip:Show();
                   </OnEnter>
                   <OnLeave function="GameTooltip_Hide"/>
@@ -675,36 +681,26 @@
           </Layer>
         </Layers>
         <Frames>
-          <Frame name="$parentTalentRow1" inherits="ArmoryPVPTalentRowTemplate" parentKey="tier1" id="1">
+          <Button parentKey="TrinketSlot" parentArray="Slots" inherits="ArmoryPvpTalentTrinketSlotTemplate">
             <Anchors>
               <Anchor point="TOPLEFT" x="5" y="-180"/>
             </Anchors>
-          </Frame>
-          <Frame name="$parentTalentRow2" inherits="ArmoryPVPTalentRowTemplate" parentKey="tier2" id="2">
+          </Button>
+          <Button parentKey="TalentSlot1" parentArray="Slots" inherits="ArmoryPvpTalentSlotTemplate">
             <Anchors>
-              <Anchor point="TOPLEFT" relativeTo="$parentTalentRow1" relativePoint="BOTTOMLEFT" x="0" y="3"/>
+              <Anchor point="TOPLEFT" relativeKey="$parent.TrinketSlot" relativePoint="BOTTOM" x="0" y="-8"/>
             </Anchors>
-          </Frame>
-          <Frame name="$parentTalentRow3" inherits="ArmoryPVPTalentRowTemplate" parentKey="tier3" id="3">
+          </Button>
+          <Button parentKey="TalentSlot2" parentArray="Slots" inherits="ArmoryPvpTalentSlotTemplate">
             <Anchors>
-              <Anchor point="TOPLEFT" relativeTo="$parentTalentRow2" relativePoint="BOTTOMLEFT" x="0" y="3"/>
+              <Anchor point="TOP" relativeKey="$parent.TalentSlot1" relativePoint="BOTTOM" x="0" y="-8"/>
             </Anchors>
-          </Frame>
-          <Frame name="$parentTalentRow4" inherits="ArmoryPVPTalentRowTemplate" parentKey="tier4" id="4">
+          </Button>
+          <Button parentKey="TalentSlot3" parentArray="Slots" inherits="ArmoryPvpTalentSlotTemplate">
             <Anchors>
-              <Anchor point="TOPLEFT" relativeTo="$parentTalentRow3" relativePoint="BOTTOMLEFT" x="0" y="3"/>
+              <Anchor point="TOP" relativeKey="$parent.TalentSlot2" relativePoint="BOTTOM" x="0" y="-8"/>
             </Anchors>
-          </Frame>
-          <Frame name="$parentTalentRow5" inherits="ArmoryPVPTalentRowTemplate" parentKey="tier5" id="5">
-            <Anchors>
-              <Anchor point="TOPLEFT" relativeTo="$parentTalentRow4" relativePoint="BOTTOMLEFT" x="0" y="3"/>
-            </Anchors>
-          </Frame>
-          <Frame name="$parentTalentRow6" inherits="ArmoryPVPTalentRowTemplate" parentKey="tier6" id="6">
-            <Anchors>
-              <Anchor point="TOPLEFT" relativeTo="$parentTalentRow5" relativePoint="BOTTOMLEFT" x="0" y="3"/>
-            </Anchors>
-          </Frame>
+          </Button>
         </Frames>
       </Frame>
     </Frames>

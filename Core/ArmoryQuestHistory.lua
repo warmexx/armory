@@ -64,7 +64,10 @@ local function GetQuestLines()
         table.wipe(historyLines);
 
         local header, timestamp, isWeekly, tag, isTrivial;
-        local _, month, day, year = CalendarGetDate();
+        local date = C_Calendar.GetDate();
+        local month = date.month;
+        local day = date.monthDay;
+        local year = date.year;
         local today = Armory:GetLocalTimeAsServerTime(Armory:MakeDate(day, month, year));
         local weekday, hour, minute;
         local questDate, questTime, days, key;

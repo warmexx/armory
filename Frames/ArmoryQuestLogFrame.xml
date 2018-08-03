@@ -33,26 +33,14 @@
   </Button>
   <Button name="ArmoryQuestInfoRewardItemCodeTemplate" virtual="true">
     <Scripts>
-      <OnEnter>
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-        if (self.objectType == "item") then
-          Armory:SetQuestLogItem(self.type, self:GetID());
-          ArmoryShowCompareItem(GameTooltip, select(2, Armory:GetItemFromTooltip(GameTooltip)));
-        elseif (self.objectType == "currency") then
-          Armory:SetQuestLogCurrency(self.type, self:GetID());
-        end
-      </OnEnter>
+			<OnEnter function="ArmoryQuestInfoRewardItemCodeTemplate_OnEnter" />
+			<OnClick function="ArmoryQuestInfoRewardItemCodeTemplate_OnClick" />
       <OnLeave>
         ArmoryComparisonTooltip1:Hide();
         ArmoryComparisonTooltip2:Hide();
         GameTooltip:Hide();
         ResetCursor();
       </OnLeave>
-      <OnClick>
-        if ( IsModifiedClick() and self.objectType == "item" ) then
-          HandleModifiedItemClick(Armory:GetQuestLogItemLink(self.type, self:GetID()));
-        end
-      </OnClick>
     </Scripts>
   </Button>
 
@@ -61,6 +49,14 @@
 			<Layer level="OVERLAY" textureSubLevel="1">
 				<Texture parentKey="IconBorder" file="Interface\Common\WhiteIconFrame" hidden="true">
 					<Size x="37" y="37"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Icon"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="2">
+				<Texture parentKey="IconOverlay" hidden="true">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeKey="$parent.Icon"/>
 						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon"/>
@@ -679,7 +675,8 @@
         <Size x="257" y="78"/>
         <Layers>
           <Layer level="ARTWORK">
-            <FontString parentKey="Text" inherits="QuestFont_Huge" justifyH="LEFT">
+            <FontString parentKey="Text" inherits="QuestFont_Huge" mixin="ShrinkUntilTruncateFontStringMixin" justifyH="LEFT">
+							<Size x="160" y="44"/>
               <Anchors>
                 <Anchor point="LEFT" x="5" y="-12"/>
               </Anchors>
@@ -691,6 +688,11 @@
             </Texture>
           </Layer>
         </Layers>
+        <Scripts>
+					<OnLoad>
+						self.Text:SetFontObjectsToTry("QuestFont_Huge", "QuestFont_Large", "Fancy14Font", "Fancy12Font");
+					</OnLoad>
+				</Scripts>
       </Frame>
     </Frames>
     <Scripts>
