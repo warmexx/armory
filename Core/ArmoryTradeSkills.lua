@@ -785,7 +785,7 @@ function Armory:UpdateTradeSkill()
         return;
     end
 
-    tradeSkillID, name, rank, maxRank, modifier = C_TradeSkillUI.GetTradeSkillLine();
+    tradeSkillID, _, rank, maxRank, modifier, _, name = C_TradeSkillUI.GetTradeSkillLine();
 
     if ( name and name ~= "UNKNOWN" ) then
         if ( not IsTradeSkill(name) ) then
