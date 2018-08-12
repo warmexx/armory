@@ -82,8 +82,6 @@ function Armory:UpdateArtifact()
             dbEntry:SetValue(3, container, itemID, "ArtInfo", self:CopyTable(C_ArtifactUI.GetArtifactArtInfo()));
             dbEntry:SetValue(3, container, itemID, "PointsRemaining", C_ArtifactUI.GetPointsRemaining());
             dbEntry:SetValue(3, container, itemID, "PurchasedRanks", C_ArtifactUI.GetTotalPurchasedRanks());
-            dbEntry:SetValue(3, container, itemID, "KnowledgeLevel", C_ArtifactUI.GetArtifactKnowledgeLevel());
-            dbEntry:SetValue(3, container, itemID, "KnowledgeMultiplier", C_ArtifactUI.GetArtifactKnowledgeMultiplier());
             dbEntry:SetValue(3, container, itemID, "MetaPower", C_ArtifactUI.GetMetaPowerInfo());
             dbEntry:SetValue(3, container, itemID, "Powers", C_ArtifactUI.GetPowers());
             dbEntry:SetValue(3, container, itemID, "Tier", C_ArtifactUI.GetArtifactTier());
@@ -190,14 +188,6 @@ end
 
 function Armory:GetTotalPurchasedRanks(artifact)
     return GetArtifactValue("PurchasedRanks", artifact);
-end
-
-function Armory:GetArtifactKnowledgeLevel(artifact)
-    return GetArtifactValue("KnowledgeLevel", artifact);
-end
-
-function Armory:GetArtifactKnowledgeMultiplier(artifact)
-    return GetArtifactValue("KnowledgeMultiplier", artifact);
 end
 
 function Armory:GetMetaPowerInfo(artifact)

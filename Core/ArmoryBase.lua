@@ -678,6 +678,21 @@ function Armory:IsDbCompatible()
 
         -- convert from 47 to 48
         elseif ( dbVersion == 47 ) then
+            for realm in pairs(ArmoryDB) do
+                for character in pairs(ArmoryDB[realm]) do
+                    entry = ArmoryDB[realm][character];
+
+                    if ( entry.Artifacts ) then
+                        for k, v in pairs(entry.Artifacts) do
+                            if ( type(v) == "table" ) then
+                                v.KnowledgeLevel = nil;
+                                v.KnowledgeMultiplier = nil;
+                            end
+                        end
+                    end
+                end
+            end
+
             ArmoryShared.PETACTION = nil;
 
             upgraded = true;

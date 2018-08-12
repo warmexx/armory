@@ -152,20 +152,6 @@ function ArmoryArtifactFrameMixin:OnKnowledgeEnter(knowledgeFrame)
     GameTooltip:AddLine(ARTIFACTS_NUM_PURCHASED_RANKS:format(Armory:GetTotalPurchasedRanks()), HIGHLIGHT_FONT_COLOR:GetRGB());
 
     local addedAnyMetaPowers = MetaPowerTooltipHelper(Armory:GetMetaPowerInfo());
-
-    local knowledgeLevel = Armory:GetArtifactKnowledgeLevel();
-    if ( knowledgeLevel and knowledgeLevel > 0 ) then
-        local knowledgeMultiplier = Armory:GetArtifactKnowledgeMultiplier();
-        local percentIncrease = math.floor(((knowledgeMultiplier - 1.0) * 100) + .5);
-        if ( percentIncrease > 0.0 ) then
-            if ( addedAnyMetaPowers ) then
-                GameTooltip:AddLine(" ");
-            end
-
-            GameTooltip:AddLine(ARTIFACTS_KNOWLEDGE_TOOLTIP_LEVEL:format(knowledgeLevel), HIGHLIGHT_FONT_COLOR:GetRGB());
-            GameTooltip:AddLine(ARTIFACTS_KNOWLEDGE_TOOLTIP_DESC:format(BreakUpLargeNumbers(percentIncrease)), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true);
-        end
-    end
     
     GameTooltip:Show();
 end
