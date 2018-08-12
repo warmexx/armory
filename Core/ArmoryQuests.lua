@@ -168,7 +168,7 @@ function Armory:UpdateQuests()
         if ( self:HasQuestLog() ) then
             local success, dataMissing;
         
-            local _, numQuests = _G.GetNumQuestLogEntries();
+            local numQuests = 0;
             local currentQuest = _G.GetQuestLogSelection();
 
             -- store the complete (expanded) list
@@ -185,6 +185,8 @@ function Armory:UpdateQuests()
                 ProcessQuestLogRewardFactions();
             end;
             local funcAdditionalInfo = function(index)
+                numQuests = numQuests + 1;
+
                 local questID = select(8, _G.GetQuestLogTitle(index));
                 local link = _G.GetQuestLink(questID);
                 local id = tostring(questID);
