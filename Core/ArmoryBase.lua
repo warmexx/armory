@@ -40,7 +40,7 @@ if ( not Armory ) then
 
         title = ARMORY_TITLE,
         version = GetAddOnMetadata("Armory", "Version"),
-        dbVersion = 47,
+        dbVersion = 48,
         interface = _G.GetBuildInfo(),
     };
 end
@@ -656,26 +656,32 @@ function Armory:IsDbCompatible()
             upgraded = true;
 
         -- convert from 46 to 47
-    elseif ( dbVersion == 46 ) then
-        for realm in pairs(ArmoryDB) do
-            for character in pairs(ArmoryDB[realm]) do
-                entry = ArmoryDB[realm][character];
+        elseif ( dbVersion == 46 ) then
+            for realm in pairs(ArmoryDB) do
+                for character in pairs(ArmoryDB[realm]) do
+                    entry = ArmoryDB[realm][character];
 
-                entry.Artifacts = nil;
-                entry.Buffs = nil;
-                entry.CanPrestige = nil;
-                entry.HonorExhaustion = nil;
-                entry.HonorLevelRewardPack = nil;
-                entry.HonorRestState = nil;
-                entry.HonorTalents = nil;
-                entry.Prestige = nil;
-                entry.PVPTalentUnlock = nil;
-                entry.Quests = nil;
+                    entry.Artifacts = nil;
+                    entry.Buffs = nil;
+                    entry.CanPrestige = nil;
+                    entry.HonorExhaustion = nil;
+                    entry.HonorLevelRewardPack = nil;
+                    entry.HonorRestState = nil;
+                    entry.HonorTalents = nil;
+                    entry.Prestige = nil;
+                    entry.PVPTalentUnlock = nil;
+                    entry.Quests = nil;
+                end
             end
-        end
 
-        upgraded = true;
-    end
+            upgraded = true;
+
+        -- convert from 47 to 48
+        elseif ( dbVersion == 47 ) then
+            ArmoryShared.PETACTION = nil;
+
+            upgraded = true;
+        end
 
         if ( upgraded ) then
             dbEntry:SetValue("DbVersion", dbVersion + 1);

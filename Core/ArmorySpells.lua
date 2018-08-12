@@ -100,13 +100,16 @@ local function SaveSpellBook(dbEntry, oldNum, newNum, bookType)
         
                 if ( bookType == BOOKTYPE_PET ) then
                     if ( slotType == "PETACTION" ) then
-                        spellName = _G.GetSpellBookItemName(i, bookType);
-                        texture = _G.GetSpellBookItemTexture(i, bookType);
-                        Armory:SetSharedValue(2, slotType, spellName, subSpellName, texture);
+                        _, spellID = _G.GetSpellLink(i, bookType);
+                        if ( not spellID ) then
+                            spellName = _G.GetSpellBookItemName(i, bookType);
+                            texture = _G.GetSpellBookItemTexture(i, bookType);
+                            Armory:SetSharedValue(2, slotType, spellName, subSpellName, texture);
+                        elseif ( family ) then
+                            Armory:SetClassValue("player", 3, container, family, tostring(spellID), subSpellName or "");
+                        end
                     elseif ( spec and specSpells and IsSpecializationSpell(spellID, specSpells) ) then
                         Armory:SetClassValue("pet", 3, container, spec, tostring(spellID), subSpellName or "");
-                    elseif ( family ) then
-                        Armory:SetClassValue("player", 3, container, family, tostring(spellID), subSpellName or "");
                     end
                 else
                     if ( slotType == "FLYOUT" ) then
