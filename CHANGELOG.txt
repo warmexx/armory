@@ -4,6 +4,14 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+==== v15.0.1 ====
+# Professions with comprehensive names weren't updated; this has been fixed.
+# Updating the spellbook resulted in an error; this has been fixed.
+# Pet spells were not stored per family anymore; this has been fixed (log in with a pet to save the pet commands and stances again).
+# Replaced ChatThrottleLib by AceComm-3.0.
+# In rare cases requesting the number of quests from the API returns 0; a work-around has been implemented.
+# Removed references to deleted artifact knowledge API methods.
+
 ==== v15.0.0 ====
 # Adjustments have been made for patch 8.0.1
 
