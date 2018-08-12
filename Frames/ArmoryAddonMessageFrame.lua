@@ -27,6 +27,7 @@
 --]] 
 
 local Armory, _ = Armory;
+local C = LibStub("AceComm-3.0");
 
 ARMORY_BROADCAST_DELAY = 180;
 ARMORY_MESSAGE_UPDATE_DELAY = 0.5;
@@ -204,9 +205,9 @@ function ArmoryAddonMessageFrame_SendMessage(message, destination)
     end
     if ( Armory.messaging ) then
         if ( destination == "CHANNEL" ) then
-            ChatThrottleLib:SendChatMessage("NORMAL", ARMORY_ID, message, destination, nil, Armory.channel);
+            C:SendCommMessage(ARMORY_ID, message, destination, Armory.channel);
         else
-            ChatThrottleLib:SendAddonMessage("NORMAL", ARMORY_ID, message, destination, target);
+            C:SendCommMessage(ARMORY_ID, message, destination, target);
         end
     else
         ArmoryAddonMessageFrame_ParseMessage(message, "WHISPER", target or "test");
