@@ -4,6 +4,9 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+==== v15.0.2 ====
+# The summary sheet may show a "bad argument #2 to 'format'" error; this has been fixed (thanks to HonorGoG)
+
 ==== v15.0.1 ====
 # Professions with comprehensive names weren't updated; this has been fixed.
 # Updating the spellbook resulted in an error; this has been fixed.

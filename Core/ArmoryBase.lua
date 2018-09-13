@@ -55,8 +55,8 @@ function cellPrototype:InitializeCell()
 end
 
 function cellPrototype:SetupCell(tooltip, value, justification, font)
-    local _, height = baseCellPrototype.SetupCell(self, tooltip, format("|T%s:0|t", value), "CENTER");
-    return baseCellPrototype.SetupCell(self, tooltip, format("|T%s:%2$d:%2$d:0:0:64:64:4:60:4:60|t", value, height), "CENTER");
+    local _, height = baseCellPrototype.SetupCell(self, tooltip, format("|T%s:0|t", tostring(value), "CENTER");
+    return baseCellPrototype.SetupCell(self, tooltip, format("|T%s:%2$d:%2$d:0:0:64:64:4:60:4:60|t", tostring(value), height), "CENTER");
 end
 
 function Armory:Debug(...)
