@@ -1104,7 +1104,7 @@ function ArmoryPaperDollFrame_SetCritChance(statFrame, unit)
 		
     PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, critChance, true, critChance);
 		
-	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_CRITICAL_STRIKE).." "..format("%.2F%%", critChance)..FONT_COLOR_CODE_CLOSE;
+	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_CRITICAL_STRIKE)..FONT_COLOR_CODE_CLOSE;
 	local extraCritChance = Armory:GetCombatRatingBonus(rating);
     local extraCritRating = Armory:GetCombatRating(rating);
 	if ( Armory:GetCritChanceProvidesParryEffect() ) then
@@ -1192,7 +1192,7 @@ function ArmoryPaperDollFrame_SetHaste(statFrame, unit)
         hasteFormatString = "%s";
     end
     PaperDollFrame_SetLabelAndText(statFrame, STAT_HASTE, format(hasteFormatString, format("%d%%", haste + 0.5)), false, haste);
-    statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE .. format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_HASTE) .. " " .. format(hasteFormatString, format("%.2F%%", haste)) .. FONT_COLOR_CODE_CLOSE;
+    statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_HASTE)..FONT_COLOR_CODE_CLOSE;
 
     local _, class = Armory:UnitClass(unit);	
     statFrame.tooltip2 = _G["STAT_HASTE_"..class.."_TOOLTIP"];
@@ -1237,12 +1237,6 @@ function ArmoryMastery_OnEnter(statFrame)
 	local _, class = Armory:UnitClass("player");
 	local mastery, bonusCoeff = Armory:GetMasteryEffect();
 	local masteryBonus = Armory:GetCombatRatingBonus(CR_MASTERY) * bonusCoeff;
-	
-	local title = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_MASTERY).." "..format("%.2F%%", mastery)..FONT_COLOR_CODE_CLOSE;
-	if ( masteryBonus > 0 ) then
-		title = title..HIGHLIGHT_FONT_COLOR_CODE.." ("..format("%.2F%%", mastery - masteryBonus)..FONT_COLOR_CODE_CLOSE..GREEN_FONT_COLOR_CODE.."+"..format("%.2F%%", masteryBonus)..FONT_COLOR_CODE_CLOSE..HIGHLIGHT_FONT_COLOR_CODE..")"..FONT_COLOR_CODE_CLOSE;
-	end
-	GameTooltip:SetText(title);
 	
 	local primaryTalentTree = Armory:GetSpecialization();
 	if ( primaryTalentTree ) then
@@ -1340,8 +1334,8 @@ function ArmoryPaperDollFrame_SetVersatility(statFrame, unit)
 	local versatilityDamageBonus = Armory:GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE) + Armory:GetVersatilityBonus(CR_VERSATILITY_DAMAGE_DONE);
 	local versatilityDamageTakenReduction = Armory:GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_TAKEN) + Armory:GetVersatilityBonus(CR_VERSATILITY_DAMAGE_TAKEN);
     PaperDollFrame_SetLabelAndText(statFrame, STAT_VERSATILITY, versatilityDamageBonus, true, versatilityDamageBonus);
-	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE .. format(VERSATILITY_TOOLTIP_FORMAT, STAT_VERSATILITY, versatilityDamageBonus, versatilityDamageTakenReduction) .. FONT_COLOR_CODE_CLOSE;
-	
+	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_VERSATILITY)..FONT_COLOR_CODE_CLOSE;
+    
 	statFrame.tooltip2 = format(CR_VERSATILITY_TOOLTIP, versatilityDamageBonus, versatilityDamageTakenReduction, BreakUpLargeNumbers(versatility), versatilityDamageBonus, versatilityDamageTakenReduction);
 
 	statFrame:Show();

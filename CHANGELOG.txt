@@ -4,6 +4,9 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+==== v15.1.0 ====
+# Adjustments have been made for patch 8.1.0
+
 ==== v15.0.3 ====
 # Fixes "')' expected near ';'" which really messed things up
 

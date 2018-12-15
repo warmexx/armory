@@ -64,7 +64,7 @@ local function GetQuestLines()
         table.wipe(historyLines);
 
         local header, timestamp, isWeekly, tag, isTrivial;
-        local date = C_Calendar.GetDate();
+        local date = C_DateAndTime.GetCurrentCalendarTime();
         local month = date.month;
         local day = date.monthDay;
         local year = date.year;

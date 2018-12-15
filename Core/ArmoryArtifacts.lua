@@ -86,6 +86,7 @@ function Armory:UpdateArtifact()
             dbEntry:SetValue(3, container, itemID, "Powers", C_ArtifactUI.GetPowers());
             dbEntry:SetValue(3, container, itemID, "Tier", C_ArtifactUI.GetArtifactTier());
             dbEntry:SetValue(3, container, itemID, "IsMaxedByRulesOrEffect", C_ArtifactUI.IsMaxedByRulesOrEffect());
+            dbEntry:SetValue(3, container, itemID, "ItemID", C_ArtifactUI.GetArtifactItemID());
 
             local powers = C_ArtifactUI.GetPowers();
             for i, powerID in ipairs(powers) do
@@ -172,6 +173,10 @@ function Armory:GetArtifactArtInfo(artifact)
     artifactArtInfo.titleColor = CreateColor(data.titleColor.r, data.titleColor.g, data.titleColor.b, data.titleColor.a);
    
    return artifactArtInfo;
+end
+
+function Armory:GetArtifactItemID()
+    return GetArtifactValue("ItemID", artifact);
 end
 
 function Armory:GetArtifactTier(artifact)

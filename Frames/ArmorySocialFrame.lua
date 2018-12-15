@@ -120,7 +120,7 @@ function ArmorySocialFrame_OnEvent(self, event, ...)
         Armory:Execute(ArmorySocialFrame_UpdateEvents);
     else
         -- CALENDAR_CLOSE_EVENT doesn't fire, maybe one day...
-        local date = C_Calendar.GetDate();
+        local date = C_DateAndTime.GetCurrentCalendarTime();
         local presentMonth = date.month;
         local presentYear = date.year;
     

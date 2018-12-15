@@ -257,13 +257,13 @@ function Armory:GetParryChanceFromAttribute()
 end
 
 function Armory:GetPersonalRatedInfo(id)
-    local rating, seasonBest, weeklyBest, seasonPlayed, seasonWon, weeklyPlayed, weeklyWon, cap = self:SetGetCharacterValue("PersonalRatedInfo"..id, _G.GetPersonalRatedInfo(id));
+    local rating, seasonBest, weeklyBest, seasonPlayed, seasonWon, weeklyPlayed, weeklyWon, lastWeeksBest, hasWon, pvpTier, ranking = self:SetGetCharacterValue("PersonalRatedInfo"..id, _G.GetPersonalRatedInfo(id));
     if ( time() >= self:GetWeeklyQuestResetTime() ) then
         weeklyBest = 0;
         weeklyPlayed = 0;
         weeklyWon = 0;
     end
-    return rating or 0, seasonBest or 0, weeklyBest or 0, seasonPlayed or 0, seasonWon or 0, weeklyPlayed or 0, weeklyWon or 0, cap or 0;
+    return rating or 0, seasonBest or 0, weeklyBest or 0, seasonPlayed or 0, seasonWon or 0, weeklyPlayed or 0, weeklyWon or 0;
 end
 
 function Armory:GetPetExperience()

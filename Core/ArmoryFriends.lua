@@ -56,10 +56,10 @@ function Armory:UpdateFriends()
         self:PrintDebug("UPDATE", container);
         
         local oldFriends = dbEntry:GetNumValues(container);
-        local newFriends = _G.GetNumFriends();
+        local newFriends = C_FriendList.GetNumFriends();
 
         local oldIgnores = dbEntry:GetNumValues(container, "Ignores");
-        local newIgnores = _G.GetNumIgnores();
+        local newIgnores = C_FriendList.GetNumIgnores();
         
         if ( newFriends + newIgnores == 0 ) then
             dbEntry:SetValue(container, nil);
@@ -79,7 +79,7 @@ function Armory:UpdateFriends()
                 if ( index > newFriends ) then
                     dbEntry:SetValue(2, container, index, nil);
                 else
-                    name, _, class, _, _, _, note = _G.GetFriendInfo(index);
+                    name, _, class, _, _, _, note = C_FriendList.GetFriendInfoByIndex(index);
                     if ( name ) then
                         if ( class == UNKNOWN and classes[name] ) then
                             class = classes[name];
@@ -97,7 +97,7 @@ function Armory:UpdateFriends()
                     if ( index > newIgnores ) then
                         ignores[index] = nil;
                     else
-                        ignores[index] = _G.GetIgnoreName(index) or UNKNOWN;
+                        ignores[index] = C_FriendList.GetIgnoreName(index) or UNKNOWN;
                     end
                 end
             end

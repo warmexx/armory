@@ -352,8 +352,6 @@ function ArmoryArtifactPerksMixin:RefreshPowerTiers()
 			self.CrestFrame:SetPoint("CENTER", finalTier2Button, "CENTER");
 			self.CrestFrame:Show();
 
-			local artifactArtInfo = Armory:GetArtifactArtInfo();
-
 			self.Tier2ForgingScene:Show();
 			self.Tier2ForgingScene:SetFromModelSceneID(TIER_2_FORGING_MODEL_SCENE_ID, true);
 			local forgingEffect = self.Tier2ForgingScene:GetActorByTag("effect");
@@ -411,6 +409,11 @@ end
 
 function ArmoryArtifactPerksMixin:Refresh(newItem)
     self.newItem = self.newItem or newItem;
+
+    local artifactItemID = Armory:GetArtifactItemID();
+    if ( not artifactItemID or not C_Item.IsItemDataCachedByID(artifactItemID) ) then
+        return;
+    end
 
     if ( newItem ) then
         self:HideAllLines();
