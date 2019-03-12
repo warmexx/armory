@@ -53,7 +53,7 @@
     <NormalFont style="GameFontHighlightLeft" />
     <DisabledFont style="GameFontHighlightSmallOutline" />
   </Button>
-  <Button name="ArmoryGuildBankItemButtonTemplate" inherits="ItemButtonTemplate" virtual="true">
+  <Button name="ArmoryGuildBankItemButtonTemplate" inherits="ArmoryItemButtonTemplate" virtual="true">
     <Scripts>
       <OnClick>
         if ( IsModifiedClick("CHATLINK") and self.link ) then

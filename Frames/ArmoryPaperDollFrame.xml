@@ -7,7 +7,7 @@
       <AbsValue val="8"/>
     </FontHeight>
   </Font>
-  <Button name="ArmoryPaperDollItemSlotButtonTemplate" inherits="ItemButtonTemplate" virtual="true">
+  <Button name="ArmoryPaperDollItemSlotButtonTemplate" inherits="ArmoryItemButtonTemplate" virtual="true">
     <Scripts>
       <OnClick function="ArmoryPaperDollItemSlotButton_OnClick" />
       <OnLoad function="ArmoryPaperDollItemSlotButton_OnLoad" />

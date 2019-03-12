@@ -1958,7 +1958,7 @@ function ArmoryAlternateSlotFrame_Show(parent, orientation, direction)
         -- "^Armory.*Slot" pattern used by EQC
         button = _G["ArmoryAlternate"..i.."Slot"];
         if ( not button ) then
-            button = CreateFrame("CheckButton", "ArmoryAlternate"..i.."Slot", frame, "ItemButtonTemplate");
+            button = CreateFrame("CheckButton", "ArmoryAlternate"..i.."Slot", frame, "ArmoryItemButtonTemplate");
             button:RegisterForClicks("LeftButtonUp", "RightButtonUp");
             button:SetScript("OnClick", ArmoryAlternateSlotButton_OnClick);
             button:SetScript("OnEnter", ArmoryAlternateSlotButton_OnEnter);
