@@ -187,7 +187,15 @@ function ArmoryQuestLog_Update()
                 else
                     questLogTitle:SetText("  "..questLogTitleText);
                 end
-                questLogTitle:SetNormalTexture("");
+                if ( questID and C_CampaignInfo.IsCampaignQuest(questID) ) then
+                    local faction = Armory:UnitFactionGroup("player");
+                    local coords = faction == "Horde" and QUEST_TAG_TCOORDS.HORDE or QUEST_TAG_TCOORDS.ALLIANCE;
+                    questLogTitle:SetNormalTexture(QUEST_ICONS_FILE);
+                    questLogTitle:GetNormalTexture():SetTexCoord( unpack(coords) );
+                else
+                    questLogTitle:SetNormalTexture("");
+                    questLogTitle:GetNormalTexture():SetTexCoord(0, 1, 0, 1);
+                end
                 questHighlight:SetTexture("");
             end
             -- Save if its a header or not
