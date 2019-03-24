@@ -1904,7 +1904,7 @@ end
 
 function Armory:GetLink(kind, id, name, color)
     if ( kind == "item" and type(color) == "number" ) then
-        _, _, _, color = GetItemQualityColor(color);
+        color = ITEM_QUALITY_COLORS[color].hex;
     end
     if ( kind == "achievement" ) then
         color = "|cffffff00";
@@ -1921,7 +1921,12 @@ function Armory:GetLink(kind, id, name, color)
     elseif ( kind == "glyph" ) then
         color = "|cff66bbff";
     elseif ( kind == "battlepet" ) then
-        color = "|cff1eff00";
+        local breedQuality = select(3, strsplit(":", id));
+        if ( breedQuality ) then
+            color = ITEM_QUALITY_COLORS[tonumber(breedQuality)].hex;
+        else
+            color = "|cffffd200";
+        end
     elseif ( not color ) then
         color = "|cffffd000";
     end

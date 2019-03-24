@@ -658,8 +658,10 @@ function CloseGuildBankFrame(...)
                     tooltip = Armory:AllocateTooltip();
 	                local speciesID, level, breedQuality, maxHealth, power, speed, petName = tooltip:SetGuildBankItem(tab, i);
                     Armory:ReleaseTooltip(tooltip);
-	                if ( speciesID and tonumber(speciesID) > 0 ) then
-                        texture = strupper(texture):match("^INTERFACE\\ICONS\\(.+)") or "";
+                    if ( speciesID and tonumber(speciesID) > 0 ) then
+                        if ( type(texture) == "string" ) then
+                            texture = strupper(texture):match("^INTERFACE\\ICONS\\(.+)") or "";
+                        end
                         itemString = strjoin(":", speciesID, level, breedQuality, maxHealth, power, speed);
                         itemString = strjoin("|", itemString, texture, petName);
                     else
