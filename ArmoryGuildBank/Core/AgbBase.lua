@@ -528,7 +528,7 @@ function AGB:GetItemInfo(itemString)
     -- Caged pet
     local id, icon, name = itemString:match("(.+)|(.+)|(.+)");
     if ( name ) then
-        return name, Armory:GetLink("battlepet", id, name), tonumber(icon) or "Interface\\Icons\\"..icon;
+        return name, Armory:GetLink("battlepet", id..":0000000000000000", name), tonumber(icon) or "Interface\\Icons\\"..icon;
     end
 
     -- phase 1: try to get the info from the game tooltip
