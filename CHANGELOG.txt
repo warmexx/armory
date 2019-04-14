@@ -4,6 +4,11 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+==== v15.3.0 ====
+# Caged pets were not displayed properly anymore when stored in the guildbank; this has been fixed.
+# A faction icon will now be shown in front of campaign quests in the quest log.
+# Recipe expansion requirements were not taken into account; this has been fixed (requires rescan).
+
 ==== v15.2.0 ====
 # Adjustments have been made for patch 8.1.5
 
