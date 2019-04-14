@@ -210,7 +210,7 @@ local function EnhanceItemTooltip(tooltip, id, link)
             end
             local recipeType, recipeName = name:match("^(.-): (.+)$");
 
-            knownBy, hasSkill, canLearn = Armory:GetRecipeAltInfo(recipeName, link, reqProfession or recipeType, reqRank, reqReputation, reqStanding, reqSkill);
+            knownBy, hasSkill, canLearn = Armory:GetRecipeAltInfo(recipeName, link, subType or recipeType, reqProfession, reqRank, reqReputation, reqStanding, reqSkill);
 
         elseif ( itemType == LE_ITEM_CLASS_GLYPH ) then
             crafters = Armory:GetInscribers(name, subType);

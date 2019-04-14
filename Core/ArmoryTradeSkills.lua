@@ -33,6 +33,7 @@ local container = "Professions";
 local itemContainer = "SkillLines";
 local recipeContainer = "Recipes";
 local reagentContainer = "Reagents";
+local rankContainer = "Ranks";
 
 local selectedSkill;
 
@@ -597,6 +598,12 @@ function Armory:ClearTradeSkills()
 end
 
 local function StoreTradeSkillInfo(dbEntry, recipeID, index)
+    local skillLineID, skillLineName = C_TradeSkillUI.GetTradeSkillLineForRecipe(recipeID);
+    if ( skillLineName and not dbEntry:Contains(rankContainer, skillLineName) ) then
+        local _, skillLineRank = C_TradeSkillUI.GetTradeSkillLineInfoByID(skillLineID);
+        dbEntry:SetValue(2, rankContainer, skillLineName, skillLineRank);
+    end
+
     local recipe = Armory.sharedDbEntry:SelectContainer(container, recipeContainer, tostring(recipeID));
     local reagents = Armory.sharedDbEntry:SelectContainer(container, reagentContainer);
 
@@ -1339,7 +1346,7 @@ local function AddHasSkill(name)
     end
 end
 
-function Armory:GetRecipeAltInfo(name, link, profession, reqRank, reqReputation, reqStanding, reqSkill)
+function Armory:GetRecipeAltInfo(name, link, profession, reqProfession, reqRank, reqReputation, reqStanding, reqSkill)
     table.wipe(recipeOwners);
     table.wipe(recipeHasSkill);
     table.wipe(recipeCanLearn);
@@ -1378,7 +1385,7 @@ function Armory:GetRecipeAltInfo(name, link, profession, reqRank, reqReputation,
             if ( not known and dbEntry:Contains(container, profession) and (self:GetConfigShowHasSkill() or self:GetConfigShowCanLearn()) ) then
 				local character = self:GetQualifiedCharacterName();
                 local skillName, subSkillName, standingID, standing;
-                local rank = dbEntry:GetValue(container, profession, "Rank");
+                local rank = reqProfession and dbEntry:GetValue(container, profession, rankContainer, reqProfession) or dbEntry:GetValue(container, profession, "Rank");
                 local learnable = reqRank <= rank;
                 local attainable = not learnable;
                 local unknown = false;
