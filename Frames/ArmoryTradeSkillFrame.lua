@@ -702,7 +702,7 @@ function ArmoryTradeSkillButtonMixin:SetUpHeader(textWidth, tradeSkillInfo)
         self.SubSkillRankBar:SetMinMaxValues(tradeSkillInfo.skillLineStartingRank, tradeSkillInfo.skillLineMaxLevel);
         self.SubSkillRankBar:SetValue(tradeSkillInfo.skillLineCurrentLevel);
         self.SubSkillRankBar.currentRank = tradeSkillInfo.skillLineCurrentLevel;
-        self.SubSkillRankBar.maxRank = skillLineMaxLevel;
+        self.SubSkillRankBar.maxRank = tradeSkillInfo.skillLineMaxLevel;
 
         textWidth = textWidth - ARMORY_SUB_SKILL_BAR_WIDTH;
     else
