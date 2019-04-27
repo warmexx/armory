@@ -84,6 +84,9 @@ end
 
 local function GetReagentInfo(id, index)
     local recipeID, count = GetRecipeValue(id, "Reagents", index);
+    if ( not tonumber(recipeID) ) then
+        return recipeID or UNKNOWN, "Interface\\Icons\\INV_Misc_QuestionMark", count;
+    end
     local name, texture, link = Armory:GetSharedValue(container, reagentContainer, recipeID);
     return name, texture, count, link;
 end
@@ -625,6 +628,8 @@ local function StoreTradeSkillInfo(dbEntry, recipeID, index)
                 local _, id = Armory:GetLinkId(link);
                 reagents[id] = dbEntry.Save(reagentName, reagentTexture, link);
                 recipe.Reagents[i] = dbEntry.Save(id, reagentCount);
+            else
+                recipe.Reagents[i] = dbEntry.Save(reagentName, reagentCount);
             end
         end
     end

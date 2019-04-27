@@ -89,6 +89,7 @@ function ArmoryTradeSkillFrameMixin:OnEvent(event, ...)
     elseif ( event == "TRADE_SKILL_CLOSE" ) then
         self.isOpen = false;
     elseif ( not Armory:GetConfigExtendedTradeSkills() ) then
+        Armory:PullTradeSkillItems();
         Armory:Execute(function() self:Update() end);
     end
 end
