@@ -150,7 +150,7 @@ local function GetProfessionLines()
     local group = { index=0, expanded=true, included=true, items={} };
     local numReagents, oldPosition, names, isIncluded, itemMinLevel;
     local numLines, extended;
-    local name, id, skillType, numAvailable, difficulty, disabled, categoryID, isExpanded;
+    local name, id, skillType, numAvailable, numIndents, difficulty, disabled, categoryID, isExpanded;
     local subgroup;
 
     table.wipe(professionLines);
@@ -164,10 +164,10 @@ local function GetProfessionLines()
              
             -- apply filters
             for i = 1, numLines do
-                name, skillType, numAvailable,  _, _, _, _, _, difficulty, _, _, _, _, disabled, _, categoryID = dbEntry:GetValue(itemContainer, i, "Info");
+                name, skillType, numAvailable,  _, _, numIndents, _, _, difficulty, _, _, _, _, disabled, _, categoryID = dbEntry:GetValue(itemContainer, i, "Info");
                 id = dbEntry:GetValue(itemContainer, i, "Data");
                 isExpanded = not Armory:GetHeaderLineState(itemContainer..selectedSkill, name);
-                if ( skillType == "header" or (i == 1 and skillType == "subheader") ) then
+                if ( not IsRecipe(skillType) and numIndents == 0 ) then
                     if ( #tradeSkillSubClassFilter > 1 ) then
                         isIncluded = false;
                         for j = 2, #tradeSkillSubClassFilter do
@@ -183,7 +183,7 @@ local function GetProfessionLines()
                     subgroup = nil;
                     table.insert(groups, group);
                 elseif ( group.included ) then
-                    if ( skillType == "subheader" ) then
+                    if ( not IsRecipe(skillType) ) then
                         subgroup = { index=i, expanded=isExpanded, items={} };
                         table.insert(group.items, subgroup);
                     else
