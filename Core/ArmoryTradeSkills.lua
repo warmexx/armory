@@ -416,7 +416,9 @@ local function GetProfessionLineValue(index)
         info.disabled, 
         info.disabledReason, 
         info.categoryID,
-        info.productQuality = dbEntry:GetValue(container, selectedSkill, itemContainer, professionLines[index], "Info");
+        info.productQuality,
+        info.currentRank,
+        info.totalRanks = dbEntry:GetValue(container, selectedSkill, itemContainer, professionLines[index], "Info");
         
         info.cooldown, 
         info.isDayCooldown, 
@@ -668,6 +670,27 @@ local function GetNumTradeSkills()
 end
 
 local function GetTradeSkillLineInfo(info)
+    if ( IsRecipe(info.type) and not info.currentRank ) then
+        info.currentRank = 1;
+        do
+            local previousRecipeID = info.previousRecipeID;
+            while ( previousRecipeID ) do
+                info.currentRank = info.currentRank + 1;
+                local previousRecipeInfo = C_TradeSkillUI.GetRecipeInfo(previousRecipeID);
+                previousRecipeID = previousRecipeInfo.previousRecipeID;
+            end
+        end
+        info.totalRanks = info.currentRank;
+        do
+            local nextRecipeID = info.nextRecipeID;
+            while ( nextRecipeID ) do
+                info.totalRanks = info.totalRanks + 1;
+                local nextRecipeInfo = C_TradeSkillUI.GetRecipeInfo(nextRecipeID);
+                nextRecipeID = nextRecipeInfo.nextRecipeID;
+            end
+        end
+    end
+
     return 
         info.name, 
         info.type, 
@@ -685,7 +708,9 @@ local function GetTradeSkillLineInfo(info)
         info.disabled, 
         info.disabledReason, 
         info.categoryID,
-        info.productQuality;
+        info.productQuality,
+        info.currentRank,
+        info.totalRanks;
 end
 
 local invSlotTypes = {};

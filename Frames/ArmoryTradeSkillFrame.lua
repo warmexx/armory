@@ -694,6 +694,8 @@ function ArmoryTradeSkillButtonMixin:SetUpHeader(textWidth, tradeSkillInfo)
     self.isHeader = true;
     self.SkillUps:Hide();
     self.LockedIcon:Hide();
+    self.StarsFrame:Hide();
+	self:SetAlpha(1.0);
 
     self:SetBaseColor(ArmoryTradeSkillTypeColor[tradeSkillInfo.type]);
 
@@ -756,6 +758,24 @@ function ArmoryTradeSkillButtonMixin:SetUpRecipe(textWidth, tradeSkillInfo)
 
     self:SetNormalTexture("");
     self.Highlight:SetTexture("");
+
+    local totalRanks, currentRank = tradeSkillInfo.totalRanks, tradeSkillInfo.currentRank;
+	if ( totalRanks and totalRanks > 1 ) then
+		usedWidth = usedWidth + self.StarsFrame:GetWidth();
+		self.StarsFrame:Show();
+		for i, starFrame in ipairs(self.StarsFrame.Stars) do
+			starFrame.EarnedStar:SetShown(i <= currentRank);
+		end
+		if ( self.SkillUps:IsShown() ) then
+			self.SkillUps:SetPoint("RIGHT", self.StarsFrame, "LEFT", -2, 0);
+			usedWidth = usedWidth + 11;
+		end
+	else
+		self.StarsFrame:Hide();
+		if ( self.SkillUps:IsShown() ) then
+			self.SkillUps:SetPoint("RIGHT", self, "RIGHT", 3, 0);
+		end
+	end
 
     self.Text:SetWidth(0);
     self.Text:SetFormattedText("%s%s", skillNamePrefix, tradeSkillInfo.name);
@@ -849,6 +869,7 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
     local recipeInfo = self.selectedRecipe and Armory:GetTradeSkillInfo(self.selectedRecipe);
 	if ( recipeInfo and recipeInfo.type == "recipe" ) then
         self.Contents.RecipeName:SetText(recipeInfo.name);
+        self.recipeID = recipeInfo.recipeID;
 
         local recipeLink = C_TradeSkillUI.GetRecipeItemLink(recipeInfo.recipeID);
         if ( recipeInfo.productQuality ) then
@@ -875,7 +896,18 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
         else
             self.Contents.ResultIcon.Count:SetText("");
         end
-
+        
+        local totalRanks, currentRank = recipeInfo.totalRanks, recipeInfo.currentRank;
+		self.currentRank = currentRank;
+		if ( totalRanks and totalRanks > 1 ) then
+			self.Contents.StarsFrame:Show();
+			for i, starFrame in ipairs(self.Contents.StarsFrame.Stars) do
+				starFrame.EarnedStar:SetShown(i <= currentRank);
+			end
+		else
+			self.Contents.StarsFrame:Hide();
+        end
+        
         local recipeDescription = Armory:GetTradeSkillDescription(self.selectedRecipe);
         if ( recipeDescription and #recipeDescription > 0 ) then
             self.Contents.Description:SetText(recipeDescription);
