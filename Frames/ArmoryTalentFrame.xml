@@ -108,7 +108,7 @@
         </Texture>
       </Layer>
       <Layer level="ARTWORK">
-        <FontString inherits="GameFontNormal" maxLines="2" parentKey="unspentText" text="Unpent">
+        <FontString inherits="GameFontNormal" maxLines="2" parentKey="unspentText" text="Unspent">
           <Anchors>
             <Anchor point="TOP" x="22" y="-35"/>
           </Anchors>
