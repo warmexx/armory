@@ -1267,7 +1267,7 @@ function Armory_oGlow_PaperDollItemSlotButton_Update(button)
 end
 
 function Armory_oGlow_SetItemLink(self, button, link)
-    local icon = _G[button:GetName().."IconTexture"] or button;
+    local icon = _G[(button:GetName() or "").."IconTexture"] or button;
     if ( icon and icon.IsDesaturated and icon:IsDesaturated() ) then
         return;
     elseif ( oGlow.CallFilters ) then
