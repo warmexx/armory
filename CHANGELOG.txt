@@ -4,6 +4,9 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+==== v15.4.1 ====
+# An "attempt to concatenate a nil value" error may appear when opening Armory's tradeskill window; this has been fixed.
+
 ==== v15.4.0 ====
 # The skill progress bar didn't show ranks anymore while hovering; this has been fixed. 
 # Added recipe ranks (requires rescan).
