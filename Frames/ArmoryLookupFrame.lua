@@ -421,7 +421,7 @@ function ArmoryLookupFrame_UpdateTarget()
         ArmoryLookupFrameTargetText:SetText(UnitName("target"));
     elseif ( channel == "GUILD" ) then
         if ( GetNumGuildMembers() == 0 ) then
-            GuildRoster();
+            C_GuildInfo.GuildRoster();
         end
         for i = 1, GetNumGuildMembers() do
             _, _, _, _, _, _, _, _, online = GetGuildRosterInfo(i);

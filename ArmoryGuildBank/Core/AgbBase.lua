@@ -657,7 +657,7 @@ function AGB:IsOnline(member)
     local name;
 
     if ( IsInGuild() ) then
-        GuildRoster();
+        C_GuildInfo.GuildRoster();
 
         for i = 1, GetNumGuildMembers() do
             name = GetGuildRosterInfo(i);

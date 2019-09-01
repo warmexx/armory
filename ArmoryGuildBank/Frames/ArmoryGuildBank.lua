@@ -253,8 +253,8 @@ local function UpdateGuildInfo(dbEntry, frame)
     local name = frame:GetName();
 
     if ( not tabardEmblemUpper ) then
-        tabardBackgroundUpper = "Textures\\GuildEmblems\\Background_49_TU_U";
-        tabardBackgroundLower = "Textures\\GuildEmblems\\Background_49_TL_U";
+		tabardBackgroundUpper = 180158; --"Textures\\GuildEmblems\\Background_49_TU_U";
+		tabardBackgroundLower = 180159; --"Textures\\GuildEmblems\\Background_49_TL_U";
     end
 
     _G[name.."EmblemBackgroundUL"]:SetTexture(tabardBackgroundUpper);

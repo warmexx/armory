@@ -167,8 +167,7 @@ local NUM_CURVED_LINE_SEGEMENTS = 20;
 local CURVED_LINE_RADIUS_SCALAR = 0.98;
 local CURVED_LINE_THICKNESS = 5;
 
-local TIER_2_FORGING_MODEL_SCENE_ID = 55;
-local TIER_2_FORGING_EFFECT_MODEL_ID = 382335;--"SPELLS\\EASTERN_PLAGUELANDS_BEAM_EFFECT.M2";
+local TIER2_FORGING_MODEL_SCENE_INFO = StaticModelInfo.CreateModelSceneEntry(55, 382335);			--"SPELLS\\EASTERN_PLAGUELANDS_BEAM_EFFECT.M2";
 
 function ArmoryArtifactPerksMixin:OnLoad()
 	self.powerButtonPool = CreateFramePool("BUTTON", self, "ArmoryArtifactPowerButtonTemplate");
@@ -352,13 +351,12 @@ function ArmoryArtifactPerksMixin:RefreshPowerTiers()
 			self.CrestFrame:SetPoint("CENTER", finalTier2Button, "CENTER");
 			self.CrestFrame:Show();
 
+            local forceUpdate = true;
+
 			self.Tier2ForgingScene:Show();
-			self.Tier2ForgingScene:SetFromModelSceneID(TIER_2_FORGING_MODEL_SCENE_ID, true);
-			local forgingEffect = self.Tier2ForgingScene:GetActorByTag("effect");
+            local forgingEffect = StaticModelInfo.SetupModelScene(self.Tier2ForgingScene, TIER2_FORGING_MODEL_SCENE_INFO, forceUpdate);
 			if ( forgingEffect ) then
-				forgingEffect:SetModelByFileID(TIER_2_FORGING_EFFECT_MODEL_ID);
 				forgingEffect:SetAlpha(0.0);
-				self.Tier2ForgingScene.ForgingEffect = forgingEffect;
 			end
 		else
 			self.CrestFrame:Hide();
