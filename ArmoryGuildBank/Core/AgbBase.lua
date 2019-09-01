@@ -370,7 +370,7 @@ function AGB:DeleteTab(tab)
 end
 
 function AGB:UpdateGuildInfo()
-    self:SetValue("Tabard", GetGuildTabardFileNames());
+    self:SetValue("Tabard", GetGuildTabardFiles());
     self:SetValue("Faction", UnitFactionGroup("player"));
 end
 
