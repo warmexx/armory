@@ -1,4 +1,4 @@
-## Interface: 80100
+## Interface: 80200
 ## Title: ArmoryGuildBank
 ## Title-deDE: ArmoryGuildBank [Armory Gildenbank]
 ## Title-esES: ArmoryGuildBank [Banco de Hermandad]
@@ -11,6 +11,7 @@
 ## Notes-frFR: Fournit des renseignements de la banque de guilde aux utilisateurs de l'Armurerie
 ## Notes-koKR: Armory사용자에게 길드은행의 정보를 추가로 제공합니다.
 ## Notes-ruRU: Предоставляет доступ к информации о гильдейском банке пользователям Armory
+## Notes-zhCN: 向Armory用户提供公会银行信息
 ## Author: Warmexx [Neighbours]
 ## Dependencies: Armory
 ## SavedVariables: AgbDB, AgbDBRealms
