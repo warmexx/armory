@@ -811,7 +811,7 @@ function Armory:PullTradeSkillItems()
 end
 
 function Armory:UpdateTradeSkill()
-    local name, rank, maxRank;
+    local name, parentName, rank, maxRank;
     local modeChanged;
     local warned;
     
@@ -822,7 +822,11 @@ function Armory:UpdateTradeSkill()
         return;
     end
 
-    tradeSkillID, _, rank, maxRank, modifier, _, name = C_TradeSkillUI.GetTradeSkillLine();
+    _, name, rank, maxRank, modifier, _, parentName = C_TradeSkillUI.GetTradeSkillLine();
+
+    if ( parentName ) then
+        name = parentName;
+    end
 
     if ( name and name ~= "UNKNOWN" ) then
         if ( not IsTradeSkill(name) ) then
