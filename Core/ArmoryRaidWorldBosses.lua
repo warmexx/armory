@@ -70,7 +70,7 @@ local wodBosses = {};
 local function GetWoDSavedWorldBossInfo()
     table.wipe(wodBosses);
     for _, info in pairs(WOD_WORLD_BOSSES) do
-        if ( IsQuestFlaggedCompleted(info.quest) ) then
+        if ( C_QuestLog.IsQuestFlaggedCompleted(info.quest) ) then
             local id, name = EJ_GetCreatureInfo(1, info.id);
             local reset = Armory:GetWeeklyQuestResetTime() - time();
             table.insert(wodBosses, {name, id, reset});
