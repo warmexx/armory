@@ -40,7 +40,7 @@ if ( not Armory ) then
 
         title = ARMORY_TITLE,
         version = GetAddOnMetadata("Armory", "Version"),
-        dbVersion = 48,
+        dbVersion = 49,
         interface = _G.GetBuildInfo(),
     };
 end
@@ -696,6 +696,14 @@ function Armory:IsDbCompatible()
             ArmoryShared.PETACTION = nil;
 
             upgraded = true;
+
+        -- convert from 48 to 49
+        elseif ( dbVersion == 48 ) then
+            dbEntry:SetValue(2, "General", "MinimapAngle", nil);
+            dbEntry:SetValue(2, "General", "MinimapRadius", nil);
+
+            upgraded = true;
+
         end
 
         if ( upgraded ) then

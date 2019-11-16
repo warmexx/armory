@@ -820,17 +820,14 @@ function ArmoryMinimapButton_OnUpdate(self, elapsed)
     self.updateDelay = self.updateDelay + elapsed;
 
     if ( self.isMoving ) then
+        local xmid, ymid = Minimap:GetCenter();
         local xpos, ypos = GetCursorPosition();
-        local xmin, ymin = Minimap:GetLeft(), Minimap:GetBottom();
+        local scale = Minimap:GetEffectiveScale();
         local angle;
 
-        xpos = xmin - xpos / Minimap:GetEffectiveScale() + 70;
-        ypos = ypos / Minimap:GetEffectiveScale() - ymin - 70;
-
-        angle = math.deg(math.atan2(ypos, xpos));
-        if ( angle < 0 ) then
-            angle = angle + 360;
-        end
+        xpos = xpos / scale - xmid;
+        ypos = ypos / scale - ymid;
+        angle = math.deg(math.atan2(ypos, xpos)) % 360;
 
         Armory:SetConfigMinimapAngle(angle);
         ArmoryOptionsMinimapPanelAngleSlider:SetValue(angle);
@@ -844,13 +841,48 @@ function ArmoryMinimapButton_OnUpdate(self, elapsed)
     end
 end
 
+local minimapShapes = {
+    ["ROUND"] = {true, true, true, true},
+    ["SQUARE"] = {false, false, false, false},
+    ["CORNER-TOPLEFT"] = {false, false, false, true},
+    ["CORNER-TOPRIGHT"] = {false, false, true, false},
+    ["CORNER-BOTTOMLEFT"] = {false, true, false, false},
+    ["CORNER-BOTTOMRIGHT"] = {true, false, false, false},
+    ["SIDE-LEFT"] = {false, true, false, true},
+    ["SIDE-RIGHT"] = {true, false, true, false},
+    ["SIDE-TOP"] = {false, false, true, true},
+    ["SIDE-BOTTOM"] = {true, true, false, false},
+    ["TRICORNER-TOPLEFT"] = {false, true, true, true},
+    ["TRICORNER-TOPRIGHT"] = {true, false, true, true},
+    ["TRICORNER-BOTTOMLEFT"] = {true, true, false, true},
+    ["TRICORNER-BOTTOMRIGHT"] = {true, true, true, false},
+};
 function ArmoryMinimapButton_Move()
-    local angle = Armory:GetConfigMinimapAngle();
-    local radius = Armory:GetConfigMinimapRadius();
-    local xpos = radius * cos(angle);
-    local ypos = radius * sin(angle);
-
-    ArmoryMinimapButton:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", 54 - xpos, ypos - 55);
+    local angle = rad(Armory:GetConfigMinimapAngle() or 215);
+    local radius = Armory:GetConfigMinimapRadius() or 5;
+    local x = math.cos(angle);
+    local y = math.sin(angle);
+    local q = 1;
+    if ( x < 0 ) then 
+        q = q + 1;
+    end
+    if ( y > 0 ) then
+        q = q + 2;
+    end
+    local minimapShape = GetMinimapShape and GetMinimapShape() or "ROUND";
+    local quadTable = minimapShapes[minimapShape];
+    local w = (Minimap:GetWidth() / 2) + radius;
+    local h = (Minimap:GetHeight() / 2) + radius;
+    if ( quadTable[q] ) then
+        x = x * w;
+        y = y * h;
+    else
+        local diagRadiusW = math.sqrt(2 * w^2) - 10;
+        local diagRadiusH = math.sqrt(2 * h^2) - 10;
+        x = max(-w, min(x * diagRadiusW, w));
+        y = max(-h, min(y * diagRadiusH, h));
+    end
+    ArmoryMinimapButton:SetPoint("CENTER", Minimap, "CENTER", x, y);
 end
 
 local Orig_GameTooltip_ShowCompareItem = GameTooltip_ShowCompareItem;
