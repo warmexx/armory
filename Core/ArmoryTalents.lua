@@ -88,7 +88,7 @@ end
 ----------------------------------------------------------
 
 function Armory:HasTalents()
-	return self:TalentsEnabled();
+	return self:TalentsEnabled() and self:UnitLevel("player") >= SHOW_TALENT_LEVEL;
 end
 
 function Armory:GetNumUnspentTalents(spec)
