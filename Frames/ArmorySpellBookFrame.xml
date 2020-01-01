@@ -23,9 +23,9 @@
       </Layer>
       <Layer level="ARTWORK" textureSubLevel="1">
         <Texture name="$parentTabardEmblem" parentKey="TabardEmblem" hidden="true" urgency="5" file="Interface\GuildFrame\GuildEmblemsLG_01">
-          <Size x="38" y="38"/>
+          <Size x="33" y="38"/>
           <Anchors>
-            <Anchor point="TOPLEFT" x="-3" y="3"/>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="TOPLEFT" x="16" y="-15"/>
           </Anchors>
         </Texture>
       </Layer>
@@ -165,6 +165,18 @@
           </Anchors>
         </FontString>
       </Layer>
+			<Layer level="OVERLAY" textureSubLevel ="-2">
+				<Texture name="$parentLevelLinkLockBg" hidden="true" setAllPoints="true">
+					<Color color="BLACK_FONT_COLOR" a=".3"/>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="-1">
+				<Texture name="$parentLevelLinkLockTexture" atlas="QuestSharing-Padlock" useAtlasSize="true" hidden="true">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
       <Layer level="OVERLAY">
         <Texture name="$parentAutoCastable" file="Interface\Buttons\UI-AutoCastableOverlay" hidden="true">
           <Size>

@@ -320,9 +320,11 @@ function ArmorySpellButton_UpdateButton(self)
     ArmorySpellBookFrame.selectedSkillLineNumSlots = numSlots;
     ArmorySpellBookFrame.selectedSkillLineOffset = offset;
 	local isOffSpec = (offSpecID ~= 0) and (ArmorySpellBookFrame.bookType == BOOKTYPE_SPELL);
-    local slot, slotType, attachedGlyph = ArmorySpellBook_GetSpellBookSlot(self);
+    local slot, slotType, attachedGlyph, isDisabled, isLocked = ArmorySpellBook_GetSpellBookSlot(self);
     local name = self:GetName();
     local iconTexture = _G[name.."IconTexture"];
+	local levelLinkLockTexture = _G[name.."LevelLinkLockTexture"];
+	local levelLinkLockBg = _G[name.."LevelLinkLockBg"];
     local spellString = _G[name.."SpellName"];
     local subSpellString = _G[name.."SubSpellName"];
     local autoCastableTexture = _G[name.."AutoCastable"];
@@ -330,6 +332,8 @@ function ArmorySpellButton_UpdateButton(self)
     if ( (ArmorySpellBookFrame.bookType ~= BOOKTYPE_PET) and not slot ) then
         self:Disable();
         iconTexture:Hide();
+		levelLinkLockTexture:Hide();
+		levelLinkLockBg:Hide();
         spellString:Hide();
         subSpellString:Hide();
         autoCastableTexture:Hide();
@@ -369,7 +373,7 @@ function ArmorySpellButton_UpdateButton(self)
         autoCastableTexture:Hide();
     end
 
-    local spellName, subSpellName = Armory:GetSpellBookItemName(slot, ArmorySpellBookFrame.bookType, ArmorySpellBookFrame.selectedPetSpec);
+    local spellName, subSpellName _, spellID = Armory:GetSpellBookItemName(slot, ArmorySpellBookFrame.bookType, ArmorySpellBookFrame.selectedPetSpec);
     local isPassive = Armory:IsPassiveSpell(slot, ArmorySpellBookFrame.bookType, ArmorySpellBookFrame.selectedPetSpec);
     if ( isPassive ) then
         normalTexture:SetVertexColor(0, 0, 0);
@@ -390,9 +394,14 @@ function ArmorySpellButton_UpdateButton(self)
     end
 
     iconTexture:Show();
-    if ( not (slotType == "FUTURESPELL") ) then
-        iconTexture:SetAlpha(1);
-        iconTexture:SetDesaturated(false);
+    spellString:Show();
+    subSpellString:Show();
+
+    local iconTextureAlpha;
+	local iconTextureDesaturated;
+	if ( not (slotType == "FUTURESPELL") and not isDisabled ) then
+		iconTextureAlpha = 1;
+		iconTextureDesaturated = false;
         self.RequiredLevelString:Hide();
         self.SeeTrainerString:Hide();
         self.SpellName:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
@@ -403,14 +412,19 @@ function ArmorySpellButton_UpdateButton(self)
         end
     else
         local level = Armory:GetSpellAvailableLevel(slot, ArmorySpellBookFrame.bookType, ArmorySpellBookFrame.selectedPetSpec);
-        iconTexture:SetAlpha(0.5);
-        iconTexture:SetDesaturated(true);
+		iconTextureAlpha = .5;
+		iconTextureDesaturated = true;
         self.GlyphIcon:Hide();
-        if ( level and level > Armory:UnitLevel("player") ) then
+        if ( level and level > Armory:UnitLevel("player") or isDisabled ) then
             self.SeeTrainerString:Hide();
-            self.RequiredLevelString:Show();
-            self.RequiredLevelString:SetFormattedText(SPELLBOOK_AVAILABLE_AT, level);
-			self.RequiredLevelString:SetTextColor(0.25, 0.12, 0);
+
+			local displayedLevel = isDisabled and Armory:GetSpellLevelLearned(slot, ArmorySpellBookFrame.bookType, ArmorySpellBookFrame.selectedPetSpec) or level;
+			if ( displayedLevel > 0 ) then
+				self.RequiredLevelString:SetFormattedText(SPELLBOOK_AVAILABLE_AT, displayedLevel);
+				self.RequiredLevelString:SetTextColor(0.25, 0.12, 0);
+				self.RequiredLevelString:Show();
+			end
+
             self.SpellName:SetTextColor(0.25, 0.12, 0);
         else
             self.SeeTrainerString:Show();
@@ -419,14 +433,22 @@ function ArmorySpellButton_UpdateButton(self)
          end
     end
 
-   	if ( isOffSpec ) then
+	local isLevelLinkLocked = spellID and isLocked or false;
+	levelLinkLockTexture:SetShown(isLevelLinkLocked);
+	levelLinkLockBg:SetShown(isLevelLinkLocked);
+	if ( isLevelLinkLocked ) then
+		iconTexture:SetAlpha(1.0);
+		iconTexture:SetDesaturated(true);
+	else
+		iconTexture:SetAlpha(iconTextureAlpha);
+		iconTexture:SetDesaturated(iconTextureDesaturated);
+	end
+
+    if ( isOffSpec ) then
 		iconTexture:SetDesaturated(isOffSpec);
 		self.SpellName:SetTextColor(0.75, 0.75, 0.75);
 		self.RequiredLevelString:SetTextColor(0.1, 0.1, 0.1);
     end
-    
-    spellString:Show();
-    subSpellString:Show();
 end
 
 function ArmorySpellBookPrevPageButton_OnClick(self)
@@ -469,10 +491,10 @@ function ArmorySpellBook_GetSpellBookSlot(spellButton)
         local relativeSlot = id + ( SPELLS_PER_PAGE * (ARMORY_SPELLBOOK_PAGENUMBERS[ArmorySpellBookFrame.selectedSkillLine] - 1));
         if ( ArmorySpellBookFrame.selectedSkillLineNumSlots and relativeSlot <= ArmorySpellBookFrame.selectedSkillLineNumSlots ) then
             local slot = ArmorySpellBookFrame.selectedSkillLineOffset + relativeSlot;
-            local slotType, slotID, attachedGlyph = Armory:GetSpellBookItemInfo(slot, ArmorySpellBookFrame.bookType);
-            return slot, slotType, attachedGlyph;
+            local slotType, slotID, attachedGlyph, isDisabled, isLocked = Armory:GetSpellBookItemInfo(slot, ArmorySpellBookFrame.bookType);
+            return slot, slotType, attachedGlyph, isDisabled, isLocked;
         else
-            return nil, nil, nil;
+            return nil, nil, nil, nil, nil;
         end
     end
 end

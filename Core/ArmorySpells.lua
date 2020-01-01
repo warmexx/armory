@@ -96,8 +96,11 @@ local function SaveSpellBook(dbEntry, oldNum, newNum, bookType)
             if ( spellID ) then
                 local attachedGlyph = _G.HasAttachedGlyph(spellID) and GetCurrentGlyphNameForSpell(spellID) or nil;   
                 local subSpellName = GetSubSpellName(i, bookType);
-                local spellName, texture, link, level;
-        
+                local isDisabled = C_SpellBook.IsSpellDisabled(spellID);
+                local isLocked = C_LevelLink.IsSpellLocked(spellID);
+                local level = _G.GetSpellAvailableLevel(i, bookType);
+                local spellName, texture, link;
+
                 if ( bookType == BOOKTYPE_PET ) then
                     if ( slotType == "PETACTION" ) then
                         _, spellID = _G.GetSpellLink(i, bookType);
@@ -116,7 +119,6 @@ local function SaveSpellBook(dbEntry, oldNum, newNum, bookType)
                         spellID = nil;
                         spellName = _G.GetSpellBookItemName(i, bookType);
                         texture = _G.GetSpellBookItemTexture(i, bookType);
-                        level = _G.GetSpellAvailableLevel(i, bookType);
                         local tradeSkillLink, tradeSkillSpellID = _G.GetSpellTradeSkillLink(i, bookType);
                         if ( tradeSkillSpellID ) then
                             link = tradeSkillLink;
@@ -126,7 +128,7 @@ local function SaveSpellBook(dbEntry, oldNum, newNum, bookType)
                     elseif ( attachedGlyph ) then
                         link = _G.GetSpellLink(i, bookType);
                     end
-                    dbEntry:SetValue(2, container, i, spellID, subSpellName, slotType, spellName, texture, link, level, attachedGlyph);
+                    dbEntry:SetValue(2, container, i, spellID, subSpellName, slotType, spellName, texture, link, level, attachedGlyph, isDisabled, isLocked);
                 end
             end
         end
@@ -365,9 +367,16 @@ function Armory:GetSpellBookItemName(id, bookType, specialization)
 end
 
 function Armory:GetSpellBookItemInfo(id, bookType, specialization)
-    local spellID, _, slotType, _, _, _, _, hasAttachedGlyph = GetSpellBookInfo(id, bookType, specialization);
+    local spellID, _, slotType, _, _, _, _, hasAttachedGlyph, isDisabled, isLocked = GetSpellBookInfo(id, bookType, specialization);
     if ( spellID ) then
-        return slotType, spellID, hasAttachedGlyph;
+        return slotType, spellID, hasAttachedGlyph, isDisabled, isLocked;
+    end
+end
+                             
+function Armory:GetSpellLevelLearned(id, bookType, specialization)
+    local spellID = GetSpellBookInfo(id, bookType, specialization);
+    if ( spellID ) then
+        return _G.GetSpellLevelLearned(spellID);
     end
 end
 
