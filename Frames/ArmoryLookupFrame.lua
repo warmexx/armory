@@ -844,6 +844,7 @@ local function AddRef(result, link, refType)
 end
 
 function ArmoryLookupFrame_FindQuest(exact, search, arg1)
+    local wildcard = (search == "*" and ArmoryDropDownMenu_GetSelectedValue(ArmoryLookupChannelDropDown) == "CHANNEL");
     local dbEntry = Armory.selectedDbBaseEntry;
     local container = "Quests";
 
@@ -871,7 +872,7 @@ function ArmoryLookupFrame_FindQuest(exact, search, arg1)
                     until ( isHeader or questIndex > numEntries )
                     questIndex = questIndex - 1;
                 end
-            elseif ( not isHeader and ArmoryLookupFrame_IsMatch(name, search, exact) ) then
+            elseif ( not isHeader and (wildcard or ArmoryLookupFrame_IsMatch(name, search, exact)) ) then
                 -- name
                 id = dbEntry:GetValue(container, questIndex, "Data");
                 AddRef(result, dbEntry:GetValue(container, id, "Link"), refType);
@@ -967,6 +968,7 @@ end
 
 local itemCounts = {};
 function ArmoryLookupFrame_FindItem(exact, search)
+    local wildcard = (search == "*" and ArmoryDropDownMenu_GetSelectedValue(ArmoryLookupChannelDropDown) == "CHANNEL");
     local result = {};
 
     if ( Armory:GetConfigShareItems() and Armory:HasInventory() ) then
@@ -980,7 +982,7 @@ function ArmoryLookupFrame_FindItem(exact, search)
                     link = Armory:GetContainerItemLink(id, index);
                     name = Armory:GetNameFromLink(link);
                     itemId = Armory:GetQualifiedItemId(link);
-                    if ( itemId and ArmoryLookupFrame_IsMatch(name, search, exact) ) then
+                    if ( itemId and (wildcard or ArmoryLookupFrame_IsMatch(name, search, exact)) ) then
                         _, itemCount = Armory:GetContainerItemInfo(id, index);
                         if ( itemCounts[itemId] ) then
                             itemCounts[itemId] = itemCounts[itemId] + itemCount;

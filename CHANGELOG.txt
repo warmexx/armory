@@ -11,6 +11,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 # Support for bonus reputation has been added.
 # Some minor UI issues have been fixed.
 # Lookup wasn't working properly anymore; this has been fixed.
+# Adds support for wildcard (*) lookup of quests and items when using a private channel.
 # todo: fix creaturefamily
 
 ==== v15.5.0 ====
