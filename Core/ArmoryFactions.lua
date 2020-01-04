@@ -167,13 +167,20 @@ function Armory:UpdateFactions()
         local funcCollapse = _G.CollapseFactionHeader;
         local funcAdditionalInfo = function(index)
             dbEntry:SetValue(2, container, "BonusFactionID", _G.GetLFGBonusFactionID());
+
             local factionID = select(14, _G.GetFactionInfo(index));
-			if ( factionID and C_Reputation.IsFactionParagon(factionID) ) then
+			if ( factionID ) then
                 local id = tostring(factionID);
                 local info = dbEntry:SelectContainer(container, id);
-				
-                info.Paragon = dbEntry.Save(C_Reputation.GetFactionParagonInfo(factionID));
                 
+                if ( C_Reputation.IsFactionParagon(factionID) ) then
+                    info.Paragon = dbEntry.Save(C_Reputation.GetFactionParagonInfo(factionID));
+                    info.NoData = nil;
+                else
+                    info.Paragon = nil;
+                    info.NoData = true;
+                end
+
                 return id;
             end
         end;
