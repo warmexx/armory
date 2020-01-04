@@ -94,11 +94,7 @@ local function SaveSpellBook(dbEntry, oldNum, newNum, bookType)
         else
             local slotType, spellID = _G.GetSpellBookItemInfo(i, bookType);
             if ( spellID ) then
-                local attachedGlyph = _G.HasAttachedGlyph(spellID) and GetCurrentGlyphNameForSpell(spellID) or nil;   
                 local subSpellName = GetSubSpellName(i, bookType);
-                local isDisabled = C_SpellBook.IsSpellDisabled(spellID);
-                local isLocked = C_LevelLink.IsSpellLocked(spellID);
-                local level = _G.GetSpellAvailableLevel(i, bookType);
                 local spellName, texture, link;
 
                 if ( bookType == BOOKTYPE_PET ) then
@@ -115,6 +111,11 @@ local function SaveSpellBook(dbEntry, oldNum, newNum, bookType)
                         Armory:SetClassValue("pet", 3, container, spec, tostring(spellID), subSpellName or "");
                     end
                 else
+                    local attachedGlyph = _G.HasAttachedGlyph(spellID) and GetCurrentGlyphNameForSpell(spellID) or nil;   
+                    local isDisabled = C_SpellBook.IsSpellDisabled(spellID);
+                    local isLocked = C_LevelLink.IsSpellLocked(spellID);
+                    local level = _G.GetSpellAvailableLevel(i, bookType);
+
                     if ( slotType == "FLYOUT" ) then
                         spellID = nil;
                         spellName = _G.GetSpellBookItemName(i, bookType);
