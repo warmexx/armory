@@ -1168,12 +1168,17 @@ function ArmoryPaperDollFrame_SetRuneRegen(statFrame, unit)
     end
 
     -- Note: change ArmoryLookup if not 1
-    local _, regenRate = Armory:GetRuneCooldown(1); -- Assuming they are all the same for now
-    local regenRateText = format(STAT_RUNE_REGEN_FORMAT, regenRate);
-    PaperDollFrame_SetLabelAndText(statFrame, STAT_RUNE_REGEN, regenRateText, false, regenRate);
-    statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_RUNE_REGEN).." "..regenRateText..FONT_COLOR_CODE_CLOSE;
-    statFrame.tooltip2 = STAT_RUNE_REGEN_TOOLTIP;
-    statFrame:Show();
+    for i = 1, 6 do
+        local  _, regenRate = Armory:GetRuneCooldown(i); -- Assuming they are all the same for now
+        if ( regenRate ) then
+            local regenRateText = format(STAT_RUNE_REGEN_FORMAT, regenRate);
+            PaperDollFrame_SetLabelAndText(statFrame, STAT_RUNE_REGEN, regenRateText, false, regenRate);
+            statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_RUNE_REGEN).." "..regenRateText..FONT_COLOR_CODE_CLOSE;
+            statFrame.tooltip2 = STAT_RUNE_REGEN_TOOLTIP;
+            statFrame:Show();
+            return;
+        end
+    end
 end
 
 function ArmoryPaperDollFrame_SetHaste(statFrame, unit)

@@ -12,6 +12,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 # Lookup wasn't working properly anymore; this has been fixed.
 # Adds support for wildcard (*) lookup of quests and items when using a private channel.
 # Non-hunter pet icons were not shown for non-English clients; this has been fixed.
+# Rune speed calculation could result in an error; this has been fixed.
 # Several other minor UI issues have been fixed.
 
 ==== v15.5.0 ====
