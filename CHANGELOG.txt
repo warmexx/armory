@@ -10,7 +10,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 # Support for quest session bonus rewards has been added.
 # Support for bonus reputation has been added.
 # Some minor UI issues have been fixed.
-# todo: fix channel
+# Lookup wasn't working properly anymore; this has been fixed.
 # todo: fix creaturefamily
 
 ==== v15.5.0 ====
