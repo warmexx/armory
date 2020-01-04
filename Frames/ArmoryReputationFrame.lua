@@ -35,6 +35,7 @@ ARMORY_MAX_REPUTATION_REACTION = 8;
 function ArmoryReputationFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("UPDATE_FACTION");
+    self:RegisterEvent("LFG_BONUS_FACTION_ID_UPDATED");
     self.paragonFramesPool = CreateFramePool("FRAME", self, "ArmoryReputationParagonFrameTemplate");
 end
 
@@ -75,7 +76,7 @@ function ArmoryReputationFrame_UpdateHeader(show)
     end
 end
 
-function ArmoryReputationFrame_SetRowType(factionRow, rowType, hasRep)    --rowType is a binary table of type isHeader, isChild
+function ArmoryReputationFrame_SetRowType(factionRow, isChild, isHeader, hasRep)    --rowType is a binary table of type isHeader, isChild
     local factionRowName = factionRow:GetName()
     local factionBar = _G[factionRowName.."ReputationBar"];
     local factionTitle = _G[factionRowName.."FactionName"];
@@ -87,85 +88,69 @@ function ArmoryReputationFrame_SetRowType(factionRow, rowType, hasRep)    --rowT
     factionLeftTexture:SetWidth(62);
     factionRightTexture:SetWidth(42);
     factionBar:SetPoint("RIGHT", factionRow, "RIGHT", 0, 0);
-    if ( rowType == 0 ) then --Not header, not child
-        factionRow:SetPoint("LEFT", ArmoryReputationFrame, "LEFT", 34, 0);
-        factionButton:Hide();
-        factionTitle:SetPoint("LEFT", factionRow, "LEFT", 10, 0);
-        factionTitle:SetFontObject(GameFontHighlightSmall);
-        factionTitle:SetWidth(160);
-        factionBackground:Show();
-        factionLeftTexture:SetHeight(21);
-        factionRightTexture:SetHeight(21);
-        factionLeftTexture:SetTexCoord(0.7578125, 1.0, 0.0, 0.328125);
-        factionRightTexture:SetTexCoord(0.0, 0.1640625, 0.34375, 0.671875);
-        factionBar:SetWidth(101);
-    elseif ( rowType == 1 ) then --Child, not header
-        factionRow:SetPoint("LEFT", ArmoryReputationFrame, "LEFT", 52, 0);
-        factionButton:Hide()
-        factionTitle:SetPoint("LEFT", factionRow, "LEFT", 10, 0);
-        factionTitle:SetFontObject(GameFontHighlightSmall);
-        factionTitle:SetWidth(150);
-        factionBackground:Show();
-        factionLeftTexture:SetHeight(21);
-        factionRightTexture:SetHeight(21);
-        factionLeftTexture:SetTexCoord(0.7578125, 1.0, 0.0, 0.328125);
-        factionRightTexture:SetTexCoord(0.0, 0.1640625, 0.34375, 0.671875);
-        factionBar:SetWidth(101);
-    elseif ( rowType == 2 ) then    --Header, not child
-        factionRow:SetPoint("LEFT", ArmoryReputationFrame, "LEFT", 10, 0);
-        factionButton:SetPoint("LEFT", factionRow, "LEFT", 3, 0);
-        factionButton:Show();
-        factionTitle:SetPoint("LEFT",factionButton,"RIGHT",10,0);
-        factionTitle:SetFontObject(GameFontNormalLeft);
-        factionTitle:SetWidth(145);
-        factionBackground:Hide()    
-        factionLeftTexture:SetHeight(15);
-        factionLeftTexture:SetWidth(60);
-        factionRightTexture:SetHeight(15);
-        factionRightTexture:SetWidth(39);
-        factionLeftTexture:SetTexCoord(0.765625, 1.0, 0.046875, 0.28125);
-        factionRightTexture:SetTexCoord(0.0, 0.15234375, 0.390625, 0.625);
-        factionBar:SetWidth(99);
-    elseif ( rowType == 3 ) then --Header and child
-        factionRow:SetPoint("LEFT", ArmoryReputationFrame, "LEFT", 29, 0);
-        factionButton:SetPoint("LEFT", factionRow, "LEFT", 3, 0);
-        factionButton:Show();
-        factionTitle:SetPoint("LEFT" ,factionButton, "RIGHT", 10, 0);
-        factionTitle:SetFontObject(GameFontNormalLeft);
-        factionTitle:SetWidth(135);
-        factionBackground:Hide()
-        factionLeftTexture:SetHeight(15);
-        factionLeftTexture:SetWidth(60);
-        factionRightTexture:SetHeight(15);
-        factionRightTexture:SetWidth(39);
-        factionLeftTexture:SetTexCoord(0.765625, 1.0, 0.046875, 0.28125);
-        factionRightTexture:SetTexCoord(0.0, 0.15234375, 0.390625, 0.625);
-        factionBar:SetWidth(99);
-    end
-    
-    if ( (hasRep) or (rowType == 0) or (rowType == 1)) then
-        factionStanding:Show();
-        factionBar:Show();
-        factionBar:GetParent().hasRep = true;
-    else
-        factionStanding:Hide();
-        factionBar:Hide();
-        factionBar:GetParent().hasRep = false;
-    end
+	if ( isHeader ) then
+		if (isChild) then
+			factionRow:SetPoint("LEFT", ArmoryReputationFrame, "LEFT", 29, 0);
+		else
+			factionRow:SetPoint("LEFT", ArmoryReputationFrame, "LEFT", 10, 0);
+		end
+		factionButton:SetPoint("LEFT", factionRow, "LEFT", 3, 0);
+		factionButton:Show();
+		factionTitle:SetPoint("LEFT", factionButton, "RIGHT", 10, 0);
+		if ( hasRep ) then
+			factionTitle:SetPoint("RIGHT", factionBar, "LEFT", -3, 0);
+		else
+			factionTitle:SetPoint("RIGHT", factionBar, "RIGHT", -3, 0);
+		end
+
+		factionTitle:SetFontObject(GameFontNormalLeft);
+		factionBackground:Hide()
+		factionLeftTexture:SetHeight(15);
+		factionLeftTexture:SetWidth(60);
+		factionRightTexture:SetHeight(15);
+		factionRightTexture:SetWidth(39);
+		factionLeftTexture:SetTexCoord(0.765625, 1.0, 0.046875, 0.28125);
+		factionRightTexture:SetTexCoord(0.0, 0.15234375, 0.390625, 0.625);
+		factionBar:SetWidth(99);
+		factionRow.LFGBonusRepButton:SetPoint("RIGHT", factionButton, "LEFT", 0, 1);
+	else
+		if ( isChild ) then
+			factionRow:SetPoint("LEFT", ArmoryReputationFrame, "LEFT", 52, 0);
+		else
+			factionRow:SetPoint("LEFT", ArmoryReputationFrame, "LEFT", 34, 0);
+		end
+
+		factionButton:Hide();
+		factionTitle:SetPoint("LEFT", factionRow, "LEFT", 10, 0);
+		factionTitle:SetPoint("RIGHT", factionBar, "LEFT", -3, 0);
+		factionTitle:SetFontObject(GameFontHighlightSmall);
+		factionBackground:Show();
+		factionLeftTexture:SetHeight(21);
+		factionRightTexture:SetHeight(21);
+		factionLeftTexture:SetTexCoord(0.7578125, 1.0, 0.0, 0.328125);
+		factionRightTexture:SetTexCoord(0.0, 0.1640625, 0.34375, 0.671875);
+		factionBar:SetWidth(101)
+		factionRow.LFGBonusRepButton:SetPoint("RIGHT", factionBackground, "LEFT", -2, 0);
+	end
+
+	if ( (hasRep) or (not isHeader) ) then
+		factionStanding:Show();
+		factionBar:Show();
+		factionBar:GetParent().hasRep = true;
+	else
+		factionStanding:Hide();
+		factionBar:Hide();
+		factionBar:GetParent().hasRep = false;
+	end
 end
 
 function ArmoryReputationFrame_Update()
     ArmoryReputationFrame.paragonFramesPool:ReleaseAll();
 
     local numFactions = Armory:GetNumFactions();
-    local factionIndex, factionRow, factionTitle, factionStanding, factionBar, factionButton, factionLeftLine, factionBottomLine, factionBackground;
-    local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID;
+    local factionIndex, factionRow, factionTitle, factionStanding, factionBar, factionButton, factionBackground;
+    local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID, hasBonusRepGain, canBeLFGBonus;
     local atWarIndicator, rightBarTexture;
-
-    local previousBigTexture = ArmoryReputationFrameTopTreeTexture;    --In case we have a line going off the panel to the top
-    previousBigTexture:Hide();
-    local previousBigTexture2 = ArmoryReputationFrameTopTreeTexture2;
-    previousBigTexture2:Hide();
 
     -- Update scroll frame
     if ( not FauxScrollFrame_Update(ArmoryReputationListScrollFrame, numFactions, ARMORY_NUM_FACTIONS_DISPLAYED, ARMORY_REPUTATIONFRAME_FACTIONHEIGHT ) ) then
@@ -174,6 +159,7 @@ function ArmoryReputationFrame_Update()
     local factionOffset = FauxScrollFrame_GetOffset(ArmoryReputationListScrollFrame);
 
     local gender = Armory:UnitSex("player");
+    local lfgBonusFactionID = Armory:GetLFGBonusFactionID();
 
     local offScreenFudgeFactor = 5;
     local previousBigTextureRows = 0;
@@ -184,12 +170,10 @@ function ArmoryReputationFrame_Update()
         factionBar = _G["ArmoryReputationBar"..i.."ReputationBar"];
         factionTitle = _G["ArmoryReputationBar"..i.."FactionName"];
         factionButton = _G["ArmoryReputationBar"..i.."ExpandOrCollapseButton"];
-        factionLeftLine = _G["ArmoryReputationBar"..i.."LeftLine"];
-        factionBottomLine = _G["ArmoryReputationBar"..i.."BottomLine"];
         factionStanding = _G["ArmoryReputationBar"..i.."ReputationBarFactionStanding"];
         factionBackground = _G["ArmoryReputationBar"..i.."Background"];
         if ( factionIndex <= numFactions ) then
-            name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID = Armory:GetFactionInfo(factionIndex);
+            name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID, hasBonusRepGain, canBeLFGBonus = Armory:GetFactionInfo(factionIndex);
             factionTitle:SetText(name);
             if ( isCollapsed ) then
                 factionButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up");
@@ -242,44 +226,14 @@ function ArmoryReputationFrame_Update()
             local color = FACTION_BAR_COLORS[standingID];
             factionBar:SetStatusBarColor(color.r, color.g, color.b);
 
-            if ( isHeader and not isChild ) then
-                factionLeftLine:SetTexCoord(0, 0.25, 0, 2);
-                factionBottomLine:Hide();
-                factionLeftLine:Hide();
-                if ( previousBigTextureRows == 0 ) then
-                    previousBigTexture:Hide();
-                end
-                previousBigTexture = factionBottomLine;
-                previousBigTextureRows = 0;
+            factionBar.BonusIcon:SetShown(hasBonusRepGain);
 
-            elseif ( isHeader and isChild ) then
-                ArmoryReputationBar_DrawHorizontalLine(factionLeftLine, 11, factionButton);
-                if ( previousBigTexture2 and previousBigTextureRows2 == 0 ) then
-                    previousBigTexture2:Hide();
-                end
-                factionBottomLine:Hide();
-                previousBigTexture2 = factionBottomLine;
-                previousBigTextureRows2 = 0;
-                previousBigTextureRows = previousBigTextureRows+1;
-                ArmoryReputationBar_DrawVerticalLine(previousBigTexture, previousBigTextureRows);
+			factionRow.LFGBonusRepButton.factionID = factionID;
+			factionRow.LFGBonusRepButton:SetShown(canBeLFGBonus);
+			factionRow.LFGBonusRepButton:SetChecked(lfgBonusFactionID == factionID);
+			factionRow.LFGBonusRepButton:SetEnabled(false);
 
-            elseif ( isChild ) then
-                ArmoryReputationBar_DrawHorizontalLine(factionLeftLine, 11, factionBackground);
-                factionBottomLine:Hide();
-                previousBigTextureRows = previousBigTextureRows+1;
-                previousBigTextureRows2 = previousBigTextureRows2+1;
-                ArmoryReputationBar_DrawVerticalLine(previousBigTexture2, previousBigTextureRows2);
-
-            else
-                -- is immediately under a main category
-                ArmoryReputationBar_DrawHorizontalLine(factionLeftLine, 13, factionBackground);
-                factionBottomLine:Hide();
-                previousBigTextureRows = previousBigTextureRows+1;
-                ArmoryReputationBar_DrawVerticalLine(previousBigTexture, previousBigTextureRows);
-
-            end
-
-            ArmoryReputationFrame_SetRowType(factionRow, ((isChild and 1 or 0) + (isHeader and 2 or 0)), hasRep);
+            ArmoryReputationFrame_SetRowType(factionRow, isChild, isHeader, hasRep);
 
             factionRow:Show();
 
@@ -299,39 +253,6 @@ function ArmoryReputationFrame_Update()
             factionRow:Hide();
         end
     end
-    
-    for i = (ARMORY_NUM_FACTIONS_DISPLAYED + factionOffset + 1), numFactions, 1 do
-        local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild  = Armory:GetFactionInfo(i);
-        if not name then break; end
-
-        if ( isHeader and not isChild ) then
-            break;
-        elseif ( (isHeader and isChild) or not(isHeader or isChild) ) then
-            ArmoryReputationBar_DrawVerticalLine(previousBigTexture, previousBigTextureRows+1);
-            break;
-        elseif ( isChild ) then
-            ArmoryReputationBar_DrawVerticalLine(previousBigTexture2, previousBigTextureRows2+1);
-            break;
-        end
-    end
-end
-
-function ArmoryReputationBar_DrawVerticalLine(texture, rows)
-    -- Need to add this fudge factor because the lines are anchored to the top of the screen in this case, not another button
-    local fudgeFactor = 0;
-    if ( texture == ArmoryReputationFrameTopTreeTexture or texture == ArmoryReputationFrameTopTreeTexture2) then
-        fudgeFactor = 5;
-    end
-    texture:SetHeight(rows*REPUTATIONFRAME_ROWSPACING-fudgeFactor);
-    texture:SetTexCoord(0, 0.25, 0, texture:GetHeight()/2);
-    texture:Show();
-end
-
-function ArmoryReputationBar_DrawHorizontalLine(texture, width, anchorTo)
-  	texture:SetPoint("RIGHT", anchorTo, "LEFT", 3, 0);
-	texture:SetWidth(width);
-	texture:SetTexCoord(0, width/2, 0, 0.25);
-	texture:Show();
 end
 
 function ArmoryReputationBar_OnLoad(self)
@@ -343,9 +264,6 @@ function ArmoryReputationBar_OnLoad(self)
     _G[name.."ReputationBarAtWarHighlight1"]:SetAlpha(0.2);
     _G[name.."ReputationBarAtWarHighlight2"]:SetAlpha(0.2);
     _G[name.."Background"]:SetPoint("TOPRIGHT", name.."ReputationBarLeftTexture", "TOPLEFT", 0, 0);
-    _G[name.."LeftLine"]:SetWidth(0);
-    _G[name.."BottomLine"]:SetHeight(0);
-    _G[name.."BottomLine"]:SetPoint("TOP", name.."ExpandOrCollapseButton", "CENTER", 5, 0);
 end
 
 function ArmoryReputationBar_OnClick(self)

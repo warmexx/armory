@@ -8,6 +8,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 # Adjustments have been made for patch 8.2.5
 # Minimap icon will now honor border of square minimap.
 # Support for quest session bonus rewards has been added.
+# Support for bonus reputation has been added.
 # todo: fix channel
 # todo: fix creaturefamily
 
