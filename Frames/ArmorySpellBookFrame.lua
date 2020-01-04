@@ -373,7 +373,7 @@ function ArmorySpellButton_UpdateButton(self)
         autoCastableTexture:Hide();
     end
 
-    local spellName, subSpellName _, spellID = Armory:GetSpellBookItemName(slot, ArmorySpellBookFrame.bookType, ArmorySpellBookFrame.selectedPetSpec);
+    local spellName, subSpellName, spellID = Armory:GetSpellBookItemName(slot, ArmorySpellBookFrame.bookType, ArmorySpellBookFrame.selectedPetSpec);
     local isPassive = Armory:IsPassiveSpell(slot, ArmorySpellBookFrame.bookType, ArmorySpellBookFrame.selectedPetSpec);
     if ( isPassive ) then
         normalTexture:SetVertexColor(0, 0, 0);
@@ -398,7 +398,8 @@ function ArmorySpellButton_UpdateButton(self)
     subSpellString:Show();
 
     local iconTextureAlpha;
-	local iconTextureDesaturated;
+    local iconTextureDesaturated;
+    isDisabled = spellID and isDisabled;
 	if ( not (slotType == "FUTURESPELL") and not isDisabled ) then
 		iconTextureAlpha = 1;
 		iconTextureDesaturated = false;
