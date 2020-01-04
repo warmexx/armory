@@ -11,4 +11,6 @@
   <Script file="Libs\AceLocale-3.0\AceLocale-3.0.lua"/>
   <Script file="Libs\LibQTip-1.0\LibQTip-1.0.lua"/>
   <Script file="Libs\LibRecipes-2.0\LibRecipes-2.0.lua"/>
+  <Script file="Libs\LibBabble-CreatureType-3.0\LibBabble-3.0.lua" />
+  <Script file="Libs\LibBabble-CreatureType-3.0\LibBabble-CreatureType-3.0.lua" />
 </Ui>

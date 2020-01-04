@@ -9,10 +9,10 @@ Thanks for using Armory. You can show your appreciation and support future devel
 # Minimap icon will now honor border of square minimap.
 # Support for quest session bonus rewards has been added.
 # Support for bonus reputation has been added.
-# Some minor UI issues have been fixed.
 # Lookup wasn't working properly anymore; this has been fixed.
 # Adds support for wildcard (*) lookup of quests and items when using a private channel.
-# todo: fix creaturefamily
+# Non-hunter pet icons were not shown for non-English clients; this has been fixed.
+# Several other minor UI issues have been fixed.
 
 ==== v15.5.0 ====
 # Adjustments have been made for patch 8.2.0

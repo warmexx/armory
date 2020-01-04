@@ -28,6 +28,9 @@ externals:
     Libs/LibRecipes-2.0:
         url: https://repos.wowace.com/wow/librecipes-2-0
         tag: latest
+    Libs/LibBabble-CreatureType-3.0:
+        url: https://repos.wowace.com/wow/libbabble-creaturetype-3-0/trunk
+        tag: latest
 
 enable-nolib-creation: no
 
