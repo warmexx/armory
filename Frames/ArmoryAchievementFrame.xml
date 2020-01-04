@@ -156,28 +156,6 @@
         </Texture>
       </Layer>
       <Layer level="OVERLAY">
-        <Texture name="$parentLeftLine" file="Interface\PaperDollInfoFrame\UI-Character-ReputationLines" hidden="true">
-          <Size>
-            <AbsDimension x="0" y="2"/>
-          </Size>
-          <Anchors>
-            <Anchor point="RIGHT">
-              <Offset x="0" y="0"/>
-            </Anchor>
-          </Anchors>
-          <TexCoords left="0" right="2" top="0" bottom="2"/>
-        </Texture>
-        <Texture name="$parentBottomLine" file="Interface\PaperDollInfoFrame\UI-Character-ReputationLines" hidden="true">
-          <Size>
-            <AbsDimension x="2" y="0"/>
-          </Size>
-          <Anchors>
-            <Anchor point="TOP">
-              <Offset x="0" y="0"/>
-            </Anchor>
-          </Anchors>
-          <TexCoords left="0" right="2" top="0" bottom="2"/>
-        </Texture>
         <FontString name="$parentAchievementName" inherits="GameFontHighlightSmall" justifyH="LEFT">
           <Size x="135" y="10"/>
         </FontString>
@@ -188,9 +166,6 @@
         _G[self:GetName().."AchievementBarHighlight1"]:SetPoint("TOPLEFT",self,"TOPLEFT",-2, 4);
         _G[self:GetName().."AchievementBarHighlight1"]:SetPoint("BOTTOMRIGHT",self,"BOTTOMRIGHT",-10, -4);
         _G[self:GetName().."Background"]:SetPoint("TOPRIGHT", self:GetName().."AchievementBarLeftTexture", "TOPLEFT", 0, 0);
-        _G[self:GetName().."LeftLine"]:SetWidth(0);
-        _G[self:GetName().."BottomLine"]:SetHeight(0);
-        _G[self:GetName().."BottomLine"]:SetPoint("TOP", self:GetName().."ExpandOrCollapseButton", "CENTER", 5, 0);
       </OnLoad>
       <OnClick>
         ArmoryAchievementBar_OnClick(self);
@@ -298,30 +273,6 @@
             </Anchor>
           </Anchors>
         </FontString>
-      </Layer>
-      <Layer level="OVERLAY">
-        <Texture name="ArmoryAchievementFrameTopTreeTexture" file="Interface\PaperDollInfoFrame\UI-Character-ReputationLines" hidden="true">
-          <Size>
-            <AbsDimension x="2" y="4"/>
-          </Size>
-          <Anchors>
-            <Anchor point="TOP" relativeTo="ArmoryAchievementFrame" relativePoint="TOPLEFT">
-              <Offset x="35" y="-76"/>
-            </Anchor>
-          </Anchors>
-          <TexCoords left="0" right="2" top="0" bottom="2"/>
-        </Texture>
-        <Texture name="ArmoryAchievementFrameTopTreeTexture2" file="Interface\PaperDollInfoFrame\UI-Character-ReputationLines" hidden="true">
-          <Size>
-            <AbsDimension x="2" y="4"/>
-          </Size>
-          <Anchors>
-            <Anchor point="TOP" relativeTo="ArmoryAchievementFrame" relativePoint="TOPLEFT">
-              <Offset x="53" y="-76"/>
-            </Anchor>
-          </Anchors>
-          <TexCoords left="0" right="2" top="0" bottom="2"/>
-        </Texture>
       </Layer>
     </Layers>
     <Frames>

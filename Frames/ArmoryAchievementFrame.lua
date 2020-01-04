@@ -87,7 +87,7 @@ function ArmoryAchievementFrame_OnShow(self)
     ArmoryAchievementFrame_Update();
 end
 
-function ArmoryAchievementFrame_SetRowType(achievementRow, rowType, hasQuantity)	--rowType is a binary table of type isHeader, isChild
+function ArmoryAchievementFrame_SetRowType(achievementRow, isChild, isHeader, hasQuantity)	--rowType is a binary table of type isHeader, isChild
 	local achievementRowName = achievementRow:GetName()
 	local achievementBar = _G[achievementRowName.."AchievementBar"];
 	local achievementTitle = _G[achievementRowName.."AchievementName"];
@@ -98,52 +98,19 @@ function ArmoryAchievementFrame_SetRowType(achievementRow, rowType, hasQuantity)
 	local achievementRightTexture = _G[achievementRowName.."AchievementBarRightTexture"];
 	achievementLeftTexture:SetWidth(62);
 	achievementRightTexture:SetWidth(42);
-	achievementBar:SetPoint("RIGHT", achievementRow, "RIGHT", 0, 0);
-	if ( rowType == 0 ) then --Not header, not child
-		achievementRow:SetPoint("LEFT", ArmoryAchievementFrame, "LEFT", 44, 0);
-		achievementButton:Hide();
-		achievementTitle:SetPoint("LEFT", achievementRow, "LEFT", 10, 0);
-		achievementTitle:SetFontObject(GameFontHighlightSmall);
-		achievementTitle:SetWidth(160);
-		achievementBackground:Show();
-		achievementLeftTexture:SetHeight(21);
-		achievementRightTexture:SetHeight(21);
-		achievementLeftTexture:SetTexCoord(0.7578125, 1.0, 0.0, 0.328125);
-		achievementRightTexture:SetTexCoord(0.0, 0.1640625, 0.34375, 0.671875);
-	elseif ( rowType == 1 ) then --Child, not header
-		achievementRow:SetPoint("LEFT", ArmoryAchievementFrame, "LEFT", 62, 0);
-		achievementButton:Hide()
-		achievementTitle:SetPoint("LEFT", achievementRow, "LEFT", 10, 0);
-		achievementTitle:SetFontObject(GameFontHighlightSmall);
-		achievementTitle:SetWidth(150);
-		achievementBackground:Show();
-		achievementLeftTexture:SetHeight(21);
-		achievementRightTexture:SetHeight(21);
-		achievementLeftTexture:SetTexCoord(0.7578125, 1.0, 0.0, 0.328125);
-		achievementRightTexture:SetTexCoord(0.0, 0.1640625, 0.34375, 0.671875);
-	elseif ( rowType == 2 ) then	--Header, not child
-		achievementRow:SetPoint("LEFT", ArmoryAchievementFrame, "LEFT", 20, 0);
+    achievementBar:SetPoint("RIGHT", achievementRow, "RIGHT", 0, 0);
+    if ( isHeader ) then
+		if (isChild) then
+			achievementRow:SetPoint("LEFT", ArmoryAchievementFrame, "LEFT", 39, 0);
+		    achievementTitle:SetWidth(135);
+        else
+			achievementRow:SetPoint("LEFT", ArmoryAchievementFrame, "LEFT", 20, 0);
+		    achievementTitle:SetWidth(145);
+        end
 		achievementButton:SetPoint("LEFT", achievementRow, "LEFT", 3, 0);
 		achievementButton:Show();
-		achievementTitle:SetPoint("LEFT",achievementButton,"RIGHT",10,0);
+		achievementTitle:SetPoint("LEFT", achievementButton, "RIGHT", 10, 0);
 		achievementTitle:SetFontObject(GameFontNormalLeft);
-		achievementTitle:SetWidth(145);
-		achievementBackground:Hide()	
-		achievementLeftTexture:SetHeight(15);
-		achievementLeftTexture:SetWidth(60);
-		achievementRightTexture:SetHeight(15);
-		achievementRightTexture:SetWidth(39);
-		achievementLeftTexture:SetTexCoord(0.765625, 1.0, 0.046875, 0.28125);
-		achievementRightTexture:SetTexCoord(0.0, 0.15234375, 0.390625, 0.625);
-		achievementLeftTexture:SetPoint("LEFT", achievementBar, "LEFT", -2, 0);
-		achievementBar:SetPoint("RIGHT", achievementRow, "RIGHT", 2, 0);
-	elseif ( rowType == 3 ) then --Header and child
-		achievementRow:SetPoint("LEFT", ArmoryAchievementFrame, "LEFT", 39, 0);
-		achievementButton:SetPoint("LEFT", achievementRow, "LEFT", 3, 0);	--Change this
-		achievementButton:Show();
-		achievementTitle:SetPoint("LEFT" ,achievementButton, "RIGHT", 10, 0);
-		achievementTitle:SetFontObject(GameFontNormalLeft);
-		achievementTitle:SetWidth(135);
 		achievementBackground:Hide()
 		achievementLeftTexture:SetHeight(15);
 		achievementLeftTexture:SetWidth(60);
@@ -151,11 +118,28 @@ function ArmoryAchievementFrame_SetRowType(achievementRow, rowType, hasQuantity)
 		achievementRightTexture:SetWidth(39);
 		achievementLeftTexture:SetTexCoord(0.765625, 1.0, 0.046875, 0.28125);
 		achievementRightTexture:SetTexCoord(0.0, 0.15234375, 0.390625, 0.625);
-		achievementLeftTexture:SetPoint("LEFT", achievementBar, "LEFT", -2, 0);
-		achievementBar:SetPoint("RIGHT", achievementRow, "RIGHT", 2, 0);
+        achievementLeftTexture:SetPoint("LEFT", achievementBar, "LEFT", -2, 0);
+	 	achievementBar:SetPoint("RIGHT", achievementRow, "RIGHT", 2, 0);
+    else
+		if ( isChild ) then
+			achievementRow:SetPoint("LEFT", ArmoryAchievementFrame, "LEFT", 62, 0);
+		    achievementTitle:SetWidth(150);
+        else
+			achievementRow:SetPoint("LEFT", ArmoryAchievementFrame, "LEFT", 44, 0);
+		    achievementTitle:SetWidth(160);
+        end
+		achievementButton:Hide();
+		achievementTitle:SetPoint("LEFT", achievementRow, "LEFT", 10, 0);
+		achievementTitle:SetPoint("RIGHT", achievementBar, "LEFT", -3, 0);
+		achievementTitle:SetFontObject(GameFontHighlightSmall);
+		achievementBackground:Show();
+		achievementLeftTexture:SetHeight(21);
+		achievementRightTexture:SetHeight(21);
+		achievementLeftTexture:SetTexCoord(0.7578125, 1.0, 0.0, 0.328125);
+		achievementRightTexture:SetTexCoord(0.0, 0.1640625, 0.34375, 0.671875);
 	end
 	
-	if ( (hasQuantity) or (rowType == 0) or (rowType == 1)) then
+	if ( (hasQuantity) or (not isHeader)) then
 		achievementQuantity:Show();
 		achievementBar:Show();
 	else
@@ -166,14 +150,9 @@ end
 
 function ArmoryAchievementFrame_Update()
     local numAchievements;
-    local achievementIndex, achievementRow, achievementTitle, achievementQuantity, achievementBar, achievementButton, achievementLeftLine, achievementBottomLine, achievementBackground;
+    local achievementIndex, achievementRow, achievementTitle, achievementQuantity, achievementBar, achievementButton, achievementBackground;
     local id, name, isHeader, isChild, collapsed, quantity;
     local rightBarTexture, hasQuantity;
-
-    local previousBigTexture = ArmoryAchievementFrameTopTreeTexture;	--In case we have a line going off the panel to the top
-    previousBigTexture:Hide();
-    local previousBigTexture2 = ArmoryAchievementFrameTopTreeTexture2;
-    previousBigTexture2:Hide();
 
     if ( ArmoryAchievementFrame.selected == "achievements" ) then
         numAchievements = Armory:GetNumAchievements();
@@ -202,8 +181,6 @@ function ArmoryAchievementFrame_Update()
 		achievementBar = _G["ArmoryAchievementBar"..i.."AchievementBar"];
 		achievementTitle = _G["ArmoryAchievementBar"..i.."AchievementName"];
 		achievementButton = _G["ArmoryAchievementBar"..i.."ExpandOrCollapseButton"];
-		achievementLeftLine = _G["ArmoryAchievementBar"..i.."LeftLine"];
-		achievementBottomLine = _G["ArmoryAchievementBar"..i.."BottomLine"];
 		achievementQuantity = _G["ArmoryAchievementBar"..i.."AchievementBarQuantity"];
 		achievementBackground = _G["ArmoryAchievementBar"..i.."Background"];
         if ( achievementIndex <= numAchievements ) then
@@ -270,45 +247,8 @@ function ArmoryAchievementFrame_Update()
                end
             end
             achievementBar:SetStatusBarColor(.25, .25, .75);
-            
-            if ( isHeader and not isChild ) then
-                achievementLeftLine:SetTexCoord(0, 0.25, 0, 2);
-                achievementBottomLine:Hide();
-                achievementLeftLine:Hide();
-                if ( previousBigTextureRows == 0 ) then
-                    previousBigTexture:Hide();
-                end
-                previousBigTexture = achievementBottomLine;
-                previousBigTextureRows = 0;
 
-            elseif ( isHeader and isChild ) then
-                ArmoryAchievementBar_DrawHorizontalLine(achievementLeftLine, 11, achievementButton);
-                if ( previousBigTexture2 and previousBigTextureRows2 == 0 ) then
-                    previousBigTexture2:Hide();
-                end
-                achievementBottomLine:Hide();
-                previousBigTexture2 = achievementBottomLine;
-                previousBigTextureRows2 = 0;
-                previousBigTextureRows = previousBigTextureRows+1;
-                ArmoryAchievementBar_DrawVerticalLine(previousBigTexture, previousBigTextureRows);
-
-            elseif ( isChild ) then
-                ArmoryAchievementBar_DrawHorizontalLine(achievementLeftLine, 11, achievementBackground);
-                achievementBottomLine:Hide();
-                previousBigTextureRows = previousBigTextureRows+1;
-                previousBigTextureRows2 = previousBigTextureRows2+1;
-                ArmoryAchievementBar_DrawVerticalLine(previousBigTexture2, previousBigTextureRows2);
-
-            else
-                -- is immediately under a main category
-                ArmoryAchievementBar_DrawHorizontalLine(achievementLeftLine, 13, achievementBackground);
-                achievementBottomLine:Hide();
-                previousBigTextureRows = previousBigTextureRows+1;
-                ArmoryAchievementBar_DrawVerticalLine(previousBigTexture, previousBigTextureRows);
-
-            end
-
-            ArmoryAchievementFrame_SetRowType(achievementRow, ((isChild and 1 or 0) + (isHeader and 2 or 0)), hasQuantity);
+            ArmoryAchievementFrame_SetRowType(achievementRow, isChild, isHeader, hasQuantity);
 
             achievementRow:Show();
 
@@ -320,26 +260,6 @@ function ArmoryAchievementFrame_Update()
             achievementRow:Hide();
         end
     end
-	
-    for i = (ARMORY_NUM_ACHIEVEMENTS_DISPLAYED + achievementOffset + 1), numAchievements, 1 do
-        if ( ArmoryAchievementFrame.selected == "achievements" ) then
-            _, name, isHeader, isChild = Armory:GetAchievementInfo(i);
-        else
-            _, name, isHeader, isChild = Armory:GetStatisticInfo(i);
-        end
-        if not name then break; end
-
-        if ( isHeader and not isChild ) then
-            break;
-        elseif ( (isHeader and isChild) or not (isHeader or isChild) ) then
-            ArmoryAchievementBar_DrawVerticalLine(previousBigTexture, previousBigTextureRows+1);
-            break;
-        elseif ( isChild ) then
-            ArmoryAchievementBar_DrawVerticalLine(previousBigTexture2, previousBigTextureRows2+1);
-            break;
-        end
-    end
-    
     
     -- Set the expand/collapse all button texture
     local numHeaders = 0;
@@ -367,21 +287,6 @@ function ArmoryAchievementFrame_Update()
         ArmoryAchievementCollapseAllButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up");
     end
 
-end
-
-function ArmoryAchievementBar_DrawVerticalLine(texture, rows)
-    -- Need to add this fudge factor because the lines are anchored to the top of the screen in this case, not another button
-    local fudgeFactor = 0;
-    if ( texture == ArmoryAchievementFrameTopTreeTexture or texture == ArmoryAchievementFrameTopTreeTexture2) then
-        fudgeFactor = 5;
-    end
-    texture:SetHeight(rows * REPUTATIONFRAME_ROWSPACING - fudgeFactor);
-    texture:SetTexCoord(0, 0.25, 0, texture:GetHeight()/2);
-    texture:Show();
-end
-
-function ArmoryAchievementBar_DrawHorizontalLine(texture, width, anchorTo)
-    ArmoryReputationBar_DrawHorizontalLine(texture, width, anchorTo);
 end
 
 function ArmoryAchievementBar_OnClick(self)
