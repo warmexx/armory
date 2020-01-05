@@ -121,7 +121,10 @@ end
 function Armory:GetFriendInfo(index)
     local dbEntry = self.selectedDbBaseEntry;
     if ( dbEntry ) then
-        return dbEntry:GetValue(container, index);
+        local info = dbEntry:GetValue(container, index);
+        if ( info ) then
+            return info.name, info.className, info.notes
+        end
     end
 end
 
