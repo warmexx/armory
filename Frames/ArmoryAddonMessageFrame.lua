@@ -28,7 +28,8 @@
 
 local Armory, _ = Armory;
 local AC = LibStub("AceComm-3.0");
-local CTL = ChatThrottleLib;
+local LC = LibStub("LibCompress");
+local Encoder = LC:GetAddonEncodeTable(ARMORY_MESSAGE_SEPARATOR);
 
 ARMORY_BROADCAST_DELAY = 180;
 ARMORY_MESSAGE_UPDATE_DELAY = 0.5;
@@ -54,7 +55,6 @@ function ArmoryAddonMessageFrame_OnLoad(self)
     self.timerDelay = 0;
     self.broadcastDelay = 0;
     self:RegisterEvent("VARIABLES_LOADED");
-    self:RegisterEvent("CHAT_MSG_CHANNEL");
     self:RegisterEvent("CHAT_MSG_CHANNEL_NOTICE");
 end
 
@@ -66,8 +66,6 @@ function ArmoryAddonMessageFrame_OnEvent(self, event, ...)
         Armory:ExecuteConditional(ArmoryAddonMessageFrame_HasChannels, ArmoryAddonMessageFrame_UpdateChannel);
     elseif ( not Armory:CanHandleEvents() ) then
         return;
-    elseif ( event == "CHAT_MSG_CHANNEL" ) then
-        ArmoryAddonMessageFrame_ParseChatMessage(arg1, arg9, arg2);
     elseif ( event == "CHAT_MSG_CHANNEL_NOTICE" ) then
         ArmoryAddonMessageFrame_CheckNotice(arg1, arg9);
     end
@@ -205,26 +203,14 @@ function ArmoryAddonMessageFrame_SendMessage(message, destination)
     end
     if ( Armory.messaging ) then
         if ( destination == "CHANNEL" ) then
-            CTL:SendChatMessage("NORMAL", ARMORY_ID, ArmoryAddonMessageFrame_Encode(message), destination, nil, Armory.channel);
-        else
-            AC:SendCommMessage(ARMORY_ID, message, destination, target);
+            target = Armory.channel;
         end
+        AC:SendCommMessage(ARMORY_ID, message, destination, target);
     else
         ArmoryAddonMessageFrame_ParseMessage(message, "WHISPER", target or "test");
     end
 
     Armory:PrintDebug("Send", destination, target, message:gsub("%c", " "));
-end
-
-function ArmoryAddonMessageFrame_ParseChatMessage(message, channel, sender)
-    if ( channel ~= Armory:GetConfigChannelName() ) then
-        return;
-    elseif ( strsub(message, -8) == " ...hic!" ) then
-        message = ArmoryAddonMessageFrame_Decode(strsub(message, 1, -9));
-    else
-        message = ArmoryAddonMessageFrame_Decode(message);
-    end
-    ArmoryAddonMessageFrame_ParseMessage(message, "CHANNEL", sender);
 end
 
 local function GetNextField(fields)
@@ -405,9 +391,6 @@ function ArmoryAddonMessageFrame_CheckNotice(message, channelName)
     end
 end
 
-local LC = LibStub("LibCompress");
-local Encoder = LC:GetAddonEncodeTable(ARMORY_MESSAGE_SEPARATOR);
-
 function ArmoryAddonMessageFrame_Compress(message)
     message = LC:CompressHuffman(message);
     message = Encoder:Encode(message);
@@ -417,17 +400,5 @@ end
 function ArmoryAddonMessageFrame_Decompress(message)
     message = Encoder:Decode(message);
     message = LC:Decompress(message);
-    return message;
-end
-
-local Base64 = LibStub("LibBase64-1.0");
-
-function ArmoryAddonMessageFrame_Encode(message)
-    message = Base64.Encode(message);
-    return message;
-end
-
-function ArmoryAddonMessageFrame_Decode(message)
-    message = Base64.Decode(message);
     return message;
 end
