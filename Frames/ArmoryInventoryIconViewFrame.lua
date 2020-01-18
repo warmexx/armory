@@ -34,6 +34,7 @@ ARMORY_MAX_CONTAINER_ITEMS = 160;
 ARMORY_CONTAINER_OFFSET_X = 22;
 ARMORY_CONTAINER_OFFSET_Y = -5;
 ARMORY_CONTAINER_ROW_HEIGHT = 37;
+ARMORY_NUM_CONTAINER_COLUMNS = 4;
 
 ARMORY_VOID_CONTAINER_COLUMNS = 10;
 ARMORY_VOID_CONTAINER_ROW_HEIGHT = 26;
@@ -82,7 +83,7 @@ function ArmoryInventoryIconViewFrame_ShowContainer(containerFrame)
     local rowHeight = ARMORY_CONTAINER_ROW_HEIGHT;
     
     if ( Armory:GetInventoryBagLayout() and id >= BACKPACK_CONTAINER and id <= NUM_BAG_SLOTS + NUM_BANKBAGSLOTS ) then
-        columns = NUM_CONTAINER_COLUMNS;
+        columns = ARMORY_NUM_CONTAINER_COLUMNS;
         isPlusTwoBag = (mod(numSlots, columns) == 2);
     elseif ( Armory:GetInventoryBagLayout() and id == ARMORY_VOID_CONTAINER ) then
         numSlots = ARMORY_VOID_STORAGE_MAX * ARMORY_VOID_STORAGE_PAGES;
