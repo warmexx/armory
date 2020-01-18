@@ -1,4 +1,4 @@
-## Interface: 80205
+## Interface: 80300
 ## Title: ArmoryGuildBank
 ## Title-deDE: ArmoryGuildBank [Armory Gildenbank]
 ## Title-esES: ArmoryGuildBank [Banco de Hermandad]
