@@ -5,6 +5,7 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
 ==== v15.7.0 ====
+# Adjustments have been made for patch 8.3.0
 # Friends were not shown anymore; this has been fixed.
 
 ==== v15.6.0 ====
