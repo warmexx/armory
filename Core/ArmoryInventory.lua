@@ -396,15 +396,23 @@ function Armory:SetContainer(id)
             end
 
         elseif ( id == ARMORY_AUCTIONS_CONTAINER or id == ARMORY_NEUTRAL_AUCTIONS_CONTAINER ) then
-            local saleStatus;
-            for i = 1, _G.GetNumAuctionItems("owner") do
-                _, texture, count, quality, _, _, _, _, _, _, _, _, _, _, _, saleStatus = _G.GetAuctionItemInfo("owner", i);
-                if ( texture and saleStatus ~= 1 ) then
-                    link = _G.GetAuctionItemLink("owner", i);
-                    timeLeft = _G.GetAuctionItemTimeLeft("owner", i);
-                    SetSlotInfo(id, nextSlot, texture, count, quality, link, timeLeft);
-                    SetItemCache(itemContainer, link, count, "player");
-                    nextSlot = nextSlot + 1;
+            local info;
+            for i = 1, C_AuctionHouse.GetNumOwnedAuctions() do
+                info = C_AuctionHouse.GetOwnedAuctionInfo(i);
+                if ( info and info.itemKey and info.status ~= Enum.AuctionStatus.Sold ) then
+                    link = info.itemLink;
+                    timeLeft = info.timeLeftSeconds;
+                    count = info.quantity;
+
+                    info = C_AuctionHouse.GetItemKeyInfo(info.itemKey);
+                    if ( info and info.iconFileID ) then
+                        texture = info.iconFileID;
+                        quality = info.quality;
+
+                        SetSlotInfo(id, nextSlot, texture, count, quality, link, timeLeft);
+                        SetItemCache(itemContainer, link, count, "player");
+                        nextSlot = nextSlot + 1;
+                    end
                 end
             end
 

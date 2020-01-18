@@ -704,24 +704,9 @@ function Armory:SetBagItem(id, index)
         elseif ( id == ARMORY_AUCTIONS_CONTAINER or id == ARMORY_NEUTRAL_AUCTIONS_CONTAINER ) then
             local timeLeft, _, remaining = self:GetContainerItemExpiration(id, index);
             if ( timeLeft ) then
-                local timeLeftScanned = SecondsToTime(remaining, true);
-                if ( timeLeftScanned ~= "" ) then
-                    timeLeftScanned = " "..string.format(GUILD_BANK_LOG_TIME, timeLeftScanned);
-                end
- 
-            --local timeLeft, timestamp = self:GetInventoryContainerValue(id, "TimeLeft"..index);
-            --if ( timeLeft ) then
-                --local timeLeftScanned = SecondsToTime(time() - timestamp, true);
-                --if ( timeLeftScanned ~= "" ) then
-                    --timeLeftScanned = " "..string.format(GUILD_BANK_LOG_TIME, timeLeftScanned);
-                --end
-
                 local tooltipLines = self:Tooltip2Table(GameTooltip);
-                local remaining = "?";
-                if ( _G["AUCTION_TIME_LEFT"..timeLeft] ) then
-                    remaining = _G["AUCTION_TIME_LEFT"..timeLeft];
-                end
-                table.insert(tooltipLines, 2, self:Text2String(remaining..timeLeftScanned, 1.0, 1.0, 0.6));
+                local remaining = SecondsToTime(timeLeft - remaining, true);
+                table.insert(tooltipLines, 2, self:Text2String(remaining, 1.0, 1.0, 0.6));
                 self:Table2Tooltip(GameTooltip, tooltipLines);
                 GameTooltip:Show();
             end

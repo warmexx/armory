@@ -67,7 +67,9 @@ function ArmoryInventoryFrame_OnLoad(self)
 	self:RegisterEvent("MAIL_SHOW");
     self:RegisterEvent("MAIL_SEND_SUCCESS");
     self:RegisterEvent("MAIL_CLOSED");
-    self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE");
+	self:RegisterEvent("AUCTION_HOUSE_SHOW");
+    self:RegisterEvent("COMMODITY_SEARCH_RESULTS_UPDATED");
+    self:RegisterEvent("OWNED_AUCTIONS_UPDATED");
     self:RegisterEvent("VOID_STORAGE_CLOSE");
 
     SetPortraitToTexture("ArmoryInventoryFramePortrait", "Interface\\Buttons\\Button-Backpack-Up");
@@ -159,13 +161,11 @@ function ArmoryInventoryFrame_OnEvent(self, event, ...)
                 end
             end
          end
-    elseif ( event == "AUCTION_OWNED_LIST_UPDATE" ) then
+    elseif ( event == "AUCTION_HOUSE_SHOW" or event == "COMMODITY_SEARCH_RESULTS_UPDATED" ) then
+        C_AuctionHouse.QueryOwnedAuctions({});
+    elseif ( event == "OWNED_AUCTIONS_UPDATED" ) then
         -- Must execute immediately
-        if ( GetAuctionHouseDepositRate() > 5 ) then
-            ArmoryInventoryFrame_UpdateContainer(ARMORY_NEUTRAL_AUCTIONS_CONTAINER);
-        else
-            ArmoryInventoryFrame_UpdateContainer(ARMORY_AUCTIONS_CONTAINER);
-        end
+        ArmoryInventoryFrame_UpdateContainer(ARMORY_AUCTIONS_CONTAINER);
     elseif ( event == "VOID_STORAGE_CLOSE" ) then
         Armory:Execute(ArmoryInventoryFrame_UpdateContainer, ARMORY_VOID_CONTAINER);
     end
