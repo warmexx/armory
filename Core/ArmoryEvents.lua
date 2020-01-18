@@ -60,10 +60,11 @@ local function GetCooldownEntry(dbEntry, cooldown)
 end
 
 local calendarState = {
-    {cvar = "calendarShowBattlegrounds"},
+    {cvar = "calendarShowHolidays"},
     {cvar = "calendarShowDarkmoon"},
     {cvar = "calendarShowLockouts"},
     {cvar = "calendarShowWeeklyHolidays"},
+    {cvar = "calendarShowBattlegrounds"},
 };
 
 local function PreserveCalendarState()
