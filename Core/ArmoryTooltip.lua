@@ -885,7 +885,7 @@ function Armory:Tooltip2Table(tooltip, all)
 
     for i = 1, 10 do
         icon = _G[name.."Texture"..i];
-        if ( icon and icon:IsShown() ) then
+        if ( icon and icon:IsShown() and icon:GetTexture() ) then
             _, relativeTo = icon:GetPoint();
             line = tonumber(relativeTo:GetName():match("(%d+)$"));
             if ( line > 0 and line <= #lines ) then
