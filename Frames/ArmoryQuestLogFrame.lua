@@ -31,12 +31,32 @@ local Armory, _ = Armory;
 ARMORY_QUESTS_DISPLAYED = 6;
 ARMORY_QUESTLOG_QUEST_HEIGHT = 16;
 
-local REWARDS_SECTION_OFFSET = 5;        -- vertical distance between sections
+local REWARDS_SECTION_OFFSET = 5;       -- vertical distance between sections
+local REWARDS_ROW_OFFSET = 2;			-- vertical distance between rows within a section
 
 local SEAL_QUESTS = {
-    [40519] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_KING_VARIAN_WRYNN.."|r", sealAtlas = "Quest-Alliance-WaxSeal"},
-    [43926] = { bgAtlas = "QuestBG-Horde", text = "|cff480404"..QUEST_WARCHIEF_VOLJIN.."|r", sealAtlas = "Quest-Horde-WaxSeal"},
-	[46730] = { bgAtlas = "QuestBG-Legionfall", text = "|cff2f0a48"..QUEST_KHADGAR.."|r", sealAtlas = "Quest-Legionfall-WaxSeal"},
+	[40519] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_KING_VARIAN_WRYNN.."|r", sealAtlas = "Quest-Alliance-WaxSeal"},
+	[43926] = { bgAtlas = "QuestBG-Horde", text = "|cff480404"..QUEST_WARCHIEF_VOLJIN.."|r", sealAtlas = "Quest-Horde-WaxSeal"},
+	[47221] = { bgAtlas = "QuestBG-TheHandofFate", },
+	[47835] = { bgAtlas = "QuestBG-TheHandofFate", },
+	[50476] = { bgAtlas = "QuestBG-Horde", sealAtlas = "Quest-Horde-WaxSeal" },
+	-- BfA start quests
+	[46727] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_KING_ANDUIN_WRYNN.."|r", sealAtlas = "Quest-Alliance-WaxSeal" },
+	[50668] = { bgAtlas = "QuestBG-Horde", text = "|cff480404"..QUEST_WARCHIEF_SYLVANAS_WINDRUNNER.."|r", sealAtlas = "Quest-Horde-WaxSeal"},
+
+	[51795] = { bgAtlas = "QuestBG-Alliance" },
+	[52058] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_KING_ANDUIN_WRYNN.."|r", sealAtlas = "Quest-Alliance-WaxSeal"},
+
+	[51796] = { bgAtlas = "QuestBG-Horde" },
+
+	[53372] = { bgAtlas = "QuestBG-Horde", text = "|cff480404"..QUEST_WARCHIEF_SYLVANAS_WINDRUNNER.."|r", sealAtlas = "Quest-Horde-WaxSeal"},
+	[53370] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_KING_ANDUIN_WRYNN.."|r", sealAtlas = "Quest-Alliance-WaxSeal"},
+
+	[56030] = { bgAtlas = "QuestBG-Horde", text = "|cff480404"..QUEST_NATHANOS_BLIGHTCALLER.."|r", sealAtlas = "Quest-Horde-WaxSeal"},
+	[56031] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_GENN_GREYMANE.."|r", sealAtlas = "Quest-Alliance-WaxSeal"},
+	-- BfA 8.3
+	[58582] = { bgAtlas = "QuestBG-Horde", sealAtlas = "Quest-Horde-WaxSeal" },
+	[58496] = { bgAtlas = "QuestBG-Alliance", sealAtlas = "Quest-Alliance-WaxSeal"},
 };
 
 function ArmoryQuestLogTitleButton_OnClick(self, button)
@@ -364,21 +384,17 @@ function ArmoryQuestLog_GetFirstSelectableQuest()
     return 0;
 end
 
-function ArmoryQuestInfo_ToggleRewardElement(frame, value, anchor)
-    if ( value and tonumber(value) ~= 0 ) then
-        frame:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
-        frame.ValueText:SetText(value);
-        frame:Show();
-        return true;
-    else
-        frame:Hide();
-    end
-end
-
 function ArmoryQuestInfo_Display(template, parentFrame)
     local questID = select(8, Armory:GetQuestLogTitle(Armory:GetQuestLogSelection()));
-    ArmoryQuestInfoSealFrame.sealInfo = SEAL_QUESTS[questID];
 
+    ArmoryQuestInfoSealFrame.sealInfo = nil;
+    local sealQuestInfo = SEAL_QUESTS[questID];
+    if ( sealQuestInfo ) then
+        if ( sealQuestInfo.text or sealQuestInfo.sealAtlas ) then
+            ArmoryQuestInfoSealFrame.sealInfo = sealQuestInfo;
+        end
+    end
+    
     if ( ArmoryQuestInfoFrame.material ~= material ) then
         ArmoryQuestInfoFrame.material = material;    
         local textColor, titleTextColor = GetMaterialTextColors(material);    
@@ -675,21 +691,55 @@ function ArmoryQuestInfo_ShowRewards()
 
     local questItem, name, texture, quality, isUsable, itemID, numItems;
     local rewardsCount = 0;
-    local lastFrame = rewardsFrame.Header;
     
     local totalHeight = rewardsFrame.Header:GetHeight();
     local buttonHeight = rewardsFrame.RewardButtons[1]:GetHeight();
 
+	-- [[ anchoring ]]
+	local startNewSection = true;
+	local useOneElementPerRow = false;		-- default is 2 elements per row
+	local function BeginRewardsSection(largeElements)
+		startNewSection = true;
+		useOneElementPerRow = not not largeElements;
+	end
+
+	local lastAnchorElement = rewardsFrame.Header;
+	local rightSideElementPlaced = false;
+	local function AddRewardElement(rewardElement)
+		if ( not startNewSection and not rightSideElementPlaced and not useOneElementPerRow ) then
+			-- continue on same row
+			rewardElement:SetPoint("TOPLEFT", lastAnchorElement, "TOPRIGHT", 1, 0);
+			rightSideElementPlaced = true;
+		else
+			-- make new row
+			local spacing = startNewSection and REWARDS_SECTION_OFFSET or REWARDS_ROW_OFFSET;
+			rewardElement:SetPoint("TOPLEFT", lastAnchorElement, "BOTTOMLEFT", 0, -spacing);
+			local isItemButton = rewardElement.smallItemButton or rewardElement.largeItemButton;
+			local addedHeight = isItemButton and buttonHeight or rewardElement:GetHeight();
+			totalHeight = totalHeight + addedHeight + spacing;
+			lastAnchorElement = rewardElement;
+			-- there's no frame on the right side of this row yet
+			rightSideElementPlaced = false;
+			-- inside a section now
+			startNewSection = false;
+		end
+		rewardElement:Show();
+	end
+
+	local function AddHeaderElement(rewardElement)
+		local largeElements = true;
+		BeginRewardsSection(largeElements);
+		AddRewardElement(rewardElement);
+	end
+	-- [[ anchoring ]]
+
     rewardsFrame.ArtifactXPFrame:ClearAllPoints();
     if ( artifactXP > 0 ) then
         local name, icon = C_ArtifactUI.GetArtifactXPRewardTargetInfo(artifactCategory);
-        rewardsFrame.ArtifactXPFrame:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
         rewardsFrame.ArtifactXPFrame.Name:SetText(BreakUpLargeNumbers(artifactXP));
         rewardsFrame.ArtifactXPFrame.Icon:SetTexture(icon or "Interface\\Icons\\INV_Misc_QuestionMark");
         rewardsFrame.ArtifactXPFrame:Show();
-
-        lastFrame = rewardsFrame.ArtifactXPFrame;
-        totalHeight = totalHeight + rewardsFrame.ArtifactXPFrame:GetHeight() + REWARDS_SECTION_OFFSET;
+        AddRewardElement(rewardsFrame.ArtifactXPFrame);
     else
         rewardsFrame.ArtifactXPFrame:Hide();
     end
@@ -698,8 +748,14 @@ function ArmoryQuestInfo_ShowRewards()
     rewardsFrame.ItemChooseText:ClearAllPoints();
     if ( numQuestChoices > 0 ) then
         rewardsFrame.ItemChooseText:Show();
-        rewardsFrame.ItemChooseText:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -5);
-        
+		if ( numQuestChoices == 1 ) then
+			rewardsFrame.ItemChooseText:SetText(REWARD_ITEMS_ONLY);
+		else
+			rewardsFrame.ItemChooseText:SetText(REWARD_CHOICES);
+		end
+		AddHeaderElement(rewardsFrame.ItemChooseText);
+
+		BeginRewardsSection();
         local index;
         local baseIndex = rewardsCount;
         for i = 1, numQuestChoices do    
@@ -723,27 +779,9 @@ function ArmoryQuestInfo_ShowRewards()
                 SetItemButtonTextureVertexColor(questItem, 0.9, 0, 0);
                 SetItemButtonNameFrameVertexColor(questItem, 0.9, 0, 0);
             end
-            if ( i > 1 ) then
-                if ( mod(i,2) == 1 ) then
-                    questItem:SetPoint("TOPLEFT", rewardButtons[index - 2], "BOTTOMLEFT", 0, -2);
-                    lastFrame = questItem;
-                    totalHeight = totalHeight + buttonHeight + 2;
-                else
-                    questItem:SetPoint("TOPLEFT", rewardButtons[index - 1], "TOPRIGHT", 1, 0);
-                end
-            else
-                questItem:SetPoint("TOPLEFT", rewardsFrame.ItemChooseText, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
-                lastFrame = questItem;
-                totalHeight = totalHeight + buttonHeight + REWARDS_SECTION_OFFSET;
-            end
+            AddRewardElement(questItem);
             rewardsCount = rewardsCount + 1;
         end
-        if ( numQuestChoices == 1 ) then
-            rewardsFrame.ItemChooseText:SetText(REWARD_ITEMS_ONLY);
-        else
-            rewardsFrame.ItemChooseText:SetText(REWARD_CHOICES);
-        end
-        totalHeight = totalHeight + rewardsFrame.ItemChooseText:GetHeight() + REWARDS_SECTION_OFFSET;
     else
         rewardsFrame.ItemChooseText:Hide();
     end
@@ -751,6 +789,7 @@ function ArmoryQuestInfo_ShowRewards()
     rewardsFrame.spellRewardPool:ReleaseAll();
     rewardsFrame.followerRewardPool:ReleaseAll();
     rewardsFrame.spellHeaderPool:ReleaseAll();
+    rewardsFrame.WarModeBonusFrame:Hide();
     
     -- Setup spell rewards
     if ( numQuestSpellRewards > 0 ) then
@@ -784,15 +823,17 @@ function ArmoryQuestInfo_ShowRewards()
                     if ( i == 1 and not hideSpellLearnText ) then
                         local header = rewardsFrame.spellHeaderPool:Acquire();
                         header:SetText(QUEST_INFO_SPELL_REWARD_TO_HEADER[spellBucketType]);
-                        header:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
                         if rewardsFrame.spellHeaderPool.textR and rewardsFrame.spellHeaderPool.textG and rewardsFrame.spellHeaderPool.textB then
                             header:SetVertexColor(rewardsFrame.spellHeaderPool.textR, rewardsFrame.spellHeaderPool.textG, rewardsFrame.spellHeaderPool.textB);
                         end
                         header:Show();
-
-                        totalHeight = totalHeight + header:GetHeight() + REWARDS_SECTION_OFFSET;
-                        lastFrame = header;
+                        AddHeaderElement(header);
                     end
+
+                    if i == 1 then
+						local largeElements = true;
+						BeginRewardsSection(largeElements);
+					end
 
                     local anchorFrame;
                     if ( garrFollowerID ) then
@@ -814,14 +855,7 @@ function ArmoryQuestInfo_ShowRewards()
 
                         anchorFrame = spellRewardFrame;
                     end
-                    if ( i % 2 ==  1 ) then
-                        anchorFrame:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
-                        totalHeight = totalHeight + anchorFrame:GetHeight() + REWARDS_SECTION_OFFSET;
-
-                        lastFrame = anchorFrame;
-                    else
-                        anchorFrame:SetPoint("LEFT", lastFrame, "RIGHT", 1, 0);
-                    end
+                    AddRewardElement(anchorFrame);
                 end
             end
         end
@@ -829,14 +863,10 @@ function ArmoryQuestInfo_ShowRewards()
 
     -- Title reward
     if ( playerTitle ) then
-        rewardsFrame.PlayerTitleText:Show();
-        rewardsFrame.PlayerTitleText:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
-        totalHeight = totalHeight +  rewardsFrame.PlayerTitleText:GetHeight() + REWARDS_SECTION_OFFSET;
-        rewardsFrame.TitleFrame:SetPoint("TOPLEFT", rewardsFrame.PlayerTitleText, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
+        AddHeaderElement(rewardsFrame.PlayerTitleText);
         rewardsFrame.TitleFrame.Name:SetText(playerTitle);
-        rewardsFrame.TitleFrame:Show();
-        lastFrame = rewardsFrame.TitleFrame;
-        totalHeight = totalHeight +  rewardsFrame.TitleFrame:GetHeight() + REWARDS_SECTION_OFFSET;
+		BeginRewardsSection();
+        AddRewardElement(rewardsFrame.TitleFrame);
     else
         rewardsFrame.PlayerTitleText:Hide();
         rewardsFrame.TitleFrame:Hide();
@@ -852,11 +882,8 @@ function ArmoryQuestInfo_ShowRewards()
         else
             questItemReceiveText:SetText(REWARD_ITEMS_ONLY);
         end
-        questItemReceiveText:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
-        questItemReceiveText:Show();
-        totalHeight = totalHeight + questItemReceiveText:GetHeight() + REWARDS_SECTION_OFFSET;
-        lastFrame = questItemReceiveText;
-
+        AddHeaderElement(questItemReceiveText);
+        
         -- Money rewards
         if ( money > 0 ) then
             MoneyFrame_Update(rewardsFrame.MoneyFrame, money);
@@ -865,13 +892,15 @@ function ArmoryQuestInfo_ShowRewards()
             rewardsFrame.MoneyFrame:Hide();
         end
         -- XP rewards
-        if ( ArmoryQuestInfo_ToggleRewardElement(rewardsFrame.XPFrame, BreakUpLargeNumbers(xp), lastFrame) ) then
-            lastFrame = rewardsFrame.XPFrame;
-            totalHeight = totalHeight + rewardsFrame.XPFrame:GetHeight() + REWARDS_SECTION_OFFSET;
+        if ( xp > 0 ) then
+            rewardsFrame.XPFrame.ValueText:SetText(BreakUpLargeNumbers(xp));
+            AddRewardElement(rewardsFrame.XPFrame);
+        else
+            rewardsFrame.XPFrame:Hide();
         end
         -- Skill Point rewards
-        if ( ArmoryQuestInfo_ToggleRewardElement(rewardsFrame.SkillPointFrame, skillPoints, lastFrame) ) then
-            lastFrame = rewardsFrame.SkillPointFrame;
+        if ( skillPoints ) then
+            rewardsFrame.SkillPointFrame.ValueText:SetText(skillPoints);
             rewardsFrame.SkillPointFrame.Icon:SetTexture(skillIcon);
             if ( skillName ) then
                 rewardsFrame.SkillPointFrame.Name:SetFormattedText(BONUS_SKILLPOINTS, skillName);
@@ -880,8 +909,13 @@ function ArmoryQuestInfo_ShowRewards()
                 rewardsFrame.SkillPointFrame.tooltip = nil;
                 rewardsFrame.SkillPointFrame.Name:SetText("");
             end
-            totalHeight = totalHeight + buttonHeight + REWARDS_SECTION_OFFSET;
+			AddRewardElement(rewardsFrame.SkillPointFrame);
+		else
+			rewardsFrame.SkillPointFrame:Hide();
         end
+
+        BeginRewardsSection();
+
         -- Item rewards
         local index;
         local baseIndex = rewardsCount;
@@ -894,7 +928,6 @@ function ArmoryQuestInfo_ShowRewards()
             questItem.objectType = "item";
             name, texture, numItems, quality, isUsable = Armory:GetQuestLogRewardInfo(i);
             questItem:SetID(i)
-            questItem:Show();
             -- For the tooltip
             questItem.Name:SetText(name);
             SetItemButtonCount(questItem, numItems);
@@ -907,27 +940,15 @@ function ArmoryQuestInfo_ShowRewards()
                 SetItemButtonNameFrameVertexColor(questItem, 0.9, 0, 0);
             end
             
-            if ( buttonIndex > 1 ) then
-                if ( mod(buttonIndex,2) == 1 ) then
-                    questItem:SetPoint("TOPLEFT", rewardButtons[index - 2], "BOTTOMLEFT", 0, -2);
-                    lastFrame = questItem;
-                    totalHeight = totalHeight + buttonHeight + 2;
-                else
-                    questItem:SetPoint("TOPLEFT", rewardButtons[index - 1], "TOPRIGHT", 1, 0);
-                end
-            else
-                questItem:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
-                lastFrame = questItem;
-                totalHeight = totalHeight + buttonHeight + REWARDS_SECTION_OFFSET;                
-            end
+            AddRewardElement(questItem);
             rewardsCount = rewardsCount + 1;
         end
         
         -- currency
         baseIndex = rewardsCount;
         local foundCurrencies = 0;
-        buttonIndex = buttonIndex + 1;
         for i = 1, GetMaxRewardCurrencies(), 1 do
+            buttonIndex = buttonIndex + 1;
             index = i + baseIndex;
             questItem = QuestInfo_GetRewardButton(rewardsFrame, index);
             questItem.type = "reward";
@@ -937,7 +958,6 @@ function ArmoryQuestInfo_ShowRewards()
             if ( name and texture and numItems ) then
 				name, texture, numItems, quality = CurrencyContainerUtil.GetCurrencyContainerInfo(currencyID, numItems, name, texture, quality); 
                 questItem:SetID(i)
-                questItem:Show();
                 -- For the tooltip
                 questItem.Name:SetText(name);
                 SetItemButtonCount(questItem, numItems, true);
@@ -948,28 +968,21 @@ function ArmoryQuestInfo_ShowRewards()
                 SetItemButtonNameFrameVertexColor(questItem, 1.0, 1.0, 1.0);
                 SetItemButtonQuality(questItem, quality, currencyID);
                 
-                if ( buttonIndex > 1 ) then
-                    if ( mod(buttonIndex,2) == 1 ) then
-                        questItem:SetPoint("TOPLEFT", rewardButtons[index - 2], "BOTTOMLEFT", 0, -2);
-                        lastFrame = questItem;
-                        totalHeight = totalHeight + buttonHeight + 2;
-                    else
-                        questItem:SetPoint("TOPLEFT", rewardButtons[index - 1], "TOPRIGHT", 1, 0);
-                    end
-                else
-                    questItem:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
-                    lastFrame = questItem;
-                    totalHeight = totalHeight + buttonHeight + REWARDS_SECTION_OFFSET;
-                end
+                AddRewardElement(questItem);
                 rewardsCount = rewardsCount + 1;
                 foundCurrencies = foundCurrencies + 1;
-                buttonIndex = buttonIndex + 1;
                 if ( foundCurrencies == numQuestCurrencies ) then
                     break;
                 end
             end
         end
-        
+
+        -- warmode bonus
+		if ( C_QuestLog.QuestHasWarModeBonus(questID) and Armory:IsWarModeDesired() ) then
+			rewardsFrame.WarModeBonusFrame.Count:SetFormattedText(PLUS_PERCENT_FORMAT, C_PvP.GetWarModeRewardBonus());
+			AddRewardElement(rewardsFrame.WarModeBonusFrame);
+		end
+
         rewardsFrame.HonorFrame:ClearAllPoints();
         if ( honor > 0 ) then
             local icon;
@@ -979,26 +992,17 @@ function ArmoryQuestInfo_ShowRewards()
                 icon = "Interface\\Icons\\PVPCurrency-Honor-Alliance";
             end
 
-            rewardsFrame.HonorFrame:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
             rewardsFrame.HonorFrame.Count:SetText(BreakUpLargeNumbers(honor));
             rewardsFrame.HonorFrame.Name:SetText(HONOR);
             rewardsFrame.HonorFrame.Icon:SetTexture(icon);
-            rewardsFrame.HonorFrame:Show();
-
-            lastFrame = rewardsFrame.HonorFrame;
-            totalHeight = totalHeight + rewardsFrame.HonorFrame:GetHeight() + REWARDS_SECTION_OFFSET;
+            BeginRewardsSection();
+			AddRewardElement(rewardsFrame.HonorFrame);
         else
             rewardsFrame.HonorFrame:Hide();
         end
 
         -- Bonus reward chance for quest sessions
         if ( hasChanceForQuestSessionBonusReward ) then
-        	-- Set up the title for the Bonus
-			rewardsFrame.QuestSessionBonusReward:Show();
-			rewardsFrame.QuestSessionBonusReward:ClearAllPoints();
-			rewardsFrame.QuestSessionBonusReward:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
-			lastFrame = rewardsFrame.QuestSessionBonusReward;
-
 			rewardsCount = rewardsCount + 1;
 			questItem = QuestInfo_GetRewardButton(rewardsFrame, rewardsCount);
 
@@ -1021,11 +1025,9 @@ function ArmoryQuestInfo_ShowRewards()
 			end
 
 			questItem:SetID(QUEST_SESSION_BONUS_REWARD_ITEM_ID);
-			questItem:Show();
 
-			questItem:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -REWARDS_SECTION_OFFSET);
-			lastFrame = questItem;
-			totalHeight = totalHeight + questItem:GetHeight() + rewardsFrame.QuestSessionBonusReward:GetStringHeight() + 4 * REWARDS_SECTION_OFFSET;
+            AddHeaderElement(rewardsFrame.QuestSessionBonusReward);
+            AddRewardElement(questItem);
         else
         	rewardsFrame.QuestSessionBonusReward:Hide();
         end
@@ -1040,7 +1042,7 @@ function ArmoryQuestInfo_ShowRewards()
 
     rewardsFrame:Show();
     rewardsFrame:SetHeight(totalHeight);
-    return rewardsFrame, lastFrame;
+    return rewardsFrame, lastAnchorElement;
 end
 
 function ArmoryQuestInfoRewardItemCodeTemplate_OnEnter(self)

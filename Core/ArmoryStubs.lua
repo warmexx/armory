@@ -667,6 +667,10 @@ function Armory:IsSwimming(unit)
     return self:SetGetCharacterValue("IsSwimming", _G.IsSwimming(unit));
 end
 
+function Armory:IsWarModeDesired()
+    return self:SetGetCharacterValue("IsWarModeDesired", C_PvP.IsWarModeDesired());
+end
+
 function Armory:IsXPUserDisabled()
    return self:SetGetCharacterValue("IsXPUserDisabled", _G.IsXPUserDisabled());
 end

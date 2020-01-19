@@ -587,6 +587,7 @@
           <OnLeave function="GameTooltip_Hide" />
         </Scripts>
       </Button>
+      <Button parentKey="WarModeBonusFrame" inherits="LargeItemButtonTemplate, WarModeBonusFrameTemplate" hidden="true"/>
       <Frame parentKey="TitleFrame" name="ArmoryQuestInfoPlayerTitleFrame">
         <Size x="500" y="39"/>
         <Layers>
