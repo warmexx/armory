@@ -809,12 +809,6 @@ function ArmoryToggleDropDownMenu(level, value, dropDownFrame, anchorName, xOffs
 	end
 end
 
-hooksecurefunc("CloseDropDownMenus", function(level) 
-    if ( not level ) then
-        ArmoryCloseDropDownMenus();
-    end
-end);
-
 function ArmoryCloseDropDownMenus(level)
 	if ( not level ) then
 		level = 1;
