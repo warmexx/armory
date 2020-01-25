@@ -381,7 +381,7 @@ function ArmoryReputationParagonFrame_SetupParagonTooltip(frame)
 	local factionName = GetFactionInfoByID(frame.factionID);
 	local gender = Armory:UnitSex("player");
 	local factionStandingtext = GetText("FACTION_STANDING_LABEL"..frame.standingID, gender);
-    local currentValue, threshold, rewardQuestID, hasRewardPending, tooLowLevelForParagon = Armory:GetFactionParagonInfo(factionID);
+    local currentValue, threshold, rewardQuestID, hasRewardPending, tooLowLevelForParagon = Armory:GetFactionParagonInfo(frame.factionID);
  
     if ( tooLowLevelForParagon ) then
         EmbeddedItemTooltip:SetText(PARAGON_REPUTATION_TOOLTIP_TEXT_LOW_LEVEL);
