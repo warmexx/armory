@@ -4,7 +4,8 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
-==== v15.7.1 ====
+==== v15.8.0 ====
+# Corruption has been added to stats.
 # Paragon faction rewards were not shown anymore; this has been fixed.
 
 ==== v15.7.0 ====

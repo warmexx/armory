@@ -76,6 +76,14 @@ function Armory:GetCombatRatingBonusForCombatRatingValue(index, value)
     end
 end
 
+function Armory:GetCorruption()
+    return self:SetGetCharacterValue("Corruption", _G.GetCorruption());
+end
+
+function Armory:GetCorruptionResistance()
+    return self:SetGetCharacterValue("CorruptionResistance", _G.GetCorruptionResistance());
+end
+
 function Armory:GetCritChance()
     return self:SetGetCharacterValue("CritChance", _G.GetCritChance());
 end
@@ -239,6 +247,10 @@ end
 
 function Armory:GetMultistrikeEffect()
     return self:SetGetCharacterValue("MultistrikeEffect", _G.GetMultistrikeEffect());
+end
+
+function Armory:GetNegativeCorruptionEffectInfo()
+    return self:SetGetCharacterValue("NegativeCorruptionEffectInfo", _G.GetNegativeCorruptionEffectInfo());
 end
 
 function Armory:GetOverrideAPBySpellPower()

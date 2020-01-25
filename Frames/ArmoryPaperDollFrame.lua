@@ -132,6 +132,9 @@ ARMORY_PAPERDOLL_STATINFO = {
     ["MOVESPEED"] = {
         updateFunc = function(statFrame, unit) ArmoryPaperDollFrame_SetMovementSpeed(statFrame, unit); end
     },
+    ["CORRUPTION"] = {
+        updateFunc = function(statFrame, unit) ArmoryPaperDollFrame_SetCorruption(statFrame, unit); end
+    },
 	    
     -- Base stats
     ["STRENGTH"] = {
@@ -224,7 +227,8 @@ ARMORY_PAPERDOLL_STATCATEGORIES = {
 			"ALTERNATEMANA",  -- Druids when in bear/cat form and Mistweaver Monks
 			"POWER",
 			"ITEMLEVEL",
-			"MOVESPEED",
+            "MOVESPEED",
+            "CORRUPTION",
 		}
 	},
 						
@@ -1453,6 +1457,77 @@ function ArmoryPaperDollFrame_SetMovementSpeed(statFrame, unit)
     statFrame:SetScript("OnEnter", ArmoryMovementSpeed_OnEnter);
 end
 
+function ArmoryCorruption_OnEnter(self)
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+    GameTooltip:SetMinimumWidth(250);
+
+    local corruption = self.corruption;
+	local corruptionResistance = self.corruptionResistance;
+	local totalCorruption = math.max(corruption - corruptionResistance, 0);
+
+	local noWrap = false;
+	local wrap = true;
+	local descriptionXOffset = 10;
+
+	GameTooltip_AddColoredLine(GameTooltip, CORRUPTION_TOOLTIP_TITLE, HIGHLIGHT_FONT_COLOR);
+	GameTooltip_AddColoredLine(GameTooltip, CORRUPTION_DESCRIPTION, NORMAL_FONT_COLOR);
+	GameTooltip_AddBlankLineToTooltip(GameTooltip);
+	GameTooltip_AddColoredDoubleLine(GameTooltip, CORRUPTION_TOOLTIP_LINE, corruption, HIGHLIGHT_FONT_COLOR, HIGHLIGHT_FONT_COLOR, noWrap);
+	GameTooltip_AddColoredDoubleLine(GameTooltip, CORRUPTION_RESISTANCE_TOOLTIP_LINE, corruptionResistance, HIGHLIGHT_FONT_COLOR, HIGHLIGHT_FONT_COLOR, noWrap);
+	GameTooltip_AddColoredDoubleLine(GameTooltip, TOTAL_CORRUPTION_TOOLTIP_LINE, totalCorruption, CORRUPTION_COLOR, CORRUPTION_COLOR, noWrap);
+	GameTooltip_AddBlankLineToTooltip(GameTooltip);
+
+	local corruptionEffects = self.effectInfo;
+	table.sort(corruptionEffects, function(a, b) return a.minCorruption < b.minCorruption; end);
+
+	for i = 1, #corruptionEffects do
+		local corruptionInfo = corruptionEffects[i];
+
+		if i > 1 then
+			GameTooltip_AddBlankLineToTooltip(GameTooltip);
+		end
+
+		-- We only show 1 effect above the player's current corruption.
+		local lastEffect = (corruptionInfo.minCorruption > totalCorruption);
+
+		GameTooltip_AddColoredLine(GameTooltip, CORRUPTION_EFFECT_HEADER:format(corruptionInfo.name, corruptionInfo.minCorruption), lastEffect and GRAY_FONT_COLOR or HIGHLIGHT_FONT_COLOR, noWrap);
+		GameTooltip_AddColoredLine(GameTooltip, corruptionInfo.description, lastEffect and GRAY_FONT_COLOR or CORRUPTION_COLOR, wrap, descriptionXOffset);
+
+		if ( lastEffect ) then
+			break;
+		end
+	end
+   
+    GameTooltip:Show();
+end
+
+function ArmoryPaperDollFrame_SetCorruption(statFrame, unit)
+	if ( unit ~= "player" ) then
+		statFrame:Hide();
+		return;
+    end
+    
+    local corruption = Armory:GetCorruption();
+    if ( (corruption or 0) == 0 ) then
+		statFrame:Hide();
+		return;
+    end
+	local corruptionResistance = Armory:GetCorruptionResistance();
+	local totalCorruption = math.max(corruption - corruptionResistance, 0);
+
+    local color = Armory:HexColor(CORRUPTION_COLOR);
+    local label = color .. TOTAL_CORRUPTION_TOOLTIP_LINE:gsub(":", "");
+    local text = color .. totalCorruption .. FONT_COLOR_CODE_CLOSE;
+    PaperDollFrame_SetLabelAndText(statFrame, label, text, false, totalCorruption);
+
+    statFrame.corruption = corruption;
+    statFrame.corruptionResistance = corruptionResistance;
+    statFrame.effectInfo = Armory:GetNegativeCorruptionEffectInfo();
+
+    statFrame:SetScript("OnEnter", ArmoryCorruption_OnEnter);
+    statFrame:Show();
+end
+
 function ArmoryCharacterSpellBonusDamage_OnEnter(self)
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
     GameTooltip:SetText(HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, self.tooltip).." "..BreakUpLargeNumbers(self.minModifier)..FONT_COLOR_CODE_CLOSE);
@@ -1685,6 +1760,7 @@ function ArmoryPaperDollFrame_OnLoad(self)
 	self:RegisterUnitEvent("UNIT_MAXHEALTH", "player");
 	self:RegisterUnitEvent("UNIT_AURA", "player");
 	self:RegisterEvent("SPELL_POWER_CHANGED");
+	self:RegisterEvent("SPELL_TEXT_UPDATE");
 
     ARMORY_PLAYERSTAT_DROPDOWN_SELECTION = nil;
 
@@ -1731,7 +1807,8 @@ function ArmoryPaperDollFrame_OnEvent(self, event, unit)
 		 event == "AVOIDANCE_UPDATE" or 
 		 event == "PLAYER_AVG_ITEM_LEVEL_UPDATE" or 
 		 event == "PLAYER_DAMAGE_DONE_MODS" or 
-		 event == "SPELL_POWER_CHANGED" ) then
+		 event == "SPELL_POWER_CHANGED" or
+         event == "SPELL_TEXT_UPDATE" ) then
         Armory:Execute(ArmoryPaperDollFrame_UpdateStats);
     elseif ( event == "ZONE_CHANGED" or event == "ZONE_CHANGED_INDOORS" or event == "ZONE_CHANGED_NEW_AREA" ) then
         Armory:Execute(ArmoryPaperDollFrame_SetZone);
