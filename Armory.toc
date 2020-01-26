@@ -1,4 +1,5 @@
 ## Interface: 80300
+## X-Min-Interface: 80300
 ## Title: Armory
 ## Title-frFR: Armory [Armurerie]
 ## Title-esES: Armory [Armería]
