@@ -6,6 +6,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 
 ==== v15.9.0 ====
 # Adds item counts to action tooltips.
+# Querying for owned auctions was called too often; this has been fixed.
 
 ==== v15.8.0 ====
 # Corruption has been added to stats.

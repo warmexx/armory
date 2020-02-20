@@ -820,6 +820,8 @@ function Armory:UpdateTradeSkill()
     elseif ( not self:HasTradeSkills() ) then
         ClearProfessions();
         return;
+    elseif ( not TradeSkillFrame ) then
+        return;
     end
 
     _, name, rank, maxRank, modifier, _, parentName = C_TradeSkillUI.GetTradeSkillLine();

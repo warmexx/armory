@@ -67,7 +67,7 @@ function ArmoryInventoryFrame_OnLoad(self)
 	self:RegisterEvent("MAIL_SHOW");
     self:RegisterEvent("MAIL_SEND_SUCCESS");
     self:RegisterEvent("MAIL_CLOSED");
-	self:RegisterEvent("AUCTION_HOUSE_SHOW");
+	self:RegisterEvent("AUCTION_HOUSE_AUCTION_CREATED");
     self:RegisterEvent("COMMODITY_SEARCH_RESULTS_UPDATED");
     self:RegisterEvent("OWNED_AUCTIONS_UPDATED");
     self:RegisterEvent("VOID_STORAGE_CLOSE");
@@ -90,6 +90,14 @@ function ArmoryInventoryFrame_OnLoad(self)
             ArmoryInventoryFramePasteItem(button, link);
         end
     );
+end
+
+local function QueryOwnedAuctions()
+    if ( not ArmoryInventoryFrame.queryOwnedAuctions ) then
+        return;
+    end
+    ArmoryInventoryFrame.queryOwnedAuctions = false;
+    C_AuctionHouse.QueryOwnedAuctions({});
 end
 
 function ArmoryInventoryFrame_OnEvent(self, event, ...)
@@ -161,9 +169,14 @@ function ArmoryInventoryFrame_OnEvent(self, event, ...)
                 end
             end
          end
-    elseif ( event == "AUCTION_HOUSE_SHOW" or event == "COMMODITY_SEARCH_RESULTS_UPDATED" ) then
-        C_AuctionHouse.QueryOwnedAuctions({});
+	elseif ( event == "AUCTION_HOUSE_AUCTION_CREATED" ) then
+		self.queryOwnedAuctions = true;
+    elseif ( event == "COMMODITY_SEARCH_RESULTS_UPDATED" ) then
+		if ( self.queryOwnedAuctions ) then
+			Armory:ExecuteConditional(C_AuctionHouse.IsThrottledMessageSystemReady, QueryOwnedAuctions); 
+		end
     elseif ( event == "OWNED_AUCTIONS_UPDATED" ) then
+        self.queryOwnedAuctions = false;
         -- Must execute immediately
         ArmoryInventoryFrame_UpdateContainer(ARMORY_AUCTIONS_CONTAINER);
     elseif ( event == "VOID_STORAGE_CLOSE" ) then
