@@ -737,6 +737,13 @@ local function RegisterTooltipHook(tooltip, idType, hook, reset)
             local _, _, link, currencyName = _G.GetMerchantItemCostItem(index, itemIndex);
             return link or GetDummyCurrencyLink(currencyName);
         end);
+        
+        SetTooltipHook(tooltip, "SetAction", function(action)
+            local actionType, actionID = _G.GetActionInfo(action);
+            if ( actionType == "item" ) then
+                return select(2, _G.GetItemInfo(actionID));
+            end
+        end);
 
         SetTooltipHook(tooltip, "SetItemByID", function(id)
             return select(2, _G.GetItemInfo(id));
