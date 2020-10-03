@@ -27,7 +27,7 @@
 --]]
 
 local Armory, _ = Armory;
-local LR = LibStub("LibRecipes-2.0");
+local LR = LibStub("LibRecipes-3.0");
 
 local container = "Professions";
 local itemContainer = "SkillLines";
