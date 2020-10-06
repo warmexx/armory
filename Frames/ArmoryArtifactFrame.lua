@@ -146,7 +146,7 @@ end
 function ArmoryArtifactFrameMixin:OnKnowledgeEnter(knowledgeFrame)
     GameTooltip:SetOwner(knowledgeFrame, "ANCHOR_BOTTOMRIGHT", -25, 27);
     local artifactArtInfo = Armory:GetArtifactArtInfo();
-	local color = ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_ARTIFACT];
+	local color = ITEM_QUALITY_COLORS[Enum.ItemQuality.Artifact];
 	GameTooltip:SetText(artifactArtInfo.titleName, color.r, color.g, color.b);
 
     GameTooltip:AddLine(ARTIFACTS_NUM_PURCHASED_RANKS:format(Armory:GetTotalPurchasedRanks()), HIGHLIGHT_FONT_COLOR:GetRGB());

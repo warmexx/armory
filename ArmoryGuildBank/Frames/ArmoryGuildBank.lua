@@ -339,7 +339,7 @@ function ArmoryGuildBankFrame_Update()
                 end
                 
                 quality = Armory:GetQualityFromLink(link);
-				if ( quality and quality > LE_ITEM_QUALITY_COMMON and BAG_ITEM_QUALITY_COLORS[quality] ) then
+				if ( quality and quality > Enum.ItemQuality.Common and BAG_ITEM_QUALITY_COLORS[quality] ) then
 					button.IconBorder:Show();
 					button.IconBorder:SetVertexColor(BAG_ITEM_QUALITY_COLORS[quality].r, BAG_ITEM_QUALITY_COLORS[quality].g, BAG_ITEM_QUALITY_COLORS[quality].b);
 				else

@@ -29,6 +29,8 @@
 local Armory, _ = Armory;
 local container = "HonorTalents";
 
+SHOW_PVP_TALENT_LEVEL = 20;
+
 ----------------------------------------------------------
 -- Talents Storage
 ----------------------------------------------------------

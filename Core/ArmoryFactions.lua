@@ -143,7 +143,7 @@ function Armory:UpdateFactions()
         -- store the complete (expanded) list
         local funcNumLines = _G.GetNumFactions;
         local funcGetLineInfo = function(index)
-            local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID, hasBonusRepGain, canBeLFGBonus = _G.GetFactionInfo(index);
+            local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID, hasBonusRepGain = _G.GetFactionInfo(index);
             local friendID, friendRep, friendMaxRep, friendName, friendText, friendTexture, friendTextLevel, friendThreshold, nextFriendThreshold = GetFriendshipReputation(factionID);
             if ( friendID ~= nil ) then
                 description = friendTextLevel;
@@ -157,7 +157,7 @@ function Armory:UpdateFactions()
             else
                 description = nil;
             end
-            return name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, hasBonusRepGain, canBeLFGBonus;
+            return name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, hasBonusRepGain;
         end;
         local funcGetLineState = function(index)
             local _, _, _, _, _, _, _, _, isHeader, isCollapsed = _G.GetFactionInfo(index);
@@ -166,8 +166,6 @@ function Armory:UpdateFactions()
         local funcExpand = _G.ExpandFactionHeader;
         local funcCollapse = _G.CollapseFactionHeader;
         local funcAdditionalInfo = function(index)
-            dbEntry:SetValue(2, container, "BonusFactionID", _G.GetLFGBonusFactionID());
-
             local factionID = select(14, _G.GetFactionInfo(index));
 			if ( factionID ) then
                 local id = tostring(factionID);
@@ -220,13 +218,13 @@ function Armory:GetFactionInfo(index)
     local dbEntry = self.selectedDbBaseEntry;
     local numLines = self:GetNumFactions();
     if ( dbEntry and index > 0 and index <= numLines ) then
-        local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, hasBonusRepGain, canBeLFGBonus = GetFactionLineValue(index);
+        local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, hasBonusRepGain = GetFactionLineValue(index);
         local factionID = dbEntry:GetValue(container, factionLines[index], "Data");
         if ( factionID ) then
             factionID = tonumber(factionID);
         end
         isCollapsed = self:GetHeaderLineState(container, name);
-        return name, description, standingID or 1, barMin or 0, barMax or 0, barValue or 0, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID, hasBonusRepGain, canBeLFGBonus;
+        return name, description, standingID or 1, barMin or 0, barMax or 0, barValue or 0, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID, hasBonusRepGain;
     end
 end
 
@@ -266,13 +264,5 @@ function Armory:GetFactionParagonInfo(factionID)
     
     if ( dbEntry ) then
         return dbEntry:GetValue(container, tostring(factionID), "Paragon");
-    end
-end
-
-function Armory:GetLFGBonusFactionID()
-    local dbEntry = self.selectedDbBaseEntry;
-    
-    if ( dbEntry ) then
-        return dbEntry:GetValue(container, "BonusFactionID");
     end
 end

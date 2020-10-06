@@ -35,7 +35,7 @@ ARMORY_MAX_REPUTATION_REACTION = 8;
 function ArmoryReputationFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("UPDATE_FACTION");
-    self:RegisterEvent("LFG_BONUS_FACTION_ID_UPDATED");
+    self:RegisterEvent("QUEST_LOG_UPDATE");
     self.paragonFramesPool = CreateFramePool("FRAME", self, "ArmoryReputationParagonFrameTemplate");
 end
 
@@ -112,7 +112,6 @@ function ArmoryReputationFrame_SetRowType(factionRow, isChild, isHeader, hasRep)
 		factionLeftTexture:SetTexCoord(0.765625, 1.0, 0.046875, 0.28125);
 		factionRightTexture:SetTexCoord(0.0, 0.15234375, 0.390625, 0.625);
 		factionBar:SetWidth(99);
-		factionRow.LFGBonusRepButton:SetPoint("RIGHT", factionButton, "LEFT", 0, 1);
 	else
 		if ( isChild ) then
 			factionRow:SetPoint("LEFT", ArmoryReputationFrame, "LEFT", 52, 0);
@@ -130,7 +129,6 @@ function ArmoryReputationFrame_SetRowType(factionRow, isChild, isHeader, hasRep)
 		factionLeftTexture:SetTexCoord(0.7578125, 1.0, 0.0, 0.328125);
 		factionRightTexture:SetTexCoord(0.0, 0.1640625, 0.34375, 0.671875);
 		factionBar:SetWidth(101)
-		factionRow.LFGBonusRepButton:SetPoint("RIGHT", factionBackground, "LEFT", -2, 0);
 	end
 
 	if ( (hasRep) or (not isHeader) ) then
@@ -149,7 +147,7 @@ function ArmoryReputationFrame_Update()
 
     local numFactions = Armory:GetNumFactions();
     local factionIndex, factionRow, factionTitle, factionStanding, factionBar, factionButton, factionBackground;
-    local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID, hasBonusRepGain, canBeLFGBonus;
+    local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID, hasBonusRepGain;
     local atWarIndicator, rightBarTexture;
 
     -- Update scroll frame
@@ -159,7 +157,6 @@ function ArmoryReputationFrame_Update()
     local factionOffset = FauxScrollFrame_GetOffset(ArmoryReputationListScrollFrame);
 
     local gender = Armory:UnitSex("player");
-    local lfgBonusFactionID = Armory:GetLFGBonusFactionID();
 
     local offScreenFudgeFactor = 5;
     local previousBigTextureRows = 0;
@@ -173,7 +170,7 @@ function ArmoryReputationFrame_Update()
         factionStanding = _G["ArmoryReputationBar"..i.."ReputationBarFactionStanding"];
         factionBackground = _G["ArmoryReputationBar"..i.."Background"];
         if ( factionIndex <= numFactions ) then
-            name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID, hasBonusRepGain, canBeLFGBonus = Armory:GetFactionInfo(factionIndex);
+            name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID, hasBonusRepGain = Armory:GetFactionInfo(factionIndex);
             factionTitle:SetText(name);
             if ( isCollapsed ) then
                 factionButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up");
@@ -227,11 +224,6 @@ function ArmoryReputationFrame_Update()
             factionBar:SetStatusBarColor(color.r, color.g, color.b);
 
             factionBar.BonusIcon:SetShown(hasBonusRepGain);
-
-			factionRow.LFGBonusRepButton.factionID = factionID;
-			factionRow.LFGBonusRepButton:SetShown(canBeLFGBonus);
-			factionRow.LFGBonusRepButton:SetChecked(lfgBonusFactionID == factionID);
-			factionRow.LFGBonusRepButton:SetEnabled(false);
 
             ArmoryReputationFrame_SetRowType(factionRow, isChild, isHeader, hasRep);
 

@@ -714,10 +714,12 @@ local function RegisterTooltipHook(tooltip, idType, hook, reset)
         tooltipHooks[tooltip] = {};
         tooltipHooks[tooltip].hooks = {};
 
-        SetTooltipHook(tooltip, "SetCurrencyToken", _G.GetCurrencyListInfo);
+        SetTooltipHook(tooltip, "SetCurrencyToken", function(index) 
+            return C_CurrencyInfo.GetCurrencyListInfo(index).name;
+        end);
         SetTooltipHook(tooltip, "SetQuestCurrency", _G.GetQuestCurrencyInfo);
-        SetTooltipHook(tooltip, "SetQuestLogCurrency", function(type, index)
-            return _G.GetQuestLogRewardCurrencyInfo(index);
+        SetTooltipHook(tooltip, "SetQuestLogCurrency", function(type, index, questID)
+            return _G.GetQuestLogRewardCurrencyInfo(index, questID);
         end);
 
         SetTooltipHook(tooltip, "SetMerchantItem", _G.GetMerchantItemLink);

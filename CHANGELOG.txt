@@ -4,6 +4,9 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+==== v16.0.0 ====
+# Adjustments have been made for patch 9.0.2
+
 ==== v15.9.0 ====
 # Adds item counts to action tooltips.
 # Querying for owned auctions was called too often; this has been fixed.

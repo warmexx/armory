@@ -112,14 +112,17 @@ function Armory:GetCurrencyInfo(index)
     -- 402 Chef's Award
     -- 1191 WoD Valor
 
-    if ( _G.GetCurrencyInfo(index) ) then
-        local name, quantity, icon, earnedThisWeek, earnablePerWeek, maxQuantity, isDiscovered, rarity = self:SetGetCharacterValue("CurrencyInfo"..index, _G.GetCurrencyInfo(index));
+    local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(index);
+
+    if ( currencyInfo ) then
+        local name, quantity, icon, earnedThisWeek, earnablePerWeek = currencyInfo.name, currencyInfo.quantity, currencyInfo.iconFileID, currencyInfo.quantityEarnedThisWeek, currencyInfo.maxWeeklyQuantity;
+        name, quantity, icon, earnedThisWeek, earnablePerWeek = self:SetGetCharacterValue("CurrencyInfo"..index, name, quantity, icon, earnedThisWeek, earnablePerWeek);
 
         if ( time() >= self:GetWeeklyQuestResetTime() ) then
             earnedThisWeek = 0;
         end
 
-        return name, quantity, icon, earnedThisWeek, earnablePerWeek, maxQuantity, isDiscovered, rarity;
+        return name, quantity, icon, earnedThisWeek, earnablePerWeek;
     end
 end
 
@@ -580,21 +583,7 @@ function Armory:GetVersatilityBonus(index)
 end
 
 function Armory:GetWeeklyQuestResetTime()
-	local day = self:GetConfigWeeklyReset();
-	local offset = (6 + day - date("%w", time())) % 7;
-	return self:GetQuestResetTime() + offset * 24 * 60 * 60;
-end
-
-function Armory:GetWeeklyResetDay()
-    local day = 4;
-	--local region = strupper(GetCVar("realmList"):match("^[%a.]-(%a+).%a+.%a+.%a+$"));
-	local region = GetCVar("portal");
-	if ( region == "US" ) then
-		day = 2;
-	elseif ( region == "EU" ) then
-		day = 3;
-	end
-    return day;
+    return time() + C_DateAndTime.GetSecondsUntilWeeklyReset();
 end
 
 function Armory:GetXPExhaustion()

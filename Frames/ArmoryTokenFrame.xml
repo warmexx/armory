@@ -3,9 +3,7 @@
 ..\..\..\FrameXML\UI.xsd">
   <Script file="ArmoryTokenFrame.lua"/>
   <Button name="ArmoryTokenButtonTemplate" virtual="true">
-    <Size>
-      <AbsDimension x="295" y="17"/>
-    </Size>
+    <Size x="295" y="17"/>
     <Layers>
       <Layer level="BACKGROUND">
         <Texture name="$parentStripe">
@@ -18,40 +16,26 @@
       </Layer>
       <Layer level="BORDER">
         <Texture name="$parentIcon">
-          <Size>
-            <AbsDimension x="15" y="15"/>
-          </Size>
+          <Size x="15" y="15"/>
           <Anchors>
-            <Anchor point="RIGHT" >
-              <Offset x="-20" y="0"/>
-            </Anchor>
+            <Anchor point="RIGHT" x="-20" y="0"/>
           </Anchors>
         </Texture>
         <FontString name="$parentCount" inherits="GameFontHighlightRight" text="100">
           <Anchors>
-            <Anchor point="RIGHT" relativeTo="$parentIcon" relativePoint="LEFT">
-              <Offset x="-5" y="0"/>
-            </Anchor>
+            <Anchor point="RIGHT" relativeTo="$parentIcon" relativePoint="LEFT" x="-5" y="0"/>
           </Anchors>
         </FontString>
         <FontString name="$parentName" inherits="GameFontHighlightLeft">
-          <Size>
-            <AbsDimension x="210" y="11"/>
-          </Size>
+          <Size x="210" y="11"/>
           <Anchors>
-            <Anchor point="LEFT">
-              <Offset x="11" y="0"/>
-            </Anchor>
+            <Anchor point="LEFT" x="11" y="0"/>
           </Anchors>
         </FontString>
         <Texture name="$parentCheck" file="Interface\Buttons\UI-CheckBox-Check">
-          <Size>
-            <AbsDimension x="16" y="16"/>
-          </Size>
+          <Size x="16" y="16"/>
           <Anchors>
-            <Anchor point="RIGHT">
-              <Offset x="-3" y="0"/>
-            </Anchor>
+            <Anchor point="RIGHT" x="-3" y="0"/>
           </Anchors>
         </Texture>
 
@@ -81,13 +65,9 @@
       </Layer>
       <Layer level="ARTWORK">
         <Texture name="$parentExpandIcon" file="Interface\Buttons\UI-PlusMinus-Buttons">
-          <Size>
-            <AbsDimension x="7" y="7"/>
-          </Size>
+          <Size x="7" y="7"/>
           <Anchors>
-            <Anchor point="LEFT">
-              <Offset x="8" y="0"/>
-            </Anchor>
+            <Anchor point="LEFT" x="8" y="0"/>
           </Anchors>
         </Texture>
       </Layer>
@@ -95,12 +75,8 @@
     <Frames>
       <Button enableMouse="true" parentKey="LinkButton">
         <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="$parentIcon">
-            <Offset x="0" y="0"/>
-          </Anchor>
-          <Anchor point="BOTTOMRIGHT" relativeTo="$parentIcon">
-            <Offset x="0" y="0"/>
-          </Anchor>
+          <Anchor point="TOPLEFT" relativeTo="$parentIcon" x="0" y="0"/>
+          <Anchor point="BOTTOMRIGHT" relativeTo="$parentIcon" x="0" y="0"/>
         </Anchors>
         <Scripts>
           <OnEnter>
@@ -138,12 +114,8 @@
     <NormalFont style="GameFontNormal"/>
     <HighlightTexture name="$parentHighlight" file="Interface\TokenFrame\UI-TokenFrame-CategoryButton" alphaMode="ADD">
       <Anchors>
-        <Anchor point="TOPLEFT">
-          <Offset x="3" y="-2"/>
-        </Anchor>
-        <Anchor point="BOTTOMRIGHT">
-          <Offset x="-3" y="2"/>
-        </Anchor>
+        <Anchor point="TOPLEFT" x="3" y="-2"/>
+        <Anchor point="BOTTOMRIGHT" x="-3" y="2"/>
       </Anchors>
       <TexCoords left="0" right="1" top="0.609375" bottom="0.796875"/>
     </HighlightTexture>
@@ -156,25 +128,13 @@
       <ScrollFrame name="$parentContainer" inherits="HybridScrollFrameTemplate">
         <Size x="299" y="350"/>
         <Anchors>
-          <Anchor point="TOPLEFT">
-            <Offset>
-              <AbsDimension x="26" y="-77"/>
-            </Offset>
-          </Anchor>
+          <Anchor point="TOPLEFT" x="26" y="-77"/>
         </Anchors>
         <Frames>
           <Slider name="$parentScrollBar" inherits="HybridScrollBarTemplate">
             <Anchors>
-              <Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
-                <Offset>
-                  <AbsDimension x="0" y="-12"/>
-                </Offset>
-              </Anchor>
-              <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
-                <Offset>
-                  <AbsDimension x="0" y="11"/>
-                </Offset>
-              </Anchor>
+              <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="0" y="-12"/>
+              <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="0" y="11"/>
             </Anchors>
           </Slider>
         </Frames>

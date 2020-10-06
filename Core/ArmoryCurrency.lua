@@ -144,21 +144,33 @@ function Armory:UpdateCurrency()
         self:PrintDebug("UPDATE", container);
 
         -- store the complete (expanded) list
-        local funcNumLines = _G.GetCurrencyListSize;
+        local funcNumLines = C_CurrencyInfo.GetCurrencyListSize;
         local funcGetLineInfo = function(index)
-            local name, isHeader, isExpanded, isUnused, isWatched, count, icon = _G.GetCurrencyListInfo(index);
-            local link;
-            if ( not isHeader ) then
-                link = _G.GetCurrencyListLink(index);
+            local currencyInfo = C_CurrencyInfo.GetCurrencyListInfo(index);
+            if ( currencyInfo ) then
+                local name, isHeader, isExpanded, isUnused, isWatched, count, icon;
+                name = currencyInfo.name;
+                isHeader = currencyInfo.isHeader;
+                isExpanded = currencyInfo.isHeaderExpanded;
+                isUnused = currencyInfo.isTypeUnused;
+                isWatched = currencyInfo.isShowInBackpack;
+                count = currencyInfo.quantity;
+                icon = currencyInfo.iconFileID;
+                local link;
+                if ( not isHeader ) then
+                    link = C_CurrencyInfo.GetCurrencyListLink(index);
+                end
+                return name, isHeader, isExpanded, isUnused, isWatched, count, icon, link;
             end
-            return name, isHeader, isExpanded, isUnused, isWatched, count, icon, link;
         end;
         local funcGetLineState = function(index)
-            local _, isHeader, isExpanded = _G.GetCurrencyListInfo(index);
-            return isHeader, isExpanded;
+            local currencyInfo = C_CurrencyInfo.GetCurrencyListInfo(index);
+            if ( currencyInfo ) then
+                return currencyInfo.isHeader, currencyInfo.isHeaderExpanded;
+            end
         end;
-        local funcExpand = function(index) _G.ExpandCurrencyList(index, 1); end;
-        local funcCollapse = function(index) _G.ExpandCurrencyList(index, 0); end;
+        local funcExpand = function(index) C_CurrencyInfo.ExpandCurrencyList(index, 1); end;
+        local funcCollapse = function(index) C_CurrencyInfo.ExpandCurrencyList(index, 0); end;
 
         if ( retries < 1 and not dbEntry:SetExpandableListValues(container, funcNumLines, funcGetLineState, funcGetLineInfo, funcExpand, funcCollapse) ) then
             retries = retries + 1;
@@ -222,7 +234,7 @@ function Armory:CountCurrency(link)
         if ( link:find("|H") ) then
             name = self:GetNameFromLink(link);
         else
-            name = _G.GetCurrencyInfo(currency);
+            name = self:GetCurrencyName(currency);
         end
         for i = 1, dbEntry:GetNumValues(container) do
             local currencyName, isHeader, _, _, _, count, icon = dbEntry:GetValue(container, i);
@@ -236,11 +248,19 @@ end
 
 function Armory:IsContentReward(name)
 	for i = 1, #CONTENT_REWARDS do
-		if ( name == (_G.GetCurrencyInfo(CONTENT_REWARDS[i])) ) then
+		if ( name == self:GetCurrencyName(CONTENT_REWARDS[i]) ) then
 			return name ~= "";
 		end
 	end
 	return false;
+end
+
+function Armory:GetCurrencyName(index)
+    local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(index);
+    if ( currencyInfo and currencyInfo.name ) then
+        return currencyInfo.name;
+    end
+    return "";
 end
 
 function Armory:GetVirtualNumCurrencies()
@@ -260,7 +280,7 @@ function Armory:GetVirtualCurrencyInfo(index, contentReward)
         if ( dbEntry ) then
 			name, isHeader, _, _, _, count, icon = dbEntry:GetValue(container, index);
 			for i = 1, #CONTENT_REWARDS do
-				if ( name == (_G.GetCurrencyInfo(CONTENT_REWARDS[i])) ) then
+				if ( name == self:GetCurrencyName(CONTENT_REWARDS[i]) ) then
 					return self:GetVirtualCurrencyInfo(i, true);
 				end
 			end

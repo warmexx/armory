@@ -155,6 +155,21 @@
         self.value = value; 
         self.setFunc(value);
       </OnValueChanged>
+      <OnEnter>
+        if ( not self.disabled ) then
+          if ( self.tooltipText ) then
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+            GameTooltip:SetText(self.tooltipText, nil, nil, nil, nil, true);
+          end
+          if ( self.tooltipRequirement ) then
+            GameTooltip:AddLine(self.tooltipRequirement, "", 1.0, 1.0, 1.0);
+            GameTooltip:Show();
+          end
+        end
+      </OnEnter>
+      <OnLeave>
+        GameTooltip:Hide();
+      </OnLeave>
     </Scripts>
   </Slider>
   <CheckButton name="ArmoryOptionsCurrencyCheckButtonTemplate" virtual="true" inherits="ArmoryOptionsCheckButtonTemplate">
@@ -420,34 +435,6 @@
           </OnLoad>
         </Scripts>
       </CheckButton>
-      <Frame name="$parentWeeklyResetDropDown" inherits="ArmoryOptionsDropDownTemplate" hidden="true">
-        <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="$parentClassColors" relativePoint="BOTTOMLEFT">
-            <Offset>
-              <AbsDimension x="-13" y="-24"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-          <OnLoad>
-            self.type = CONTROLTYPE_DROPDOWN;
-            ArmoryOptionsPanel_RegisterControl(self, self:GetParent());
-            self:RegisterEvent("PLAYER_ENTERING_WORLD");
-          </OnLoad>
-          <OnEnter>
-            if ( not self.isDisabled ) then
-              GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
-              GameTooltip:SetText(self.tooltip, nil, nil, nil, nil, true);
-            end
-          </OnEnter>
-          <OnEvent>
-            ArmoryOptionsPanel_WeeklyResetDropDown_OnEvent(self, event, ...);
-          </OnEvent>
-          <OnLeave>
-            GameTooltip_Hide();
-          </OnLeave>
-        </Scripts>
-      </Frame>
       <Button name="$parentResetScreen" inherits="ArmoryOptionsPanelButtonTemplate" text="ARMORY_CMD_RESET_FRAME_MENUTEXT">
         <Size>
           <AbsDimension x="175" y="25"/>
@@ -490,10 +477,6 @@
             _G[self:GetName().."Low"]:SetText(tostring(self.minValue));
             _G[self:GetName().."High"]:SetText(tostring(self.maxValue));
           </OnShow>
-          <OnValueChanged>
-            self.value = value;
-            self.setFunc(value);
-          </OnValueChanged>
         </Scripts>
       </Slider>
       <CheckButton name="$parentScaleOnMouseWheel" inherits="ArmoryOptionsWideCheckButtonTemplate">
@@ -1949,21 +1932,6 @@
             self.text = Armory:Proper(ARMORY_CMD_SET_EXPDAYS_TEXT)..": "..self.text;
             _G[self:GetName().."Text"]:SetText(self.text);
           </OnValueChanged>
-          <OnEnter>
-            if ( not self.disabled ) then
-              if ( self.tooltipText ) then
-                GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-                GameTooltip:SetText(self.tooltipText, nil, nil, nil, nil, true);
-              end
-              if ( self.tooltipRequirement ) then
-                GameTooltip:AddLine(self.tooltipRequirement, "", 1.0, 1.0, 1.0);
-                GameTooltip:Show();
-              end
-            end
-          </OnEnter>
-          <OnLeave>
-            GameTooltip:Hide();
-          </OnLeave>
         </Scripts>
       </Slider>
       <CheckButton name="$parentIgnoreAlts" inherits="ArmoryOptionsWideCheckButtonTemplate">
@@ -2196,25 +2164,6 @@
             ArmoryOptionsPanel_RegisterControl(self, self:GetParent());
             ArmoryOptionsPanel_SetupDependentControl(ArmoryOptionsSummaryPanelSummary, self);
           </OnLoad>
-          <OnValueChanged>
-            self.value = value;
-            self.setFunc(value);
-          </OnValueChanged>
-          <OnEnter>
-            if ( not self.disabled ) then
-              if ( self.tooltipText ) then
-                GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-                GameTooltip:SetText(self.tooltipText, nil, nil, nil, nil, true);
-              end
-              if ( self.tooltipRequirement ) then
-                GameTooltip:AddLine(self.tooltipRequirement, "", 1.0, 1.0, 1.0);
-                GameTooltip:Show();
-              end
-            end
-          </OnEnter>
-          <OnLeave>
-            GameTooltip:Hide();
-          </OnLeave>
         </Scripts>
       </Slider>
       <CheckButton name="$parentClass" inherits="ArmoryOptionsCheckButtonTemplate">

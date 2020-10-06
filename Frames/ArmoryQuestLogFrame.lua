@@ -34,31 +34,6 @@ ARMORY_QUESTLOG_QUEST_HEIGHT = 16;
 local REWARDS_SECTION_OFFSET = 5;       -- vertical distance between sections
 local REWARDS_ROW_OFFSET = 2;			-- vertical distance between rows within a section
 
-local SEAL_QUESTS = {
-	[40519] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_KING_VARIAN_WRYNN.."|r", sealAtlas = "Quest-Alliance-WaxSeal"},
-	[43926] = { bgAtlas = "QuestBG-Horde", text = "|cff480404"..QUEST_WARCHIEF_VOLJIN.."|r", sealAtlas = "Quest-Horde-WaxSeal"},
-	[47221] = { bgAtlas = "QuestBG-TheHandofFate", },
-	[47835] = { bgAtlas = "QuestBG-TheHandofFate", },
-	[50476] = { bgAtlas = "QuestBG-Horde", sealAtlas = "Quest-Horde-WaxSeal" },
-	-- BfA start quests
-	[46727] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_KING_ANDUIN_WRYNN.."|r", sealAtlas = "Quest-Alliance-WaxSeal" },
-	[50668] = { bgAtlas = "QuestBG-Horde", text = "|cff480404"..QUEST_WARCHIEF_SYLVANAS_WINDRUNNER.."|r", sealAtlas = "Quest-Horde-WaxSeal"},
-
-	[51795] = { bgAtlas = "QuestBG-Alliance" },
-	[52058] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_KING_ANDUIN_WRYNN.."|r", sealAtlas = "Quest-Alliance-WaxSeal"},
-
-	[51796] = { bgAtlas = "QuestBG-Horde" },
-
-	[53372] = { bgAtlas = "QuestBG-Horde", text = "|cff480404"..QUEST_WARCHIEF_SYLVANAS_WINDRUNNER.."|r", sealAtlas = "Quest-Horde-WaxSeal"},
-	[53370] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_KING_ANDUIN_WRYNN.."|r", sealAtlas = "Quest-Alliance-WaxSeal"},
-
-	[56030] = { bgAtlas = "QuestBG-Horde", text = "|cff480404"..QUEST_NATHANOS_BLIGHTCALLER.."|r", sealAtlas = "Quest-Horde-WaxSeal"},
-	[56031] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_GENN_GREYMANE.."|r", sealAtlas = "Quest-Alliance-WaxSeal"},
-	-- BfA 8.3
-	[58582] = { bgAtlas = "QuestBG-Horde", sealAtlas = "Quest-Horde-WaxSeal" },
-	[58496] = { bgAtlas = "QuestBG-Alliance", sealAtlas = "Quest-Alliance-WaxSeal"},
-};
-
 function ArmoryQuestLogTitleButton_OnClick(self, button)
     local questName = self:GetText();
     local questIndex = self:GetID() + FauxScrollFrame_GetOffset(ArmoryQuestLogListScrollFrame);
@@ -179,7 +154,7 @@ function ArmoryQuestLog_Update()
     end
 
     local questIndex, questLogTitle, questTag, questTitleTag, questNormalText, questHighlight;
-    local questLogTitleText, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, color, questID, displayQuestID;
+    local questLogTitleText, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, color, questID, displayQuestID, difficultyLevel;
 
     for i = 1, ARMORY_QUESTS_DISPLAYED do
         questIndex = i + FauxScrollFrame_GetOffset(ArmoryQuestLogListScrollFrame);
@@ -188,8 +163,8 @@ function ArmoryQuestLog_Update()
         questNormalText = _G["ArmoryQuestLogTitle"..i.."NormalText"];
         questHighlight = _G["ArmoryQuestLogTitle"..i.."Highlight"];
         if ( questIndex <= numEntries ) then
-            questLogTitleText, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, _, displayQuestID = Armory:GetQuestLogTitle(questIndex);
-            -- title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory
+            questLogTitleText, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, _, displayQuestID, _, _, _, _, _, _, _, difficultyLevel = Armory:GetQuestLogTitle(questIndex);
+            -- title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling, difficultyLevel, campaignID, isCalling;
             if ( isHeader ) then
                 if ( questLogTitleText ) then
                     questLogTitle:SetText(questLogTitleText);
@@ -202,13 +177,16 @@ function ArmoryQuestLog_Update()
                 else
                     questLogTitle:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up"); 
                 end
+                questLogTitle:GetNormalTexture():SetTexCoord(0, 1, 0, 1);
                 questHighlight:SetTexture("Interface\\Buttons\\UI-PlusButton-Hilight");
             else
                 if ( questID and displayQuestID ) then
-                    questLogTitle:SetText("  "..questID.." - "..questLogTitleText);
-                else
-                    questLogTitle:SetText("  "..questLogTitleText);
+                    questLogTitleText = questID.." - "..questLogTitleText;
                 end
+                if ( difficultyLevel and ENABLE_COLORBLIND_MODE == "1" ) then
+                    questLogTitleText = "["..difficultyLevel.."] "..questLogTitleText;
+                end
+                questLogTitle:SetText("  "..questLogTitleText);
                 if ( questID and C_CampaignInfo.IsCampaignQuest(questID) ) then
                     local faction = Armory:UnitFactionGroup("player");
                     local coords = faction == "Horde" and QUEST_TAG_TCOORDS.HORDE or QUEST_TAG_TCOORDS.ALLIANCE;
@@ -223,7 +201,7 @@ function ArmoryQuestLog_Update()
             -- Save if its a header or not
             questLogTitle.isHeader = isHeader;
             
-            local questTag = ArmoryQuestLog_GetQuestTag(questID, isComplete, frequency);
+            local questTag = ArmoryQuestLog_GetQuestTag(questID, questIndex, isComplete, frequency);
             if ( questTag ) then
                 questTitleTag:SetText("("..questTag..")");
                 -- Shrink text to accomdate quest tags without wrapping
@@ -285,8 +263,11 @@ function ArmoryQuestLog_Update()
     end
 end
 
-function ArmoryQuestLog_GetQuestTag(questID, isComplete, frequency)
-    local questTagID, questTag = GetQuestTagInfo(questID);
+function ArmoryQuestLog_GetQuestTag(questID, questIndex, isComplete, frequency)
+    local tagInfo = Armory:GetQuestTagInfo(questIndex);
+    local questTagID = tagInfo and tagInfo.tagID;
+    local questTag = tagInfo and tagInfo.tagName;
+
     if ( isComplete and isComplete < 0 ) then
         questTag = FAILED;
     elseif ( isComplete and isComplete > 0 ) then
@@ -299,9 +280,9 @@ function ArmoryQuestLog_GetQuestTag(questID, isComplete, frequency)
                 questTag = FACTION_HORDE;
             end
         end
-    elseif( frequency == LE_QUEST_FREQUENCY_DAILY and (not isComplete or isComplete == 0) ) then
+    elseif( frequency == Enum.QuestFrequency.Daily and (not isComplete or isComplete == 0) ) then
         questTag = DAILY;
-    elseif( frequency == LE_QUEST_FREQUENCY_WEEKLY and (not isComplete or isComplete == 0) )then
+    elseif( frequency == Enum.QuestFrequency.Weekly and (not isComplete or isComplete == 0) )then
         questTag = WEEKLY;
     end
     return questTag;
@@ -387,14 +368,10 @@ end
 function ArmoryQuestInfo_Display(template, parentFrame)
     local questID = select(8, Armory:GetQuestLogTitle(Armory:GetQuestLogSelection()));
 
-    ArmoryQuestInfoSealFrame.sealInfo = nil;
-    local sealQuestInfo = SEAL_QUESTS[questID];
-    if ( sealQuestInfo ) then
-        if ( sealQuestInfo.text or sealQuestInfo.sealAtlas ) then
-            ArmoryQuestInfoSealFrame.sealInfo = sealQuestInfo;
-        end
+    if ( questID ) then
+        ArmoryQuestInfoSealFrame.theme = C_QuestLog.GetQuestDetailsTheme(questID);
     end
-    
+
     if ( ArmoryQuestInfoFrame.material ~= material ) then
         ArmoryQuestInfoFrame.material = material;    
         local textColor, titleTextColor = GetMaterialTextColors(material);    
@@ -630,18 +607,23 @@ end
 
 function ArmoryQuestInfo_ShowSeal(parentFrame)
     local frame = ArmoryQuestInfoSealFrame;
-	-- Temporary anchor to ensure :IsTruncated will work for the seal text.
-	frame:SetPoint("CENTER", parentFrame or UIParent);
-    if ( frame.sealInfo ) then
-        frame.Text:SetText(frame.sealInfo.text);
-        frame.Texture:SetAtlas(frame.sealInfo.sealAtlas, true);
-        frame.Texture:SetPoint("TOPLEFT", 160, -6);
-        frame:Show();
-        return frame;
-    else
-        frame:Hide();
-        return nil;
-    end
+    local theme = frame.theme;
+	local hasAnyPartOfTheSeal = theme and (theme.signature ~= "" or theme.seal);
+    frame:SetShown(hasAnyPartOfTheSeal);
+    
+	if ( hasAnyPartOfTheSeal ) then
+		-- Temporary anchor to ensure :IsTruncated will work for the seal text.
+		frame:SetPoint("CENTER", parentFrame or UIParent);
+
+		frame.Text:SetText(theme.signature);
+		frame.Texture:SetShown(theme.seal ~= nil);
+		if ( theme.seal ) then
+			frame.Texture:SetAtlas(theme.seal, true);
+            frame.Texture:SetPoint("TOPLEFT", 160, -6);
+		end
+
+		return frame;
+	end
 end
 
 local function AddSpellToBucket(spellBuckets, type, rewardSpellIndex)

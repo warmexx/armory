@@ -1272,11 +1272,6 @@ function ArmoryPaperDollFrame_SetMastery(statFrame, unit)
 		statFrame:Hide();
 		return;
 	end
-    if ( Armory:UnitLevel("player") < SHOW_MASTERY_LEVEL ) then
-        statFrame.numericValue = 0;
-        statFrame:Hide();
-        return;
-    end
 
     local mastery = Armory:GetMasteryEffect();
     PaperDollFrame_SetLabelAndText(statFrame, STAT_MASTERY, mastery, true, mastery);
@@ -2052,7 +2047,7 @@ function ArmoryAlternateSlotFrame_Show(parent, orientation, direction)
         button:SetID(parent:GetID());
         button:ClearAllPoints();
         button:SetPoint(anchor.point, frame, anchor.point, x, y);
-        button:SetFrameLevel(frame:GetFrameLevel() + 1);
+        button:SetFrameLevel(555);--frame:GetParent():GetFrameLevel() + 1);
         button:Show();
     end
     table.wipe(alternatives);

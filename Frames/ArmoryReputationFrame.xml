@@ -63,21 +63,6 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<CheckButton parentKey="LFGBonusRepButton">
-				<Size x="16" y="16"/>
-				<Anchors>
-					<Anchor point="RIGHT" relativeTo="$parentBackground" relativePoint="LEFT" x="-2" y="0"/>
-				</Anchors>
-				<NormalTexture file="Interface\Common\ReputationStar">
-					<TexCoords left="0.5" right="1" top="0" bottom="0.5"/>
-				</NormalTexture>
-				<HighlightTexture file="Interface\Common\ReputationStar">
-					<TexCoords left="0" right="0.5" top="0.5" bottom="1"/>
-				</HighlightTexture>
-				<CheckedTexture file="Interface\Common\ReputationStar">
-					<TexCoords left="0" right="0.5" top="0" bottom="0.5"/>
-				</CheckedTexture>
-			</CheckButton>
 			<Button name="$parentExpandOrCollapseButton">
 				<Size x="13" y="13"/>
 				<Anchors>
@@ -229,12 +214,12 @@
       <Layer level="ARTWORK">
         <FontString name="ArmoryReputationFrameFactionLabel" inherits="GameFontHighlight" text="FACTION">
           <Anchors>
-            <Anchor point="TOPLEFT" x="80" y="-56"/>
+            <Anchor point="TOPLEFT" x="80" y="-46"/>
           </Anchors>
         </FontString>
         <FontString name="ArmoryReputationFrameStandingLabel" inherits="GameFontHighlight" text="STANDING">
           <Anchors>
-            <Anchor point="TOPLEFT" x="235" y="-56"/>
+            <Anchor point="TOPLEFT" x="222" y="-46"/>
           </Anchors>
         </FontString>
       </Layer>

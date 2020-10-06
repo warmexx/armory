@@ -37,57 +37,165 @@ local questLogFilter = "";
 ----------------------------------------------------------
 
 local questLines = {};
+local questCount = 0;
 local dirty = true;
 local owner = "";
+
+local function ShouldShowHeaderButton(info)
+	-- NOTE: Info must refer to a header and it shouldDisplay must have been determined in advance.
+	return info.isHeader and info.shouldDisplay;
+end
+
+local function ShouldShowQuestButton(info)
+	-- If it's not a quest, then it shouldn't show as a quest button
+    if ( info.isHeader ) then
+        return false;
+    end
+
+    -- If it is a quest, but its header is collapsed, then it shouldn't show
+    if ( info.header and info.header.isCollapsed ) then
+        return false;
+    end
+
+    -- Normal rules about quest visibility.
+    return not info.isTask and not info.isHidden and (not info.isBounty or info.isComplete);
+end
+
+local function ShouldCountAsQuest(info)
+    local dbEntry = Armory.selectedDbBaseEntry;
+    
+    if ( info.isHeader ) then
+        return false;
+    end
+
+    local id = tostring(info.questID);
+    local tagInfo = dbEntry:GetValue(container, id, "Tag");
+    local questTagID = tagInfo and tagInfo.tagID;
+    if ( questTagID == Enum.QuestTag.Account ) then
+        return false;
+    end
+
+    return not info.isTask and not info.isHidden and (not info.isBounty or info.isComplete);
+end
+
+local function BuildSingleQuestInfo(questLogIndex, questInfoContainer, lastHeader)
+    local dbEntry = Armory.selectedDbBaseEntry;
+    local title, _, _, isHeader, isCollapsed, isComplete, _, questID, _, _, _, _, isTask, isBounty, _, isHidden, _, _, campaignID, isCalling = dbEntry:GetValue(container, questLogIndex, "Info");
+    if ( not title ) then
+        return;
+    end
+
+    local info =  { 
+        questLogIndex = questLogIndex, 
+        title = title, 
+        isHeader = isHeader, 
+        isCollapsed = Armory:GetHeaderLineState(container, title),
+        questID = questID, 
+        isTask = isTask,
+        isBounty = isBounty,
+        isHidden = isHidden,
+        isComplete = isComplete and isComplete > 0,
+        campaignID = campaignID, 
+        isCalling = isCalling 
+    };
+    
+    questInfoContainer[questLogIndex] = info;
+
+    -- Precompute whether or not the headers should display so that it's easier to add them later.
+	-- We don't care about collapsed states, we only care about the fact that there are any quests
+	-- to display under the header.
+	-- Caveat: Campaign headers will always display, otherwise they wouldn't be added to the quest log!
+	if ( info.isHeader ) then
+		lastHeader = info;
+
+		local isCampaign = info.campaignID ~= nil;
+		info.shouldDisplay = isCampaign; -- Always display campaign headers, the rest start as hidden
+	else
+		-- "Intro" Callings go into Campaigns...current move is to not let them display under a calling header, because they will be duplicated
+		info.isCalling = info.campaignID == nil and info.isCalling;
+
+		if ( lastHeader and not lastHeader.shouldDisplay ) then
+			lastHeader.shouldDisplay = info.isCalling or ShouldShowQuestButton(info);
+		end
+
+		-- Make it easy for a quest to look up its header
+		info.header = lastHeader;
+
+		if ( info.isCalling and info.header and not info.header.isCampaign ) then
+			info.header.isCalling = true;
+		end
+	end
+
+	return lastHeader;
+end
+
+local function BuildQuestInfoContainer()
+    local dbEntry = Armory.selectedDbBaseEntry;
+    local questInfoContainer = {};
+
+    if ( dbEntry ) then
+        local numEntries = dbEntry:GetNumValues(container);
+        local lastHeader;
+
+        for questLogIndex = 1, numEntries do
+            lastHeader = BuildSingleQuestInfo(questLogIndex, questInfoContainer, lastHeader);
+        end
+    end
+
+	return questInfoContainer;
+end
+
+local function MeetsQuestLogFilter(info)
+    local dbEntry = Armory.selectedDbBaseEntry;
+
+    if ( questLogFilter == "" ) then
+        return true;
+    end
+
+    local id = tostring(info.questID);
+    local text = info.title.."\t"..dbEntry:GetValue(container, id, "Text");
+    local numItems = dbEntry:GetNumValues(container, id, "LeaderBoards");
+    for index = 1, numItems do
+        text = text.."\t"..(dbEntry:GetValue(container, id, "LeaderBoards", index) or "");
+    end
+    numItems = dbEntry:GetNumValues(container, id, "Rewards");
+    for index = 1, numItems do
+        text = text.."\t"..(dbEntry:GetValue(container, id, "Rewards", index) or "");
+    end
+    local _, name = dbEntry:GetValue(container, id, "RewardSpell");
+    if ( name ) then
+        text = text.."\t"..name;
+    end
+
+    return string.find(strlower(text), strlower(questLogFilter), 1, true);
+end
 
 local function GetQuestLines()
     local dbEntry = Armory.selectedDbBaseEntry;
 
-    table.wipe(questLines);
-    
-    if ( dbEntry ) then
-        local count = dbEntry:GetNumValues(container);
-        local collapsed = false;
-        local hasItems = (questLogFilter == "");
-        local include, text, numItems;
-        
-        for i = 1, count do
-            local name, _, _, isHeader, _, _, _, questID = dbEntry:GetValue(container, i, "Info");
+    local infos = BuildQuestInfoContainer();
+    local hasItems = (questLogFilter == "");
+    local include, text, name;
 
-            local isCollapsed = Armory:GetHeaderLineState(container, name);
-            if ( isHeader ) then
-                table.insert(questLines, i);
-                collapsed = isCollapsed;
-            elseif ( not collapsed ) then
-                if ( questLogFilter == "" ) then
-                    include = true;
-                else
-                    local id = tostring(questID);
-                    text = name.."\t"..dbEntry:GetValue(container, id, "Text");
-                    numItems = dbEntry:GetNumValues(container, id, "LeaderBoards");
-                    for index = 1, numItems do
-                        text = text.."\t"..(dbEntry:GetValue(container, id, "LeaderBoards", index) or "");
-                    end
-                    numItems = dbEntry:GetNumValues(container, id, "Rewards");
-                    for index = 1, numItems do
-                        text = text.."\t"..(dbEntry:GetValue(container, id, "Rewards", index) or "");
-                    end
-                    _, name = dbEntry:GetValue(container, id, "RewardSpell");
-                    if ( name ) then
-                        text = text.."\t"..name;
-                    end
-                    include = string.find(strlower(text), strlower(questLogFilter), 1, true);
-                end
-                if ( include ) then
-                    hasItems = true;
-                    table.insert(questLines, i);
-                end
+    table.wipe(questLines);
+    questCount = 0;
+
+    for _, info in ipairs(infos) do
+        if ( ShouldShowHeaderButton(info) ) then
+            table.insert(questLines, info.questLogIndex);
+        else
+            if ( ShouldCountAsQuest(info) ) then
+                questCount = questCount + 1;
+            end
+            if ( ShouldShowQuestButton(info) and MeetsQuestLogFilter(info) ) then
+                hasItems = true;
+                table.insert(questLines, info.questLogIndex);
             end
         end
-        
-        if ( not hasItems ) then
-            table.wipe(questLines);
-        end
+    end
+
+    if ( not hasItems ) then
+        table.wipe(questLines);
     end
     
     dirty = false;
@@ -169,38 +277,73 @@ function Armory:UpdateQuests()
             local success, dataMissing;
         
             local numQuests = 0;
-            local currentQuest = _G.GetQuestLogSelection();
+            local currentQuest = C_QuestLog.GetSelectedQuest();
 
             -- store the complete (expanded) list
-            local funcNumLines = _G.GetNumQuestLogEntries;
-            local funcGetLineInfo = _G.GetQuestLogTitle;
+            local funcNumLines = C_QuestLog.GetNumQuestLogEntries;
+            local funcGetLineInfo = function(index)
+                local info = C_QuestLog.GetInfo(index);
+                local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent;
+                local displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling;
+                local difficultyLevel, campaignID, isCalling;
+                title = info.title;
+                level = info.level;
+                suggestedGroup = info.suggestedGroup;
+                isHeader = info.isHeader;
+                isCollapsed = info.isCollapsed;
+                if ( C_QuestLog.IsComplete(info.questID) ) then
+                    isComplete = 1;
+                elseif ( C_QuestLog.IsFailed(info.questID) ) then
+                    isComplete = -1;
+                else
+                    isComplete = 0;
+                end
+                frequency = info.frequency;
+                questID = info.questID;
+                startEvent = info.startEvent;
+                displayQuestID = GetCVarBool("displayQuestID");
+                isOnMap = info.isOnMap;
+                hasLocalPOI = info.hasLocalPOI;
+                isTask = info.isTask;
+                isBounty = info.isBounty;
+                isStory = info.isStory;
+                isHidden = info.isHidden;
+                isScaling = info.isScaling;
+                difficultyLevel = info.difficultyLevel;
+                campaignID = info.campaignID;
+                isCalling = C_QuestLog.IsQuestCalling(info.questID);
+                return title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling, difficultyLevel, campaignID, isCalling;
+            end;
             local funcGetLineState = function(index)
-                local _, _, _, isHeader, isCollapsed = _G.GetQuestLogTitle(index);
-                return isHeader, not isCollapsed;
+                local info = C_QuestLog.GetInfo(index);
+                if ( info ) then
+                    return info.isHeader, not info.isCollapsed;
+                end
             end;
             local funcExpand = _G.ExpandQuestHeader;
             local funcCollapse = _G.CollapseQuestHeader;
             local funcSelect = function(index)
-                _G.SelectQuestLogEntry(index);
+                C_QuestLog.SetSelectedQuest(C_QuestLog.GetInfo(index).questID);
                 ProcessQuestLogRewardFactions();
             end;
             local funcAdditionalInfo = function(index)
                 numQuests = numQuests + 1;
 
-                local questID = select(8, _G.GetQuestLogTitle(index));
+                local questID = C_QuestLog.GetInfo(index).questID;
                 local link = _G.GetQuestLink(questID);
                 local id = tostring(questID);
                 local info = dbEntry:SelectContainer(container, id);
                 info.Link = link;
                 info.Text = dbEntry.Save(_G.GetQuestLogQuestText());
+                info.Tag = C_QuestLog.GetQuestTagInfo(questID);
                 if ( _G.IsCurrentQuestFailed() ) then
                     info.Failed = _G.IsCurrentQuestFailed();
                 end
                 if ( _G.GetQuestLogTimeLeft() ) then
                     info.TimeLeft = dbEntry.Save(_G.GetQuestLogTimeLeft(), time()); 
                 end
-                if ( _G.GetQuestLogRequiredMoney() > 0 ) then
-                    info.RequiredMoney = _G.GetQuestLogRequiredMoney();
+                if ( C_QuestLog.GetRequiredMoney() > 0 ) then
+                    info.RequiredMoney = C_QuestLog.GetRequiredMoney();
                 end
                 if ( _G.GetQuestLogRewardMoney() > 0 ) then
                     info.RewardMoney = _G.GetQuestLogRewardMoney();
@@ -233,8 +376,8 @@ function Armory:UpdateQuests()
                 if ( _G.GetQuestLogRewardTitle() ) then
                     info.RewardTitle = _G.GetQuestLogRewardTitle();
                 end
-                if ( _G.GetQuestLogGroupNum() > 0 ) then
-                    info.GroupNum = _G.GetQuestLogGroupNum();
+                if ( C_QuestLog.GetSuggestedGroupSize(questID) > 0 ) then
+                    info.GroupNum = C_QuestLog.GetSuggestedGroupSize(questID);
                 end
                 if ( _G.GetQuestLogCriteriaSpell() ) then
                     info.CriteriaSpell = dbEntry.Save(_G.GetQuestLogCriteriaSpell());
@@ -245,32 +388,32 @@ function Armory:UpdateQuests()
                         info.LeaderBoards[i] = dbEntry.Save(_G.GetQuestLogLeaderBoard(i));
                     end
                 end
-                if ( _G.GetNumQuestLogRewards() > 0 ) then
+                if ( _G.GetNumQuestLogRewards(questID) > 0 ) then
                     info.Rewards = {};
-                    for i = 1, _G.GetNumQuestLogRewards() do
-                        local name, texture, numItems, quality, isUsable = _G.GetQuestLogRewardInfo(i);
-                        link = _G.GetQuestLogItemLink("reward", i);
+                    for i = 1, _G.GetNumQuestLogRewards(questID) do
+                        local name, texture, numItems, quality, isUsable = _G.GetQuestLogRewardInfo(i, questID);
+                        link = _G.GetQuestLogItemLink("reward", i, questID);
                         info.Rewards[i] = dbEntry.Save(name, texture, numItems, quality, isUsable, link);
                         if ( not link ) then
                             dataMissing = true;
                         end
                     end
                 end
-                if ( _G.GetNumQuestLogChoices() > 0 ) then
+                if ( _G.GetNumQuestLogChoices(questID) > 0 ) then
                     info.Choices = {};
-                    for i = 1, _G.GetNumQuestLogChoices() do
-                        local name, texture, numItems, quality, isUsable = _G.GetQuestLogChoiceInfo(i);
-                        link = _G.GetQuestLogItemLink("choice", i);
+                    for i = 1, _G.GetNumQuestLogChoices(questID) do
+                        local name, texture, numItems, quality, isUsable = _G.GetQuestLogChoiceInfo(i, questID);
+                        link = _G.GetQuestLogItemLink("choice", i, questID);
                         info.Choices[i] = dbEntry.Save(name, texture, numItems, quality, isUsable, link);
                         if ( not link ) then
                             dataMissing = true;
                         end
                     end
                 end
-                if ( _G.GetNumQuestLogRewardCurrencies() > 0 ) then
+                if ( _G.GetNumQuestLogRewardCurrencies(questID) > 0 ) then
                     info.Currencies = {};
-                    for i = 1, _G.GetNumQuestLogRewardCurrencies() do
-                        info.Currencies[i] = dbEntry.Save(_G.GetQuestLogRewardCurrencyInfo(i));
+                    for i = 1, _G.GetNumQuestLogRewardCurrencies(questID) do
+                        info.Currencies[i] = dbEntry.Save(_G.GetQuestLogRewardCurrencyInfo(i, questID));
                     end
                 end
                 return id;
@@ -301,7 +444,7 @@ function Armory:UpdateQuests()
 
             dbEntry:SetValue(2, container, "NumQuests", numQuests);
 
-            _G.SelectQuestLogEntry(currentQuest);
+            C_QuestLog.SetSelectedQuest(currentQuest);
             
             if ( stubbed ) then
                 LightHeaded.GetCurrentQID = stubbed;
@@ -356,15 +499,13 @@ function Armory:GetNumQuestLogEntries()
     if ( dirty or not self:IsSelectedCharacter(owner) ) then
         GetQuestLines();
     end
-    local dbEntry = self.selectedDbBaseEntry;
-    local numQuests = (dbEntry and dbEntry:GetValue(container, "NumQuests")) or 0;
-    return #questLines, numQuests;
+    return #questLines, questCount;
 end
 
 function Armory:GetQuestLogTitle(index)
-    local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLineValue(index); 
+    local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling, difficultyLevel, campaignID, isCalling = GetQuestLineValue(index); 
     isCollapsed = self:GetHeaderLineState(container, title);
-    return title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory;
+    return title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling, difficultyLevel, campaignID, isCalling;
 end
 
 function Armory:ExpandQuestHeader(index)
@@ -526,6 +667,10 @@ end
 
 function Armory:GetQuestLogFilter()
     return questLogFilter;
+end
+
+function Armory:GetQuestTagInfo(id)
+    return GetQuestLineValue(selectedQuestLine, "Tag", id);
 end
 
 ----------------------------------------------------------

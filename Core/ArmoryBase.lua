@@ -552,10 +552,10 @@ function Armory:IsDbCompatible()
             dbEntry:SetValue(2, "General", "MailIgnoreMarks", nil);
             dbEntry:SetValue(2, "General", "PartialFilter", nil);
             dbEntry:SetValue(2, "General", "ShowAllSpellRanks", nil);
-            dbEntry:SetValue(2, "General", "SummaryCurrency:"..(_G.GetCurrencyInfo(CONQUEST_CURRENCY)), nil);
-            dbEntry:SetValue(2, "General", "SummaryCurrency:"..(_G.GetCurrencyInfo(JUSTICE_CURRENCY)), nil);
-            dbEntry:SetValue(2, "General", "SummaryCurrency:"..(_G.GetCurrencyInfo(VALOR_CURRENCY)), nil);
-            dbEntry:SetValue(2, "General", "SummaryCurrency:"..(_G.GetCurrencyInfo(WOD_VALOR_CURRENCY)), nil);
+            dbEntry:SetValue(2, "General", "SummaryCurrency:"..self.GetCurrencyName(CONQUEST_CURRENCY), nil);
+            dbEntry:SetValue(2, "General", "SummaryCurrency:"..self.GetCurrencyName(JUSTICE_CURRENCY), nil);
+            dbEntry:SetValue(2, "General", "SummaryCurrency:"..self.GetCurrencyName(VALOR_CURRENCY), nil);
+            dbEntry:SetValue(2, "General", "SummaryCurrency:"..self.GetCurrencyName(WOD_VALOR_CURRENCY), nil);
             dbEntry:SetValue(2, "General", "UseInProgressColor", nil);
             dbEntry:SetValue(2, "General", "WeeklyReset", nil);
             
@@ -946,7 +946,7 @@ function Armory:Reset(what, silent)
         if ( what == strlower(ARMORY_CMD_RESET_FRAME) ) then
             for _, frameName in ipairs(ARMORYFRAME_MAINFRAMES) do
                 _G[frameName]:ClearAllPoints();
-                _G[frameName]:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", 20, -110);
+                _G[frameName]:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 20, -110);
             end
             self:SetConfigFrameScale(1);
             ArmoryOptionsPanelScaleSlider:SetValue(1);

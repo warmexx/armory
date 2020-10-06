@@ -1658,11 +1658,3 @@ end
 function Armory:GetConfigEnableSystemWarnings()
     return not self:Setting("General", "DisableSystemWarnings");
 end
-
-function Armory:SetConfigWeeklyReset(day)
-    self:Setting("General", "WeeklyReset", day);
-end
-
-function Armory:GetConfigWeeklyReset()
-    return self:Setting("General", "WeeklyReset") or self:GetWeeklyResetDay();
-end

@@ -369,7 +369,7 @@
           </Anchors>
         </HighlightTexture>
       </Button>
-      <Button name="ArmoryFrameLeftButton">
+      <Button name="ArmoryFrameLeftButton" >
         <Size>
           <AbsDimension x="16" y="16"/>
         </Size>
@@ -382,7 +382,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            self:SetFrameLevel(self:GetFrameLevel() + 4);
+            self:SetFrameLevel(555);
           </OnLoad>
           <OnClick>
             ArmoryFrameLeft_Click(self);
@@ -413,7 +413,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            self:SetFrameLevel(self:GetFrameLevel() + 4);
+            self:SetFrameLevel(555);
           </OnLoad>
           <OnClick>
             ArmoryFrameRight_Click(self);

@@ -228,7 +228,7 @@ function ArmoryInventoryIconViewFrame_ShowContainer(containerFrame)
 						itemButton.searchOverlay:Show();
 					end
 
-					if ( quality and quality > LE_ITEM_QUALITY_COMMON and BAG_ITEM_QUALITY_COLORS[quality] ) then
+					if ( quality and quality > Enum.ItemQuality.Common and BAG_ITEM_QUALITY_COLORS[quality] ) then
 						itemButton.IconBorder:Show();
 						itemButton.IconBorder:SetVertexColor(BAG_ITEM_QUALITY_COLORS[quality].r, BAG_ITEM_QUALITY_COLORS[quality].g, BAG_ITEM_QUALITY_COLORS[quality].b);
 					else
