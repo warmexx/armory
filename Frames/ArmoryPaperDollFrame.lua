@@ -859,7 +859,7 @@ end
 function ArmoryPaperDollFrame_SetDamage(statFrame, unit)
     local speed, offhandSpeed = Armory:UnitAttackSpeed(unit);
     local minDamage, maxDamage, minOffHandDamage, maxOffHandDamage, physicalBonusPos, physicalBonusNeg, percent = GetAppropriateDamage(unit);
-    if ( not minDamage ) then
+    if ( not minDamage or percent == 0 ) then
         statFrame:Hide();
         return;
     end 
