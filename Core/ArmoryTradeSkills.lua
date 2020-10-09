@@ -421,7 +421,12 @@ local function GetProfessionLineValue(index)
         info.categoryID,
         info.productQuality,
         info.currentRank,
-        info.totalRanks = dbEntry:GetValue(container, selectedSkill, itemContainer, professionLines[index], "Info");
+        info.totalRanks,
+        info.unlockedRecipeLevel,
+        info.currentRecipeExperience,
+        info.nextLevelRecipeExperience,
+        info.earnedExperience,
+        info.categorySkillRank = dbEntry:GetValue(container, selectedSkill, itemContainer, professionLines[index], "Info");
         
         info.cooldown, 
         info.isDayCooldown, 
@@ -634,6 +639,14 @@ local function StoreTradeSkillInfo(dbEntry, recipeID, index)
         end
     end
 
+    local optionalReagentSlots = C_TradeSkillUI.GetOptionalReagentInfo(recipeID);
+    if ( #optionalReagentSlots > 0 ) then
+        recipe.OptionalReagents = {};
+        for optionalReagentIndex, slot in ipairs(optionalReagentSlots) do
+            recipe.OptionalReagents[optionalReagentIndex] = dbEntry.Save(slot.requiredSkillRank, slot.slotText, slot.options);
+        end
+    end
+
     local cooldown, isDayCooldown, charges, maxCharges = C_TradeSkillUI.GetRecipeCooldown(recipeID);
 
     -- HACK: when a cd is activated it will return 00:00, but after a relog it suddenly becomes 03:00
@@ -675,25 +688,33 @@ local function GetNumTradeSkills()
 end
 
 local function GetTradeSkillLineInfo(info)
-    if ( IsRecipe(info.type) and not info.currentRank ) then
-        info.currentRank = 1;
-        do
-            local previousRecipeID = info.previousRecipeID;
-            while ( previousRecipeID ) do
-                info.currentRank = info.currentRank + 1;
-                local previousRecipeInfo = C_TradeSkillUI.GetRecipeInfo(previousRecipeID);
-                previousRecipeID = previousRecipeInfo.previousRecipeID;
+    if ( IsRecipe(info.type) ) then
+        if ( not info.currentRank ) then
+            info.currentRank = 1;
+            do
+                local previousRecipeID = info.previousRecipeID;
+                while ( previousRecipeID ) do
+                    info.currentRank = info.currentRank + 1;
+                    local previousRecipeInfo = C_TradeSkillUI.GetRecipeInfo(previousRecipeID);
+                    previousRecipeID = previousRecipeInfo.previousRecipeID;
+                end
+            end
+            info.totalRanks = info.currentRank;
+            do
+                local nextRecipeID = info.nextRecipeID;
+                while ( nextRecipeID ) do
+                    info.totalRanks = info.totalRanks + 1;
+                    local nextRecipeInfo = C_TradeSkillUI.GetRecipeInfo(nextRecipeID);
+                    nextRecipeID = nextRecipeInfo.nextRecipeID;
+                end
             end
         end
-        info.totalRanks = info.currentRank;
-        do
-            local nextRecipeID = info.nextRecipeID;
-            while ( nextRecipeID ) do
-                info.totalRanks = info.totalRanks + 1;
-                local nextRecipeInfo = C_TradeSkillUI.GetRecipeInfo(nextRecipeID);
-                nextRecipeID = nextRecipeInfo.nextRecipeID;
-            end
+
+        local categoryInfo = C_TradeSkillUI.GetCategoryInfo(info.categoryID);
+        while ( not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID ) do
+            categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID);
         end
+        info.categorySkillRank = categoryInfo.skillLineCurrentLevel;
     end
 
     return 
@@ -715,7 +736,12 @@ local function GetTradeSkillLineInfo(info)
         info.categoryID,
         info.productQuality,
         info.currentRank,
-        info.totalRanks;
+        info.totalRanks,
+        info.unlockedRecipeLevel,
+        info.currentRecipeExperience,
+        info.nextLevelRecipeExperience,
+        info.earnedExperience,
+        info.categorySkillRank;
 end
 
 local invSlotTypes = {};
@@ -1252,6 +1278,20 @@ end
 function Armory:GetTradeSkillRecipeLink(index)
     local id = GetProfessionLineValue(index).recipeID;
     return GetRecipeValue(id, "RecipeLink");
+end
+
+function Armory:GetOptionalReagentSlots(index)
+    local id = GetProfessionLineValue(index).recipeID;
+    local optionalReagents = GetRecipeValue(id, "OptionalReagents");
+    local optionalReagentSlots = {};
+    if ( optionalReagents ) then
+        for optionalReagentIndex, optionalReagent in ipairs(optionalReagents) do
+            local slot = {};
+            slot.requiredSkillRank, slot.slotText, slot.options = ArmoryDbEntry.Load(optionalReagent);
+            optionalReagentSlots[optionalReagentIndex] = slot;
+        end
+    end
+    return optionalReagentSlots;
 end
 
 function Armory:GetTradeSkillReagentInfo(index, id)

@@ -37,23 +37,23 @@ ARMORY_TRADE_SKILL_SKILLUP_TEXT_WIDTH = 30;
 ARMORY_SUB_SKILL_BAR_WIDTH = 60;
 
 ArmoryTradeSkillTypePrefix = {
-	optimal			= " [+++] ",
-	medium			= " [++] ",
-	easy			= " [+] ",
-	trivial			= " ", 
-	header			= " ",
-	subheader		= " ",
-	nodifficulty	= " ",
+    optimal      = " [+++] ",
+    medium       = " [++] ",
+    easy         = " [+] ",
+    trivial      = " ", 
+    header       = " ",
+    subheader    = " ",
+    nodifficulty = " ",
 }
 
 ArmoryTradeSkillTypeColor = {
-	optimal			= { r = 1.00, g = 0.50, b = 0.25,	font = GameFontNormalLeftOrange };
-	medium			= { r = 1.00, g = 1.00, b = 0.00,	font = GameFontNormalLeftYellow };
-	easy			= { r = 0.25, g = 0.75, b = 0.25,	font = GameFontNormalLeftLightGreen };
-	trivial			= { r = 0.50, g = 0.50, b = 0.50,	font = GameFontNormalLeftGrey };
-	header			= { r = 1.00, g = 0.82, b = 0,		font = GameFontNormalLeft };
-	subheader		= { r = 1.00, g = 0.82, b = 0,		font = GameFontNormalLeft };
-	nodifficulty	= { r = 0.96, g = 0.96, b = 0.96,	font = GameFontNormalLeftGrey };
+    optimal      = { r = 1.00, g = 0.50, b = 0.25, font = GameFontNormalLeftOrange };
+    medium       = { r = 1.00, g = 1.00, b = 0.00, font = GameFontNormalLeftYellow };
+    easy         = { r = 0.25, g = 0.75, b = 0.25, font = GameFontNormalLeftLightGreen };
+    trivial      = { r = 0.50, g = 0.50, b = 0.50, font = GameFontNormalLeftGrey };
+    header       = { r = 1.00, g = 0.82, b = 0,    font = GameFontNormalLeft };
+    subheader    = { r = 1.00, g = 0.82, b = 0,    font = GameFontNormalLeft };
+    nodifficulty = { r = 0.96, g = 0.96, b = 0.96, font = GameFontNormalLeftGrey };
 };
 
 
@@ -68,9 +68,9 @@ function ArmoryTradeSkillFrameMixin:OnLoad()
 
     self:RegisterEvent("TRADE_SKILL_SHOW");
     self:RegisterEvent("TRADE_SKILL_CLOSE");
-	self:RegisterEvent("TRADE_SKILL_LIST_UPDATE");
-	self:RegisterEvent("TRADE_SKILL_DETAILS_UPDATE");
-	self:RegisterEvent("TRADE_SKILL_NAME_UPDATE");
+    self:RegisterEvent("TRADE_SKILL_LIST_UPDATE");
+    self:RegisterEvent("TRADE_SKILL_DETAILS_UPDATE");
+    self:RegisterEvent("TRADE_SKILL_NAME_UPDATE");
 
     Armory:RegisterTradeSkillAddOn("Armory", 
         function() ArmoryTradeSkillFrame:UnregisterEvent("TRADE_SKILL_LIST_UPDATE"); end, 
@@ -95,11 +95,11 @@ function ArmoryTradeSkillFrameMixin:OnEvent(event, ...)
 end
 
 function ArmoryTradeSkillFrameMixin:OnShow()
-	PlaySound(SOUNDKIT.UI_PROFESSIONS_WINDOW_OPEN);
+    PlaySound(SOUNDKIT.UI_PROFESSIONS_WINDOW_OPEN);
 end
 
 function ArmoryTradeSkillFrameMixin:OnHide()
-	PlaySound(SOUNDKIT.UI_PROFESSIONS_WINDOW_CLOSE);
+    PlaySound(SOUNDKIT.UI_PROFESSIONS_WINDOW_CLOSE);
 end
 
 function ArmoryTradeSkillFrameMixin:Update()
@@ -267,7 +267,7 @@ function ArmoryTradeSkillFrameMixin:RefreshExpandButtonFrame(numTradeSkills)
 end
 
 function ArmoryTradeSkillFrameMixin:OnRecipeChanged(id)
-	self.DetailsFrame:SetSelectedRecipe(self.RecipeList:GetSelectedRecipe());
+    self.DetailsFrame:SetSelectedRecipe(self.RecipeList:GetSelectedRecipe());
 end
 
 function ArmoryTradeSkillFrameMixin:OnSearchTextChanged(searchBox)
@@ -295,91 +295,91 @@ function ArmoryTradeSkillFrameMixin:CollapseAllButtonClicked(button)
 end
 
 function ArmoryTradeSkillFrameMixin:InitFilterMenu(dropdown, level)
-	local info = ArmoryDropDownMenu_CreateInfo();
-	if ( level == 1 ) then
-		--[[ Only show makeable recipes ]]--
-		info.text = CRAFT_IS_MAKEABLE;
-		info.func = function() 
-			Armory:SetOnlyShowMakeableRecipes(not Armory:GetOnlyShowMakeableRecipes());
-		    self:SetSelectedRecipe(Armory:GetFirstTradeSkill());
-		end;
+    local info = ArmoryDropDownMenu_CreateInfo();
+    if ( level == 1 ) then
+        --[[ Only show makeable recipes ]]--
+        info.text = CRAFT_IS_MAKEABLE;
+        info.func = function() 
+            Armory:SetOnlyShowMakeableRecipes(not Armory:GetOnlyShowMakeableRecipes());
+            self:SetSelectedRecipe(Armory:GetFirstTradeSkill());
+        end;
 
-		info.keepShownOnClick = true;
-		info.checked = Armory:GetOnlyShowMakeableRecipes();
-		info.isNotRadio = true;
-		ArmoryDropDownMenu_AddButton(info, level)
-		
-		--[[ Only show recipes that provide skill ups ]]--
-		info.text = TRADESKILL_FILTER_HAS_SKILL_UP;
-		info.func = function() 
-			Armory:SetOnlyShowSkillUpRecipes(not Armory:GetOnlyShowSkillUpRecipes());
-		    self:SetSelectedRecipe(Armory:GetFirstTradeSkill());
-		end;
-		info.keepShownOnClick = true;
-		info.checked = Armory:GetOnlyShowSkillUpRecipes();
-		info.isNotRadio = true;
-		ArmoryDropDownMenu_AddButton(info, level);
-		
-		info.checked = 	nil;
-		info.isNotRadio = nil;
-		info.func = nil;
-		info.notCheckable = true;
-		info.keepShownOnClick = true;
-		info.hasArrow = true;	
-		
-		--[[ Filter recipes by inventory slot ]]--	
-		info.text = TRADESKILL_FILTER_SLOTS;
-		info.value = 1;
-		ArmoryDropDownMenu_AddButton(info, level);
-				
-		--[[ Filter recipes by parent category ]]--	
-		info.text = TRADESKILL_FILTER_CATEGORY;
-		info.value = 2;
-		ArmoryDropDownMenu_AddButton(info, level);
-	
-	elseif ( level == 2 ) then
-		--[[ Inventory slots ]]--	
-		if ARMORY_DROPDOWNMENU_MENU_VALUE == 1 then
-			local inventorySlots = { Armory:GetTradeSkillInvSlots() };
-			for i, inventorySlot in ipairs(inventorySlots) do
-				info.text = inventorySlot;
-				info.func = function() self:SetSlotFilter(i, nil, nil); end;
-				info.notCheckable = true;
-				info.hasArrow = false;
-				info.keepShownOnClick = true;
-				ArmoryDropDownMenu_AddButton(info, level);
-			end
-		elseif ( ARMORY_DROPDOWNMENU_MENU_VALUE == 2 ) then
-			-- Parent categories]]--	
-			local categories = Armory:GetTradeSkillCategories();
+        info.keepShownOnClick = true;
+        info.checked = Armory:GetOnlyShowMakeableRecipes();
+        info.isNotRadio = true;
+        ArmoryDropDownMenu_AddButton(info, level)
+        
+        --[[ Only show recipes that provide skill ups ]]--
+        info.text = TRADESKILL_FILTER_HAS_SKILL_UP;
+        info.func = function() 
+            Armory:SetOnlyShowSkillUpRecipes(not Armory:GetOnlyShowSkillUpRecipes());
+            self:SetSelectedRecipe(Armory:GetFirstTradeSkill());
+        end;
+        info.keepShownOnClick = true;
+        info.checked = Armory:GetOnlyShowSkillUpRecipes();
+        info.isNotRadio = true;
+        ArmoryDropDownMenu_AddButton(info, level);
+        
+        info.checked =     nil;
+        info.isNotRadio = nil;
+        info.func = nil;
+        info.notCheckable = true;
+        info.keepShownOnClick = true;
+        info.hasArrow = true;    
+        
+        --[[ Filter recipes by inventory slot ]]--    
+        info.text = TRADESKILL_FILTER_SLOTS;
+        info.value = 1;
+        ArmoryDropDownMenu_AddButton(info, level);
+                
+        --[[ Filter recipes by parent category ]]--    
+        info.text = TRADESKILL_FILTER_CATEGORY;
+        info.value = 2;
+        ArmoryDropDownMenu_AddButton(info, level);
+    
+    elseif ( level == 2 ) then
+        --[[ Inventory slots ]]--    
+        if ARMORY_DROPDOWNMENU_MENU_VALUE == 1 then
+            local inventorySlots = { Armory:GetTradeSkillInvSlots() };
+            for i, inventorySlot in ipairs(inventorySlots) do
+                info.text = inventorySlot;
+                info.func = function() self:SetSlotFilter(i, nil, nil); end;
+                info.notCheckable = true;
+                info.hasArrow = false;
+                info.keepShownOnClick = true;
+                ArmoryDropDownMenu_AddButton(info, level);
+            end
+        elseif ( ARMORY_DROPDOWNMENU_MENU_VALUE == 2 ) then
+            -- Parent categories]]--    
+            local categories = Armory:GetTradeSkillCategories();
 
-			for i, categoryID in ipairs(categories) do
-				local categoryData = Armory:GetTradeSkillCategoryInfo(categoryID);
-				info.text = categoryData.name;
-				info.func = function() self:SetSlotFilter(nil, categoryID, nil); end
-				info.notCheckable = true;
-				info.hasArrow = table.getn(Armory:GetTradeSkillSubCategories(categoryID)) > 0;
-				info.keepShownOnClick = true;
-				info.value = categoryID;
-				ArmoryDropDownMenu_AddButton(info, level);
-			end
-		end
-	elseif ( level == 3 ) then
-		-- Subcategories ]]--	
-		local categoryID = ARMORY_DROPDOWNMENU_MENU_VALUE;
-		local categoryData = Armory:GetTradeSkillCategoryInfo(categoryID);
-		local subCategories = Armory:GetTradeSkillSubCategories(categoryID);
+            for i, categoryID in ipairs(categories) do
+                local categoryData = Armory:GetTradeSkillCategoryInfo(categoryID);
+                info.text = categoryData.name;
+                info.func = function() self:SetSlotFilter(nil, categoryID, nil); end
+                info.notCheckable = true;
+                info.hasArrow = table.getn(Armory:GetTradeSkillSubCategories(categoryID)) > 0;
+                info.keepShownOnClick = true;
+                info.value = categoryID;
+                ArmoryDropDownMenu_AddButton(info, level);
+            end
+        end
+    elseif ( level == 3 ) then
+        -- Subcategories ]]--    
+        local categoryID = ARMORY_DROPDOWNMENU_MENU_VALUE;
+        local categoryData = Armory:GetTradeSkillCategoryInfo(categoryID);
+        local subCategories = Armory:GetTradeSkillSubCategories(categoryID);
 
-		for i, subCategoryID in ipairs(subCategories) do
-			local subCategoryData = Armory:GetTradeSkillCategoryInfo(subCategoryID);
-			info.text = subCategoryData.name;
-			info.func = function() self:SetSlotFilter(nil, categoryID, subCategoryID); end
-			info.notCheckable = true;
-			info.keepShownOnClick = true;
-			info.value = subCategoryID;
-			ArmoryDropDownMenu_AddButton(info, level);
-		end
-	end
+        for i, subCategoryID in ipairs(subCategories) do
+            local subCategoryData = Armory:GetTradeSkillCategoryInfo(subCategoryID);
+            info.text = subCategoryData.name;
+            info.func = function() self:SetSlotFilter(nil, categoryID, subCategoryID); end
+            info.notCheckable = true;
+            info.keepShownOnClick = true;
+            info.value = subCategoryID;
+            ArmoryDropDownMenu_AddButton(info, level);
+        end
+    end
 end
 
 function ArmoryTradeSkillFrameMixin:UpdateLayout()
@@ -408,9 +408,9 @@ end
 ArmoryTradeSkillRecipeListMixin = {}
 
 function ArmoryTradeSkillRecipeListMixin:OnLoad()
-	HybridScrollFrame_CreateButtons(self, "ArmoryTradeSkillSkillButtonTemplate", 0, 0);
-	self.update = self.RefreshDisplay;
-	self.stepSize = ROW_HEIGHT * 2;
+    HybridScrollFrame_CreateButtons(self, "ArmoryTradeSkillSkillButtonTemplate", 0, 0);
+    self.update = self.RefreshDisplay;
+    self.stepSize = ROW_HEIGHT * 2;
 end
 
 function ArmoryTradeSkillRecipeListMixin:OnDataSourceChanging()
@@ -424,9 +424,9 @@ end
 
 function ArmoryTradeSkillRecipeListMixin:OnDataSourceChanged()
     self.scrollBar:SetValue(0);
-	self.selectedSkill = nil;
-	self:UpdateLayout();
-	self:Refresh();
+    self.selectedSkill = nil;
+    self:UpdateLayout();
+    self:Refresh();
 end
 
 function ArmoryTradeSkillRecipeListMixin:OnHeaderButtonClicked(categoryButton, categoryInfo)
@@ -441,7 +441,7 @@ function ArmoryTradeSkillRecipeListMixin:OnHeaderButtonClicked(categoryButton, c
 end
 
 function ArmoryTradeSkillRecipeListMixin:OnRecipeButtonClicked(recipeButton, recipeInfo)
-	self:SetSelectedRecipe(recipeButton:GetID());
+    self:SetSelectedRecipe(recipeButton:GetID());
 end
 
 function ArmoryTradeSkillRecipeListMixin:SetSelectedRecipe(id)
@@ -461,29 +461,29 @@ function ArmoryTradeSkillRecipeListMixin:GetSelectedRecipe()
 end
 
 function ArmoryTradeSkillRecipeListMixin:UpdateFilterBar()
-	local filters = nil;
-	if ( Armory:GetOnlyShowMakeableRecipes() ) then
-		filters = filters or {};
-		filters[#filters + 1] = CRAFT_IS_MAKEABLE;
-	end
-	
-	if ( Armory:GetOnlyShowSkillUpRecipes() ) then 
-		filters = filters or {};
-		filters[#filters + 1] = TRADESKILL_FILTER_HAS_SKILL_UP;
-	end
+    local filters = nil;
+    if ( Armory:GetOnlyShowMakeableRecipes() ) then
+        filters = filters or {};
+        filters[#filters + 1] = CRAFT_IS_MAKEABLE;
+    end
+    
+    if ( Armory:GetOnlyShowSkillUpRecipes() ) then 
+        filters = filters or {};
+        filters[#filters + 1] = TRADESKILL_FILTER_HAS_SKILL_UP;
+    end
 
     local subClassFilter = Armory:GetTradeSkillSubClassFilter();
-	if ( #subClassFilter > 1 ) then
-		local categoryName = subClassFilter[1];
-		filters = filters or {};
-		filters[#filters + 1] = categoryName;
-	end
-	
-	local invSlotFilter = Armory:GetTradeSkillInvSlotFilter();
-	if ( invSlotFilter ) then
-		filters = filters or {};
-		filters[#filters + 1] = invSlotFilter;
-	end
+    if ( #subClassFilter > 1 ) then
+        local categoryName = subClassFilter[1];
+        filters = filters or {};
+        filters[#filters + 1] = categoryName;
+    end
+    
+    local invSlotFilter = Armory:GetTradeSkillInvSlotFilter();
+    if ( invSlotFilter ) then
+        filters = filters or {};
+        filters[#filters + 1] = invSlotFilter;
+    end
 
     if ( filters ) then
         self.FilterBar.Text:SetFormattedText("%s: %s", FILTER, table.concat(filters, PLAYER_LIST_DELIMITER));
@@ -491,7 +491,7 @@ function ArmoryTradeSkillRecipeListMixin:UpdateFilterBar()
 
     self.filtered = filters ~= nil;
     
-	self:UpdateLayout();
+    self:UpdateLayout();
 end
 
 function ArmoryTradeSkillRecipeListMixin:RefreshReagentCost()
@@ -531,12 +531,12 @@ function ArmoryTradeSkillRecipeListMixin:RefreshReagentCost()
 end
 
 function ArmoryTradeSkillRecipeListMixin:RefreshDisplay()
-	self:UpdateFilterBar();
+    self:UpdateFilterBar();
 
     local numTradeSkills = Armory:GetNumTradeSkills();
     local skillOffset = HybridScrollFrame_GetOffset(self);
 
-	for i, skillButton in ipairs(self.buttons) do
+    for i, skillButton in ipairs(self.buttons) do
         local skillIndex = i + skillOffset;
 
         skillButton = self.buttons[i];
@@ -547,9 +547,9 @@ function ArmoryTradeSkillRecipeListMixin:RefreshDisplay()
         if ( info and info.name and skillIndex <= numTradeSkills ) then
             skillButton:SetUp(info);
 
-			if ( info.type == "recipe" ) then
+            if ( info.type == "recipe" ) then
                 skillButton:SetSelected(self:GetSelectedRecipe() == skillIndex);
-			end
+            end
         else
             skillButton:Clear();
         end
@@ -558,7 +558,7 @@ function ArmoryTradeSkillRecipeListMixin:RefreshDisplay()
     self:RefreshReagentCost();
     self:UpdateSkillButtonIndent();
 
-	HybridScrollFrame_Update(self, numTradeSkills * ROW_HEIGHT, self:GetHeight());
+    HybridScrollFrame_Update(self, numTradeSkills * ROW_HEIGHT, self:GetHeight());
 end
 
 function ArmoryTradeSkillRecipeListMixin:Refresh()
@@ -567,13 +567,13 @@ function ArmoryTradeSkillRecipeListMixin:Refresh()
 end
 
 function ArmoryTradeSkillRecipeListMixin:SetRecipeChangedCallback(recipeChangedCallback)
-	self.recipeChangedCallback = recipeChangedCallback;
+    self.recipeChangedCallback = recipeChangedCallback;
 end
 
 function ArmoryTradeSkillRecipeListMixin:UpdateSkillButtonIndent()
     if ( self.hasHeaders ) then
         -- If has headers then move all the names to the right
-	    for i, skillButton in ipairs(self.buttons) do
+        for i, skillButton in ipairs(self.buttons) do
             local tradeSkillInfo = skillButton.tradeSkillInfo;
             if ( tradeSkillInfo and tradeSkillInfo.numIndents ~= 0 ) then
                 skillButton.Text:SetPoint("TOPLEFT", skillButton, "TOPLEFT", 46, 0);
@@ -583,7 +583,7 @@ function ArmoryTradeSkillRecipeListMixin:UpdateSkillButtonIndent()
         end
     else
         -- If no headers then move all the names to the left
-	    for i, skillButton in ipairs(self.buttons) do
+        for i, skillButton in ipairs(self.buttons) do
             skillButton.Text:SetPoint("TOPLEFT", skillButton, "TOPLEFT", 3, 0);
         end
     end
@@ -696,7 +696,7 @@ function ArmoryTradeSkillButtonMixin:SetUpHeader(textWidth, tradeSkillInfo)
     self.SkillUps:Hide();
     self.LockedIcon:Hide();
     self.StarsFrame:Hide();
-	self:SetAlpha(1.0);
+    self:SetAlpha(1.0);
 
     self:SetBaseColor(ArmoryTradeSkillTypeColor[tradeSkillInfo.type]);
 
@@ -761,22 +761,22 @@ function ArmoryTradeSkillButtonMixin:SetUpRecipe(textWidth, tradeSkillInfo)
     self.Highlight:SetTexture("");
 
     local totalRanks, currentRank = tradeSkillInfo.totalRanks, tradeSkillInfo.currentRank;
-	if ( totalRanks and totalRanks > 1 ) then
-		usedWidth = usedWidth + self.StarsFrame:GetWidth();
-		self.StarsFrame:Show();
-		for i, starFrame in ipairs(self.StarsFrame.Stars) do
-			starFrame.EarnedStar:SetShown(i <= currentRank);
-		end
-		if ( self.SkillUps:IsShown() ) then
-			self.SkillUps:SetPoint("RIGHT", self.StarsFrame, "LEFT", -2, 0);
-			usedWidth = usedWidth + 11;
-		end
-	else
-		self.StarsFrame:Hide();
-		if ( self.SkillUps:IsShown() ) then
-			self.SkillUps:SetPoint("RIGHT", self, "RIGHT", 3, 0);
-		end
-	end
+    if ( totalRanks and totalRanks > 1 ) then
+        usedWidth = usedWidth + self.StarsFrame:GetWidth();
+        self.StarsFrame:Show();
+        for i, starFrame in ipairs(self.StarsFrame.Stars) do
+            starFrame.EarnedStar:SetShown(i <= currentRank);
+        end
+        if ( self.SkillUps:IsShown() ) then
+            self.SkillUps:SetPoint("RIGHT", self.StarsFrame, "LEFT", -2, 0);
+            usedWidth = usedWidth + 11;
+        end
+    else
+        self.StarsFrame:Hide();
+        if ( self.SkillUps:IsShown() ) then
+            self.SkillUps:SetPoint("RIGHT", self, "RIGHT", 3, 0);
+        end
+    end
 
     self.Text:SetWidth(0);
     self.Text:SetFormattedText("%s%s", skillNamePrefix, tradeSkillInfo.name);
@@ -843,11 +843,11 @@ function ArmoryTradeSkillButtonMixin:OnMouseLeave()
 end
 
 function ArmoryTradeSkillButtonMixin:OnLockIconMouseEnter()
-	if ( self.tradeSkillInfo.disabled and self.tradeSkillInfo.disabledReason ) then
-		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-		GameTooltip:AddLine(self.tradeSkillInfo.disabledReason, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true);
-		GameTooltip:Show();
-	end
+    if ( self.tradeSkillInfo.disabled and self.tradeSkillInfo.disabledReason ) then
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+        GameTooltip:AddLine(self.tradeSkillInfo.disabledReason, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true);
+        GameTooltip:Show();
+    end
 end
 
 
@@ -860,15 +860,66 @@ ArmoryTradeSkillDetailsMixin = {}
 function ArmoryTradeSkillDetailsMixin:SetSelectedRecipe(id)
     if ( self.selectedRecipe ~= id ) then
         self.selectedRecipe = id;
-        self.hasReagentDataByIndex = {};
+        self.optionalReagents = {};
         self:Refresh();
+    end
+end
+
+function ArmoryTradeSkillDetailsMixin:AddContentWidget(widget)
+    self.activeContentWidgets[#self.activeContentWidgets + 1] = widget;
+end
+
+function ArmoryTradeSkillDetailsMixin:CalculateContentHeight()
+    local height = 0;
+    local contentTop = self.Contents:GetTop();
+    for i, widget in ipairs(self.activeContentWidgets) do
+        local bottom = widget:GetBottom();
+        if ( bottom ) then
+            height = math.max(height, contentTop - bottom);
+        end
+    end
+
+    return height;
+end
+
+local function SetUpReagentButton(reagentButton, reagentName, reagentTexture, requiredReagentCount, playerReagentCount, isOptional, bonusText, optionalReagentQuality)
+    reagentName = reagentName or "";
+    reagentTexture = reagentTexture or "";
+
+    reagentButton.Icon:SetTexture(reagentTexture);
+
+    if ( isOptional ) then
+        reagentButton:SetReagentText(bonusText);
+        reagentButton:SetReagentQuality(optionalReagentQuality);
+    else
+        reagentButton.Name:SetText(reagentName);
+    end
+
+    if ( playerReagentCount < requiredReagentCount ) then
+        reagentButton.Icon:SetVertexColor(0.5, 0.5, 0.5);
+        reagentButton.Name:SetTextColor(GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b);
+    else
+        reagentButton.Icon:SetVertexColor(1.0, 1.0, 1.0);
+        reagentButton.Name:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+    end
+
+    if ( isOptional and requiredReagentCount == 1 ) then
+        reagentButton.Count:SetText(playerReagentCount);
+    else
+        SetItemButtonReagentCount(reagentButton, requiredReagentCount, playerReagentCount);
     end
 end
 
 local SPACING_BETWEEN_LINES = 11;
 function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
+    self.activeContentWidgets = {};
+
     local recipeInfo = self.selectedRecipe and Armory:GetTradeSkillInfo(self.selectedRecipe);
-	if ( recipeInfo and recipeInfo.type == "recipe" ) then
+    if ( recipeInfo and recipeInfo.type == "recipe" ) then
+        local categorySkillRank = recipeInfo.categorySkillRank or 0;
+        local hasRecipeLeveling = recipeInfo.unlockedRecipeLevel;
+        local hasMaxRecipeLevel = hasRecipeLeveling and (recipeInfo.currentRecipeExperience == nil);
+
         self.Contents.RecipeName:SetText(recipeInfo.name);
         self.recipeID = recipeInfo.recipeID;
 
@@ -880,6 +931,7 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
         end
 
         SetItemButtonQuality(self.Contents.ResultIcon, recipeInfo.productQuality, recipeLink);
+        self:AddContentWidget(self.Contents.RecipeName);
 
         self.Contents.ResultIcon:SetNormalTexture(recipeInfo.icon);
         Armory:SetItemLink(self.Contents.ResultIcon, Armory:GetTradeSkillItemLink(self.selectedRecipe));
@@ -897,16 +949,25 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
         else
             self.Contents.ResultIcon.Count:SetText("");
         end
+        self:AddContentWidget(self.Contents.ResultIcon);
         
         local totalRanks, currentRank = recipeInfo.totalRanks, recipeInfo.currentRank;
-		self.currentRank = currentRank;
-		if ( totalRanks and totalRanks > 1 ) then
-			self.Contents.StarsFrame:Show();
-			for i, starFrame in ipairs(self.Contents.StarsFrame.Stars) do
-				starFrame.EarnedStar:SetShown(i <= currentRank);
-			end
-		else
-			self.Contents.StarsFrame:Hide();
+        self.currentRank = currentRank;
+        
+        self.Contents.StarsFrame:Hide();
+        self.Contents.RecipeLevel:Hide();
+
+        if ( totalRanks and totalRanks > 1 ) then
+            for i, starFrame in ipairs(self.Contents.StarsFrame.Stars) do
+                starFrame.EarnedStar:SetShown(i <= currentRank);
+            end
+            self:AddContentWidget(self.Contents.StarsFrame);
+            self.Contents.StarsFrame:Show();
+        elseif ( hasRecipeLeveling ) then
+            local recipeLevelBar = self.Contents.RecipeLevel;
+            recipeLevelBar:SetExperience(recipeInfo.currentRecipeExperience, recipeInfo.nextLevelRecipeExperience, recipeInfo.unlockedRecipeLevel);
+            self:AddContentWidget(recipeLevelBar);
+            recipeLevelBar:Show();
         end
         
         local recipeDescription = Armory:GetTradeSkillDescription(self.selectedRecipe);
@@ -917,15 +978,38 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
             self.Contents.Description:SetText("");
             self.Contents.RequirementLabel:SetPoint("TOPLEFT", self.Contents.Description, "BOTTOMLEFT", 0, 0);
         end
+        self:AddContentWidget(self.Contents.Description);
 
         local requiredToolsString = Armory:GetTradeSkillTools(self.selectedRecipe);
         if ( requiredToolsString and requiredToolsString ~= "" ) then
             self.Contents.RequirementLabel:Show();
             self.Contents.RequirementText:SetText(requiredToolsString);
-            self.Contents.RecipeCooldown:SetPoint("TOP", self.Contents.RequirementText, "BOTTOM", 0, -SPACING_BETWEEN_LINES);
+            self.Contents.ExperienceLabel:SetPoint("TOP", self.Contents.RequirementText, "BOTTOM", 0, 0);
+            self:AddContentWidget(self.Contents.RequirementLabel);
+            self:AddContentWidget(self.Contents.RequirementText);
         else
             self.Contents.RequirementLabel:Hide();
             self.Contents.RequirementText:SetText("");
+            self.Contents.ExperienceLabel:SetPoint("TOP", self.Contents.RequirementText, "TOP", 0, 0);
+        end
+
+        local earnedExperience = recipeInfo.earnedExperience;
+        local showEarnedExperience = (earnedExperience ~= nil) and not hasMaxRecipeLevel;
+        if ( showEarnedExperience ) then
+            self.Contents.ExperienceLabel:Show();
+            self.Contents.ExperienceText:SetText(earnedExperience);
+            self:AddContentWidget(self.Contents.ExperienceLabel);
+            self:AddContentWidget(self.Contents.ExperienceText);
+        else
+            self.Contents.ExperienceLabel:Hide();
+            self.Contents.ExperienceText:SetText("");
+        end
+
+        if ( showEarnedExperience ) then
+            self.Contents.RecipeCooldown:SetPoint("TOP", self.Contents.ExperienceText, "BOTTOM", 0, -SPACING_BETWEEN_LINES);
+        elseif requiredToolsString then
+            self.Contents.RecipeCooldown:SetPoint("TOP", self.Contents.RequirementText, "BOTTOM", 0, -SPACING_BETWEEN_LINES);
+        else
             self.Contents.RecipeCooldown:SetPoint("TOP", self.Contents.RequirementText, "BOTTOM", 0, 0);
         end
 
@@ -934,9 +1018,11 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
         if ( maxCharges > 0 and (charges > 0 or not cooldown) ) then
             self.Contents.RecipeCooldown:SetFormattedText(TRADESKILL_CHARGES_REMAINING, charges, maxCharges);
             self.Contents.RecipeCooldown:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+            self:AddContentWidget(self.Contents.RecipeCooldown);
         elseif ( recipeInfo.disabled ) then
             self.Contents.RecipeCooldown:SetTextColor(RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b);
             self.Contents.RecipeCooldown:SetText(recipeInfo.disabledReason);
+            self:AddContentWidget(self.Contents.RecipeCooldown);
         else
             self.Contents.RecipeCooldown:SetTextColor(RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b);
             if ( not cooldown ) then
@@ -944,10 +1030,12 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
                 self.Contents.ReagentLabel:SetPoint("TOPLEFT", self.Contents.RecipeCooldown, "BOTTOMLEFT", 0, 0);
             elseif ( not isDayCooldown ) then
                 self.Contents.RecipeCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown));
-            elseif ( cooldown > 60 * 60 * 24 ) then	--Cooldown is greater than 1 day.
+            elseif ( cooldown > 60 * 60 * 24 ) then    --Cooldown is greater than 1 day.
                 self.Contents.RecipeCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown, true, false, 1, true));
+                self:AddContentWidget(self.Contents.RecipeCooldown);
             else
                 self.Contents.RecipeCooldown:SetText(COOLDOWN_EXPIRES_AT_MIDNIGHT);
+                self:AddContentWidget(self.Contents.RecipeCooldown);
             end
         end
 
@@ -955,6 +1043,7 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
 
         if ( numReagents > 0 ) then
             self.Contents.ReagentLabel:Show();
+            self:AddContentWidget(self.Contents.ReagentLabel);
         else
             self.Contents.ReagentLabel:Hide();
         end
@@ -963,44 +1052,16 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
             local reagentName, reagentTexture, reagentCount, playerReagentCount = Armory:GetTradeSkillReagentInfo(self.selectedRecipe, reagentIndex);
             local reagentButton = self.Contents.Reagents[reagentIndex];
 
-            reagentButton:Show();
-
-            if ( not self.hasReagentDataByIndex[reagentIndex] ) then
-                if ( not reagentName or not reagentTexture ) then
-                    reagentButton.Icon:SetTexture("");
-                    reagentButton.Name:SetText("");
-                else
-                    reagentButton.Icon:SetTexture(reagentTexture);
-                    reagentButton.Name:SetText(reagentName);
-
-                    self.hasReagentDataByIndex[reagentIndex] = true;
-                    Armory:SetItemLink(reagentButton, Armory:GetTradeSkillReagentItemLink(self.selectedRecipe, reagentIndex));
-                end
-            end
-            
             if ( Armory:HasInventory() ) then
                 -- use count from inventory
                 playerReagentCount = Armory:ScanInventory(reagentButton.link, true);
-
-                if ( playerReagentCount < reagentCount ) then
-                    reagentButton.Icon:SetVertexColor(0.5, 0.5, 0.5);
-                    reagentButton.Name:SetTextColor(GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b);
-                else
-                    reagentButton.Icon:SetVertexColor(1.0, 1.0, 1.0);
-                    reagentButton.Name:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-                end
-
-                local playerReagentCountAbbreviated = AbbreviateNumbers(playerReagentCount);
-                reagentButton.Count:SetFormattedText(TRADESKILL_REAGENT_COUNT, playerReagentCountAbbreviated, reagentCount);
-                --fix text overflow when the reagentButton count is too high
-                if ( math.floor(reagentButton.Count:GetStringWidth()) > math.floor(reagentButton.Icon:GetWidth() + .5) ) then 
-                    --round count width down because the leftmost number can overflow slightly without looking bad
-                    --round icon width because it should always be an int, but sometimes it's a slightly off float
-                    reagentButton.Count:SetFormattedText("%s\n/%s", playerReagentCountAbbreviated, reagentCount);
-                end
-            else
-                reagentButton.Count:SetText(reagentCount.." ");
             end
+
+            reagentButton:Show();
+            self:AddContentWidget(reagentButton);
+
+            SetUpReagentButton(reagentButton, reagentName, reagentTexture, reagentCount, playerReagentCount);
+            Armory:SetItemLink(reagentButton, Armory:GetTradeSkillReagentItemLink(self.selectedRecipe, reagentIndex));
         end
 
         for reagentIndex = numReagents + 1, #self.Contents.Reagents do
@@ -1008,7 +1069,47 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
             reagentButton:Hide();
         end
         
-		self:Show();
+        local optionalReagentSlots = Armory:GetOptionalReagentSlots(self.selectedRecipe);
+        self.optionalReagentSlots = optionalReagentSlots;
+        local numOptionalReagentSlots = #optionalReagentSlots;
+        local hasOptionalReagentSlots = numOptionalReagentSlots > 0;
+        
+        self.Contents.OptionalReagentLabel:SetShown(hasOptionalReagentSlots);
+        if ( hasOptionalReagentSlots ) then
+            if ( numReagents > 0 ) then
+                self.Contents.OptionalReagentLabel:SetPoint("TOP", self.Contents.Reagents[numReagents], "BOTTOM", 0, -15)
+            else
+                self.Contents.OptionalReagentLabel:SetPoint("TOP", self.Contents.ReagentLabel, "TOP");
+            end
+
+            self:AddContentWidget(self.Contents.OptionalReagentLabel);
+        end
+
+        for optionalReagentIndex, slot in ipairs(optionalReagentSlots) do
+            local reagentButton = self.Contents.OptionalReagents[optionalReagentIndex];
+
+            local hasRequiredSkillRank = categorySkillRank >= slot.requiredSkillRank;
+            reagentButton:SetLocked(not hasRequiredSkillRank, slot.requiredSkillRank);
+
+            reagentButton.Icon:SetAtlas(hasRequiredSkillRank and "tradeskills-icon-add" or "tradeskills-icon-locked", TextureKitConstants.UseAtlasSize);
+            reagentButton.Icon:SetVertexColor(1.0, 1.0, 1.0);
+            reagentButton.Count:SetText("");
+            reagentButton:SetReagentText(slot.slotText or OPTIONAL_REAGENT_POSTFIX);
+            reagentButton:SetReagentColor(hasRequiredSkillRank and HIGHLIGHT_FONT_COLOR or GRAY_FONT_COLOR);
+            reagentButton:SetOptions(slot.options);
+
+            reagentButton:Show();
+            self:AddContentWidget(reagentButton);
+        end
+
+        for optionalReagentIndex = numOptionalReagentSlots + 1, #self.Contents.OptionalReagents do
+            local reagentButton = self.Contents.OptionalReagents[optionalReagentIndex];
+            reagentButton:Hide();
+        end
+        
+        self.Contents:SetHeight(self:CalculateContentHeight());
+        self.Contents:Show();
+        self:Show();
     else
         self:Clear();
     end
@@ -1036,7 +1137,7 @@ function ArmoryTradeSkillDetailsMixin:OnResultMouseEnter(resultButton)
 end
 
 function ArmoryTradeSkillDetailsMixin:OnReagentMouseEnter(reagentButton)
-	GameTooltip:SetOwner(reagentButton, "ANCHOR_TOPLEFT");
+    GameTooltip:SetOwner(reagentButton, "ANCHOR_TOPLEFT");
     Armory:SetTradeSkillItem(self.selectedRecipe, reagentButton.reagentIndex);
 end
 
@@ -1044,6 +1145,137 @@ function ArmoryTradeSkillDetailsMixin:OnReagentClicked(reagentButton)
     if ( IsModifiedClick("CHATLINK") and reagentButton.link ) then
         HandleModifiedItemClick(reagentButton.link);
     end
+end
+
+function ArmoryTradeSkillDetailsMixin:OnOptionalReagentMouseEnter(reagentButton)
+    GameTooltip:SetOwner(reagentButton, "ANCHOR_TOPLEFT");
+
+    GameTooltip_SetTitle(GameTooltip, EMPTY_OPTIONAL_REAGENT_TOOLTIP_TITLE);
+
+    if ( reagentButton:IsLocked() ) then
+        GameTooltip_AddErrorLine(GameTooltip, OPTIONAL_REAGENT_TOOLTIP_SLOT_LOCKED_FORMAT:format(reagentButton:GetLockedSkillRank()));
+    end
+
+    local options = reagentButton:GetOptions();
+    if ( options ) then
+        for i = 1, #options do
+            local itemName, _, quality, _, _, _, _, _, _, itemTexture = _G.GetItemInfo(options[i]);
+            if ( quality and quality > Enum.ItemQuality.Common and BAG_ITEM_QUALITY_COLORS[quality] ) then
+                GameTooltip_AddColoredLine(GameTooltip,  "|T"..itemTexture..":0:0:0:-1|t "..itemName, BAG_ITEM_QUALITY_COLORS[quality])
+            elseif ( itemName ) then
+                GameTooltip_AddNormalLine(GameTooltip, "|T"..itemTexture..":0:0:0:-1|t "..itemName);
+            end
+        end
+    end
+
+    GameTooltip:Show();
+end
+
+
+----------------------------------------------------------
+-- TradeSkillRecipeLevelBar Mixin
+----------------------------------------------------------
+
+ArmoryTradeSkillRecipeLevelBarMixin = {}
+
+function ArmoryTradeSkillRecipeLevelBarMixin:OnLoad()
+    self.Rank:Hide();
+    self:SetStatusBarColor(TRADESKILL_EXPERIENCE_COLOR:GetRGB());
+end
+
+function ArmoryTradeSkillRecipeLevelBarMixin:OnEnter()
+    self.Rank:Show();
+
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+
+    if ( self:IsMaxLevel() ) then
+        GameTooltip_SetTitle(GameTooltip, TRADESKILL_RECIPE_LEVEL_TOOLTIP_HIGHEST_RANK, NORMAL_FONT_COLOR);
+        GameTooltip_AddColoredLine(GameTooltip, TRADESKILL_RECIPE_LEVEL_TOOLTIP_HIGHEST_RANK_EXPLANATION, GREEN_FONT_COLOR);
+    else
+        local experiencePercent = math.floor((self.currentExperience / self.maxExperience) * 100);
+        GameTooltip_SetTitle(GameTooltip, TRADESKILL_RECIPE_LEVEL_TOOLTIP_RANK_FORMAT:format(self.currentLevel), NORMAL_FONT_COLOR);
+        GameTooltip_AddHighlightLine(GameTooltip, TRADESKILL_RECIPE_LEVEL_TOOLTIP_EXPERIENCE_FORMAT:format(self.currentExperience, self.maxExperience, experiencePercent));
+        GameTooltip_AddColoredLine(GameTooltip, TRADESKILL_RECIPE_LEVEL_TOOLTIP_LEVELING_FORMAT:format(self.currentLevel + 1), GREEN_FONT_COLOR);
+    end
+
+    GameTooltip:Show();
+end
+
+function ArmoryTradeSkillRecipeLevelBarMixin:OnLeave()
+    self.Rank:Hide();
+
+    GameTooltip_Hide();
+end
+
+function ArmoryTradeSkillRecipeLevelBarMixin:SetExperience(currentExperience, maxExperience, currentLevel)
+    self.currentExperience = currentExperience;
+    self.maxExperience = maxExperience;
+    self.currentLevel = currentLevel;
+
+    if ( self:IsMaxLevel() ) then
+        self:SetMinMaxValues(0, 1);
+        self:SetValue(1);
+        self.Rank:SetText(TRADESKILL_RECIPE_LEVEL_MAXIMUM);
+    else
+        self:SetMinMaxValues(0, maxExperience);
+        self:SetValue(currentExperience);
+        self.Rank:SetFormattedText(GENERIC_FRACTION_STRING, currentExperience, maxExperience);
+    end
+end
+
+function ArmoryTradeSkillRecipeLevelBarMixin:IsMaxLevel()
+    return self.currentExperience == nil;
+end
+
+
+----------------------------------------------------------
+-- OptionalReagentButton Mixin
+----------------------------------------------------------
+
+ArmoryOptionalReagentButtonMixin = {}
+
+function ArmoryOptionalReagentButtonMixin:OnLoad()
+    self.Name:SetFontObject("GameFontHighlightSmall");
+    self.Name:SetMaxLines(3);
+    self.Name:ClearAllPoints();
+    self.Name:SetPoint("LEFT", self.Icon, "RIGHT", 6, 0);
+end
+
+function ArmoryOptionalReagentButtonMixin:SetReagentQuality(quality)
+    local itemQualityColor = ITEM_QUALITY_COLORS[quality];
+    self.Name:SetTextColor(itemQualityColor.r, itemQualityColor.g, itemQualityColor.b);
+    self.IconBorder:Show();
+    SetItemButtonQuality(self, quality);
+end
+
+function ArmoryOptionalReagentButtonMixin:SetReagentColor(color)
+    self.Name:SetTextColor(color:GetRGB());
+    self.IconBorder:Hide();
+end
+
+function ArmoryOptionalReagentButtonMixin:SetReagentText(name)
+    self.Name:SetText(name);
+end
+
+function ArmoryOptionalReagentButtonMixin:SetLocked(locked, lockedSkillRank)
+    self.locked = locked;
+    self.lockedSkillRank = lockedSkillRank;
+end
+
+function ArmoryOptionalReagentButtonMixin:IsLocked()
+    return self.locked;
+end
+
+function ArmoryOptionalReagentButtonMixin:GetLockedSkillRank()
+    return self.lockedSkillRank;
+end
+
+function ArmoryOptionalReagentButtonMixin:SetOptions(options)
+    self.options = options;
+end
+
+function ArmoryOptionalReagentButtonMixin:GetOptions(options)
+    return self.options;
 end
 
 ----------------------------------------------------------

@@ -294,6 +294,39 @@
         if TRADESKILL_REAGENT_FONT then
           self.Count:SetFontObject(TRADESKILL_REAGENT_FONT);
         end
+        if TRADESKILL_FRAME_EXTEND_REAGENT_NAME_FIELD then
+          self.Name:SetWidth(100);
+        end
+      </OnLoad>
+    </Scripts>
+  </Button>
+
+  <Button name="ArmoryTradeSkillOptionalReagentTemplate" parentArray="OptionalReagents" inherits="LargeItemButtonTemplate" mixin="ArmoryOptionalReagentButtonMixin" hidden="true" virtual="true" enableMouse="true">
+    <Layers>
+      <Layer level="OVERLAY">
+        <Texture parentKey="SelectedTexture" file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD" hidden="true">
+          <Size x="42" y="42"/>
+          <Anchors>
+            <Anchor point="CENTER" relativeKey="$parent.Icon" relativePoint="CENTER"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnEnter>
+        self:GetParent():GetParent():OnOptionalReagentMouseEnter(self);
+      </OnEnter>
+      <OnLeave function="GameTooltip_HideResetCursor" />
+      <OnLoad>
+        ArmoryOptionalReagentButtonMixin.OnLoad(self);
+
+        -- Uses in Korean to fix Bug ID: 244689
+        if TRADESKILL_REAGENT_FONT then
+          self.Count:SetFontObject(TRADESKILL_REAGENT_FONT);
+        end
+        if TRADESKILL_FRAME_EXTEND_REAGENT_NAME_FIELD then
+          self.Name:SetWidth(100);
+        end
       </OnLoad>
     </Scripts>
   </Button>
@@ -664,6 +697,19 @@
                   </Anchors>
                 </FontString>
 
+                <FontString parentKey="ExperienceLabel" inherits="GameFontNormalSmall" text="TRADESKILL_RECIPE_EXPERIENCE_LABEL">
+                  <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.RequirementLabel" relativePoint="LEFT"/>
+                    <Anchor point="TOP" relativeKey="$parent.RequirementText" relativePoint="BOTTOM"/>
+                  </Anchors>
+                </FontString>
+                <FontString parentKey="ExperienceText" inherits="GameFontHighlightSmall" justifyV="TOP" justifyH="LEFT">
+                  <Size x="240" y="0"/>
+                  <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.ExperienceLabel" relativePoint="TOPRIGHT" x="4" y="0"/>
+                  </Anchors>
+                </FontString>
+
                 <FontString parentKey="RecipeCooldown" name="ArmoryTradeSkillSkillCooldown" inherits="GameFontRedSmall">
                   <Anchors>
                     <Anchor point="LEFT" relativeKey="$parent.RequirementLabel"/>
@@ -683,9 +729,16 @@
                     <Anchor point="TOPLEFT" relativeKey="$parent.HeaderLeft" relativePoint="TOPRIGHT" x="0" y="0"/>
                   </Anchors>
                 </Texture>
-               <FontString parentKey="ReagentLabel" inherits="GameFontNormalSmall" text="SPELL_REAGENTS">
+
+                <FontString parentKey="ReagentLabel" inherits="GameFontNormalSmall" text="SPELL_REAGENTS">
                   <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.Description" relativePoint="BOTTOMLEFT" x="0" y="-10"/>
+                  </Anchors>
+                </FontString>
+
+                <FontString parentKey="OptionalReagentLabel" inherits="GameFontNormalSmall" text="SPELL_REAGENTS_OPTIONAL">
+                  <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.ReagentLabel"/>
                   </Anchors>
                 </FontString>
               </Layer>
@@ -763,6 +816,51 @@
                   </Frame>
                 </Frames>
               </Frame> 
+              <StatusBar parentKey="RecipeLevel" mixin="ArmoryTradeSkillRecipeLevelBarMixin">
+                <Size x="80" y="14"/>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeKey="$parent.RecipeName" relativePoint="BOTTOMLEFT" x="1" y="-5"/>
+                </Anchors>
+                <Layers>
+                  <Layer level="OVERLAY">
+                    <Texture parentKey="BorderLeft" file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder">
+                      <Size x="9" y="18"/>
+                      <Anchors>
+                        <Anchor point="LEFT" x="-2" y="0"/>
+                      </Anchors>
+                      <TexCoords left="0.007843" right="0.043137" top="0.193548" bottom="0.774193"/>
+                    </Texture>
+                    <Texture parentKey="BorderRight" file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder">
+                      <Size x="9" y="18"/>
+                      <Anchors>
+                        <Anchor point="RIGHT" x="3" y="0"/>
+                      </Anchors>
+                      <TexCoords left="0.043137" right="0.007843" top="0.193548" bottom="0.774193"/>
+                    </Texture>
+                    <Texture parentKey="BorderMid" file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder">
+                      <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.BorderLeft" relativePoint="TOPRIGHT"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.BorderRight" relativePoint="BOTTOMLEFT"/>
+                      </Anchors>
+                      <TexCoords left="0.113726" right="0.1490196" top="0.193548" bottom="0.774193"/>
+                    </Texture>
+                  </Layer>
+                  <Layer level="OVERLAY" textureSubLevel="1">
+                    <FontString parentKey="Rank" inherits="GameFontHighlightSmall">
+                      <Anchors>
+                        <Anchor point="CENTER"/>
+                      </Anchors>
+                    </FontString>
+                  </Layer>
+                </Layers>
+                <BarTexture file="Interface\PaperDollInfoFrame\UI-Character-Skills-Bar"/>
+                <BarColor r=".25" g=".25" b=".75"/>
+                <Scripts>
+                  <OnLoad method="OnLoad"/>
+                  <OnEnter method="OnEnter"/>
+                  <OnLeave method="OnLeave"/>
+                </Scripts>
+              </StatusBar>
               <Button parentKey="Reagent1" inherits="ArmoryTradeSkillReagentTemplate">
                 <KeyValues>
                   <KeyValue key="reagentIndex" type="number" value="1"/>
@@ -827,6 +925,54 @@
                   <Anchor point="LEFT" relativeKey="$parent.Reagent7" relativePoint="RIGHT" x="0" y="0"/>
                 </Anchors>
               </Button>              
+              <Button parentKey="OptionalReagent1" inherits="ArmoryTradeSkillOptionalReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="optionalReagentIndex" type="number" value="1"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeKey="$parent.OptionalReagentLabel" relativePoint="BOTTOMLEFT" x="-2" y="-6"/>
+                </Anchors>
+              </Button>
+              <Button parentKey="OptionalReagent2" inherits="ArmoryTradeSkillOptionalReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="optionalReagentIndex" type="number" value="2"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="LEFT" relativeKey="$parent.OptionalReagent1" relativePoint="RIGHT" x="0" y="0"/>
+                </Anchors>
+              </Button>
+              <Button parentKey="OptionalReagent3" inherits="ArmoryTradeSkillOptionalReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="optionalReagentIndex" type="number" value="3"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeKey="$parent.OptionalReagent1" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+                </Anchors>
+              </Button>
+              <Button parentKey="OptionalReagent4" inherits="ArmoryTradeSkillOptionalReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="optionalReagentIndex" type="number" value="4"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="LEFT" relativeKey="$parent.OptionalReagent3" relativePoint="RIGHT" x="0" y="0"/>
+                </Anchors>
+              </Button>
+              <Button parentKey="OptionalReagent5" inherits="ArmoryTradeSkillOptionalReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="optionalReagentIndex" type="number" value="5"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeKey="$parent.OptionalReagent3" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+                </Anchors>
+              </Button>
+              <Button parentKey="OptionalReagent6" inherits="ArmoryTradeSkillOptionalReagentTemplate">
+                <KeyValues>
+                  <KeyValue key="optionalReagentIndex" type="number" value="6"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="LEFT" relativeKey="$parent.OptionalReagent5" relativePoint="RIGHT" x="0" y="0"/>
+                </Anchors>
+              </Button>
             </Frames>
           </Frame>
         </ScrollChild>
