@@ -34,10 +34,6 @@ function Armory:GetActiveSpecGroup(inspect)
     return self:SetGetCharacterValue("ActiveSpecGroup", _G.GetActiveSpecGroup()) or 1;
 end
 
-function Armory:GetAdjustedSkillPoints()
-    return self:SetGetCharacterValue("AdjustedSkillPoints", _G.GetAdjustedSkillPoints());
-end
-
 function Armory:GetAttackPowerForStat(index, effectiveStat)
     return self:SetGetCharacterValue("AttackPowerForStat"..index, _G.GetAttackPowerForStat(index, effectiveStat));
 end
@@ -86,13 +82,6 @@ end
 
 function Armory:GetCritChance()
     return self:SetGetCharacterValue("CritChance", _G.GetCritChance());
-end
-
-function Armory:GetCritChanceFromAgility(unit)
-    if ( strlower(unit) == "pet" ) then
-        return self:SetGetPetValue("CritChanceFromAgility", _G.GetCritChanceFromAgility(unit));
-    end
-    return self:SetGetCharacterValue("CritChanceFromAgility", _G.GetCritChanceFromAgility(unit));
 end
 
 function Armory:GetCritChanceProvidesParryEffect()
@@ -242,14 +231,6 @@ end
 
 function Armory:GetMoney()
     return self:SetGetCharacterValue("Money", _G.GetMoney()) or 0;
-end
-
-function Armory:GetMultistrike()
-    return self:SetGetCharacterValue("Multistrike", _G.GetMultistrike());
-end
-
-function Armory:GetMultistrikeEffect()
-    return self:SetGetCharacterValue("MultistrikeEffect", _G.GetMultistrikeEffect());
 end
 
 function Armory:GetNegativeCorruptionEffectInfo()
@@ -419,10 +400,6 @@ function Armory:GetPVPYesterdayStats(update)
     return hk, cp;
 end
 
-function Armory:GetReadiness()
-    return self:SetGetCharacterValue("Readiness", _G.GetReadiness());
-end
-
 function Armory:GetQuestResetTime()
     return self:SetGetCharacterValue("QuestResetTime", time() + _G.GetQuestResetTime()) or 0;
 end
@@ -476,14 +453,6 @@ function Armory:GetSpecializationMasterySpells()
     return self:SetGetCharacterValue("MaterySpells", _G.GetSpecializationMasterySpells(primaryTree));
 end
 
-function Armory:GetSpecializationReadinessSpell()
-    local primaryTree = _G.GetSpecialization();
-    if ( not primaryTree ) then
-        return self:SetGetCharacterValue("ReadinessSpell", nil);
-    end
-    return self:SetGetCharacterValue("ReadinessSpell", _G.GetSpecializationReadinessSpell(primaryTree));
-end
-
 function Armory:GetSpeed()
     return self:SetGetCharacterValue("Speed", _G.GetSpeed());
 end
@@ -502,13 +471,6 @@ function Armory:GetSpellCritChance(holySchool)
     if ( holySchool ) then
         return self:SetGetCharacterValue("SpellCritChance"..holySchool, _G.GetSpellCritChance(holySchool));
     end
-end
-
-function Armory:GetSpellCritChanceFromIntellect(unit)
-    if ( strlower(unit) == "pet" ) then
-        return self:SetGetPetValue("SpellCritChanceFromIntellect", _G.GetSpellCritChanceFromIntellect(unit));
-    end
-    return self:SetGetCharacterValue("SpellCritChanceFromIntellect", _G.GetSpellCritChanceFromIntellect(unit));
 end
 
 function Armory:GetSpellHitModifier()
@@ -546,13 +508,6 @@ function Armory:GetUnitHealthModifier(unit)
         return self:SetGetPetValue("HealthModifier", _G.GetUnitHealthModifier(unit));
     end
     return self:SetGetCharacterValue("HealthModifier", _G.GetUnitHealthModifier(unit));
-end
-
-function Armory:GetUnitManaRegenRateFromSpirit(unit)
-    if ( strlower(unit) == "pet" ) then
-        return self:SetGetPetValue("ManaRegenRateFromSpirit", _G.GetUnitManaRegenRateFromSpirit(unit));
-    end
-    return self:SetGetCharacterValue("ManaRegenRateFromSpirit", _G.GetUnitManaRegenRateFromSpirit(unit));
 end
 
 function Armory:GetUnitMaxHealthModifier(unit)
@@ -914,10 +869,6 @@ function Armory:UnitBonusArmor(unit)
         return self:SetGetPetValue("BonusArmor", _G.UnitBonusArmor(unit));
     end
     return self:SetGetCharacterValue("BonusArmor", _G.UnitBonusArmor(unit));
-end
-
-function Armory:UnitCharacterPoints(unit)
-    return self:SetGetCharacterValue("CharacterPoints", _G.UnitCharacterPoints("player"));
 end
 
 function Armory:UnitClass(unit)
