@@ -26,9 +26,6 @@
         http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
--- Fix for missing new valor introduced in 6.2.3
-WOD_VALOR_CURRENCY = 1191;
-
 local Armory, _ = Armory;
 local container = "Currency";
 
@@ -40,7 +37,7 @@ local currencyLines = {};
 local dirty = true;
 local owner = "";
 
-local CONTENT_REWARDS = { HONOR_CURRENCY, CONQUEST_CURRENCY, JUSTICE_CURRENCY, WOD_VALOR_CURRENCY };
+local CONTENT_REWARDS = { HONOR_CURRENCY, CONQUEST_CURRENCY, JUSTICE_CURRENCY, VALOR_CURRENCY };
 
 local function GetCurrencyLines()
     local dbEntry = Armory.selectedDbBaseEntry;
@@ -169,8 +166,8 @@ function Armory:UpdateCurrency()
                 return currencyInfo.isHeader, currencyInfo.isHeaderExpanded;
             end
         end;
-        local funcExpand = function(index) C_CurrencyInfo.ExpandCurrencyList(index, 1); end;
-        local funcCollapse = function(index) C_CurrencyInfo.ExpandCurrencyList(index, 0); end;
+        local funcExpand = function(index) C_CurrencyInfo.ExpandCurrencyList(index, true); end;
+        local funcCollapse = function(index) C_CurrencyInfo.ExpandCurrencyList(index, false); end;
 
         if ( retries < 1 and not dbEntry:SetExpandableListValues(container, funcNumLines, funcGetLineState, funcGetLineInfo, funcExpand, funcCollapse) ) then
             retries = retries + 1;
