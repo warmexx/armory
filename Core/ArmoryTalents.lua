@@ -29,7 +29,7 @@
 local Armory, _ = Armory;
 local container = "Talents";
 
-SHOW_TALENT_LEVEL = 15;
+local SHOW_TALENT_LEVEL = 15;
 
 ----------------------------------------------------------
 -- Talents Internals
