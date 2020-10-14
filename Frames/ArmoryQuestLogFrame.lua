@@ -785,7 +785,12 @@ function ArmoryQuestInfo_ShowRewards()
                 elseif ( isBoostSpell ) then
                     AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_ABILITY, rewardSpellIndex);
                 elseif ( garrFollowerID ) then
-                    AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_FOLLOWER, rewardSpellIndex);            
+					local followerInfo = C_Garrison.GetFollowerInfo(garrFollowerID);
+					if followerInfo.followerTypeID == Enum.GarrisonFollowerType.FollowerType_9_0 then
+						AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_COMPANION, rewardSpellIndex);
+					else
+						AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_FOLLOWER, rewardSpellIndex);
+					end
                 elseif ( isSpellLearned ) then
                     AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_SPELL, rewardSpellIndex);
 				elseif ( genericUnlock ) then
@@ -968,7 +973,7 @@ function ArmoryQuestInfo_ShowRewards()
         rewardsFrame.HonorFrame:ClearAllPoints();
         if ( honor > 0 ) then
             local icon;
-            if ( Armory:UnitFactionGroup("player") == PLAYER_FACTION_GROUP[0] ) then
+            if ( Armory:UnitFactionGroup("player") == PLAYER_FACTION_GROUP[PLAYER_FACTION_GROUP.Horde] ) then
                 icon = "Interface\\Icons\\PVPCurrency-Honor-Horde";
             else
                 icon = "Interface\\Icons\\PVPCurrency-Honor-Alliance";
