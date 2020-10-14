@@ -718,12 +718,17 @@ function ArmoryTradeSkillButtonMixin:SetUpHeader(textWidth, tradeSkillInfo)
     self:SetText(tradeSkillInfo.name);
     self.Count:SetText("");
 
-    if ( tradeSkillInfo.collapsed ) then
-        self:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up");
+    if ( tradeSkillInfo.isEmptyCategory ) then
+        self:SetNormalTexture("");
+		self.Highlight:SetTexture("")
     else
-        self:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up");
+        if ( tradeSkillInfo.collapsed ) then
+            self:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up");
+        else
+            self:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up");
+        end
+        self.Highlight:SetTexture("Interface\\Buttons\\UI-PlusButton-Hilight");
     end
-    self.Highlight:SetTexture("Interface\\Buttons\\UI-PlusButton-Hilight");
 
     self.SelectedTexture:Hide();
     self:UnlockHighlight()

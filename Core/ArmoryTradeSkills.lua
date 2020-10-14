@@ -426,7 +426,8 @@ local function GetProfessionLineValue(index)
         info.currentRecipeExperience,
         info.nextLevelRecipeExperience,
         info.earnedExperience,
-        info.categorySkillRank = dbEntry:GetValue(container, selectedSkill, itemContainer, professionLines[index], "Info");
+        info.categorySkillRank,
+        info.isEmptyCategory = dbEntry:GetValue(container, selectedSkill, itemContainer, professionLines[index], "Info");
         
         info.cooldown, 
         info.isDayCooldown, 
@@ -715,6 +716,8 @@ local function GetTradeSkillLineInfo(info)
             categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID);
         end
         info.categorySkillRank = categoryInfo.skillLineCurrentLevel;
+    else
+        info.isEmptyCategory = C_TradeSkillUI.IsEmptySkillLineCategory(info.categoryID);
     end
 
     return 
@@ -741,7 +744,8 @@ local function GetTradeSkillLineInfo(info)
         info.currentRecipeExperience,
         info.nextLevelRecipeExperience,
         info.earnedExperience,
-        info.categorySkillRank;
+        info.categorySkillRank,
+        info.isEmptyCategory;
 end
 
 local invSlotTypes = {};
