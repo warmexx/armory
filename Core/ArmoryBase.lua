@@ -40,7 +40,7 @@ if ( not Armory ) then
 
         title = ARMORY_TITLE,
         version = GetAddOnMetadata("Armory", "Version"),
-        dbVersion = 49,
+        dbVersion = 50,
         interface = _G.GetBuildInfo(),
     };
 end
@@ -701,6 +701,35 @@ function Armory:IsDbCompatible()
         elseif ( dbVersion == 48 ) then
             dbEntry:SetValue(2, "General", "MinimapAngle", nil);
             dbEntry:SetValue(2, "General", "MinimapRadius", nil);
+
+            upgraded = true;
+
+        -- convert from 49 to 50
+        elseif ( dbVersion == 49 ) then
+            for realm in pairs(ArmoryDB) do
+                for character in pairs(ArmoryDB[realm]) do
+                    entry = ArmoryDB[realm][character];
+
+                    entry.AdjustedSkillPoints = nil;
+                    entry.CritChanceFromAgility = nil;
+                    entry.Multistrike = nil;
+                    entry.MultistrikeEffect = nil;
+                    entry.Readiness = nil;
+                    entry.ReadinessSpell = nil;
+                    entry.SpellCritChanceFromIntellect = nil;
+                    entry.ManaRegenRateFromSpirit = nil;
+                    entry.CharacterPoints = nil;
+                    if ( entry.Pets ) then
+                        for _, petEntry in pairs(entry.Pets) do
+                            petEntry.CritChanceFromAgility = nil;
+                            petEntry.SpellCritChanceFromIntellect = nil;
+                            petEntry.ManaRegenRateFromSpirit = nil;
+                        end
+                    end
+
+                    entry.HonorTalents = nil;
+                end
+            end
 
             upgraded = true;
 
