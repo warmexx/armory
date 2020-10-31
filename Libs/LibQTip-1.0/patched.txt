@@ -1,6 +1,0 @@
-Temporary work-around
-
-Patched version of LibQTip-1.0
-
-- Retrieving source from https://repos.wowace.com/wow/libqtip-1-0/trunk results in an internal error.
-
