@@ -719,7 +719,9 @@ local function RegisterTooltipHook(tooltip, idType, hook, reset)
         end);
         SetTooltipHook(tooltip, "SetQuestCurrency", _G.GetQuestCurrencyInfo);
         SetTooltipHook(tooltip, "SetQuestLogCurrency", function(type, index, questID)
-            return _G.GetQuestLogRewardCurrencyInfo(index, questID);
+            if ( questID ) then
+                return _G.GetQuestLogRewardCurrencyInfo(index, questID);
+            end
         end);
 
         SetTooltipHook(tooltip, "SetMerchantItem", _G.GetMerchantItemLink);
