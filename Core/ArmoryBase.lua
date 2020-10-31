@@ -552,10 +552,9 @@ function Armory:IsDbCompatible()
             dbEntry:SetValue(2, "General", "MailIgnoreMarks", nil);
             dbEntry:SetValue(2, "General", "PartialFilter", nil);
             dbEntry:SetValue(2, "General", "ShowAllSpellRanks", nil);
-            dbEntry:SetValue(2, "General", "SummaryCurrency:"..self.GetCurrencyName(CONQUEST_CURRENCY), nil);
-            dbEntry:SetValue(2, "General", "SummaryCurrency:"..self.GetCurrencyName(JUSTICE_CURRENCY), nil);
-            dbEntry:SetValue(2, "General", "SummaryCurrency:"..self.GetCurrencyName(VALOR_CURRENCY), nil);
-            dbEntry:SetValue(2, "General", "SummaryCurrency:"..self.GetCurrencyName(WOD_VALOR_CURRENCY), nil);
+            dbEntry:SetValue(2, "General", "SummaryCurrency:"..self:GetCurrencyName(CONQUEST_CURRENCY), nil);
+            dbEntry:SetValue(2, "General", "SummaryCurrency:"..self:GetCurrencyName(JUSTICE_CURRENCY), nil);
+            dbEntry:SetValue(2, "General", "SummaryCurrency:"..self:GetCurrencyName(VALOR_CURRENCY), nil);
             dbEntry:SetValue(2, "General", "UseInProgressColor", nil);
             dbEntry:SetValue(2, "General", "WeeklyReset", nil);
             

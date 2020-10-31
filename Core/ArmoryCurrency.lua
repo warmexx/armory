@@ -253,6 +253,9 @@ function Armory:IsContentReward(name)
 end
 
 function Armory:GetCurrencyName(index)
+    if ( index == 1191 ) then 
+        return "WoD Valor";
+    end
     local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(index);
     if ( currencyInfo and currencyInfo.name ) then
         return currencyInfo.name;
@@ -284,9 +287,6 @@ function Armory:GetVirtualCurrencyInfo(index, contentReward)
 		end
 	else
 		name, count, icon, earnedThisWeek, earnablePerWeek = self:GetCurrencyInfo(CONTENT_REWARDS[index]);
-		if ( earnablePerWeek and CONTENT_REWARDS[index] == WOD_VALOR_CURRENCY ) then
-			earnablePerWeek = floor(earnablePerWeek / 100);
-		end
 	end
 
 	return name, isHeader, count, icon, earnedThisWeek, earnablePerWeek;
