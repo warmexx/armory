@@ -128,6 +128,17 @@ local function GetShortDate(value)
     return day.." "..month.." "..year;
 end
 
+local function GetFreeSpaceColored(numAvailable, numFree)
+    local percentageFree = (numFree * 100) / numAvailable;
+    if ( percentageFree <= 10 ) then
+        return RED_FONT_COLOR_CODE .. numFree .. FONT_COLOR_CODE_CLOSE;
+    elseif ( percentageFree <= 75 ) then
+        return ORANGE_FONT_COLOR_CODE .. numFree .. FONT_COLOR_CODE_CLOSE;
+    else
+        return GREEN_FONT_COLOR_CODE .. numFree .. FONT_COLOR_CODE_CLOSE;
+    end
+end
+  
 local function OnLockClick(self, arg, button)
     if ( button == "LeftButton" ) then
         Armory.summary.locked = not Armory.summary.locked;
@@ -247,6 +258,19 @@ local function OnMoneyEnter(self, characterInfo)
         SetTooltipMoney(GameTooltip, characterInfo.Money);
     end
     
+    GameTooltip:Show();
+end
+
+local function OnBagsEnter(self, characterInfo)
+    SummaryHideDetail();
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+    GameTooltip:SetFrameLevel(self:GetFrameLevel() + 1);
+    GameTooltip:AddDoubleLine(AVAILABLE, GetFreeSpaceColored(characterInfo.NumBagSlots, characterInfo.FreeBagSlots));
+    GameTooltip:AddLine(" ");
+    for _, bagInfo in ipairs(characterInfo.Bags) do
+        local bag, free = unpack(bagInfo);
+        GameTooltip:AddDoubleLine(bag, free, 1, 1, 1);
+    end
     GameTooltip:Show();
 end
 
@@ -659,6 +683,15 @@ local function SortSummary(sortColumn)
             end 
         end;
 
+    elseif ( columnName == "bags" ) then
+        sorter = function(a, b) 
+            if ( summary.initial ) then 
+                return a.FreeBagSlots > b.FreeBagSlots; 
+            else 
+                return a.FreeBagSlots < b.FreeBagSlots; 
+            end 
+        end;
+
     elseif ( columnName ) then 
         sorter = function(a, b) 
 			local ac = a.CurrencyInfo[columnName] and a.CurrencyInfo[columnName].Count or 0;
@@ -775,6 +808,26 @@ function Armory:BuildSummary()
             if ( self:GetConfigSummaryMoney() ) then
                 characterInfo.Money = self:GetMoney();
                 characterInfo.MoneyDisplay, characterInfo.MoneyTruncated = GetCoinText(characterInfo.Money);
+            end
+            if ( self:GetConfigSummaryBags() and self:HasInventory() ) then
+                local numLines = self:GetNumInventoryLines();
+                characterInfo.NumBagSlots = 0;
+                characterInfo.FreeBagSlots = 0;
+                characterInfo.Bags = {};
+                for i = 1, numLines do
+                    local name, id, numAvailable, _, isHeader, _, _, _, _, numFreeSlots, containerName = self:GetInventoryLineInfo(i);
+                    if ( isHeader and id >= BACKPACK_CONTAINER and id <= NUM_BAG_SLOTS ) then
+                        if ( numAvailable ) then
+                            name = format("%s [%d/%d]", containerName or name, numAvailable - numFreeSlots, numAvailable);
+                            characterInfo.NumBagSlots = characterInfo.NumBagSlots + numAvailable;
+                            characterInfo.FreeBagSlots = characterInfo.FreeBagSlots + numFreeSlots;
+                        else
+                            name = format("%s [?/?]", containerName or name);
+                        end
+                       table.insert(characterInfo.Bags, { name, GetFreeSpaceColored(numAvailable, numFreeSlots) });
+                    end
+                end
+                characterInfo.BagsDisplay = format("%d/%d", characterInfo.NumBagSlots - characterInfo.FreeBagSlots, characterInfo.NumBagSlots);
             end
             if ( self:GetConfigSummaryCurrency() ) then
 				local name, isHeader, count, icon, earnedThisWeek, earnablePerWeek;
@@ -985,6 +1038,9 @@ function Armory:InitializeSummary(parent)
         if ( self:GetConfigSummaryMoney() ) then   
             columns = columns + 1;
         end
+        if ( self:GetConfigSummaryBags() and self:HasInventory() ) then   
+            columns = columns + 1;
+        end
         if ( self:GetConfigSummaryCurrency() ) then 
 			columns = columns + select(2, self:GetConfigSummaryEnabledCurrencies());
         end
@@ -1087,6 +1143,10 @@ function Armory:DisplaySummary()
     if ( self:GetConfigSummaryMoney() ) then   
         myColumn = column; index, column = self.summary:SetCell(index, myColumn, MONEY, headerFont, "CENTER");
         self.summary:SetCellScript(index, myColumn, "OnMouseDown", OnColumnHeaderClick, "money");
+    end
+    if ( self:GetConfigSummaryBags() and self:HasInventory() ) then   
+        myColumn = column; index, column = self.summary:SetCell(index, myColumn, BAGSLOTTEXT, headerFont, "CENTER");
+        self.summary:SetCellScript(index, myColumn, "OnMouseDown", OnColumnHeaderClick, "bags");
     end
     if ( self:GetConfigSummaryCurrency() ) then  
 		for name, icon in pairs(summary.Currencies) do
@@ -1199,6 +1259,13 @@ function Armory:DisplaySummary()
                     myColumn = column; index, column = self.summary:SetCell(index, myColumn, characterInfo.MoneyDisplay, nil, "RIGHT");
                     if ( characterInfo.Faction ) then
                         self.summary:SetCellScript(index, myColumn, "OnEnter", OnMoneyEnter, characterInfo);
+                        self.summary:SetCellScript(index, myColumn, "OnLeave", CellHideTooltip); 
+                    end
+                end
+                if ( self:GetConfigSummaryBags() and self:HasInventory() ) then
+                    myColumn = column; index, column = self.summary:SetCell(index, myColumn, characterInfo.BagsDisplay, nil, "RIGHT");
+                    if ( characterInfo.Bags ) then
+                        self.summary:SetCellScript(index, myColumn, "OnEnter", OnBagsEnter, characterInfo);
                         self.summary:SetCellScript(index, myColumn, "OnLeave", CellHideTooltip); 
                     end
                 end

@@ -2306,12 +2306,11 @@
           </OnLoad>
         </Scripts>
       </CheckButton>
-
       <CheckButton name="$parentMoney" inherits="ArmoryOptionsCheckButtonTemplate">
         <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="$parentSubText2" relativePoint="BOTTOMLEFT">
+          <Anchor point="TOPLEFT" relativeTo="$parentOnline" relativePoint="BOTTOMLEFT">
             <Offset>
-              <AbsDimension x="200" y="-8"/>
+              <AbsDimension x="0" y="-4"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -2327,9 +2326,30 @@
           </OnLoad>
         </Scripts>
       </CheckButton>
+
+      <CheckButton name="$parentBags" inherits="ArmoryOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentSubText2" relativePoint="BOTTOMLEFT">
+            <Offset>
+              <AbsDimension x="200" y="-8"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnLoad>
+            self.type = CONTROLTYPE_CHECKBOX;
+            self.text = BAGSLOTTEXT;
+            self.defaultValue = true;
+            self.GetValue = function(self) return Armory:GetConfigSummaryBags(); end
+            self.SetValue = function(self, value) self.value = value; self:SetChecked(value); Armory:SetConfigSummaryBags(value and value ~= "0"); end
+            ArmoryOptionsPanel_RegisterControl(self, self:GetParent());
+            ArmoryOptionsPanel_SetupDependentControl(ArmoryOptionsSummaryPanelSummary, self);
+          </OnLoad>
+        </Scripts>
+      </CheckButton>
       <CheckButton name="$parentCurrency" inherits="ArmoryOptionsCheckButtonTemplate">
         <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="$parentMoney" relativePoint="BOTTOMLEFT">
+          <Anchor point="TOPLEFT" relativeTo="$parentBags" relativePoint="BOTTOMLEFT">
             <Offset>
               <AbsDimension x="0" y="-4"/>
             </Offset>
@@ -2464,7 +2484,7 @@
             <Texture name="$parentBG">
               <Anchors>
                 <Anchor point="TOPLEFT"/>
-                <Anchor point="BOTTOMRIGHT"/>
+                <Anchor point="BOTTOMRIGHT" y="-30"/>
               </Anchors>
               <Color r="0.3" g="0.3" b="0.3" a="0.3"/>
             </Texture>
@@ -2480,7 +2500,7 @@
         <Frames>
           <ScrollFrame name="$parentScrollFrame" inherits="FauxScrollFrameTemplate">
             <Size>
-              <AbsDimension x="175" y="180"/>
+              <AbsDimension x="175" y="205"/>
             </Size>
             <Anchors>
               <Anchor point="TOPLEFT" x="0" y="-24" />
@@ -2525,6 +2545,11 @@
           <CheckButton name="$parentButton7" inherits="ArmoryOptionsCurrencyCheckButtonTemplate">
             <Anchors>
               <Anchor point="TOPLEFT" relativeTo="$parentButton6" relativePoint="BOTTOMLEFT" />
+            </Anchors>
+          </CheckButton>
+          <CheckButton name="$parentButton8" inherits="ArmoryOptionsCurrencyCheckButtonTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="$parentButton7" relativePoint="BOTTOMLEFT" />
             </Anchors>
           </CheckButton>
         </Frames>

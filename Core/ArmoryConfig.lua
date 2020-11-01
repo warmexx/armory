@@ -1450,6 +1450,14 @@ function Armory:GetConfigSummaryMoney()
     return not self:Setting("General", "HideSummaryMoney");
 end
 
+function Armory:SetConfigSummaryBags(on)
+    self:Setting("General", "HideSummaryBags", not on);
+end
+
+function Armory:GetConfigSummaryBags()
+    return not self:Setting("General", "HideSummaryBags");
+end
+
 function Armory:SetConfigSummaryCurrency(on)
     self:Setting("General", "HideSummaryCurrency", not on);
 end
