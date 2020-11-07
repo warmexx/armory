@@ -726,7 +726,7 @@
     </Scripts>
   </Frame>
 
-  <Frame name="ArmoryConquestTooltip" parent="UIParent" frameStrata="TOOLTIP" hidden="true" clampedToScreen="true">
+  <Frame name="ArmoryConquestTooltip" parent="UIParent" frameStrata="TOOLTIP" hidden="true" clampedToScreen="true" inherits="TooltipBackdropTemplate">
     <Size x="200" y="185"/>
     <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
       <Color r="0" b="0" g="0"/>
