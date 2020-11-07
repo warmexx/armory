@@ -285,6 +285,8 @@ function ArmoryOptionsPanel_RegisterControl(control, parentFrame)
             control.SetDisplayValue = control.SetValue;
             control.SetValue = function(self, value) self:SetDisplayValue(value); self.value = value; self.setFunc(value); end;
 
+            BackdropTemplateMixin.OnBackdropLoaded(control);
+            
         end
 
         control.defaultValue = control.defaultValue or entry.default;
