@@ -4,6 +4,10 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+==== v16.1.1 ====
+# Fixes some backdrop issues
+# Fixes slider frames
+
 ==== v16.1.0 ====
 # Support for bag slots has been added to the summary sheet
 # Fixes a bug with ancient currencies
