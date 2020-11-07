@@ -494,13 +494,11 @@
           <Anchor point="BOTTOMRIGHT" x="29" y="3"/>
         </Anchors>
         <Frames>
-          <Slider name="$parentScrollBar" minValue="0" maxValue="1" defaultValue="0" parentKey="ScrollBar">
+          <Slider name="$parentScrollBar" minValue="0" maxValue="1" defaultValue="0" parentKey="ScrollBar" inherits="BackdropTemplate">
             <Size x="12" y="0"/>
-            <Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
-              <BackgroundInsets left="3" right="3" top="3" bottom="3"/>
-              <TileSize val="8"/>
-              <EdgeSize val="8"/>
-            </Backdrop>
+            <KeyValues>
+              <KeyValue key="backdropInfo" value="BACKDROP_SLIDER_8_8" type="global"/>
+            </KeyValues>
             <Scripts>
               <OnValueChanged>
                 self:GetParent():SetVerticalScroll(value);
@@ -792,15 +790,6 @@
 
       <Frame name="ArmoryAlternateSlotFrame"  hidden="true">
         <Size x="64" y="64" />
-        <!--<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-          <BackgroundInsets>
-            <AbsInset left="4" right="4" top="4" bottom="4" />
-          </BackgroundInsets>
-          <EdgeSize>
-            <AbsValue val="16" />
-          </EdgeSize>
-          <BorderColor r=".3" g=".3" b=".3"/>
-        </Backdrop>-->
         <Scripts>
           <OnUpdate>
             ArmoryAlternateSlotFrame_OnUpdate(self, elapsed);
