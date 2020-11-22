@@ -4,6 +4,10 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+==== v16.1.2 ====
+# Updates TOC
+# Includes updated recipes
+
 ==== v16.1.1 ====
 # Fixes some backdrop issues
 # Fixes slider frames
