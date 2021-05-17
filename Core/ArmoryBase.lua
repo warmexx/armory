@@ -477,7 +477,7 @@ function Armory:InitDb()
         ArmoryShared = nil;
         ArmoryCache = nil;
     end
-    
+
     if ( not ArmoryShared ) then
         ArmoryShared = {};
     end
@@ -515,7 +515,7 @@ function Armory:IsDbCompatible()
     elseif ( dbVersion ~= self.dbVersion) then
         -- this is an older Armory version
         if ( dbVersion > self.dbVersion ) then
- 
+
         -- convert from 19 to 20
         elseif ( dbVersion == 19 ) then
             local r, g, b = dbEntry:GetValue("General", "RecipeKnownColor");
@@ -526,7 +526,7 @@ function Armory:IsDbCompatible()
             dbEntry:SetValue(2, "General", "HideRecipeKnown", nil);
 
             upgraded = true;
-        
+
         -- convert from 21 to 38
         elseif ( dbVersion < 39 ) then
             dbVersion = 38;
@@ -557,13 +557,13 @@ function Armory:IsDbCompatible()
             dbEntry:SetValue(2, "General", "SummaryCurrency:"..self:GetCurrencyName(VALOR_CURRENCY), nil);
             dbEntry:SetValue(2, "General", "UseInProgressColor", nil);
             dbEntry:SetValue(2, "General", "WeeklyReset", nil);
-            
+
             upgraded = false;
 
         -- convert from 40 to 41
         elseif ( dbVersion == 40 ) then
             dbEntry:SetValue(2, "General", "SummaryCurrency:", nil);
-            
+
             upgraded = true;
 
         -- convert from 41 to 42
@@ -582,7 +582,7 @@ function Armory:IsDbCompatible()
                     end
                 end
             end
-            
+
             upgraded = true;
 
         -- convert from 42 to 43
@@ -607,7 +607,7 @@ function Armory:IsDbCompatible()
                     end
                 end
             end
-            
+
             upgraded = true;
 
         -- convert from 43 to 44
@@ -648,7 +648,7 @@ function Armory:IsDbCompatible()
                         for i, v in ipairs(entry.Factions) do
                             entry.Factions[i] = { Info = v }
                         end
-                    end 
+                    end
                 end
             end
 
@@ -1051,7 +1051,7 @@ end
 function Armory:AllCharacterSetting(key, ...)
     if ( self.settingsDbEntry ) then
         local dbEntry = self.settingsDbEntry;
-        
+
         for realm in pairs(ArmoryDB) do
             for character in pairs(ArmoryDB[realm]) do
                 dbEntry:SetValue(4, "PerCharacter", realm, character, key, ...);
@@ -1116,7 +1116,7 @@ function Armory:SelectableProfiles()
     if ( not self:GetConfigUseFactionFilter() ) then
         return self:Profiles();
     end
-    
+
     if ( table.getn(self.selectableProfiles) == 0 ) then
         for _, realm in ipairs(self:RealmList()) do
             for _, character in ipairs(self:CharacterList(realm)) do
@@ -1124,7 +1124,7 @@ function Armory:SelectableProfiles()
             end
         end
     end
-    
+
     return self.selectableProfiles;
 end
 
@@ -1206,7 +1206,7 @@ function Armory:LoadProfile(realm, character)
 
     self:SetPaperDollLastViewed(realm, character);
     self.selectedDbBaseEntry = ArmoryDbEntry:new(ArmoryDB[realm][character]);
-    
+
     return self.selectedDbBaseEntry;
 end
 
@@ -1235,7 +1235,7 @@ function Armory:DeleteProfile(realm, character, force)
 
     self:ResetSelectableCharacters();
     self:SelectDefaultProfile();
-    
+
     if ( not ArmorySettings["PerCharacter"] ) then
         return;
     elseif ( not ArmorySettings["PerCharacter"][realm] ) then
@@ -1338,7 +1338,7 @@ function Armory:GetConnectedProfiles()
     for _, realm in ipairs(self:GetConnectedRealms()) do
         local characters = self:CharacterList(realm);
         for _, character in ipairs(characters) do
-            table.insert(connectedProfiles, {realm=realm, character=character}); 
+            table.insert(connectedProfiles, {realm=realm, character=character});
         end
     end
     return connectedProfiles;
@@ -1353,7 +1353,7 @@ function Armory:GetQualifiedCharacterName(showRealm)
     end
     if ( self:GetConfigUseClassColors() ) then
         local class, classEn = self:UnitClass("player");
-        name = "|c"..self:ClassColor(classEn, true)..name..FONT_COLOR_CODE_CLOSE; 
+        name = "|c"..self:ClassColor(classEn, true)..name..FONT_COLOR_CODE_CLOSE;
     end
     if ( showRealm and self:IsConnectedRealm(realm, true) ) then
         name = name .. "|TInterface\\FriendsFrame\\UI-FriendsFrame-Link.blp:0|t";
@@ -1443,16 +1443,16 @@ function Armory:CheckMailItems(mode, days)
                     total = total + 1;
                 end
             end
- 
+
             if ( mode ~= 2 and maxDays < 30 and self:ContainerExists(ARMORY_MAIL_CONTAINER) ) then
                 if ( self:GetConfigMailCheckVisit() and not (self:GetConfigMailExcludeVisit() or (mode == 1 and self:GetConfigMailHideLogonVisit())) ) then
                     local _, _, _, timestamp = self:GetInventoryContainerInfo(ARMORY_MAIL_CONTAINER);
                     days = floor(time() / (24 * 60 * 60)) - floor(timestamp / (24 * 60 * 60));
-                    if ( days >= 30 - maxDays ) then
+                    if ( days >= 30 - maxDays and days < 31 ) then
                         self:PrintWarning(format(ARMORY_MAIL_VISIT_WARNING, profile.character, profile.realm, format(DAYS_ABBR, floor(days))));
                     end
                 end
-                
+
                 if ( self:GetConfigMailCheckCount() and not (mode == 1 and self:GetConfigMailHideLogonCount()) ) then
                     local remaining = self:GetNumRemainingMailItems();
                     if ( remaining > 0 ) then
@@ -1669,12 +1669,12 @@ function Armory:MakeDate(day, month, year, hour, minute)
 end
 
 local weekdays = {
-    WEEKDAY_SUNDAY, 
-    WEEKDAY_MONDAY, 
-    WEEKDAY_TUESDAY, 
-    WEEKDAY_WEDNESDAY, 
-    WEEKDAY_THURSDAY, 
-    WEEKDAY_FRIDAY, 
+    WEEKDAY_SUNDAY,
+    WEEKDAY_MONDAY,
+    WEEKDAY_TUESDAY,
+    WEEKDAY_WEDNESDAY,
+    WEEKDAY_THURSDAY,
+    WEEKDAY_FRIDAY,
     WEEKDAY_SATURDAY
 };
 local monthNames = {
@@ -1995,7 +1995,7 @@ function Armory:GetInfoFromId(idType, id)
         end
     end
     self:ReleaseTooltip(tooltip);
-    
+
     if ( (name or "") == "" ) then
         if ( idType == "item" ) then
             name, link = _G.GetItemInfo(id);
@@ -2053,7 +2053,7 @@ function Armory:GetItemString(link)
 end
 
 local gemIds = {};
-function Armory:GetItemGemString(link)  
+function Armory:GetItemGemString(link)
     local _, itemString = self:GetItemLinkInfo(link);
     local gemString;
     -- itemId:enchantId:jewelId1:jewelId2:jewelId3:jewelId4:suffixId:uniqueId:linkLevel
@@ -2079,7 +2079,7 @@ end
 
 function Armory:GetInventoryItemSocketInfo(tooltip)
     local emptySockets, activeMeta;
-   
+
     local _, link = self:GetItemFromTooltip(tooltip);
     local itemId = self:GetItemId(link);
 
@@ -2125,7 +2125,7 @@ end
 local sockets = { {}, {}, {}, {} };
 function Armory:GetSocketInfo(link)
     local numGems = 0;
-    if ( link ) then    
+    if ( link ) then
         local itemId = self:GetQualifiedItemId(link);
         if ( itemId and IsEquippableItem(link) ) then
             local tooltip = self:AllocateTooltip();
@@ -2149,12 +2149,12 @@ function Armory:GetSocketInfo(link)
                 else
                     sockets[i].texture = "Interface\\ItemSocketingFrame\\UI-EmptySocket";
                 end
-                
+
                 if ( gemName ) then
                     numGems = numGems + 1;
                 end
             end
-        
+
             self:ReleaseTooltip(tooltip);
         end
     end
@@ -2474,14 +2474,14 @@ function Armory:ClearModuleData(container)
         local dbEntry = self:SelectProfile(profile);
 
         dbEntry:SetValue(container, nil);
-        self:SetClassValue(nil, container, nil); 
-        
+        self:SetClassValue(nil, container, nil);
+
         for _, pet in ipairs(self:GetPets()) do
             self:SelectPet(dbEntry, pet):SetValue(container, nil);
         end
     end
     self:SelectProfile(currentProfile);
-    
+
     self:SetClassValue("pet", container, nil);
     self:SetSharedValue(container, nil);
 end
@@ -2494,7 +2494,7 @@ function Armory:ClearPets()
         dbEntry:SetValue("Pets", nil);
     end
     self:SelectProfile(currentProfile);
-    
+
     self:SetSharedValue("PET", nil);
     self:SetSharedValue("PETACTION", nil);
 end
@@ -2619,7 +2619,7 @@ function Armory:GetXP()
                     percentXP = 150;
                     restTimeLeft = 0;
                 end
-                
+
                 chatText = format(ARMORY_XP_SUMMARY, level, xpText, nextXP - currXP, max(0, percentXP).."%");
 
                 if ( percentXP > 0 ) then
@@ -2734,7 +2734,7 @@ function Armory:ParseArgs(...)
     elseif ( arg2 and arg2:find("|H") ) then
         return arg1, self:GetNameFromLink(arg2);
     end
-    return ...;    
+    return ...;
 end
 
 local findResults = {};
@@ -2784,7 +2784,7 @@ function Armory:Find(...)
                         if ( (flags[ARMORY_CMD_FIND_ALL] or flags[ARMORY_CMD_FIND_SKILL]) and self:HasTradeSkills() ) then
                             findResults[ARMORY_CMD_FIND_SKILL] = self:FindSkill(nil, select(firstArg, ...));
                         end
-                        
+
                         for _, list in pairs(findResults) do
                             for _, line in ipairs(list) do
                                 self:PrintSearchResult(self:GetQualifiedCharacterName(self:GetConfigGlobalSearch()), line);
@@ -2846,12 +2846,12 @@ function Armory:FindItems(...)
     local list = {};
 
     self:FindInventoryItem(list, ...);
-    
+
     if ( not self:GetConfigRestrictiveSearch() ) then
         self:FindQuestItem(list, ...);
         self:FindSkill(list, ...);
     end
-    
+
     return list;
 end
 
@@ -2859,11 +2859,11 @@ function Armory:FindSpells(...)
     local list = {};
 
     self:FindSpell(list, ...);
-    
+
     if ( not self:GetConfigRestrictiveSearch() ) then
         self:FindQuestSpell(list, ...);
     end
-    
+
     return list;
 end
 

@@ -4,6 +4,9 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+==== v16.2.0 ====
+# Doesn't show warning anymore for mailbox visits longer than 30 days ago
+
 ==== v16.1.3 ====
 # Updates guild bank TOC
 
@@ -55,7 +58,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 # An "attempt to concatenate a nil value" error may appear when opening Armory's tradeskill window; this has been fixed.
 
 ==== v15.4.0 ====
-# The skill progress bar didn't show ranks anymore while hovering; this has been fixed. 
+# The skill progress bar didn't show ranks anymore while hovering; this has been fixed.
 # Added recipe ranks (requires rescan).
 # Trade skill collapse / expand all button didn't work properly anymore; this has been fixed.
 # Recipe reagents are not always returned by the API; a work-around has been implemented.
@@ -137,7 +140,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 
 ==== v13.0.0 ====
 # Adjustments have been made for patch 7.0.3. Sorry it took so long, but a lot of rewriting was involved.
-  Note: The database will be cleared because too much has changed (not for alpha users). 
+  Note: The database will be cleared because too much has changed (not for alpha users).
 
 # Character names in the summary will use class colors (if enabled) when the class column is disabled.
 # Added the option to mark a guild bank as personal to include its gold in a character's money tooltip.
@@ -161,7 +164,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 # Added tooltip to reputations showing standings for all characters.
 
 ==== v12.8.1 ====
-# Class colors are now used globally (except for summary sheet that has its own colored class column). 
+# Class colors are now used globally (except for summary sheet that has its own colored class column).
 
 ==== v12.8.0 ====
 # An option has been added to enable the use of class colors in the character selection dropdown.
@@ -196,12 +199,12 @@ Thanks for using Armory. You can show your appreciation and support future devel
 # Some item tooltips didn't contain counts anymore; this has been fixed.
 # Guildbank showed empty slots for certain items; this has been fixed.
 # Saving raid information could result in an integer overflow; this has been fixed.
-# Reenabled counts for quest log currency rewards and trade skills items. 
+# Reenabled counts for quest log currency rewards and trade skills items.
 # Quest log rewards were not displayed anymore; this has been fixed.
 # Hack for tradeskill cooldown didn't always work; this has been fixed.
 # Replaced LibCraftInfo with LibRecipes.
 # The tooltip for primary stats could show it as non-benifical; this has been fixed (rescan required).
- 
+
 ==== v12.5.1 ====
 # Tooltip errors occurred for items that became invalid with patch 6.2; this has been fixed.
 
@@ -214,7 +217,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 ==== v12.4.2 ====
 # Trying to use the Twitter option caused a taint error; this has been fixed.
 # World bosses were displayed twice in the raid frame; this has been fixed.
-# Accepting a daily quest could result in an 'index nil' error; this has been fixed. 
+# Accepting a daily quest could result in an 'index nil' error; this has been fixed.
 
 ==== v12.4.1 ====
 # Trade skill frame referred to a non-existing element; this has been fixed.
@@ -278,7 +281,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 # Included updated German translations.
 # The summary now shows '0' if there is mail that doesn't expire.
 # Some weekly data wasn't correctly reset; this has been fixed.
-# Added quest log entries to the summary. 
+# Added quest log entries to the summary.
 # World bosses have been moved from quest log to raid info.
 # Raid module didn't include LFR anymore; this has been fixed (again).
 # Added raid info to the summary sheet.
@@ -407,7 +410,7 @@ Note: The database will be upgraded.
 # Gold didn't get updated properly; this had been fixed.
 # Data sharing module has finally been adapted and is included again (character lookup is simplified though).
 # Column sorting support has been added to the summary sheet.
-# Finished some other loose ends that where still on the version 10 to-do list. 
+# Finished some other loose ends that where still on the version 10 to-do list.
 
 Note:
 The planned changes for patch 5 are hereby finished. Companions, mounts and achievements are intentionally left out.
@@ -423,7 +426,7 @@ It has been a massive amount of work and I hope you are pleased with the end res
 ==== v10.0.0 ====
 # Redesign and rewrite of code for patch 5.0.4.
 
-Note: 
+Note:
 Not all code has been reviewed yet and parts are still disabled, but all core modules are there.
 Because this release consumed all my free time for a few weeks I'll take it a bit easier now. Updates will follow in due time.
 Happy gaming!
@@ -472,7 +475,7 @@ Happy gaming!
 # "Craftable by" has been added to glyph tooltips. For this to work in other languages than English, the localization of ARMORY_TRADE_INSCRIPTION should be accurate (see project site).
 # Glyph has been added as a search type for /ar find. Searching for 'unknown' (shortcut '?') will show missing glyphs for all characters. A question mark behind the crafter indicates that the glyph's class couldn't be verified (retrying usually resolves this).
 # Known glyphs will no longer be stored for low level characters.
-# The 'rescan on login' option will now be set for all characters at once instead of only the current character. 
+# The 'rescan on login' option will now be set for all characters at once instead of only the current character.
 # Mail expiration check could result in an error under certain conditions; this has been fixed.
 # Forgot to actually load ptBR; this has been fixed.
 # An option has been added to hide the Armory button on the character frame.
@@ -625,7 +628,7 @@ Note: All data will be reset due to major API changes.
 # Final release for patch 4.0.1 / beta 4.0.3
 
 ==== v8.2.8 ====
-# Daily quests and random battlegrounds and dungeons have been added to the quest log. The last completion (server) time will be recorded up to a maximum of one week. 
+# Daily quests and random battlegrounds and dungeons have been added to the quest log. The last completion (server) time will be recorded up to a maximum of one week.
   Note: Non-holiday battlegrounds will not be stored in case of a disconnect; this is a technical limitation.
 # Events have been added to the summary sheet.
 # Mail check on start-up is now delayed for 5 seconds.
