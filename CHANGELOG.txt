@@ -7,6 +7,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 ==== v16.2.0 ====
 # Updates TOC
 # Doesn't show warning anymore for mailbox visits longer than 30 days ago
+# Changes the text of the "mail check visit" option to make it more clear
 
 ==== v16.1.3 ====
 # Updates guild bank TOC
