@@ -5,6 +5,7 @@ The Armory archive can be found on http://www.wow-neighbours.com/.
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
 ==== v16.2.0 ====
+# Updates TOC
 # Doesn't show warning anymore for mailbox visits longer than 30 days ago
 
 ==== v16.1.3 ====

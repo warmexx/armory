@@ -1,4 +1,4 @@
-## Interface: 90002
+## Interface: 90005
 ## Title: ArmoryGuildBank
 ## Title-deDE: ArmoryGuildBank [Armory Gildenbank]
 ## Title-esES: ArmoryGuildBank [Banco de Hermandad]
