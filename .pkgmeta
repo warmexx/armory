@@ -36,6 +36,6 @@ move-folders:
 
 manual-changelog:
     filename: CHANGELOG.txt
-    markup-type: creole
+    markup-type: plain
 
 license-output: GPL.txt
