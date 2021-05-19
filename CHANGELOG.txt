@@ -1,0 +1,53 @@
+﻿Armory has been released into the public domain on November 2007.
+The project page can be found on https://www.curseforge.com/wow/addons/armory.
+
+Thanks for using Armory. You can show your appreciation and support future development by donating!
+
+==== v2.0.0 ===
+Supports Burning Crusade (patch 2.5.1)
+Doesn't show warning anymore for mailbox visits longer than 30 days ago
+
+==== v1.7.1 ===
+TOC update
+Adds sanity check to skill bar display
+Contains a fix for Egan's Blaster ranged DPS calculation
+
+==== v1.7.0 ===
+Adds counts to action tooltips.
+
+==== v1.6.2 ===
+Adds missing crafts layout changes. (haste makes waste)
+
+==== v1.6.1 ===
+TOC Update
+
+==== v1.6 ===
+Adds support for wildcard (*) lookup of quests and items when using a private channel.
+Contains a possible fix for an occasional taint error.
+Contains a fix for "SendWho" failing when shift-clicking a player in the lookup frame.
+Contains a fix for demon pet spells (need to summon each once to update).
+Contains a fix for friends not being shown.
+Contains a fix for requesting a crafters list when doing a lookup.
+Contains a fix for materials filter on recipes.
+Enables filtering crafts just like trade skills.
+Fixes some minor UI issues.
+
+==== v1.5 ====
+Contains a fix for counts not showing for craft reagents.
+Adds some sanity checks to paperdoll calculations.
+
+==== v1.4 ====
+Contains a fix for raid info throwing another error in the summary sheet.
+
+==== v1.3 ====
+Contains a fix for raid info throwing an error in the summary sheet.
+
+==== v1.2 ====
+Contains a fix for herbalism not showing up as a primary trade skill.
+
+==== v1.1 ====
+Contains fix for enchants not being found in LibRecipes.
+Contains a fix for hunter pets with an unknown number of training points.
+
+==== v1.0 ====
+Initial release
