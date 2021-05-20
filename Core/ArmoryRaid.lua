@@ -35,7 +35,7 @@ local container = "Instances";
 
 local function GetInstanceValue(key)
     local dbEntry = self.selectedDbBaseEntry;
-    return dbEntry:GetSubValue(container, key);
+    return dbEntry:GetValue(container, key);
 end
 
 ----------------------------------------------------------
@@ -54,7 +54,7 @@ function Armory:UpdateInstances()
         dbEntry:SetValue(container, nil);
         return;
     end
-    
+
     if ( not self:IsLocked(container) ) then
         self:Lock(container);
 
@@ -62,7 +62,7 @@ function Armory:UpdateInstances()
 
         local oldNum = dbEntry:GetValue(container, "NumInstances") or 0;
         local newNum = _G.GetNumSavedInstances();
-        
+
         if ( newNum == 0 ) then
             dbEntry:SetValue(container, nil);
         else
@@ -77,7 +77,7 @@ function Armory:UpdateInstances()
                 end
             end
         end
-        
+
         self:Unlock(container);
     else
         self:PrintDebug("LOCKED", container);

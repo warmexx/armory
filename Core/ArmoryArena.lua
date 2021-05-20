@@ -65,7 +65,8 @@ function Armory:GetArenaTeamValue(id, key)
     if ( key == nil ) then
         return dbEntry:GetValue(container);
     end
-    return dbEntry:GetSubValue(container, key);
+
+    return dbEntry:GetValue(container, key);
 end
 
 ----------------------------------------------------------
