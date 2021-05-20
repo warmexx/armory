@@ -24,7 +24,7 @@
         You have an implicit licence to use this AddOn with these facilities
         since that is it's designated purpose as per:
         http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]] 
+--]]
 
 local Armory, _ = Armory;
 
@@ -109,7 +109,7 @@ function ArmoryQuestLogFrame_OnUpdate(self, elapsed)
         self.timePassed = self.timePassed + elapsed;
         if ( self.timePassed > UPDATE_DELAY ) then
             ArmoryQuestLogTimerText:SetText(TIME_REMAINING.." "..SecondsToTime(Armory:GetQuestLogTimeLeft()));
-            self.timePassed = 0;        
+            self.timePassed = 0;
         end
     end
 end
@@ -133,8 +133,8 @@ function ArmoryQuestLog_Update()
     end
 
     -- Update Quest Count
-    ArmoryQuestLogQuestCount:SetFormattedText(QUEST_LOG_COUNT_TEMPLATE, numQuests, MAX_QUESTLOG_QUESTS);
-    
+    ArmoryQuestLogUpdateQuestCount(numQuests);
+
     -- ScrollFrame update
     FauxScrollFrame_Update(ArmoryQuestLogListScrollFrame, numEntries, ARMORY_QUESTS_DISPLAYED, ARMORY_QUESTLOG_QUEST_HEIGHT, nil, nil, nil, ArmoryQuestLogHighlightFrame, 293, 316 )
 
@@ -167,7 +167,7 @@ function ArmoryQuestLog_Update()
                 if ( isCollapsed ) then
                     questLogTitle:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up");
                 else
-                    questLogTitle:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up"); 
+                    questLogTitle:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up");
                 end
                 questHighlight:SetTexture("Interface\\Buttons\\UI-PlusButton-Hilight");
             else
@@ -182,7 +182,13 @@ function ArmoryQuestLog_Update()
                 questTag = FAILED;
             elseif ( isComplete and isComplete > 0 ) then
                 questTag = COMPLETE;
-            end
+ 		    elseif ( frequency == LE_QUEST_FREQUENCY_DAILY ) then
+				if ( questTag ) then
+					questTag = format(DAILY_QUEST_TAG_TEMPLATE, questTag);
+				else
+					questTag = DAILY;
+				end
+			end
 
             if ( questTag ) then
                 questTitleTag:SetText("("..questTag..")");
@@ -194,7 +200,6 @@ function ArmoryQuestLog_Update()
             end
 
             -- Color the quest title and highlight according to the difficulty level
-            local playerLevel = Armory:UnitLevel("player");
             if ( isHeader ) then
                 color = QuestDifficultyColors["header"];
             else
@@ -374,6 +379,38 @@ function ArmoryQuestLog_UpdateQuestDetails(doNotScroll)
 			ArmoryQuestLogDescriptionTitle:SetPoint("TOPLEFT", "ArmoryQuestLogObjectivesText", "BOTTOMLEFT", 0, -10);
 		end
 	end
+
+    if ( Armory:GetQuestLogGroupNum() > 0 ) then
+        local suggestedGroupString = format(QUEST_SUGGESTED_GROUP_NUM, Armory:GetQuestLogGroupNum());
+        ArmoryQuestLogSuggestedGroupNum:SetText(suggestedGroupString);
+        ArmoryQuestLogSuggestedGroupNum:Show();
+        ArmoryQuestLogSuggestedGroupNum:ClearAllPoints();
+        if ( Armory:GetQuestLogRequiredMoney() > 0 ) then
+            ArmoryQuestLogSuggestedGroupNum:SetPoint("TOPLEFT", "ArmoryQuestLogRequiredMoneyText", "BOTTOMLEFT", 0, -4);
+        elseif ( numObjectives > 0 ) then
+            ArmoryQuestLogSuggestedGroupNum:SetPoint("TOPLEFT", "ArmoryQuestLogObjective"..numObjectives, "BOTTOMLEFT", 0, -4);
+        elseif ( questTimer ) then
+            ArmoryQuestLogSuggestedGroupNum:SetPoint("TOPLEFT", "ArmoryQuestLogTimerText", "BOTTOMLEFT", 0, -10);
+        else
+            ArmoryQuestLogSuggestedGroupNum:SetPoint("TOPLEFT", "ArmoryQuestLogObjectivesText", "BOTTOMLEFT", 0, -10);
+        end
+    else
+        ArmoryQuestLogSuggestedGroupNum:Hide();
+    end
+
+    if ( Armory:GetQuestLogGroupNum() > 0 ) then
+        ArmoryQuestLogDescriptionTitle:SetPoint("TOPLEFT", "ArmoryQuestLogSuggestedGroupNum", "BOTTOMLEFT", 0, -10);
+    elseif ( Armory:GetQuestLogRequiredMoney() > 0 ) then
+        ArmoryQuestLogDescriptionTitle:SetPoint("TOPLEFT", "ArmoryQuestLogRequiredMoneyText", "BOTTOMLEFT", 0, -10);
+    elseif ( numObjectives > 0 ) then
+        ArmoryQuestLogDescriptionTitle:SetPoint("TOPLEFT", "ArmoryQuestLogObjective"..numObjectives, "BOTTOMLEFT", 0, -10);
+    else
+        if ( questTimer ) then
+            ArmoryQuestLogDescriptionTitle:SetPoint("TOPLEFT", "ArmoryQuestLogTimerText", "BOTTOMLEFT", 0, -10);
+        else
+            ArmoryQuestLogDescriptionTitle:SetPoint("TOPLEFT", "ArmoryQuestLogObjectivesText", "BOTTOMLEFT", 0, -10);
+        end
+    end
     if ( questDescription ) then
         ArmoryQuestLogQuestDescription:SetText(questDescription);
         QuestFrame_SetAsLastShown(ArmoryQuestLogQuestDescription, spacerFrame);
@@ -381,8 +418,10 @@ function ArmoryQuestLog_UpdateQuestDetails(doNotScroll)
     local numRewards = Armory:GetNumQuestLogRewards();
     local numChoices = Armory:GetNumQuestLogChoices();
     local money = Armory:GetQuestLogRewardMoney();
+    local honor = Armory:GetQuestLogRewardHonor();
+	local playerTitle = Armory:GetQuestLogRewardTitle();
 
-    if ( (numRewards + numChoices + money) > 0 ) then
+	if ( playerTitle or (numRewards + numChoices + money + honor) > 0 ) then
         ArmoryQuestLogRewardTitleText:Show();
         QuestFrame_SetAsLastShown(ArmoryQuestLogRewardTitleText, spacerFrame);
     else
@@ -457,6 +496,8 @@ function ArmoryQuestFrameItems_Update()
     local numQuestChoices = Armory:GetNumQuestLogChoices();
     local numQuestSpellRewards = 0;
     local money = Armory:GetQuestLogRewardMoney();
+    local honor = Armory:GetQuestLogRewardHonor();
+    local playerTitle = Armory:GetQuestLogRewardTitle();
     local spacerFrame = ArmoryQuestLogSpacerFrame;
     local questState = "ArmoryQuestLog";
 
@@ -469,8 +510,10 @@ function ArmoryQuestFrameItems_Update()
     local material = "Parchment";
     local questItemReceiveText = _G[questState.."ItemReceiveText"];
     local moneyFrame = _G[questState.."MoneyFrame"];
+	local honorFrame = _G[questState.."HonorFrame"];
+	local playerTitleFrame = _G[questState.."PlayerTitleFrame"];
 
-    if ( totalRewards == 0 and money == 0 ) then
+    if ( totalRewards == 0 and money == 0 and honor == 0 and not playerTitle ) then
         _G[questState.."RewardTitleText"]:Hide();
     else
         _G[questState.."RewardTitleText"]:Show();
@@ -484,13 +527,36 @@ function ArmoryQuestFrameItems_Update()
         QuestFrame_SetAsLastShown(moneyFrame, spacerFrame);
         MoneyFrame_Update(questState.."MoneyFrame", money);
     end
+    if ( honor == 0 ) then
+		honorFrame:Hide();
+	else
+		honorFrame:Show();
+		QuestHonorFrame_Update(questState.."HonorFrame", honor);
+		QuestFrame_SetAsLastShown(honorFrame, spacerFrame);
+	end
+	if ( not playerTitle ) then
+		playerTitleFrame:Hide();
+	else
+		local anchorFrame;
+		if ( honor ~= 0 ) then
+			anchorFrame = honorFrame;
+		elseif ( money ~= 0 ) then
+			anchorFrame = moneyFrame;
+		else
+			anchorFrame = getglobal(questState.."RewardTitleText");
+		end
+		playerTitleFrame:SetPoint("TOPLEFT", anchorFrame, "BOTTOMLEFT", 0, -5);
+		getglobal(questState.."PlayerTitleFrameTitle"):SetText(playerTitle);
+		playerTitleFrame:Show();
+		QuestFrame_SetAsLastShown(playerTitleFrame, spacerFrame);
+	end
 
     -- Hide unused rewards
     for i = totalRewards + 1, MAX_NUM_ITEMS do
         _G[questItemName..i]:Hide();
     end
 
-    local questItem, name, texture, isTradeskillSpell, quality, isUsable, numItems = 1;
+    local questItem, name, texture, isTradeskillSpell, isSpellLearned, quality, isUsable, numItems = 1;
     local rewardsCount = 0;
 
     -- Setup choosable rewards
@@ -502,7 +568,7 @@ function ArmoryQuestFrameItems_Update()
 
         local index;
         local baseIndex = rewardsCount;
-        for i=1, numQuestChoices, 1 do    
+        for i=1, numQuestChoices, 1 do
             index = i + baseIndex;
             questItem = _G[questItemName..index];
             questItem.type = "choice";
@@ -554,9 +620,11 @@ function ArmoryQuestFrameItems_Update()
             learnSpellText:SetPoint("TOPLEFT", questState.."RewardTitleText", "BOTTOMLEFT", 0, -5);
         end
 
-        texture, name, isTradeskillSpell = Armory:GetQuestLogRewardSpell();
+        texture, name, isTradeskillSpell, isSpellLearned = Armory:GetQuestLogRewardSpell();
         if ( isTradeskillSpell ) then
             learnSpellText:SetText(REWARD_TRADESKILL_SPELL);
+        elseif ( not isSpellLearned ) then
+			learnSpellText:SetText(REWARD_AURA);
         else
             learnSpellText:SetText(REWARD_SPELL);
         end
@@ -580,7 +648,7 @@ function ArmoryQuestFrameItems_Update()
         -- Anchor the reward text differently if there are choosable rewards
         if ( numQuestSpellRewards > 0  ) then
             questItemReceiveText:SetText(REWARD_ITEMS);
-            questItemReceiveText:SetPoint("TOPLEFT", questItemName..rewardsCount, "BOTTOMLEFT", 3, -5);        
+            questItemReceiveText:SetPoint("TOPLEFT", questItemName..rewardsCount, "BOTTOMLEFT", 3, -5);
         elseif ( numQuestChoices > 0  ) then
             questItemReceiveText:SetText(REWARD_ITEMS);
             local index = numQuestChoices;
@@ -588,7 +656,7 @@ function ArmoryQuestFrameItems_Update()
                 index = index - 1;
             end
             questItemReceiveText:SetPoint("TOPLEFT", questItemName..index, "BOTTOMLEFT", 3, -5);
-        else 
+        else
             questItemReceiveText:SetText(REWARD_ITEMS_ONLY);
             questItemReceiveText:SetPoint("TOPLEFT", questState.."RewardTitleText", "BOTTOMLEFT", 3, -5);
         end
@@ -632,7 +700,18 @@ function ArmoryQuestFrameItems_Update()
             Armory:SetItemLink(questItem, Armory:GetQuestLogItemLink(questItem.type, i));
             rewardsCount = rewardsCount + 1;
         end
-    else    
+    else
         questItemReceiveText:Hide();
+    end
+end
+
+function ArmoryQuestLogUpdateQuestCount(numQuests)
+    ArmoryQuestLogQuestCount:SetFormattedText(QUEST_LOG_COUNT_TEMPLATE, numQuests, MAX_QUESTLOG_QUESTS);
+    local dailyQuestsComplete = Armory:GetDailyQuestsCompleted();
+    if ( dailyQuestsComplete > 0 ) then
+        ArmoryQuestLogDailyQuestCount:SetFormattedText(QUEST_LOG_DAILY_COUNT_TEMPLATE, dailyQuestsComplete, Armory:GetMaxDailyQuests());
+        ArmoryQuestLogDailyQuestCount:Show();
+    else
+        ArmoryQuestLogDailyQuestCount:Hide();
     end
 end

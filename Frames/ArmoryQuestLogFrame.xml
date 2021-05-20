@@ -342,6 +342,15 @@
                 <Anchor point="TOPLEFT" />
               </Anchors>
             </FontString>
+            <FontString name="ArmoryQuestLogDailyQuestCount" inherits="GameFontNormalSmall" text="Daily: 25/25">
+              <Anchors>
+                <Anchor point="TOPLEFT">
+                  <Offset>
+                    <AbsDimension x="123" y="0"/>
+                  </Offset>
+                </Anchor>
+              </Anchors>
+            </FontString>
           </Layer>
         </Layers>
       </Frame>
@@ -764,6 +773,24 @@
                     MoneyFrame_SetType(self, "STATIC");
                   </OnLoad>
                 </Scripts>
+              </Frame>
+              <Frame name="ArmoryQuestLogHonorFrame" inherits="QuestHonorFrameTemplate">
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="ArmoryQuestLogItemReceiveText" relativePoint="BOTTOMLEFT">
+                    <Offset>
+                      <AbsDimension x="0" y="-5"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+              </Frame>
+              <Frame name="ArmoryQuestLogPlayerTitleFrame" inherits="QuestPlayerTitleFrameTemplate">
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="ArmoryQuestLogItemReceiveText" relativePoint="BOTTOMLEFT">
+                    <Offset>
+                      <AbsDimension x="0" y="-5"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
               </Frame>
               <Frame name="ArmoryQuestLogRequiredMoneyFrame" inherits="MoneyFrameTemplate">
                 <Anchors>
