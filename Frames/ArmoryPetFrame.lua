@@ -86,7 +86,9 @@ function ArmoryPetFrame_OnEvent(self, event, ...)
         end
     elseif ( event == "PET_UI_UPDATE" or event == "PET_BAR_UPDATE" or event == "UNIT_PET" ) then
         ArmoryFrameTab_Update();
-        Armory:ExecuteConditional(ArmoryPetFrame_HasPetData, ArmoryPetFrame_Update);
+        if ( UnitIsVisible("pet") ) then
+            Armory:ExecuteConditional(ArmoryPetFrame_HasPetData, ArmoryPetFrame_Update);
+        end
     elseif ( event == "PET_UI_CLOSE" ) then
         ArmoryFrameTab_Update();
     elseif ( event == "UNIT_PET_EXPERIENCE" ) then

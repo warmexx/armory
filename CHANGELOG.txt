@@ -5,6 +5,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 
 ==== v1.0.1 ====
 Contains a fix for scrollbar position in reputation frame
+Containes a fix for an error that could occur when logging in without a pet present
 
 ==== v1.0.0 ====
 Initial release
