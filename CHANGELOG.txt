@@ -4,8 +4,9 @@ The project page can be found on https://www.curseforge.com/wow/addons/armory.
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
 ==== v1.0.1 ====
-Contains a fix for scrollbar position in reputation frame
-Containes a fix for an error that could occur when logging in without a pet present
+Contains a fix for the scrollbar position in the reputation frame
+Contains a fix for the position and backdrop of the reputation detail frame
+Contains a fix for an error that could occur when logging in without a pet present
 
 ==== v1.0.0 ====
 Initial release
