@@ -1,9 +1,9 @@
 ## Interface: 20501
-## Title: Armory
-## Title-frFR: Armory [Armurerie]
-## Title-esES: Armory [Armería]
-## Title-koKR: Armory [케릭터 정보 열람]
-## Title-ruRU: Armory [Оружейная]
+## Title: Armory TBC
+## Title-frFR: Armory TBC [Armurerie]
+## Title-esES: Armory TBC [Armería]
+## Title-koKR: Armory TBC [케릭터 정보 열람]
+## Title-ruRU: Armory TBC [Оружейная]
 ## Version: @project-version@
 ## Notes: Provides an overview of equipment, stats, inventory, professions, quests, spells and more for all your characters
 ## Notes-deDE: Ermöglicht einen Überblick über Ausrüstung, Werte, Inventar, Berufe, Quests, Zauber und viel mehr für alle deine Charaktere
