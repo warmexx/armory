@@ -5,6 +5,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 
 ==== v1.1.0 ====
 Remaining talent points are added to the talent frame
+Contains TBC recipe library
 
 ==== v1.0.1 ====
 Contains a fix for the scrollbar position in the reputation frame
