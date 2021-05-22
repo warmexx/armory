@@ -126,26 +126,26 @@
             </Anchor>
           </Anchors>
         </Texture>
-        <Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomLeft">
+        <Texture file="Interface\TalentFrame\UI-TalentFrame-BotLeft">
           <Size>
             <AbsDimension x="256" y="256"/>
           </Size>
           <Anchors>
             <Anchor point="TOPLEFT">
               <Offset>
-                <AbsDimension x="2" y="-257"/>
+                <AbsDimension x="2" y="-259"/>
               </Offset>
             </Anchor>
           </Anchors>
         </Texture>
-        <Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomRight">
+        <Texture file="Interface\TalentFrame\UI-TalentFrame-BotRight">
           <Size>
             <AbsDimension x="128" y="256"/>
           </Size>
           <Anchors>
             <Anchor point="TOPLEFT">
               <Offset>
-                <AbsDimension x="258" y="-257"/>
+                <AbsDimension x="258" y="-259"/>
               </Offset>
             </Anchor>
           </Anchors>
@@ -200,6 +200,26 @@
             </Anchor>
           </Anchors>
         </Texture>
+      </Layer>
+      <Layer level="OVERLAY">
+        <FontString name="ArmoryTalentFrameTalentPointsText" inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="252" y="84"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="ArmoryTalentFrameTalentPoints" inherits="GameFontNormalSmall" text="CHARACTER_POINTS1_COLON">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="ArmoryTalentFrameTalentPointsText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="-3" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
       </Layer>
     </Layers>
     <Frames>
@@ -275,7 +295,7 @@
       </Button>
       <ScrollFrame name="ArmoryTalentFrameScrollFrame" inherits="UIPanelScrollFrameTemplate">
         <Size>
-          <AbsDimension x="296" y="354"/>
+          <AbsDimension x="296" y="332"/>
         </Size>
         <Anchors>
           <Anchor point="TOPRIGHT">

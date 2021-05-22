@@ -3,6 +3,9 @@ The project page can be found on https://www.curseforge.com/wow/addons/armory.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+==== v1.1.0 ====
+Remaining talent points are added to the talent frame
+
 ==== v1.0.1 ====
 Contains a fix for the scrollbar position in the reputation frame
 Contains a fix for the position and backdrop of the reputation detail frame

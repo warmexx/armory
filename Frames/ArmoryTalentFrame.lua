@@ -557,7 +557,7 @@ end
 -- Helper functions
 function ArmoryTalentFrame_UpdateTalentPoints()
 	local talentPoints = Armory:UnitCharacterPoints("player");
-	--ArmoryTalentFrameTalentPointsText:SetText(talentPoints);
+	ArmoryTalentFrameTalentPointsText:SetText(talentPoints);
 	ArmoryTalentFrame.talentPoints = talentPoints;
 end
 
