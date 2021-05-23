@@ -28,8 +28,8 @@ externals:
     Libs/LibQTip-1.0:
         url: https://repos.wowace.com/wow/libqtip-1-0
         tag: latest
-    Libs/LibRecipes-1.0:
-        url: https://repos.wowace.com/wow/librecipes-1-0-classic
+    Libs/LibRecipes-3.0:
+        url: https://repos.wowace.com/wow/librecipes-3-0
         tag: latest
     Libs/LibBabble-CreatureType-3.0:
         url: https://repos.wowace.com/wow/libbabble-creaturetype-3-0/trunk
