@@ -188,8 +188,8 @@ function Armory:UpdateQuests()
                 local id = tostring(questID);
                 local info = dbEntry:SelectContainer(container, id);
                 info.Text = dbEntry.Save(_G.GetQuestLogQuestText());
-                info.GroupNum = _G.GetQuestLogGroupNum();
-                info.RewardTitle = _G.GetQuestLogRewardTitle();
+                info.GroupNum = _G.GetQuestLogGroupNum and _G.GetQuestLogGroupNum() or nil;
+                info.RewardTitle = _G.GetQuestLogRewardTitle and _G.GetQuestLogRewardTitle() or nil;
                 info.Failed = _G.IsCurrentQuestFailed();
                 if ( _G.GetQuestLogTimeLeft() ) then
                     info.TimeLeft = dbEntry.Save(_G.GetQuestLogTimeLeft(), time());
@@ -200,7 +200,7 @@ function Armory:UpdateQuests()
                 if ( _G.GetQuestLogRewardMoney() > 0 ) then
                     info.RewardMoney = _G.GetQuestLogRewardMoney();
                 end
-                if ( _G.GetQuestLogRewardHonor() > 0 ) then
+                if ( _G.GetQuestLogRewardHonor and _G.GetQuestLogRewardHonor() > 0 ) then
                     info.RewardHonor = _G.GetQuestLogRewardHonor();
                 end
                 if ( _G.GetNumQuestLogRewardSpells() > 0 ) then
@@ -271,8 +271,12 @@ function Armory:UpdateQuests()
             end
 
             dbEntry:SetValue(2, container, "NumQuests", numQuests);
-            dbEntry:SetValue(2, container, "MaxDailyQuests", _G.GetMaxDailyQuests());
-            dbEntry:SetValue(2, container, "DailyQuestsCompleted", _G.GetDailyQuestsCompleted());
+            if ( _G.GetMaxDailyQuests ) then
+                dbEntry:SetValue(2, container, "MaxDailyQuests", _G.GetMaxDailyQuests());
+            end
+            if ( _G.GetDailyQuestsCompleted ) then
+                dbEntry:SetValue(2, container, "DailyQuestsCompleted", _G.GetDailyQuestsCompleted());
+            end
 
             _G.SelectQuestLogEntry(currentQuest);
 
