@@ -47,5 +47,3 @@ ignore:
 manual-changelog:
     filename: CHANGELOG.txt
     markup-type: plain
-
-license-output: GPL.txt
