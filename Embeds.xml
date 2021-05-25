@@ -10,7 +10,7 @@
   <Script file="Libs\LibCompress\LibCompress.lua"/>
   <Script file="Libs\AceLocale-3.0\AceLocale-3.0.lua"/>
   <Script file="Libs\LibQTip-1.0\LibQTip-1.0.lua"/>
-  <Script file="Libs\LibRecipes-1.0\LibRecipes-1.0.lua"/>
+  <Script file="Libs\LibRecipes-3.0\LibRecipes-3.0.lua"/>
   <Script file="Libs\LibBabble-CreatureType-3.0\LibBabble-3.0.lua" />
   <Script file="Libs\LibBabble-CreatureType-3.0\LibBabble-CreatureType-3.0.lua" />
 </Ui>

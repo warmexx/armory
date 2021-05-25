@@ -27,7 +27,7 @@
 --]]
 
 local Armory, _ = Armory;
-local LR = LibStub("LibRecipes-1.0");
+local LR = LibStub("LibRecipes-3.0");
 
 local container = "Professions";
 local itemContainer = "SkillLines";
@@ -187,14 +187,14 @@ local function CanCraftFromInventory(dbEntry, index)
     if ( (numReagents or 0) == 0 ) then
         return false;
     end
-    
+
     for i = 1, numReagents do
         local _, _, count, link = GetRecentInfo(index, i);
         if ( (count or 0) > 0 and Armory:ScanInventory(link, true) < count ) then
             return false;
         end
     end
-    
+
     return true;
 end
 
@@ -215,7 +215,7 @@ local function GetProfessionLines()
         numLines, extended = GetProfessionNumValues(dbEntry);
         if ( numLines > 0 ) then
             table.wipe(groups);
-             
+
             -- apply filters
             for i = 1, numLines do
                 name, skillType, numAvailable = dbEntry:GetValue(itemContainer, i, "Info");
@@ -311,7 +311,7 @@ local function GetProfessionLines()
 
     dirty = false;
     owner = Armory:SelectedCharacter();
-    
+
     return professionLines;
 end
 
@@ -360,7 +360,7 @@ local function SetProfessions(...)
     end
 
     table.wipe(professionNames);
-    
+
     if ( dbEntry ) then
         for i = 1, select("#", ...) do
             local id = select(i, ...);
@@ -368,7 +368,7 @@ local function SetProfessions(...)
                 local name, texture, rank, maxRank, modifier = GetProfessionInfo(id);
                 if ( name ) then
                     dbEntry:SetValue(2, container, tostring(i), name);
-                    
+
                     SetProfessionValue(name, "Rank", rank, maxRank, modifier);
                     SetProfessionValue(name, "Texture", texture);
 
@@ -379,7 +379,7 @@ local function SetProfessions(...)
             end
         end
 
-        -- check if the stored trade skills are still valid    
+        -- check if the stored trade skills are still valid
         local professions = dbEntry:GetValue(container);
         for name in pairs(professions) do
             if ( not tonumber(name) and not professionNames[name] ) then
@@ -421,10 +421,10 @@ local function GetProfessionLineValue(index)
     if ( dbEntry and index > 0 and index <= numLines ) then
         local info = {};
 
-        info.name, 
-        info.type, 
+        info.name,
+        info.type,
         info.numAvailable = dbEntry:GetValue(container, selectedSkill, itemContainer, professionLines[index], "Info");
-        
+
         if ( IsRecipe(info.type) ) then
             info.difficulty = info.type;
             info.type = "recipe";
@@ -555,7 +555,7 @@ local function StoreTradeSkillInfo(dbEntry, index, id, isCraft)
 
     recipe.Icon = isCraft and _G.GetCraftIcon(id) or _G.GetTradeSkillIcon(id);
     recipe.ItemLink = isCraft and _G.GetCraftItemLink(id) or _G.GetTradeSkillItemLink(id);
-    
+
     if ( isCraft ) then
         recipe.SpellFocus = _G.GetCraftSpellFocus(id);
     else
@@ -594,7 +594,7 @@ local function StoreTradeSkillInfo(dbEntry, index, id, isCraft)
     end
 
     SetItemCache(dbEntry, nil, recipe.ItemLink);
-       
+
     return recipe;
 end
 
@@ -672,7 +672,7 @@ function Armory:UpdateTradeSkill(isCraft)
     local name, rank, maxRank;
     local modeChanged;
     local warned;
- 
+
     if ( not self.playerDbBaseEntry ) then
         return;
     elseif ( not self:HasTradeSkills() ) then
@@ -694,7 +694,7 @@ function Armory:UpdateTradeSkill(isCraft)
             self:Lock(itemContainer);
 
             self:PrintDebug("UPDATE", name);
-            
+
             SetProfessionValue(name, "Rank", rank, maxRank);
 
             local dbEntry = SelectProfession(self.playerDbBaseEntry, name);
@@ -727,7 +727,7 @@ function Armory:UpdateTradeSkill(isCraft)
         self:PrintWarning(ARMORY_TRADE_UPDATE_WARNING);
         warned = true;
     end
-    
+
     if ( warned ) then
         self:PlayWarningSound();
     end
@@ -779,7 +779,7 @@ function Armory:GetProfessionNames()
     local dbEntry = self.selectedDbBaseEntry;
 
     table.wipe(professionNames);
-    
+
     if ( dbEntry ) then
         local data = dbEntry:GetValue(container);
         if ( data ) then
@@ -791,7 +791,7 @@ function Armory:GetProfessionNames()
             table.sort(professionNames);
         end
     end
-    
+
     return professionNames;
 end
 
@@ -852,7 +852,7 @@ function Armory:SetTradeSkillSubClassFilter(index)
             if ( i == index ) then
                 tradeSkillSubClassFilter = subClasses[i];
                 break;
-            end    
+            end
         end
     end
 
@@ -920,7 +920,7 @@ function Armory:GetTradeSkillItemFilter(text)
     if ( not text ) then
         text = tradeSkillItemNameFilter or "";
     end
-    
+
     local minLevel, maxLevel;
     local approxLevel = strmatch(text, "^~(%d+)");
     if ( approxLevel ) then
@@ -1038,7 +1038,7 @@ function Armory:GetPrimaryTradeSkills()
             end
         end
     end
-            
+
     return primarySkills;
 end
 
@@ -1153,7 +1153,7 @@ function Armory:GetRecipeAltInfo(name, link, profession, reqProfession, reqRank,
             self:SelectProfile(profile);
 
             dbEntry = self.selectedDbBaseEntry;
-            
+
             local known;
             for i = 1, dbEntry:GetNumValues(container, profession, itemContainer) do
                 skillItemID = tonumber(select(2, self:GetLinkId(dbEntry:GetValue(container, profession, itemContainer, i, "ItemLink"))));
