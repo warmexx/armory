@@ -213,7 +213,7 @@ function ArmoryPVPTeam_OnEnter(self)
     local highlight = getglobal(self:GetName().."Highlight");
     if ( Armory:GetArenaTeam(self:GetID()) ) then
         highlight:Show();
-        GameTooltip_AddNewbieTip(ARENA_TEAM, 1.0, 1.0, 1.0, CLICK_FOR_DETAILS, 1);
+        GameTooltip_AddNewbieTip(self, ARENA_TEAM, 1.0, 1.0, 1.0, CLICK_FOR_DETAILS, 1);
     end
 end
 
