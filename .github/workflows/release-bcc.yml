@@ -2,11 +2,10 @@ name: Release BCC
 
 on:
   push:
-    branches: 
+    branches:
       - bcc
-    tags: 
+    tags:
       - '**'
-  workflow_dispatch:
 
 env:
   CF_API_KEY: ${{ secrets.CF_API_KEY }}
@@ -25,4 +24,4 @@ jobs:
       - name: Package BCC
         uses: BigWigsMods/packager@v1.0.1
         with:
-          args: -g bcc -p 5195 -d 
+          args: -g bcc -p 5195 -d
