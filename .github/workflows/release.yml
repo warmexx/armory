@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Select one of ''retail'', ''classic'' or ''bcc''.'
+        required: true
+        default: 'retail'
+      version:
+        description: 'The version you want to release.'
+        required: true
+
+env:
+  CF_API_KEY: ${{ secrets.CF_API_KEY }}
+  WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
+  WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+  GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event.inputs.branch == 'retail' || github.event.inputs.branch == 'classic' || github.event.inputs.branch == 'bcc' }} 
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+        with:
+          ref: '$INPUT_BRANCH'
+
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "GitHub actions"
+          git config user.email noreply@github.com
+
+      - name: Tag release
+        run: |
+          git tag ${{ github.event.inputs.version }}
+          git push origin ${{ github.event.inputs.version }}
+
+      - name: Package
+        uses: BigWigsMods/packager@v1.0.1
+        with:
+          args: -g ${{ github.event.inputs.branch }} -p 5195 -d
