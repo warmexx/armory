@@ -26,7 +26,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v2
         with:
-          ref: '$INPUT_BRANCH'
+          ref: ${{ github.event.inputs.version }}
 
       - name: Initialize mandatory git config
         run: |
