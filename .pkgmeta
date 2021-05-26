@@ -1,9 +1,6 @@
 ﻿package-as: Armory
 
 externals:
-    Parent:
-        url: https://repos.curseforge.com/wow/armory
-        tag: latest
     Libs/LibStub:
         url: https://repos.wowace.com/wow/libstub/trunk
         tag: latest
@@ -36,13 +33,6 @@ externals:
         tag: latest
 
 enable-nolib-creation: no
-
-move-folders:
-    Parent/Locales: Locales
-
-ignore:
-    - Parent
-    - Libs/LibRecipes-3.0
 
 manual-changelog:
     filename: CHANGELOG.txt
