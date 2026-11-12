@@ -358,6 +358,17 @@ function Armory:GetPetSpellBonusDamage()
     return self:SetGetPetValue("SpellBonusDamage", _G.GetPetSpellBonusDamage());
 end
 
+-- Not every race has a portrait in the game. Armory brings its own for these races (cut from
+-- Interface\Glues\CharacterCreate\CharacterCreateIcons); any other race without one gets the generic portrait.
+local OWN_PORTRAITS = { EarthenDwarf = true, Harronir = true };
+local portraitExists = {};
+local function PortraitExists(portrait)
+    if ( portraitExists[portrait] == nil ) then
+        portraitExists[portrait] = not _G.GetFileIDFromPath or _G.GetFileIDFromPath(portrait) ~= nil;
+    end
+    return portraitExists[portrait];
+end
+
 function Armory:GetPortraitTexture(unit)
     local portrait = "Interface\\CharacterFrame\\TemporaryPortrait";
 
@@ -366,10 +377,18 @@ function Armory:GetPortraitTexture(unit)
     else
         local sex = self:UnitSex(unit);
         local _, raceEn = self:UnitRace(unit);
+        local suffix;
         if ( raceEn and sex == 2 ) then
-            portrait = portrait .. "-Male-" .. raceEn;
+            suffix = "-Male-" .. raceEn;
         elseif ( raceEn and sex == 3 ) then
-            portrait = portrait .. "-Female-" .. raceEn;
+            suffix = "-Female-" .. raceEn;
+        end
+        if ( suffix ) then
+            if ( PortraitExists(portrait .. suffix) ) then
+                portrait = portrait .. suffix;
+            elseif ( OWN_PORTRAITS[raceEn] ) then
+                portrait = "Interface\\AddOns\\Armory\\Artwork\\TemporaryPortrait" .. suffix;
+            end
         end
     end
 
