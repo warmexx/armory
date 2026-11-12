@@ -1,0 +1,606 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\FrameXML\UI.xsd">
+   <Script file="ArmoryQuestLogFrame.lua"/>
+   <Button name="ArmoryQuestSpellTemplate" hidden="true" virtual="true">
+    <Size x="157" y="56"/>
+    <HitRectInsets left="0" right="0" top="0" bottom="14"/>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture parentKey="Icon" name="$parentIconTexture">
+          <Size x="39" y="39"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" x="10" y="-2"/>
+          </Anchors>
+        </Texture>
+        <Texture parentKey="NameFrame" name="$parentNameFrame" file="Interface\QuestFrame\UI-QuestItemNameFrame">
+          <Size x="128" y="64"/>
+          <Anchors>
+            <Anchor point="LEFT" relativeKey="$parent.Icon" relativePoint="RIGHT" x="-12" y="0"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+      <Layer level="OVERLAY">
+        <Texture name="$parentSpellBorder" file="Interface\Spellbook\Spellbook-Parts">
+          <Size x="70" y="65"/>
+          <Anchors>
+            <Anchor point="CENTER" relativeKey="$parent.Icon" x="2" y="0"/>
+          </Anchors>
+          <TexCoords left="0.00390625" right="0.27734375" top="0.44140625" bottom="0.69531250"/>
+        </Texture>
+        <FontString parentKey="Name" name="$parentName" inherits="GameFontHighlight" justifyH="LEFT" >
+          <Size  x="90" y="36"/>
+          <Anchors>
+            <Anchor point="LEFT" relativeKey="$parent.NameFrame"  x="17" y="0"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnEnter>
+        if (self.spellID) then
+          GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+          GameTooltip:SetSpellByID(self.spellID);
+        end
+      </OnEnter>
+      <OnLeave>
+        GameTooltip:Hide();
+      </OnLeave>
+      <OnClick>
+        if ( IsModifiedClick("CHATLINK") and self.spellID) then
+          local spellLink = Armory:GetSpellLink(self.spellID);
+          ChatFrameUtil.InsertLink(spellLink);
+        end
+      </OnClick>
+    </Scripts>
+  </Button>
+  <Button name="ArmoryQuestLogTitleButtonTemplate" inherits="ArmoryQuestTitleButtonTemplate" virtual="true">
+    <Scripts>
+      <OnClick>
+        ArmoryQuestLogTitleButton_OnClick(self, button);
+      </OnClick>
+      <OnEnter>
+        ArmoryQuestLogTitleButton_OnEnter(self);
+      </OnEnter>
+      <OnLeave>
+        ArmoryQuestLogTitleButton_OnLeave(self);
+      </OnLeave>
+    </Scripts>
+  </Button>
+  <Button name="ArmoryQuestInfoRewardSpellCodeTemplate" virtual="true">
+    <Scripts>
+      <OnEnter>
+        Armory:SetQuestLogRewardSpell();
+      </OnEnter>
+      <OnClick>
+        if ( IsModifiedClick("CHATLINK") ) then
+          ChatFrameUtil.InsertLink(Armory:GetQuestLogSpellLink());
+        end
+      </OnClick>
+      <OnLeave>
+        GameTooltip:Hide();
+        ResetCursor();
+      </OnLeave>
+    </Scripts>
+  </Button>
+  <Button name="ArmoryQuestInfoRewardItemCodeTemplate" virtual="true">
+    <Scripts>
+      <OnEnter function="ArmoryQuestInfoRewardItemCodeTemplate_OnEnter" />
+      <OnClick function="ArmoryQuestInfoRewardItemCodeTemplate_OnClick" />
+      <OnLeave>
+        ArmoryComparisonTooltip1:Hide();
+        ArmoryComparisonTooltip2:Hide();
+        GameTooltip:Hide();
+        ResetCursor();
+      </OnLeave>
+    </Scripts>
+  </Button>
+  <Button name="ArmoryLargeQuestRewardItemButtonTemplate" inherits="ArmoryLargeItemButtonTemplate, ArmoryQuestInfoRewardItemCodeTemplate" virtual="true">
+    <Layers>
+      <Layer level="OVERLAY" textureSubLevel="1">
+        <Texture parentKey="IconBorder" file="Interface\Common\WhiteIconFrame" hidden="true">
+          <Size x="37" y="37"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent.Icon"/>
+            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+      <Layer level="OVERLAY" textureSubLevel="2">
+        <Texture parentKey="IconOverlay" hidden="true">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent.Icon"/>
+            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+  </Button>
+  <Frame name="ArmoryQuestLogFrame" parent="ArmoryQuestFrame" hidden="true">
+    <Size x="384" y="370"/>
+    <Anchors>
+      <Anchor point="TOPLEFT" relativeKey="$parent.Inset"/>
+    </Anchors>
+    <Layers>
+      <Layer level="BACKGROUND" >
+        <Texture parentKey="Bg" name="$parentBg" atlas="QuestBG-Parchment" useAtlasSize="false">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.$parent.bottomInset" x="5" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.$parent.bottomInset" x="-24" y="0"/>
+					</Anchors>
+				</Texture>
+      </Layer>
+    </Layers>
+
+    <Frames>
+      <Frame name="ArmoryEmptyQuestLogFrame" hidden="true">
+        <Size x="384" y="370"/>
+        <Anchors>
+          <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture atlas="QuestLogBackground" useAtlasSize="false">
+              <Anchors>
+                <Anchor point="TOPLEFT" relativeKey="$parent.$parent.bottomInset" x="0" y="0"/>
+                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.$parent.bottomInset" x="-54" y="26"/>
+              </Anchors>
+            </Texture>
+            <FontString name="ArmoryQuestLogNoQuestsText" inherits="GameFontHighlight" text="QUESTLOG_NO_QUESTS_TEXT">
+              <Size x="200" y="16"/>
+              <Anchors>
+                <Anchor point="TOP" relativeKey="$parent.Inset" x="-25" y="-90"/>
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+      </Frame>
+      <Frame name="ArmoryQuestLogCount">
+        <Size x="380" y="20"/>
+        <Anchors>
+          <Anchor point="BOTTOMLEFT" x="11" y="3"/>
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <FontString name="ArmoryQuestLogQuestCount" inherits="GameFontNormalSmall">
+              <Anchors>
+                <Anchor point="TOPLEFT" />
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+      </Frame>
+      <Frame name="ArmoryQuestLogHighlightFrame" hidden="true">
+        <Size>
+          <AbsDimension x="293" y="16"/>
+        </Size>
+        <Anchors>
+          <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+          <Layer level="ARTWORK">
+            <Texture name="ArmoryQuestLogSkillHighlight" file="Interface\QuestFrame\UI-QuestLogTitleHighlight" alphaMode="ADD"/>
+          </Layer>
+        </Layers>
+      </Frame>
+      <Button name="ArmoryQuestLogTitle1" inherits="ArmoryQuestLogTitleButtonTemplate" id="1" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" x="3" y="-6"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryQuestLogTitle2" inherits="ArmoryQuestLogTitleButtonTemplate" id="2" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryQuestLogTitle1" relativePoint="BOTTOMLEFT" y="1"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryQuestLogTitle3" inherits="ArmoryQuestLogTitleButtonTemplate" id="3" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryQuestLogTitle2" relativePoint="BOTTOMLEFT" y="1"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryQuestLogTitle4" inherits="ArmoryQuestLogTitleButtonTemplate" id="4" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryQuestLogTitle3" relativePoint="BOTTOMLEFT" y="1"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryQuestLogTitle5" inherits="ArmoryQuestLogTitleButtonTemplate" id="5" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryQuestLogTitle4" relativePoint="BOTTOMLEFT" y="1"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryQuestLogTitle6" inherits="ArmoryQuestLogTitleButtonTemplate" id="6" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryQuestLogTitle5" relativePoint="BOTTOMLEFT" y="1"/>
+        </Anchors>
+      </Button>
+      <ScrollFrame name="ArmoryQuestLogListScrollFrame" inherits="ArmoryFauxScrollFrameTemplate">
+        <Size x="300" y="93"/>
+        <Anchors>
+          <Anchor point="TOPRIGHT" relativeKey="$parent.Inset" x="-82" y="-6"/>
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture parentKey="ScrollBarTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+              <Size x="27" y="48"/>
+              <Anchors>
+                <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" y="5"/>
+              </Anchors>
+              <TexCoords left="0" right="0.484375" top="0" bottom=".20"/>
+            </Texture>
+            <Texture parentKey="ScrollBarBottom" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+              <Size x="27" y="64"/>
+              <Anchors>
+                <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" />
+              </Anchors>
+              <TexCoords left="0.515625" right="1.0" top="0.1440625" bottom="0.4140625"/>
+            </Texture>
+          </Layer>
+        </Layers>
+        <Scripts>
+          <OnVerticalScroll>
+            FauxScrollFrame_OnVerticalScroll(self, offset, ARMORY_QUESTLOG_QUEST_HEIGHT, ArmoryQuestLog_Update);
+          </OnVerticalScroll>
+        </Scripts>
+      </ScrollFrame>
+
+      <ScrollFrame name="ArmoryQuestLogDetailScrollFrame" inherits="ArmoryUIPanelScrollFrameTemplate">
+        <Size>
+          <AbsDimension x="300" y="235"/>
+        </Size>
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryQuestLogListScrollFrame" relativePoint="BOTTOMLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-7"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture parentKey="ScrollBarTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+              <Size x="27" y="48"/>
+              <Anchors>
+                <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" y="5"/>
+              </Anchors>
+              <TexCoords left="0" right="0.484375" top="0" bottom=".20"/>
+            </Texture>
+            <Texture parentKey="ScrollBarBottom" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+              <Size x="27" y="64"/>
+              <Anchors>
+                <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" y="-2"/>
+              </Anchors>
+              <TexCoords left="0.515625" right="1.0" top="0.1440625" bottom="0.4140625"/>
+            </Texture>
+            <Texture parentKey="ScrollBarMiddle" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+              <Anchors>
+                <Anchor point="TOPLEFT" relativeKey="$parent.ScrollBarTop" relativePoint="BOTTOMLEFT"/>
+                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.ScrollBarBottom" relativePoint="TOPRIGHT"/>
+              </Anchors>
+              <TexCoords left="0" right="0.484375" top="0.1640625" bottom="1"/>
+            </Texture>
+          </Layer>
+        </Layers>
+        <ScrollChild>
+          <Frame name="ArmoryQuestLogDetailScrollChildFrame">
+            <Size>
+              <AbsDimension x="300" y="235"/>
+            </Size>
+          </Frame>
+        </ScrollChild>
+      </ScrollFrame>
+    </Frames>
+    <Scripts>
+      <OnLoad>
+        ArmoryQuestLogFrame_OnLoad(self);
+      </OnLoad>
+      <OnEvent>
+        ArmoryQuestLogFrame_OnEvent(self, event, ...);
+      </OnEvent>
+      <OnShow>
+        ArmoryQuestLogFrame_OnShow(self);
+      </OnShow>
+    </Scripts>
+  </Frame>
+
+  <Frame name="ArmoryQuestInfoObjectivesFrame" hidden="true">
+    <Size x="285" y="10" />
+    <Anchors>
+      <Anchor point="CENTER" />
+    </Anchors>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString name="ArmoryQuestInfoObjective1" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true" parentKey="Objectives">
+          <Size x="285" y="0"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" />
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+  </Frame>
+
+  <Frame name="ArmoryQuestInfoSpecialObjectivesFrame" hidden="true">
+    <Size x="285" y="10"/>
+    <Anchors>
+      <Anchor point="CENTER" />
+    </Anchors>
+    <Layers>
+      <Layer level="OVERLAY">
+        <FontString name="ArmoryQuestInfoSpellObjectiveLearnLabel" inherits="QuestFontNormalSmall" justifyH="LEFT" text="LEARN_SPELL_OBJECTIVE"/>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Button name="ArmoryQuestInfoSpellObjectiveFrame" inherits="ArmoryQuestSpellTemplate" hidden="true"/>
+    </Frames>
+  </Frame>
+
+  <Frame name="ArmoryQuestInfoTimerFrame" hidden="true">
+    <Size x="1" y="1"/>
+    <Anchors>
+      <Anchor point="CENTER" />
+    </Anchors>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString name="ArmoryQuestInfoTimerText" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="false">
+          <Size x="285" y="0"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" />
+          </Anchors>
+          <Color r="0" g="0" b="0" />
+        </FontString>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnUpdate function="ArmoryQuestInfoTimerFrame_OnUpdate"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="ArmoryQuestInfoRequiredMoneyFrame">
+    <Size x="285" y="28"/>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString name="ArmoryQuestInfoRequiredMoneyText" inherits="QuestFontNormalSmall" text="REQUIRED_MONEY">
+          <Anchors>
+            <Anchor point="LEFT"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Frame name="ArmoryQuestInfoRequiredMoneyDisplay" inherits="ArmoryMoneyFrameTemplate">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="ArmoryQuestInfoRequiredMoneyText" relativePoint="RIGHT" x="10" y="0"/>
+        </Anchors>
+        <Scripts>
+          <OnLoad>
+            ArmorySmallMoneyFrame_OnLoad(self);
+          </OnLoad>
+        </Scripts>
+      </Frame>
+    </Frames>
+  </Frame>
+
+  <Frame name="ArmoryQuestInfoRewardsFrame" hidden="true">
+    <Size x="285" y="10" />
+    <Anchors>
+      <Anchor point="CENTER" />
+    </Anchors>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString parentKey="Header" inherits="QuestTitleFont" text="QUEST_REWARDS" justifyH="LEFT">
+          <Size x="285" y="0"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" />
+          </Anchors>
+        </FontString>
+        <FontString parentKey="ItemChooseText" inherits="QuestFontNormalSmall" text="REWARD_CHOICES" hidden="true" justifyH="LEFT">
+          <Size x="285" y="0"/>
+        </FontString>
+        <FontString parentKey="ItemReceiveText" inherits="QuestFontNormalSmall" hidden="true" justifyH="LEFT" />
+        <FontString parentKey="PlayerTitleText" inherits="QuestFontNormalSmall" text="REWARD_TITLE" hidden="true" justifyH="LEFT" />
+        <FontString parentKey="QuestSessionBonusReward" inherits="QuestFontNormalSmall" text="QUEST_SESSION_BONUS_LOOT_REWARD_FRAME_TITLE" hidden="true" justifyH="LEFT">
+          <Size x="270" y="0"/>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Button parentKey="HonorFrame" inherits="ArmoryLargeItemButtonTemplate" hidden="true"/>
+      <Button parentArray="RewardButtons" name="$parentQuestInfoItem1" inherits="ArmoryLargeQuestRewardItemButtonTemplate" hidden="true"/>
+      <Frame parentKey="MoneyFrame" name="ArmoryQuestInfoMoneyFrame" inherits="ArmoryMoneyFrameTemplate">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ItemReceiveText" relativePoint="RIGHT" x="15" y="0"/>
+        </Anchors>
+      </Frame>
+      <Button parentKey="SkillPointFrame" name="ArmoryQuestInfoSkillPointFrame" inherits="ArmoryLargeItemButtonTemplate">
+        <Layers>
+          <Layer level="OVERLAY">
+            <Texture parentKey="CircleBackground" file="Interface\QuestFrame\SkillUp-BG">
+              <Size x="32" y="32"/>
+              <Anchors>
+                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" x="12" y="-6"/>
+              </Anchors>
+            </Texture>
+            <Texture parentKey="CircleBackgroundGlow" file="Interface\QuestFrame\SkillUp-Glow" alphaMode="ADD" alpha="0.3">
+              <Size x="64" y="64"/>
+              <Anchors>
+                <Anchor point="CENTER" relativeKey="$parent.CircleBackground"/>
+              </Anchors>
+            </Texture>
+            <FontString parentKey="ValueText" inherits="GameFontNormalLarge" justifyH="LEFT">
+              <Anchors>
+                <Anchor point="CENTER" relativeKey="$parent.CircleBackground" relativePoint="CENTER" x="3"/>
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+        <Scripts>
+          <OnLoad>
+            -- Hacks to get this to display a little more nicely
+            self.Name:SetPoint("LEFT", self.NameFrame, 24, 0);
+            self.Name:SetWidth(81);
+          </OnLoad>
+          <OnEnter>
+            if (self.tooltip) then
+              GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+              GameTooltip:SetText(self.tooltip, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+            end
+          </OnEnter>
+          <OnLeave>
+            GameTooltip:Hide();
+          </OnLeave>
+        </Scripts>
+      </Button>
+      <Frame parentKey="XPFrame" name="ArmoryQuestInfoXPFrame">
+        <Size x="280" y="20"/>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <FontString parentKey="ReceiveText" inherits="QuestFontNormalSmall" text="EXPERIENCE_COLON">
+              <Anchors>
+                <Anchor point="LEFT" x="0" y="0"/>
+              </Anchors>
+            </FontString>
+            <FontString parentKey="ValueText" inherits="NumberFontNormalLarge" justifyH="LEFT">
+              <Anchors>
+                <Anchor point="LEFT" relativeKey="$parent.ReceiveText" relativePoint="RIGHT" x="15" y="0"/>
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+      </Frame>
+      <Button parentKey="ArtifactXPFrame" inherits="ArmoryLargeItemButtonTemplate" hidden="true">
+        <Layers>
+          <Layer level="BORDER">
+            <Texture parentKey="Overlay" file="Interface\Artifacts\ArtifactPower-QuestBorder">
+              <Size x="64" y="64" />
+              <Anchors>
+                <Anchor point="CENTER" relativeKey="$parent.Icon" />
+              </Anchors>
+            </Texture>
+          </Layer>
+        </Layers>
+        <Scripts>
+          <OnEnter>
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+            GameTooltip:SetText(ARTIFACT_XP_REWARD, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b, nil, true);
+          </OnEnter>
+          <OnLeave function="GameTooltip_Hide" />
+        </Scripts>
+      </Button>
+      <Button parentKey="WarModeBonusFrame" inherits="ArmoryLargeItemButtonTemplate, WarModeBonusFrameTemplate" hidden="true"/>
+      <Frame parentKey="TitleFrame" name="ArmoryQuestInfoPlayerTitleFrame">
+        <Size x="500" y="39"/>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture parentKey="Icon" file="Interface\Icons\INV_Misc_Note_02">
+              <Size x="39" y="39"/>
+              <Anchors>
+                <Anchor point="TOPLEFT" x="0" y="0"/>
+              </Anchors>
+            </Texture>
+            <Texture parentKey="FrameLeft" file="Interface\QuestFrame\UI-QuestItemNameFrame">
+              <Size x="4" y="40"/>
+              <Anchors>
+                <Anchor point="LEFT" relativeKey="$parent.Icon" relativePoint="RIGHT" x="2" y="0"/>
+              </Anchors>
+              <TexCoords left="0.078125" right="0.1171875" top="0.15625" bottom="0.828125"/>
+            </Texture>
+            <Texture parentKey="FrameCenter" file="Interface\QuestFrame\UI-QuestItemNameFrame">
+              <Size x="200" y="40"/>
+              <Anchors>
+                <Anchor point="LEFT" relativeKey="$parent.FrameLeft" relativePoint="RIGHT" x="0" y="0"/>
+              </Anchors>
+              <TexCoords left="0.1171875" right="0.828125" top="0.15625" bottom="0.828125"/>
+            </Texture>
+            <Texture parentKey="FrameRight" file="Interface\QuestFrame\UI-QuestItemNameFrame">
+              <Size x="11" y="40"/>
+              <Anchors>
+                <Anchor point="LEFT" relativeKey="$parent.FrameCenter" relativePoint="RIGHT" x="0" y="0"/>
+              </Anchors>
+              <TexCoords left="0.828125" right="0.9140625" top="0.15625" bottom="0.828125"/>
+            </Texture>
+          </Layer>
+          <Layer level="OVERLAY">
+            <FontString parentKey="Name" inherits="GameFontHighlight" justifyH="LEFT">
+              <Size x="200" y="0"/>
+              <Anchors>
+                <Anchor point="LEFT" relativeKey="$parent.FrameLeft" x="8" y="-2"/>
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+      </Frame>
+    </Frames>
+    <Scripts>
+      <OnLoad>
+        self.buttonTemplate = "ArmoryLargeQuestRewardItemButtonTemplate";
+        self.spellRewardPool = CreateFramePool("BUTTON", self, "QuestSpellTemplate, ArmoryQuestInfoRewardSpellCodeTemplate");
+        self.followerRewardPool = CreateFramePool("BUTTON", self, "LargeQuestInfoRewardFollowerTemplate");
+        self.spellHeaderPool = CreateFontStringPool(self, "BACKGROUND", 0, "QuestInfoSpellHeaderTemplate");
+        self.reputationRewardPool = CreateFramePool("BUTTON", self, "LargeQuestInfoRewardReputationTemplate");
+      </OnLoad>
+    </Scripts>
+  </Frame>
+
+  <Frame name="ArmoryQuestInfoFrame" hidden="true">
+    <Size x="300" y="100"/>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString name="ArmoryQuestInfoTitleHeader" inherits="QuestTitleFont" justifyH="LEFT" text="Quest title">
+          <Size x="285" y="0"/>
+        </FontString>
+        <FontString name="ArmoryQuestInfoQuestType" inherits="QuestFontNormalSmall" justifyH="LEFT">
+          <Size x="285" y="0"/>
+        </FontString>
+        <FontString name="ArmoryQuestInfoObjectivesText" inherits="QuestFontNormalSmall" justifyH="LEFT">
+          <Size x="285" y="0"/>
+        </FontString>
+        <FontString name="ArmoryQuestInfoRewardText" inherits="QuestFontNormalSmall" justifyH="LEFT">
+          <Size x="285" y="0"/>
+        </FontString>
+        <FontString name="ArmoryQuestInfoRequiredMoneyText" inherits="QuestFontNormalSmall" text="REQUIRED_MONEY" />
+        <FontString name="ArmoryQuestInfoGroupSize" inherits="QuestFontNormalSmall" />
+        <FontString name="ArmoryQuestInfoAnchor" inherits="QuestFontNormalSmall" />
+        <FontString name="ArmoryQuestInfoDescriptionHeader" inherits="QuestTitleFont" justifyH="LEFT" text="QUEST_DESCRIPTION">
+          <Size x="285" y="0"/>
+        </FontString>
+        <FontString name="ArmoryQuestInfoObjectivesHeader" inherits="QuestTitleFont" text="QUEST_OBJECTIVES"  justifyH="LEFT">
+          <Size x="285" y="0"/>
+        </FontString>
+        <FontString name="ArmoryQuestInfoDescriptionText" inherits="QuestFontNormalSmall" justifyH="LEFT">
+          <Size x="285" y="0"/>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Frame name="ArmoryQuestInfoSpacerFrame">
+        <Size x="5" y="5"/>
+      </Frame>
+      <Frame name="ArmoryQuestInfoSealFrame">
+        <Size x="257" y="78"/>
+        <Layers>
+          <Layer level="ARTWORK">
+            <FontString parentKey="Text" inherits="QuestFont_Huge" mixin="AutoScalingFontStringMixin" justifyH="LEFT">
+              <KeyValues>
+                <KeyValue key="minLineHeight" value="12" type="number"/>
+              </KeyValues>
+              <Size x="160" y="44"/>
+              <Anchors>
+                <Anchor point="LEFT" x="5" y="-12"/>
+              </Anchors>
+            </FontString>
+            <Texture parentKey="Texture">
+              <Anchors>
+                <Anchor point="TOPLEFT" x="160" y="-6"/>
+              </Anchors>
+            </Texture>
+          </Layer>
+        </Layers>
+      </Frame>
+    </Frames>
+    <Scripts>
+      <OnLoad>
+        self.material = "Parchment";
+        self.rewardsFrame = ArmoryQuestInfoRewardsFrame;
+      </OnLoad>
+    </Scripts>
+  </Frame>
+</Ui>

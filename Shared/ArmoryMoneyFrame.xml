@@ -1,0 +1,158 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+  <Script file="ArmoryMoneyFrame.lua"/>
+
+  <Button name="ArmoryMoneyFrameButtonTemplate" virtual="true">
+    <Scripts>
+      <OnEnter>
+        ArmoryMoneyFrame_OnEnter(self:GetParent());
+      </OnEnter>
+      <OnLeave>
+        ArmoryMoneyFrame_OnLeave(self:GetParent());
+      </OnLeave>
+    </Scripts>
+  </Button>
+
+  <Frame name="ArmoryMoneyFrameTemplate" virtual="true">
+    <Size x="192" y="28"/>
+    <Frames>
+      <Button name="$parentCopperButton" parentKey="CopperButton" inherits="ArmoryMoneyFrameButtonTemplate" >
+        <Size x="47" y="19"/>
+        <Anchors>
+          <Anchor point="RIGHT" x="-13" y="0"/>
+        </Anchors>
+        <NormalTexture atlas="coin-copper">
+          <Size x="19" y="19"/>
+          <Anchors>
+            <Anchor point="RIGHT"/>
+          </Anchors>
+        </NormalTexture>
+        <ButtonText name="$parentText" parentKey="Text">
+          <Anchors>
+            <Anchor point="RIGHT" x="-19" y="0"/>
+          </Anchors>
+        </ButtonText>
+        <NormalFont style="NumberFontNormalLargeRight"/>
+        <PushedTextOffset x="0" y="0"/>
+      </Button>
+      <Button name="$parentSilverButton" parentKey="SilverButton" inherits="ArmoryMoneyFrameButtonTemplate">
+        <Size x="47" y="19"/>
+        <Anchors>
+          <Anchor point="RIGHT" relativeTo="$parentCopperButton" relativePoint="LEFT" x="-4" y="0"/>
+        </Anchors>
+        <NormalTexture atlas="coin-silver">
+          <Size x="19" y="19"/>
+          <Anchors>
+            <Anchor point="RIGHT"/>
+          </Anchors>
+        </NormalTexture>
+        <ButtonText name="$parentText" parentKey="Text">
+          <Anchors>
+            <Anchor point="RIGHT" x="-19" y="0"/>
+          </Anchors>
+        </ButtonText>
+        <NormalFont style="NumberFontNormalLargeRight"/>
+        <PushedTextOffset x="0" y="0"/>
+      </Button>
+      <Button name="$parentGoldButton" parentKey="GoldButton" inherits="ArmoryMoneyFrameButtonTemplate">
+        <Size x="47" y="19"/>
+        <Anchors>
+          <Anchor point="RIGHT" relativeTo="$parentSilverButton" relativePoint="LEFT" x="-4" y="0"/>
+        </Anchors>
+        <NormalTexture atlas="coin-gold">
+          <Size x="19" y="19"/>
+          <Anchors>
+            <Anchor point="RIGHT"/>
+          </Anchors>
+        </NormalTexture>
+        <ButtonText name="$parentText" parentKey="Text">
+          <Anchors>
+            <Anchor point="RIGHT" x="-19" y="0"/>
+          </Anchors>
+        </ButtonText>
+        <NormalFont style="NumberFontNormalLargeRight"/>
+        <PushedTextOffset x="0" y="0"/>
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnLoad>
+        ArmoryMoneyFrame_OnLoad(self);
+      </OnLoad>
+      <OnShow>
+        ArmoryMoneyFrame_UpdateMoney(self);
+      </OnShow>
+    </Scripts>
+  </Frame>
+
+  <Frame name="ArmorySmallMoneyFrameTemplate" virtual="true">
+    <Size x="128" y="13"/>
+    <Frames>
+      <Button name="$parentCopperButton" parentKey="CopperButton" inherits="ArmoryMoneyFrameButtonTemplate">
+        <Size x="32" y="13"/>
+        <Anchors>
+          <Anchor point="RIGHT" x="-13" y="0"/>
+        </Anchors>
+        <NormalTexture atlas="coin-copper">
+          <Size x="13" y="13"/>
+          <Anchors>
+            <Anchor point="RIGHT"/>
+          </Anchors>
+        </NormalTexture>
+        <ButtonText name="$parentText" parentKey="Text">
+          <Anchors>
+            <Anchor point="RIGHT" x="-13" y="0"/>
+          </Anchors>
+        </ButtonText>
+        <NormalFont style="NumberFontNormalRight"/>
+        <PushedTextOffset x="0" y="0"/>
+      </Button>
+      <Button name="$parentSilverButton" parentKey="SilverButton" inherits="ArmoryMoneyFrameButtonTemplate">
+        <Size x="32" y="13"/>
+        <Anchors>
+          <Anchor point="RIGHT" relativeTo="$parentCopperButton" relativePoint="LEFT" x="-4" y="0"/>
+        </Anchors>
+        <NormalTexture atlas="coin-silver">
+          <Size x="13" y="13"/>
+          <Anchors>
+            <Anchor point="RIGHT"/>
+          </Anchors>
+        </NormalTexture>
+        <ButtonText name="$parentText" parentKey="Text">
+          <Anchors>
+            <Anchor point="RIGHT" x="-13" y="0"/>
+          </Anchors>
+        </ButtonText>
+        <NormalFont style="NumberFontNormalRight"/>
+        <PushedTextOffset x="0" y="0"/>
+      </Button>
+      <Button name="$parentGoldButton" parentKey="GoldButton" inherits="ArmoryMoneyFrameButtonTemplate">
+        <Size x="32" y="13"/>
+        <Anchors>
+          <Anchor point="RIGHT" relativeTo="$parentSilverButton" relativePoint="LEFT" x="-4" y="0"/>
+        </Anchors>
+        <NormalTexture atlas="coin-gold">
+          <Size x="13" y="13"/>
+          <Anchors>
+            <Anchor point="RIGHT"/>
+          </Anchors>
+        </NormalTexture>
+        <ButtonText name="$parentText" parentKey="Text">
+          <Anchors>
+            <Anchor point="RIGHT" x="-13" y="0"/>
+          </Anchors>
+        </ButtonText>
+        <NormalFont style="NumberFontNormalRight"/>
+        <PushedTextOffset x="0" y="0"/>
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnLoad>
+        ArmorySmallMoneyFrame_OnLoad(self);
+      </OnLoad>
+      <OnShow>
+        ArmoryMoneyFrame_UpdateMoney(self);
+      </OnShow>
+    </Scripts>
+  </Frame>
+</Ui>

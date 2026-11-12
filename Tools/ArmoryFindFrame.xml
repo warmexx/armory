@@ -1,0 +1,464 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\FrameXML\UI.xsd">
+  <Script file="ArmoryFindFrame.lua"/>
+  <Button name="ArmoryFindFrameButtonTemplate" virtual="true">
+    <Size>
+      <AbsDimension x="298" y="16"/>
+    </Size>
+    <Layers>
+      <Layer level="BORDER">
+        <FontString name="$parentText" inherits="GameFontHighlightSmall" justifyH="LEFT" hidden="true" wordwrap="false">
+          <Anchors>
+            <Anchor point="TOPLEFT">
+              <Offset>
+                <AbsDimension x="10" y="-3"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+        <FontString name="$parentWho" inherits="GameFontHighlightSmall" justifyH="LEFT">
+          <Size>
+            <AbsDimension x="80" y="14"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOPLEFT">
+              <Offset>
+                <AbsDimension x="10" y="-3"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+        <FontString name="$parentWhere" inherits="GameFontNormalSmall" justifyH="LEFT">
+          <Size>
+            <AbsDimension x="80" y="14"/>
+          </Size>
+          <Anchors>
+            <Anchor point="LEFT" relativeTo="$parentWho" relativePoint="RIGHT">
+              <Offset>
+                <AbsDimension x="0" y="0"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+        <FontString name="$parentWhat" inherits="GameFontHighlightSmall" justifyH="LEFT">
+          <Size>
+            <AbsDimension x="131" y="14"/>
+          </Size>
+          <Anchors>
+            <Anchor point="LEFT" relativeTo="$parentWhere" relativePoint="RIGHT">
+              <Offset>
+                <AbsDimension x="2" y="0"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnClick>
+        ArmoryFindFrameButton_OnClick(self, button);
+      </OnClick>
+      <OnEnter>
+        ArmoryFindFrameButton_OnEnter(self);
+      </OnEnter>
+      <OnLeave>
+        if ( GameTooltip:IsOwned(self) ) then
+          GameTooltip:Hide();
+        end
+      </OnLeave>
+    </Scripts>
+    <HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+      <Size>
+        <AbsDimension x="298" y="16"/>
+      </Size>
+      <Anchors>
+        <Anchor point="TOP">
+          <Offset>
+            <AbsDimension x="5" y="-2"/>
+          </Offset>
+        </Anchor>
+      </Anchors>
+    </HighlightTexture>
+  </Button>
+  <Button name="ArmoryFindFrameColumnHeaderTemplate" virtual="true">
+    <Size>
+      <AbsDimension x="10" y="24"/>
+    </Size>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture name="$parentLeft" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+          <Size>
+            <AbsDimension x="5" y="24"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOPLEFT"/>
+          </Anchors>
+          <TexCoords left="0" right="0.078125" top="0" bottom="0.75"/>
+        </Texture>
+        <Texture name="$parentMiddle" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+          <Size>
+            <AbsDimension x="53" y="24"/>
+          </Size>
+          <Anchors>
+            <Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+          </Anchors>
+          <TexCoords left="0.078125" right="0.90625" top="0" bottom="0.75"/>
+        </Texture>
+        <Texture name="$parentRight" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+          <Size>
+            <AbsDimension x="4" y="24"/>
+          </Size>
+          <Anchors>
+            <Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+          </Anchors>
+          <TexCoords left="0.90625" right="0.96875" top="0" bottom="0.75"/>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnClick>
+        if ( self.sortType ) then
+          ArmoryFindFrame_Sort(self.sortType);
+        end
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+      </OnClick>
+    </Scripts>
+    <ButtonText>
+      <Anchors>
+        <Anchor point="LEFT">
+          <Offset>
+            <AbsDimension x="8" y="0"/>
+          </Offset>
+        </Anchor>
+      </Anchors>
+    </ButtonText>
+    <NormalFont style="GameFontHighlightSmall"/>
+    <HighlightTexture name="$parentHighlightTexture" file="Interface\PaperDollInfoFrame\UI-Character-Tab-Highlight" alphaMode="ADD">
+      <Anchors>
+        <Anchor point="TOPLEFT" relativeTo="$parentLeft">
+          <Offset>
+            <AbsDimension x="-2" y="5"/>
+          </Offset>
+        </Anchor>
+        <Anchor point="BOTTOMRIGHT" relativeTo="$parentRight">
+          <Offset>
+            <AbsDimension x="2" y="-7"/>
+          </Offset>
+        </Anchor>
+      </Anchors>
+    </HighlightTexture>
+  </Button>
+  <Frame name="ArmoryFindFrame" toplevel="true" movable="true" enableMouse="true" hidden="true" parent="UIParent" inherits="ArmoryButtonFrameTemplate">
+    <Anchors>
+      <Anchor point="TOPLEFT" y="-104"/>
+    </Anchors>
+    <HitRectInsets>
+      <AbsInset left="0" right="30" top="0" bottom="45"/>
+    </HitRectInsets>
+    <Layers>
+      <Layer level="ARTWORK">
+        <FontString name="ArmoryFindFrameTotals" inherits="GameFontNormalSmall">
+          <Size x="298" y="16"/>
+          <Anchors>
+            <Anchor point="BOTTOM" relativeKey="$parent.Inset" y="-18"/>
+          </Anchors>
+        </FontString>
+        <FontString name="ArmoryFindFrameDetailWho" inherits="GameFontHighlightSmall" justifyH="LEFT">
+          <Size x="315" y="11"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" x="15" y="-332"/>
+          </Anchors>
+        </FontString>
+        <FontString name="ArmoryFindFrameDetailWhere" inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="TOP">
+          <Size x="315" y="11"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameDetailWho" relativePoint="BOTTOMLEFT" y="-3"/>
+          </Anchors>
+        </FontString>
+        <FontString name="ArmoryFindFrameDetailWhat" inherits="GameFontHighlightSmall" justifyH="LEFT" justifyV="TOP">
+          <Size x="315" y="11"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameDetailWhere" relativePoint="BOTTOMLEFT" y="-3"/>
+          </Anchors>
+        </FontString>
+        <FontString name="ArmoryFindFrameDetailCount" inherits="GameFontHighlightSmall" justifyH="LEFT" justifyV="TOP">
+          <Size x="315" y="11"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameDetailWhat" relativePoint="BOTTOMLEFT" y="-3"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Button name="ArmoryFindFrameColumnHeader1" inherits="ArmoryFindFrameColumnHeaderTemplate" text="ARMORY_WHO">
+        <Anchors>
+          <Anchor point="TOPLEFT" x="8" y="-68"/>
+        </Anchors>
+        <Scripts>
+          <OnLoad>
+            WhoFrameColumn_SetWidth(self, 83);
+            self.sortType = "who";
+          </OnLoad>
+        </Scripts>
+      </Button>
+      <Button name="ArmoryFindFrameColumnHeader2" inherits="ArmoryFindFrameColumnHeaderTemplate" text="ARMORY_WHERE">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="ArmoryFindFrameColumnHeader1" relativePoint="RIGHT">
+            <Offset>
+              <AbsDimension x="-2" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnLoad>
+            WhoFrameColumn_SetWidth(self, 86);
+            self.sortType = "where";
+          </OnLoad>
+        </Scripts>
+      </Button>
+      <Button name="ArmoryFindFrameColumnHeader3" inherits="ArmoryFindFrameColumnHeaderTemplate" text="ARMORY_WHAT">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="ArmoryFindFrameColumnHeader2" relativePoint="RIGHT">
+            <Offset>
+              <AbsDimension x="-2" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnLoad>
+            WhoFrameColumn_SetWidth(self, 131);
+            self.sortType = "what";
+          </OnLoad>
+        </Scripts>
+      </Button>
+      <EditBox name="ArmoryFindFrameEditBox" inherits="ArmorySearchBoxTemplate" autoFocus="false" historyLines="32">
+        <Size x="128" y="20"/>
+        <Anchors>
+          <Anchor point="TOPLEFT" x="75" y="-36"/>
+        </Anchors>
+        <Scripts>
+          <OnEnterPressed inherit="append">
+            self:ClearFocus();
+            ArmoryFindFrameEditBox_OnEnterPressed(self);
+          </OnEnterPressed>
+          <OnTextChanged function="ArmoryFindFrameEditBox_OnTextChanged"/>
+        </Scripts>
+      </EditBox>
+      <Frame name="ArmoryFindTypeDropDown" inherits="ArmoryDropDownMenuTemplate">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="ArmoryFindFrameEditBox" relativePoint="RIGHT">
+            <Offset>
+              <AbsDimension x="-5" y="-2"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnLoad>
+            ArmoryFindTypeDropDown_OnLoad(self);
+          </OnLoad>
+        </Scripts>
+      </Frame>
+      <Button name="ArmoryFindFrameButton1" inherits="ArmoryFindFrameButtonTemplate" id="1">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Inset" x="-1" />
+        </Anchors>
+      </Button>
+      <Button name="ArmoryFindFrameButton2" inherits="ArmoryFindFrameButtonTemplate" id="2">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameButton1" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </Button>
+      <Button name="ArmoryFindFrameButton3" inherits="ArmoryFindFrameButtonTemplate" id="3">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameButton2" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </Button>
+      <Button name="ArmoryFindFrameButton4" inherits="ArmoryFindFrameButtonTemplate" id="4">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameButton3" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </Button>
+      <Button name="ArmoryFindFrameButton5" inherits="ArmoryFindFrameButtonTemplate" id="5">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameButton4" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </Button>
+      <Button name="ArmoryFindFrameButton6" inherits="ArmoryFindFrameButtonTemplate" id="6">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameButton5" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </Button>
+      <Button name="ArmoryFindFrameButton7" inherits="ArmoryFindFrameButtonTemplate" id="7">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameButton6" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </Button>
+      <Button name="ArmoryFindFrameButton8" inherits="ArmoryFindFrameButtonTemplate" id="8">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameButton7" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </Button>
+      <Button name="ArmoryFindFrameButton9" inherits="ArmoryFindFrameButtonTemplate" id="9">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameButton8" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </Button>
+      <Button name="ArmoryFindFrameButton10" inherits="ArmoryFindFrameButtonTemplate" id="10">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameButton9" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </Button>
+      <Button name="ArmoryFindFrameButton11" inherits="ArmoryFindFrameButtonTemplate" id="11">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameButton10" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </Button>
+      <Button name="ArmoryFindFrameButton12" inherits="ArmoryFindFrameButtonTemplate" id="12">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameButton11" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </Button>
+      <Button name="ArmoryFindFrameButton13" inherits="ArmoryFindFrameButtonTemplate" id="13">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryFindFrameButton12" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </Button>
+      <ScrollFrame name="ArmoryFindFrameScrollFrame" inherits="ArmoryFauxScrollFrameTemplate">
+        <Size x="296" y="205"/>
+        <Anchors>
+          <Anchor point="TOPRIGHT" relativeKey="$parent.Inset" relativePoint="TOPRIGHT" x="-24" y="-5" />
+        </Anchors>
+        <Scripts>
+          <OnVerticalScroll>
+            FauxScrollFrame_OnVerticalScroll(self, offset, ARMORY_FIND_HEIGHT, ArmoryFindFrame_Update);
+          </OnVerticalScroll>
+        </Scripts>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+              <Size x="31" y="150"/>
+              <Anchors>
+                <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-2" y="5"/>
+              </Anchors>
+              <TexCoords left="0" right="0.484375" top="0" bottom="1.0"/>
+            </Texture>
+            <Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+              <Size x="31" y="100"/>
+              <Anchors>
+                <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-2" y="-2"/>
+              </Anchors>
+              <TexCoords left="0.515625" right="1.0" top="0" bottom="0.4140625"/>
+            </Texture>
+          </Layer>
+        </Layers>
+      </ScrollFrame>
+      <Frame name="$parentBottomInset" useParentLevel="true" inherits="ArmoryInsetFrameTemplate" parentKey="bottomInset">
+        <Anchors>
+          <Anchor point="BOTTOMRIGHT" x="-6" y="32" />
+          <Anchor point="TOPLEFT" relativeTo="$parentInset" relativePoint="BOTTOMLEFT" x="0" y="-18" />
+        </Anchors>
+      </Frame>
+      <Button name="ArmoryFindButton" inherits="ArmoryUIPanelButtonTemplate" text="ARMORY_FIND_BUTTON">
+        <Size x="123" y="22"/>
+        <Anchors>
+          <Anchor point="BOTTOMLEFT" x="6" y="6" />
+        </Anchors>
+        <Scripts>
+          <OnClick>
+            ArmoryFindButton_OnClick(self);
+          </OnClick>
+        </Scripts>
+        <NormalFont style="GameFontNormalSmall"/>
+        <HighlightFont style="GameFontHighlightSmall"/>
+        <DisabledFont style="GameFontDisableSmall"/>
+      </Button>
+      <CheckButton name="ArmoryFindFrameSearchGlobalCheckButton" inherits="ArmoryUICheckButtonTemplate">
+        <Size x="20" y="20"/>
+        <Anchors>
+          <Anchor point="BOTTOMLEFT" x="144" y="6"/>
+        </Anchors>
+        <Scripts>
+          <OnLoad>
+            ArmoryFindFrameSearchGlobalCheckButtonText:SetText(ARMORY_GLOBAL);
+          </OnLoad>
+          <OnShow>
+            self:SetChecked(Armory:GetConfigGlobalSearch());
+          </OnShow>
+          <OnClick>
+            if ( self:GetChecked() ) then
+              Armory:SetConfigGlobalSearch(true);
+            else
+              Armory:SetConfigGlobalSearch(false);
+            end
+          </OnClick>
+          <OnEnter>
+            Armory:AddEnhancedTip(self, ARMORY_CMD_SET_GLOBALSEARCH_MENUTEXT, 1.0, 1.0, 1.0, ARMORY_CMD_SET_GLOBALSEARCH_TOOLTIP, 1);
+          </OnEnter>
+          <OnLeave>
+            GameTooltip:Hide();
+          </OnLeave>
+        </Scripts>
+        <HitRectInsets>
+          <AbsInset left="0" right="-75" top="0" bottom="0"/>
+        </HitRectInsets>
+      </CheckButton>
+      <CheckButton name="ArmoryFindFrameSearchExtendedCheckButton" inherits="ArmoryUICheckButtonTemplate">
+        <Size x="20" y="20"/>
+        <Anchors>
+          <Anchor point="BOTTOMLEFT" x="246" y="6"/>
+        </Anchors>
+        <Scripts>
+          <OnLoad>
+            ArmoryFindFrameSearchExtendedCheckButtonText:SetText(ARMORY_EXTENDED);
+          </OnLoad>
+          <OnShow>
+            self:SetChecked(Armory:GetConfigExtendedSearch());
+          </OnShow>
+          <OnClick>
+            if ( self:GetChecked() ) then
+              Armory:SetConfigExtendedSearch(true);
+            else
+              Armory:SetConfigExtendedSearch(false);
+            end
+          </OnClick>
+          <OnEnter>
+            Armory:AddEnhancedTip(self, ARMORY_CMD_SET_EXTENDEDSEARCH_MENUTEXT, 1.0, 1.0, 1.0, ARMORY_CMD_SET_EXTENDEDSEARCH_TOOLTIP, 1);
+          </OnEnter>
+          <OnLeave>
+            GameTooltip:Hide();
+          </OnLeave>
+        </Scripts>
+        <HitRectInsets>
+          <AbsInset left="0" right="-75" top="0" bottom="0"/>
+        </HitRectInsets>
+      </CheckButton>
+    </Frames>
+    <Scripts>
+      <OnLoad>
+        ArmoryFindFrame_OnLoad(self);
+      </OnLoad>
+      <OnShow>
+        self:SetScale(Armory:GetConfigFrameScale());
+        ArmoryFindFrame_OnShow(self);
+      </OnShow>
+      <OnHide>
+        ArmoryFindFrame_OnHide(self);
+      </OnHide>
+      <OnMouseDown>
+        if ( button == "LeftButton" ) then
+          self:StartMoving();
+          self.isMoving = true;
+        end
+      </OnMouseDown>
+      <OnMouseUp>
+        if ( self.isMoving ) then
+          self:StopMovingOrSizing();
+          self.isMoving = false;
+        end
+      </OnMouseUp>
+      <OnMouseWheel>
+        return;
+      </OnMouseWheel>
+    </Scripts>
+  </Frame>
+</Ui>

@@ -1,0 +1,159 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\FrameXML\UI.xsd">
+  <Script file="ArmoryTalentFrame.lua"/>
+
+  <Button name="ArmoryPlayerSpecTabTemplate" virtual="true" hidden="true">
+    <Size x="24" y="24"/>
+    <Layers>
+      <Layer level="OVERLAY">
+        <Texture file="Interface\RaidFrame\ReadyCheck-Ready" parentKey="activeIcon" hidden="true">
+          <Size x="12" y="12"/>
+          <Anchors>
+            <Anchor point="BOTTOMRIGHT" x="3" y="-3"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnClick function="ArmoryPlayerSpecTab_OnClick" />
+      <OnEnter function="ArmoryPlayerSpecTab_OnEnter" />
+      <OnLeave function="GameTooltip_Hide" />
+    </Scripts>
+    <NormalTexture/>
+    <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+  </Button>
+
+  <Button name="ArmoryTalentTabTemplate" inherits="ArmoryPanelTopTabButtonTemplate" virtual="true">
+    <Size x="10" y="24"/>
+    <Scripts>
+      <OnClick function="ArmoryTalentFrameTab_OnClick" />
+    </Scripts>
+  </Button>
+
+  <!-- Talent button template, the layers are taken from TalentButtonArtTemplate in Blizzard_TalentButtonArt.xml -->
+  <Button name="ArmoryTalentButtonTemplate" virtual="true">
+    <Size x="26" y="26"/>
+    <Layers>
+      <Layer level="BORDER">
+        <Texture parentKey="icon" file="Interface\Icons\INV_Misc_QuestionMark">
+          <Anchors>
+            <Anchor point="CENTER"/>
+          </Anchors>
+        </Texture>
+        <MaskTexture parentKey="iconMask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent.icon"/>
+            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.icon"/>
+          </Anchors>
+        </MaskTexture>
+      </Layer>
+      <Layer level="ARTWORK">
+        <Texture parentKey="border" texelSnappingBias="0.0" snapToPixelGrid="false">
+          <Anchors>
+            <Anchor point="CENTER"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+      <Layer level="OVERLAY">
+        <FontString parentKey="rankText" inherits="NumberFontNormalSmall" justifyH="RIGHT">
+          <Anchors>
+            <Anchor point="BOTTOMRIGHT" x="2" y="-1"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnEnter function="ArmoryTalentFrameTalent_OnEnter" />
+      <OnLeave function="GameTooltip_Hide" />
+      <OnClick function="ArmoryTalentFrameTalent_OnClick" />
+    </Scripts>
+  </Button>
+
+  <Frame name="ArmoryTalentFrame" setAllPoints="true" useParentLevel="true" enableMouse="true" movable="true" parent="ArmoryFrame" hidden="true" id="3">
+    <Layers>
+      <Layer level="ARTWORK">
+        <FontString inherits="GameFontNormalSmall" justifyH="LEFT" parentKey="statusText">
+          <Anchors>
+            <Anchor point="BOTTOMLEFT" x="14" y="9"/>
+          </Anchors>
+        </FontString>
+        <FontString inherits="GameFontHighlightSmall" justifyH="RIGHT" parentKey="pointsText">
+          <Anchors>
+            <Anchor point="BOTTOMRIGHT" x="-14" y="9"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <!-- The three parts of the talent tree -->
+      <Button name="$parentTab1" inherits="ArmoryTalentTabTemplate" id="1">
+        <Anchors>
+          <Anchor point="TOPLEFT" x="56" y="-37"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentTab2" inherits="ArmoryTalentTabTemplate" id="2">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT" x="-7" y="0"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentTab3" inherits="ArmoryTalentTabTemplate" id="3">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT" x="-7" y="0"/>
+        </Anchors>
+      </Button>
+
+      <!-- The buttons and lines of the selected part are created in ArmoryTalentFrame.lua -->
+      <Frame name="$parentTree" parentKey="Tree">
+        <Size x="290" y="330"/>
+        <Anchors>
+          <Anchor point="TOPLEFT" x="8" y="-64"/>
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture parentKey="heroIcon" hidden="true">
+              <Size x="56" y="56"/>
+              <Anchors>
+                <Anchor point="TOPLEFT" x="4" y="-4"/>
+              </Anchors>
+            </Texture>
+          </Layer>
+        </Layers>
+      </Frame>
+
+      <!-- The options of a choice node, shown on mouseover -->
+      <Frame name="$parentChoice" parentKey="Choice" frameStrata="DIALOG" clampedToScreen="true" hidden="true" inherits="TooltipBackdropTemplate">
+        <Scripts>
+          <OnUpdate function="ArmoryTalentFrameChoice_OnUpdate" />
+        </Scripts>
+      </Frame>
+
+      <!-- Spec Tabs -->
+      <Button name="ArmoryPlayerSpecTab1" inherits="ArmoryPlayerSpecTabTemplate" parentKey="specTab1" id="1">
+        <Anchors>
+          <Anchor point="TOPRIGHT" x="-14" y="-68"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryPlayerSpecTab2" inherits="ArmoryPlayerSpecTabTemplate" parentKey="specTab2" id="2">
+        <Anchors>
+          <Anchor point="TOP" relativeTo="ArmoryPlayerSpecTab1" relativePoint="BOTTOM" x="0" y="-6"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryPlayerSpecTab3" inherits="ArmoryPlayerSpecTabTemplate" parentKey="specTab3" id="3">
+        <Anchors>
+          <Anchor point="TOP" relativeTo="ArmoryPlayerSpecTab2" relativePoint="BOTTOM" x="0" y="-6"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryPlayerSpecTab4" inherits="ArmoryPlayerSpecTabTemplate" parentKey="specTab4" id="4">
+        <Anchors>
+          <Anchor point="TOP" relativeTo="ArmoryPlayerSpecTab3" relativePoint="BOTTOM" x="0" y="-6"/>
+        </Anchors>
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnShow function="ArmoryTalentFrame_OnShow" />
+      <OnLoad function="ArmoryTalentFrame_OnLoad" />
+      <OnEvent function="ArmoryTalentFrame_OnEvent" />
+    </Scripts>
+  </Frame>
+</Ui>

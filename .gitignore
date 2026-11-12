@@ -1,0 +1,5 @@
+/.release
+/.vscode
+.tokensave/
+/Libs/
+/docs/

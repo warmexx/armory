@@ -1,0 +1,195 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\FrameXML\UI.xsd">
+
+  <Script file="ArmoryOptionsSummaryPanel.lua" />
+
+  <CheckButton name="ArmoryOptionsCurrencyCheckButtonTemplate" virtual="true" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsCurrencyCheckButtonTemplateMixin">
+  </CheckButton>
+
+  <Frame name="ArmoryOptionsSummaryPanel" hidden="true" inherits="ArmoryOptionsPanelTemplate" mixin="ArmoryOptionsSummaryPanelMixin">
+    <Layers>
+      <Layer level="ARTWORK">
+        <FontString parentKey="SubText2" text="ARMORY_SUMMARY_SUBTEXT2" inherits="GameFontHighlightSmall" justifyH="LEFT" justifyV="TOP">
+          <Size y="18" x="0" />
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" y="-105" />
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+
+    <Frames>
+      <CheckButton parentKey="Summary" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryEnableMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" x="-2" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <Slider parentKey="DelaySlider" inherits="ArmoryOptionsPanelSliderTemplate" mixin="ArmoryOptionsSummaryDelayMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Summary" relativePoint="BOTTOMLEFT" x="10" y="-16" />
+        </Anchors>
+      </Slider>
+
+      <CheckButton parentKey="Class" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryClassMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText2" relativePoint="BOTTOMLEFT" x="-2" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Level" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryLevelMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Class" relativePoint="BOTTOMLEFT" y="-4" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="ItemLevel" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryItemLevelMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Level" relativePoint="BOTTOMLEFT" y="-4" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Zone" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryZoneMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ItemLevel" relativePoint="BOTTOMLEFT" y="-4" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="XP" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryXPMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Zone" relativePoint="BOTTOMLEFT" y="-4" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Played" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryPlayedMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.XP" relativePoint="BOTTOMLEFT" y="-4" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Online" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryOnlineMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Played" relativePoint="BOTTOMLEFT" y="-4" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Money" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryMoneyMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Online" relativePoint="BOTTOMLEFT" y="-4" />
+        </Anchors>
+      </CheckButton>
+
+      <CheckButton parentKey="Bags" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryBagsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText2" relativePoint="BOTTOMLEFT" x="200" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Currency" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryCurrencyMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Bags" relativePoint="BOTTOMLEFT" y="-4" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="RaidInfo" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryRaidInfoMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Currency" relativePoint="BOTTOMLEFT" y="-4" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Quest" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryQuestMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.RaidInfo" relativePoint="BOTTOMLEFT" y="-4" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Expiration" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryExpirationMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Quest" relativePoint="BOTTOMLEFT" y="-4" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Events" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryEventsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Expiration" relativePoint="BOTTOMLEFT" y="-4" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="TradeSkills" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSummaryTradeSkillsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Events" relativePoint="BOTTOMLEFT" y="-4" />
+        </Anchors>
+      </CheckButton>
+
+      <Frame name="$parentCurrencyContainer" parentKey="CurrencyContainer" mixin="ArmoryOptionsSummaryCurrencyContainerMixin">
+        <Size x="0" y="200" />
+        <Anchors>
+          <Anchor point="TOPRIGHT" x="-24" y="-194" />
+          <Anchor point="BOTTOMLEFT" relativeKey="$parent.TradeSkills" relativePoint="BOTTOMRIGHT" x="150" />
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture parentKey="BG">
+              <Anchors>
+                <Anchor point="TOPLEFT" />
+                <Anchor point="BOTTOMRIGHT" y="-30" />
+              </Anchors>
+              <Color r="0.3" g="0.3" b="0.3" a="0.3" />
+            </Texture>
+          </Layer>
+          <Layer level="ARTWORK">
+            <FontString parentKey="Title" text="CURRENCY" inherits="GameFontNormal" justifyH="LEFT" justifyV="TOP">
+              <Anchors>
+                <Anchor point="TOPLEFT" x="8" y="-8" />
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+        <Frames>
+          <ScrollFrame parentKey="ScrollFrame" inherits="ArmoryFauxScrollFrameTemplate">
+            <Size x="215" y="205" />
+            <Anchors>
+              <Anchor point="TOPLEFT" y="-24" />
+            </Anchors>
+            <Scripts>
+              <OnVerticalScroll>
+                self:GetParent():OnVerticalScroll(offset);
+              </OnVerticalScroll>
+            </Scripts>
+          </ScrollFrame>
+
+          <CheckButton name="$parentButton1" inherits="ArmoryOptionsCurrencyCheckButtonTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeKey="$parent.ScrollFrame" relativePoint="TOPLEFT" x="8" y="0" />
+            </Anchors>
+          </CheckButton>
+          <CheckButton name="$parentButton2" inherits="ArmoryOptionsCurrencyCheckButtonTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="$parentButton1" relativePoint="BOTTOMLEFT" />
+            </Anchors>
+          </CheckButton>
+          <CheckButton name="$parentButton3" inherits="ArmoryOptionsCurrencyCheckButtonTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="$parentButton2" relativePoint="BOTTOMLEFT" />
+            </Anchors>
+          </CheckButton>
+          <CheckButton name="$parentButton4" inherits="ArmoryOptionsCurrencyCheckButtonTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="$parentButton3" relativePoint="BOTTOMLEFT" />
+            </Anchors>
+          </CheckButton>
+          <CheckButton name="$parentButton5" inherits="ArmoryOptionsCurrencyCheckButtonTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="$parentButton4" relativePoint="BOTTOMLEFT" />
+            </Anchors>
+          </CheckButton>
+          <CheckButton name="$parentButton6" inherits="ArmoryOptionsCurrencyCheckButtonTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="$parentButton5" relativePoint="BOTTOMLEFT" />
+            </Anchors>
+          </CheckButton>
+          <CheckButton name="$parentButton7" inherits="ArmoryOptionsCurrencyCheckButtonTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="$parentButton6" relativePoint="BOTTOMLEFT" />
+            </Anchors>
+          </CheckButton>
+          <CheckButton name="$parentButton8" inherits="ArmoryOptionsCurrencyCheckButtonTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="$parentButton7" relativePoint="BOTTOMLEFT" />
+            </Anchors>
+          </CheckButton>
+        </Frames>
+        <Scripts>
+          <OnShow method="Initialize" />
+        </Scripts>
+      </Frame>
+    </Frames>
+</Frame>
+
+</Ui>

@@ -1,0 +1,167 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\FrameXML\UI.xsd">
+
+  <Script file="ArmoryOptionsTooltipPanel.lua" />
+
+  <Frame name="ArmoryOptionsTooltipPanel" hidden="true" inherits="ArmoryOptionsPanelTemplate" mixin="ArmoryOptionsTooltipPanelMixin">
+    <Frames>
+      <CheckButton parentKey="ShowItemCount" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowItemCountMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" x="-2" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <Frame parentKey="ShowItemCountColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsTooltipShowItemCountColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ShowItemCount" x="376"/>
+        </Anchors>
+      </Frame>
+      <Frame parentKey="ShowItemCountNumberColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsTooltipShowItemCountNumberColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ShowItemCountColor" relativePoint="RIGHT" x="20" />
+        </Anchors>
+      </Frame>
+
+      <CheckButton parentKey="ShowItemCountTotals" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowItemCountTotalsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowItemCount" relativePoint="BOTTOMLEFT" x="16" />
+        </Anchors>
+      </CheckButton>
+      <Frame parentKey="ShowItemCountTotalsColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsTooltipShowItemCountTotalsColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ShowItemCountTotals" x="360"/>
+        </Anchors>
+      </Frame>
+      <Frame parentKey="ShowItemCountTotalsNumberColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsTooltipShowItemCountTotalsNumberColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ShowItemCountTotalsColor" relativePoint="RIGHT" x="20" />
+        </Anchors>
+      </Frame>
+
+      <CheckButton parentKey="ItemCountPerSlot" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipItemCountPerSlotMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowItemCountTotals" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+
+      <CheckButton parentKey="GlobalItemCount" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipGlobalItemCountMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ItemCountPerSlot" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+
+      <CheckButton parentKey="CrossFactionItemCount" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipCrossFactionItemCountMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.GlobalItemCount" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+
+
+      <CheckButton parentKey="ShowKnownBy" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowKnownByMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.CrossFactionItemCount" relativePoint="BOTTOMLEFT" x="-16" />
+        </Anchors>
+      </CheckButton>
+      <Frame parentKey="ShowKnownByColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsTooltipShowKnownByColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ShowKnownBy" x="376"/>
+        </Anchors>
+      </Frame>
+
+      <CheckButton parentKey="ShowHasSkill" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowHasSkillMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowKnownBy" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+      <Frame parentKey="ShowHasSkillColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsTooltipShowHasSkillColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ShowHasSkill" x="376"/>
+        </Anchors>
+      </Frame>
+
+      <CheckButton parentKey="ShowCanLearn" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowCanLearnMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowHasSkill" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+      <Frame parentKey="ShowCanLearnColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsTooltipShowCanLearnColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ShowCanLearn" x="376"/>
+        </Anchors>
+      </Frame>
+
+      <CheckButton parentKey="ShowCrafters" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowCraftersMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowCanLearn" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+      <Frame parentKey="ShowCraftersColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsTooltipShowCraftersColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ShowCrafters" x="376"/>
+        </Anchors>
+      </Frame>
+
+      <CheckButton parentKey="ShowSkillRank" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowSkillRankMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowCrafters" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+      <Frame parentKey="ShowSkillRankColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsTooltipShowSkillRankColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ShowSkillRank" x="376"/>
+        </Anchors>
+      </Frame>
+
+      <CheckButton parentKey="ShowSecondarySkillRank" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowSecondarySkillRankMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowSkillRank" relativePoint="BOTTOMLEFT" x="16" />
+        </Anchors>
+      </CheckButton>
+
+      <CheckButton parentKey="ShowQuestAlts" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowQuestAltsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowSecondarySkillRank" relativePoint="BOTTOMLEFT" x="-16" />
+        </Anchors>
+      </CheckButton>
+      <Frame parentKey="ShowQuestAltsColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsTooltipShowQuestAltsColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ShowQuestAlts" x="376"/>
+        </Anchors>
+      </Frame>
+
+      <CheckButton parentKey="ShowAchievements" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowAchievementsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowQuestAlts" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+      <Frame parentKey="ShowAchievementsColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsTooltipShowAchievementsColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ShowAchievements" x="376"/>
+        </Anchors>
+      </Frame>
+
+      <CheckButton parentKey="AchievementInProgress" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipAchievementInProgressMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowAchievements" relativePoint="BOTTOMLEFT" x="16" />
+        </Anchors>
+      </CheckButton>
+      <Frame parentKey="AchievementInProgressColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsTooltipAchievementInProgressColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.AchievementInProgress" x="360"/>
+        </Anchors>
+      </Frame>
+
+      <CheckButton parentKey="ShowGearSets" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowGearSetsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.AchievementInProgress" relativePoint="BOTTOMLEFT" x="-16" />
+        </Anchors>
+      </CheckButton>
+
+      <CheckButton parentKey="ShowGems" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowGemsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowGearSets" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+    </Frames>
+  </Frame>
+
+</Ui>

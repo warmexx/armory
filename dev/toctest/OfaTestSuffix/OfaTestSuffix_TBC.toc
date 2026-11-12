@@ -1,0 +1,7 @@
+## Interface: 20505
+## Title: OfaTestSuffix
+## Notes: Armory One for All, TOC-test (fase 0)
+## SavedVariables: OfaTestSuffixDB
+## X-Ofa-Toc: TBC
+
+report.lua

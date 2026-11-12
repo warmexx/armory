@@ -1,0 +1,66 @@
+<!-- Our own little section in the Key Bindings menu -->
+<Bindings>
+  <!-- See Localization.lua for constants -->
+  <Binding name="ARMORY_TOGGLE" header="ARMORY" category="ADDONS">
+    Armory:Toggle();
+  </Binding>
+  <Binding name="ARMORY_CURRENT_CHARACTER" category="ADDONS">
+    ArmoryFrameSelectCharacter({character=Armory.player, realm=Armory.playerRealm});
+  </Binding>
+  <Binding name="ARMORY_PREVIOUS_CHARACTER" category="ADDONS">
+    ArmoryFrameCharacterCycle(false);
+  </Binding>
+  <Binding name="ARMORY_NEXT_CHARACTER" category="ADDONS">
+    ArmoryFrameCharacterCycle(true);
+  </Binding>
+
+  <Binding name="ARMORY_CHARACTER" category="ADDONS">
+    ArmoryFrame_OpenFrame(1);
+  </Binding>
+  <Binding name="ARMORY_PET" category="ADDONS">
+    ArmoryFrame_OpenFrame(2);
+  </Binding>
+  <Binding name="ARMORY_TALENT" category="ADDONS">
+    ArmoryFrame_OpenFrame(3);
+  </Binding>
+  <Binding name="ARMORY_PVP" category="ADDONS">
+    ArmoryFrame_OpenFrame(4);
+  </Binding>
+  <Binding name="ARMORY_REPUTATION" category="ADDONS">
+    ArmoryOtherFrame_OpenSubFrame(1);
+  </Binding>
+  <Binding name="ARMORY_RAID" category="ADDONS">
+    ArmoryOtherFrame_OpenSubFrame(2);
+  </Binding>
+  <Binding name="ARMORY_CURRENCY" category="ADDONS">
+    ArmoryOtherFrame_OpenSubFrame(3);
+  </Binding>
+  <Binding name="ARMORY_INVENTORY" category="ADDONS">
+    ArmoryFrame_OpenSideFrame(ArmoryInventoryFrame);
+  </Binding>
+  <Binding name="ARMORY_QUEST" category="ADDONS">
+    ArmoryFrame_OpenSideFrame(ArmoryQuestFrame);
+  </Binding>
+  <Binding name="ARMORY_SPELLBOOK" category="ADDONS">
+    ArmoryFrame_OpenSideFrame(ArmorySpellBookFrame);
+  </Binding>
+  <Binding name="ARMORY_SOCIAL" category="ADDONS">
+    ArmoryFrame_OpenSideFrame(ArmorySocialFrame);
+  </Binding>
+  <Binding name="ARMORY_ACHIEVEMENT" category="ADDONS">
+    ArmoryFrame_OpenSideFrame(ArmoryAchievementFrame);
+  </Binding>
+  <Binding name="ARMORY_TRADESKILL1" category="ADDONS">
+    ArmoryFrame_OpenSkillFrame(1);
+  </Binding>
+  <Binding name="ARMORY_TRADESKILL2" category="ADDONS">
+    ArmoryFrame_OpenSkillFrame(2);
+  </Binding>
+
+  <Binding name="ARMORY_LOOKUP" category="ADDONS">
+    ArmoryLookupFrame_Toggle();
+  </Binding>
+  <Binding name="ARMORY_FIND" category="ADDONS">
+    ArmoryFindFrame_Toggle();
+  </Binding>
+</Bindings>

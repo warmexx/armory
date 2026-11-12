@@ -1,0 +1,41 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\FrameXML\UI.xsd">
+
+  <Script file="ArmoryOptionsFindPanel.lua" />
+
+  <Frame name="ArmoryOptionsFindPanel" hidden="true" inherits="ArmoryOptionsPanelTemplate" mixin="ArmoryOptionsFindPanelMixin">
+    <Frames>
+      <CheckButton parentKey="SearchWindow" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSearchWindowMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" x="-2" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="SearchRealms" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSearchRealmsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SearchWindow" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="SearchExtended" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSearchExtendedMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SearchRealms" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="SearchRestrictive" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSearchRestrictiveMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SearchExtended" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="SearchAltClick" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSearchAltClickMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SearchRestrictive" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <Frame name="$parentDefaultSearchType" inherits="ArmoryOptionsDropDownTemplate" mixin="ArmoryOptionsDefaultSearchTypeMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SearchAltClick" relativePoint="BOTTOMLEFT" x="-13" y="-24" />
+        </Anchors>
+      </Frame>
+    </Frames>
+  </Frame>
+
+</Ui>

@@ -1,0 +1,183 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\..\FrameXML\UI.xsd">
+  <Script file="ArmoryInventoryAccountBankFrame.lua"/>
+  <Button name="ArmoryInventoryAccountBankItemTemplate" inherits="ArmoryInventoryLabelTemplate" virtual="true">
+    <Scripts>
+      <OnEnter>
+        GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 80, 5);
+        ArmoryAccountBankFrameButton_OnEnter(self);
+      </OnEnter>
+      <OnLeave function="GameTooltip_Hide" />
+    </Scripts>
+  </Button>
+  <Frame name="ArmoryInventoryAccountBankFrame" parent="ArmoryInventoryFrame" hidden="true">
+    <Size x="296" y="326"/>
+    <Anchors>
+      <Anchor point="TOPRIGHT" relativeKey="$parent.Inset" x="-24" y="-6"/>
+    </Anchors>
+    <Layers>
+      <Layer level="OVERLAY">
+        <FontString name="ArmoryInventoryAccountBankFrameMessage" inherits="GameFontNormal" text="ARMORY_NO_DATA">
+          <Anchors>
+            <Anchor point="TOP" relativeTo="ArmoryInventoryAccountBankFrame" relativePoint="TOP">
+              <Offset>
+                <AbsDimension x="10" y="-30"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Button name="ArmoryInventoryAccountBankLine1" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" x="-2"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine2" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine1" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine3" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine2" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine4" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine3" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine5" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine4" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine6" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine5" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine7" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine6" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine8" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine7" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine9" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine8" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine10" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine9" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine11" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine10" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine12" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine11" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine13" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine12" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine14" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine13" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine15" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine14" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine16" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine15" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine17" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine16" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine18" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine17" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine19" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine18" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="ArmoryInventoryAccountBankLine20" inherits="ArmoryInventoryAccountBankItemTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryAccountBankLine19" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <ScrollFrame name="ArmoryInventoryAccountBankScrollFrame" inherits="ArmoryFauxScrollFrameTemplate">
+        <Size x="296" y="326"/>
+        <Anchors>
+          <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture name="$parentScrollBarTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+              <Size>
+                <AbsDimension x="31" y="256"/>
+              </Size>
+              <Anchors>
+                <Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+                  <Offset>
+                    <AbsDimension x="-2" y="5"/>
+                  </Offset>
+                </Anchor>
+              </Anchors>
+              <TexCoords left="0" right="0.484375" top="0" bottom="1.0"/>
+            </Texture>
+            <Texture name="$parentScrollBarBottom" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+              <Size>
+                <AbsDimension x="31" y="106"/>
+              </Size>
+              <Anchors>
+                <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+                  <Offset>
+                    <AbsDimension x="-2" y="-2"/>
+                  </Offset>
+                </Anchor>
+              </Anchors>
+              <TexCoords left="0.515625" right="1.0" top="0" bottom="0.4140625"/>
+            </Texture>
+          </Layer>
+        </Layers>
+        <Scripts>
+          <OnVerticalScroll>
+            FauxScrollFrame_OnVerticalScroll(self, offset, ARMORY_INVENTORY_HEIGHT, ArmoryInventoryAccountBankFrame_Update);
+          </OnVerticalScroll>
+        </Scripts>
+      </ScrollFrame>
+    </Frames>
+    <Scripts>
+      <OnShow>
+        ArmoryInventoryAccountBankFrame_OnShow(self);
+      </OnShow>
+      <OnHide>
+        ArmoryInventoryAccountBankFrame_OnHide(self);
+      </OnHide>
+    </Scripts>
+  </Frame>
+</Ui>

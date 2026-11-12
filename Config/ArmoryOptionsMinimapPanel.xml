@@ -1,0 +1,36 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\FrameXML\UI.xsd">
+
+  <Script file="ArmoryOptionsMinimapPanel.lua" />
+
+  <Frame name="ArmoryOptionsMinimapPanel" hidden="true" inherits="ArmoryOptionsPanelTemplate" mixin="ArmoryOptionsMinimapPanelMixin">
+    <Frames>
+      <CheckButton parentKey="MinimapButton" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMinimapButtonMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" x="-2" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="GlobalMinimapButton" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsGlobalMinimapButtonMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.MinimapButton" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="HideIfToolbar" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSetHideMinimapIfToolbarMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.GlobalMinimapButton" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <Slider parentKey="AngleSlider" inherits="ArmoryOptionsPanelSliderTemplate" mixin="ArmoryOptionsSetMinimapAngleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.HideIfToolbar" relativePoint="BOTTOMLEFT" x="10" y="-25" />
+        </Anchors>
+      </Slider>
+      <CheckButton parentKey="GlobalPositionButton" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsGlobalPositionButtonMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.AngleSlider" relativePoint="RIGHT" x="16" />
+        </Anchors>
+      </CheckButton>
+    </Frames>
+  </Frame>
+
+</Ui>

@@ -1,0 +1,142 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\FrameXML\UI.xsd">
+
+  <Script file="ArmoryOptionsControls.lua" />
+
+  <CheckButton name="ArmoryOptionsCheckButtonTemplate" virtual="true" mixin="ArmoryOptionsCheckButtonTemplateMixin">
+    <Size x="26" y="26" />
+    <HitRectInsets left="0" right="-100" top="0" bottom="0" />
+    <Layers>
+      <Layer level="ARTWORK">
+        <FontString parentKey="Text" inherits="GameFontHighlightLeft">
+          <Size x="340" />
+          <Anchors>
+            <Anchor point="LEFT" relativePoint="RIGHT" x="2" y="1" />
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnLoad method="OnLoad" />
+      <OnClick method="OnClick" />
+      <OnEnter method="OnEnter" />
+      <OnLeave method="OnLeave" />
+    </Scripts>
+    <NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+    <PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+    <HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+    <CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+    <DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+  </CheckButton>
+
+  <Frame name="ArmoryOptionsColorTemplate" virtual="true" mixin="ArmoryOptionsColorTemplateMixin">
+    <Size x="100" y="26" />
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString parentKey="Text" text="ARMORY_FONT_COLOR" inherits="GameFontNormal">
+          <Anchors>
+            <Anchor point="LEFT" />
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Button parentKey="Swatch">
+        <Size x="16" y="16" />
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.Text" relativePoint="RIGHT" x="5" />
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture parentKey="SwatchBg">
+              <Size x="14" y="14" />
+              <Anchors>
+                <Anchor point="CENTER" />
+              </Anchors>
+              <Color r="1.0" g="1.0" b="1.0" />
+            </Texture>
+          </Layer>
+        </Layers>
+        <Scripts>
+          <OnClick>
+              self:GetParent():OnClick();
+          </OnClick>
+        </Scripts>
+        <NormalTexture parentKey="NormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch" />
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnLoad method="OnLoad" />
+    </Scripts>
+  </Frame>
+
+  <Button name="ArmoryOptionsPanelButtonTemplate" inherits="ArmoryUIPanelButtonTemplate" virtual="true" mixin="ArmoryOptionsPanelButtonTemplateMixin">
+    <Size x="175" y="25" />
+    <Scripts>
+      <OnLoad method="OnLoad" />
+      <OnEnter method="OnEnter" />
+      <OnLeave method="OnLeave" />
+      <OnClick method="OnClick" />
+    </Scripts>
+    <NormalFont style="GameFontNormalSmall" />
+    <HighlightFont style="GameFontHighlightSmall" />
+  </Button>
+
+  <Slider name="ArmoryOptionsPanelSliderTemplate" orientation="HORIZONTAL" enableMouse="true" virtual="true" inherits="BackdropTemplate" mixin="ArmoryOptionsSliderTemplateMixin">
+    <HitRectInsets>
+      <AbsInset left="0" right="0" top="-10" bottom="-10" />
+    </HitRectInsets>
+    <Size x="144" y="17" />
+    <KeyValues>
+      <KeyValue key="backdropInfo" value="BACKDROP_SLIDER_8_8" type="global" />
+      <KeyValue key="type" value="CONTROLTYPE_SLIDER" type="global" />
+    </KeyValues>
+    <Layers>
+      <Layer level="ARTWORK">
+        <FontString parentKey="Text" inherits="GameFontNormal">
+          <Anchors>
+            <Anchor point="BOTTOM" relativePoint="TOP" />
+          </Anchors>
+        </FontString>
+        <FontString parentKey="Low" inherits="GameFontHighlightSmall" text="LOW">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="-4" y="3" />
+          </Anchors>
+        </FontString>
+        <FontString parentKey="High" inherits="GameFontHighlightSmall" text="HIGH">
+          <Anchors>
+            <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" x="4" y="3" />
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <ThumbTexture parentKey="Thumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
+      <Size x="32" y="32" />
+    </ThumbTexture>
+    <Scripts>
+      <OnLoad method="OnLoad" />
+      <OnShow method="OnShow" />
+      <OnValueChanged method="OnValueChanged" />
+      <OnEnter method="OnEnter" />
+      <OnLeave method="OnLeave" />
+    </Scripts>
+  </Slider>
+
+  <Frame name="ArmoryOptionsDropDownTemplate" virtual="true" inherits="ArmoryDropDownMenuTemplate" enableMouse="true" mixin="ArmoryOptionsDropDownTemplateMixin">
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString parentKey="Label" inherits="GameFontHighlight">
+          <Anchors>
+            <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" x="16" y="3" />
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnLoad method="OnLoad" />
+      <OnEnter method="OnEnter" />
+      <OnLeave method="OnLeave" />
+    </Scripts>
+  </Frame>
+
+</Ui>

@@ -1,0 +1,13 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+  <Include file="Config\ArmoryOptionsControls.xml" />
+  <Include file="Config\ArmoryOptionsPanelTemplates.xml" />
+  <Include file="Config\ArmoryOptionsPanel.xml" />
+  <Include file="Config\ArmoryOptionsMinimapPanel.xml" />
+  <Include file="Config\ArmoryOptionsModulePanel.xml" />
+  <Include file="Config\ArmoryOptionsSharePanel.xml" />
+  <Include file="Config\ArmoryOptionsTooltipPanel.xml" />
+  <Include file="Config\ArmoryOptionsFindPanel.xml" />
+  <Include file="Config\ArmoryOptionsExpirationPanel.xml" />
+  <Include file="Config\ArmoryOptionsSummaryPanel.xml" />
+  <Include file="Config\ArmoryOptionsMiscPanel.xml" />
+</Ui>

@@ -1,0 +1,581 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\FrameXML\UI.xsd">
+  <Script file="ArmorySharedUIPanelTemplates.lua"/>
+
+  <Button name="ArmoryUIPanelCloseButtonNoScripts" frameLevel="510"  virtual="true">
+    <!-- <Size x="32" y="32"/>
+    <DisabledTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Disabled"/>
+    <NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
+    <PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
+    <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/> -->
+    <Size x="24" y="24"/>
+    <DisabledTexture atlas="RedButton-Exit-Disabled"/>
+    <NormalTexture atlas="RedButton-Exit"/>
+    <PushedTexture atlas="RedButton-exit-pressed"/>
+    <HighlightTexture atlas="RedButton-Highlight" alphaMode="ADD"/>
+  </Button>
+
+  <Button name="ArmoryUIPanelCloseButton" inherits="ArmoryUIPanelCloseButtonNoScripts" virtual="true">
+    <Scripts>
+      <OnClick function="ArmoryUIPanelCloseButton_OnClick"/>
+    </Scripts>
+  </Button>
+
+  <Button name="ArmoryUIPanelButtonNoTooltipTemplate" mixin="ArmoryUIPanelButtonMixin" virtual="true">
+    <Size x="40" y="22"/>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture parentKey="Left" file="Interface\Buttons\UI-Panel-Button-Up">
+          <Size x="12" y="22"/>
+          <Anchors>
+            <Anchor point="TOPLEFT"/>
+            <Anchor point="BOTTOMLEFT"/>
+          </Anchors>
+          <TexCoords left="0" right="0.09375" top="0" bottom="0.6875"/>
+        </Texture>
+        <Texture parentKey="Right" file="Interface\Buttons\UI-Panel-Button-Up">
+          <Size x="12" y="22"/>
+          <Anchors>
+            <Anchor point="TOPRIGHT"/>
+            <Anchor point="BOTTOMRIGHT"/>
+          </Anchors>
+          <TexCoords left="0.53125" right="0.625" top="0" bottom="0.6875"/>
+        </Texture>
+        <Texture parentKey="Middle" file="Interface\Buttons\UI-Panel-Button-Up">
+          <Size x="12" y="22"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT"/>
+            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Right" relativePoint="BOTTOMLEFT"/>
+          </Anchors>
+          <TexCoords left="0.09375" right="0.53125" top="0" bottom="0.6875"/>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnMouseDown method="OnMouseDown"/>
+      <OnMouseUp method="OnMouseUp"/>
+      <OnShow method="OnShow"/>
+      <OnDisable method="OnDisable"/>
+      <OnEnable method="OnEnable"/>
+    </Scripts>
+    <ButtonText name="$parentText" parentKey="Text"/>
+    <NormalFont style="GameFontNormal"/>
+    <HighlightFont style="GameFontHighlight"/>
+    <DisabledFont style="GameFontDisable"/>
+    <HighlightTexture inherits="UIPanelButtonHighlightTexture"/>
+  </Button>
+
+  <Button name="ArmoryUIPanelButtonTemplate" inherits="ArmoryUIPanelButtonNoTooltipTemplate" virtual="true">
+    <Scripts>
+      <OnEnter>
+        if(self.tooltipText ~= nil) then
+          GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+          GameTooltip_SetTitle(GameTooltip, self.tooltipText);
+          GameTooltip:Show();
+        end
+      </OnEnter>
+      <OnLeave>
+        if(self.tooltipText ~= nil) then
+          GameTooltip:Hide();
+        end
+      </OnLeave>
+    </Scripts>
+  </Button>
+
+  <CheckButton name="ArmoryUICheckButtonTemplate" virtual="true">
+    <Size x="32" y="32"/>
+    <Layers>
+      <Layer level="ARTWORK">
+        <FontString name="$parentText" inherits="GameFontNormalSmall" parentKey="text">
+          <Anchors>
+            <Anchor point="LEFT" relativePoint="RIGHT" x="-2" y="0"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+    <PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+    <HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+    <CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+    <DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+  </CheckButton>
+
+  <Button name="ArmoryUIMenuButtonStretchTemplate" mixin="ArmoryUIMenuButtonStretchMixin" virtual="true">
+    <Size x="40" y="26"/>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture parentKey="TopLeft" name="$parentTopLeft" file="Interface\Buttons\UI-Silver-Button-Up">
+          <Size x="12" y="6"/>
+          <Anchors>
+            <Anchor point="TOPLEFT"/>
+          </Anchors>
+          <TexCoords left="0" right="0.09375" top="0" bottom="0.1875"/>
+        </Texture>
+        <Texture parentKey="TopRight" name="$parentTopRight" file="Interface\Buttons\UI-Silver-Button-Up">
+          <Size x="12" y="6"/>
+          <Anchors>
+            <Anchor point="TOPRIGHT"/>
+          </Anchors>
+          <TexCoords left="0.53125" right="0.625" top="0" bottom="0.1875"/>
+        </Texture>
+        <Texture parentKey="BottomLeft" name="$parentBottomLeft" file="Interface\Buttons\UI-Silver-Button-Up">
+          <Size x="12" y="6"/>
+          <Anchors>
+            <Anchor point="BOTTOMLEFT"/>
+          </Anchors>
+          <TexCoords left="0" right="0.09375" top="0.625" bottom="0.8125"/>
+        </Texture>
+        <Texture parentKey="BottomRight" name="$parentBottomRight" file="Interface\Buttons\UI-Silver-Button-Up">
+          <Size x="12" y="6"/>
+          <Anchors>
+            <Anchor point="BOTTOMRIGHT"/>
+          </Anchors>
+          <TexCoords left="0.53125" right="0.625" top="0.625" bottom="0.8125"/>
+        </Texture>
+        <Texture parentKey="TopMiddle" name="$parentTopMiddle" file="Interface\Buttons\UI-Silver-Button-Up">
+          <Size x="56" y="6"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent.TopLeft" relativePoint="TOPRIGHT"/>
+            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.TopRight" relativePoint="BOTTOMLEFT"/>
+          </Anchors>
+          <TexCoords left="0.09375" right="0.53125" top="0" bottom="0.1875"/>
+        </Texture>
+        <Texture parentKey="MiddleLeft" name="$parentMiddleLeft" file="Interface\Buttons\UI-Silver-Button-Up">
+          <Size x="12" y="14"/>
+          <Anchors>
+            <Anchor point="TOPRIGHT" relativeKey="$parent.TopLeft" relativePoint="BOTTOMRIGHT"/>
+            <Anchor point="BOTTOMLEFT" relativeKey="$parent.BottomLeft" relativePoint="TOPLEFT"/>
+          </Anchors>
+          <TexCoords left="0" right="0.09375" top="0.1875" bottom="0.625"/>
+        </Texture>
+        <Texture parentKey="MiddleRight" name="$parentMiddleRight" file="Interface\Buttons\UI-Silver-Button-Up">
+          <Size x="12" y="14"/>
+          <Anchors>
+            <Anchor point="TOPRIGHT" relativeKey="$parent.TopRight" relativePoint="BOTTOMRIGHT"/>
+            <Anchor point="BOTTOMLEFT" relativeKey="$parent.BottomRight" relativePoint="TOPLEFT"/>
+          </Anchors>
+          <TexCoords left="0.53125" right="0.625" top="0.1875" bottom="0.625"/>
+        </Texture>
+        <Texture parentKey="BottomMiddle" name="$parentBottomMiddle" file="Interface\Buttons\UI-Silver-Button-Up">
+          <Size x="56" y="6"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent.BottomLeft" relativePoint="TOPRIGHT"/>
+            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.BottomRight" relativePoint="BOTTOMLEFT"/>
+          </Anchors>
+          <TexCoords left="0.09375" right="0.53125" top="0.625" bottom="0.8125"/>
+        </Texture>
+        <Texture parentKey="MiddleMiddle" name="$parentMiddleMiddle" file="Interface\Buttons\UI-Silver-Button-Up">
+          <Size x="56" y="14"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent.TopLeft" relativePoint="BOTTOMRIGHT"/>
+            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.BottomRight" relativePoint="TOPLEFT"/>
+          </Anchors>
+          <TexCoords left="0.09375" right="0.53125" top="0.1875" bottom="0.625"/>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnMouseDown method="OnMouseDown"/>
+      <OnMouseUp method="OnMouseUp"/>
+      <OnShow method="OnShow"/>
+      <OnEnable method="OnEnable"/>
+      <OnEnter method="OnEnter"/>
+      <OnLeave method="OnLeave"/>
+    </Scripts>
+    <ButtonText parentKey="Text" name="$parentText">
+      <Anchors>
+        <Anchor point="CENTER" x="0" y="-1"/>
+      </Anchors>
+    </ButtonText>
+    <NormalFont style="GameFontHighlightSmall"/>
+    <HighlightFont style="GameFontHighlightSmall"/>
+    <DisabledFont style="GameFontDisableSmall"/>
+    <HighlightTexture file="Interface\Buttons\UI-Silver-Button-Highlight" alphaMode="ADD">
+      <TexCoords left="0" right="1.0" top="0.03" bottom="0.7175"/>
+    </HighlightTexture>
+  </Button>
+
+  <EditBox name="ArmoryInputBoxTemplate" virtual="true">
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture parentKey="Left" atlas="common-search-border-left" useAtlasSize="false">
+          <Size x="8" y="20"/>
+          <Anchors>
+            <Anchor point="LEFT" x="-5" y="0"/>
+          </Anchors>
+        </Texture>
+        <Texture parentKey="Right" atlas="common-search-border-right">
+          <Size x="8" y="20"/>
+          <Anchors>
+            <Anchor point="RIGHT" x="0" y="0"/>
+          </Anchors>
+        </Texture>
+        <Texture parentKey="Middle" atlas="common-search-border-middle">
+          <Size x="10" y="20"/>
+          <Anchors>
+            <Anchor point="LEFT" relativeKey="$parent.Left" relativePoint="RIGHT"/>
+            <Anchor point="RIGHT" relativeKey="$parent.Right" relativePoint="LEFT"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+    <FontString inherits="ChatFontNormal"/>
+    <Scripts>
+      <OnTabPressed function="ArmoryEditBox_OnTabPressed"/>
+      <OnEscapePressed function="ArmoryEditBox_ClearFocus"/>
+      <OnEditFocusLost function="ArmoryEditBox_ClearHighlight"/>
+      <OnEditFocusGained function="ArmoryEditBox_HighlightText"/>
+    </Scripts>
+  </EditBox>
+
+  <EditBox name="ArmorySearchBoxTemplate" enableMouse="true" autoFocus="false" inherits="ArmoryInputBoxTemplate" virtual="true">
+    <Layers>
+      <Layer level="OVERLAY">
+        <Texture name="$parentSearchIcon" atlas="common-search-magnifyingglass" useAtlasSize="false" parentKey="searchIcon">
+          <Size x="10" y="10"/>
+          <Anchors>
+            <Anchor point="LEFT" x="1" y="-1"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+      <Layer level="ARTWORK">
+        <FontString parentKey="Instructions" justifyH="LEFT" justifyV="MIDDLE" inherits="GameFontDisableSmall" setAllPoints="true">
+          <Color r="0.35" g="0.35" b="0.35"/>
+        </FontString>
+      </Layer>
+    </Layers>
+    <FontString inherits="GameFontHighlightSmall"/>
+    <Frames>
+      <Button name="$parentClearButton" parentKey="clearButton" hidden="true">
+        <Size x="17" y="17"/>
+        <Anchors>
+          <Anchor point="RIGHT" x="-3" y="0"/>
+        </Anchors>
+        <Layers>
+          <Layer level="ARTWORK">
+            <Texture atlas="common-search-clearbutton" useAtlasSize="false" alpha="0.5" parentKey="texture">
+              <Size x="10" y="10"/>
+              <Anchors>
+                <Anchor point="TOPLEFT" x="3" y="-3"/>
+              </Anchors>
+            </Texture>
+          </Layer>
+        </Layers>
+        <Scripts>
+          <OnEnter>
+            self.texture:SetAlpha(1.0);
+          </OnEnter>
+          <OnLeave>
+            self.texture:SetAlpha(0.5);
+          </OnLeave>
+          <OnMouseDown>
+            if self:IsEnabled() then
+              self.texture:SetPoint("TOPLEFT", self, "TOPLEFT", 4, -4);
+            end
+          </OnMouseDown>
+          <OnMouseUp>
+            self.texture:SetPoint("TOPLEFT", self, "TOPLEFT", 3, -3);
+          </OnMouseUp>
+          <OnClick function="ArmorySearchBoxTemplateClearButton_OnClick"/>
+        </Scripts>
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnLoad function="ArmorySearchBoxTemplate_OnLoad"/>
+      <OnEditFocusLost function="ArmorySearchBoxTemplate_OnEditFocusLost"/>
+      <OnEditFocusGained function="ArmorySearchBoxTemplate_OnEditFocusGained"/>
+      <OnTextChanged function="ArmorySearchBoxTemplate_OnTextChanged"/>
+      <OnDisable function="ArmorySearchBoxTemplate_OnDisable"/>
+      <OnEnable function="ArmorySearchBoxTemplate_OnEnable"/>
+    </Scripts>
+  </EditBox>
+
+  <Button name="ArmoryUIPanelScrollUpButtonTemplate" virtual="true">
+    <Size x="18" y="16"/>
+    <NormalTexture parentKey="Normal" inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Up"/>
+    <PushedTexture parentKey="Pushed" inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Down"/>
+    <DisabledTexture parentKey="Disabled" inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Disabled"/>
+    <HighlightTexture parentKey="Highlight" inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Highlight" alphaMode="ADD"/>
+  </Button>
+  <Button name="ArmoryUIPanelScrollDownButtonTemplate" virtual="true">
+    <Size x="18" y="16"/>
+    <NormalTexture parentKey="Normal" inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Up"/>
+    <PushedTexture parentKey="Pushed" inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Down"/>
+    <DisabledTexture parentKey="Disabled" inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
+    <HighlightTexture parentKey="Highlight" inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Highlight" alphaMode="ADD"/>
+  </Button>
+  <Slider name="ArmoryUIPanelScrollBarTemplate" virtual="true">
+    <Size x="16" y="0"/>
+    <Frames>
+      <Button name="$parentScrollUpButton" parentKey="ScrollUpButton" inherits="ArmoryUIPanelScrollUpButtonTemplate">
+        <Anchors>
+          <Anchor point="BOTTOM" relativePoint="TOP"/>
+        </Anchors>
+        <Scripts>
+          <OnClick function="ArmoryUIPanelScrollBarScrollUpButton_OnClick"/>
+        </Scripts>
+      </Button>
+      <Button name="$parentScrollDownButton" parentKey="ScrollDownButton" inherits="ArmoryUIPanelScrollDownButtonTemplate">
+        <Anchors>
+          <Anchor point="TOP" relativePoint="BOTTOM"/>
+        </Anchors>
+        <Scripts>
+          <OnClick function="ArmoryUIPanelScrollBarScrollDownButton_OnClick"/>
+        </Scripts>
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnValueChanged function="ArmoryUIPanelScrollBar_OnValueChanged"/>
+    </Scripts>
+    <ThumbTexture name="$parentThumbTexture" parentKey="ThumbTexture" inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-Knob">
+      <Size x="18" y="24"/>
+      <TexCoords left="0.20" right="0.80" top="0.125" bottom="0.875"/>
+    </ThumbTexture>
+  </Slider>
+
+  <ScrollFrame name="ArmoryUIPanelScrollFrameCodeTemplate" virtual="true">
+    <Scripts>
+      <OnLoad function="ArmoryScrollFrame_OnLoad"/>
+      <OnScrollRangeChanged function="ArmoryScrollFrame_OnScrollRangeChanged"/>
+      <OnVerticalScroll function="ArmoryScrollFrame_OnVerticalScroll"/>
+      <OnMouseWheel function="ArmoryScrollFrameTemplate_OnMouseWheel"/>
+    </Scripts>
+  </ScrollFrame>
+  <ScrollFrame name="ArmoryUIPanelScrollFrameTemplate" virtual="true" inherits="ArmoryUIPanelScrollFrameCodeTemplate">
+    <Frames>
+      <Slider name="$parentScrollBar" inherits="ArmoryUIPanelScrollBarTemplate" parentKey="ScrollBar">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="6" y="-16"/>
+          <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="6" y="16"/>
+        </Anchors>
+      </Slider>
+    </Frames>
+  </ScrollFrame>
+  <ScrollFrame name="ArmoryFauxScrollFrameTemplate" inherits="ArmoryUIPanelScrollFrameTemplate" virtual="true">
+    <Scripts>
+      <OnScrollRangeChanged function=""/>
+    </Scripts>
+    <ScrollChild>
+      <Frame name="$parentScrollChildFrame" parentKey="ScrollChildFrame">
+        <Size x="300" y="334"/>
+      </Frame>
+    </ScrollChild>
+  </ScrollFrame>
+  <ScrollFrame name="ArmoryHybridScrollFrameTemplate" virtual="true">
+    <Scripts>
+      <OnLoad function="ArmoryHybridScrollFrame_OnLoad"/>
+      <OnMouseWheel function="ArmoryHybridScrollFrame_OnMouseWheel"/>
+    </Scripts>
+    <ScrollChild>
+      <Frame name="$parentScrollChild" parentKey="ScrollChild">
+        <Scripts>
+          <OnLoad function="ArmoryHybridScrollFrameScrollChild_OnLoad"/>
+        </Scripts>
+      </Frame>
+    </ScrollChild>
+  </ScrollFrame>
+
+  <Slider name="ArmoryHybridScrollBarTemplate" parentKey="scrollBar" virtual="true">
+    <Size x="20" y="0"/>
+    <Anchors>
+      <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="1" y="-14"/>
+      <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="1" y="12"/>
+    </Anchors>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture name="$parentBG" setAllPoints="true" hidden="true" parentKey="trackBG">
+          <Color r="0" g="0" b="0" a=".85"/>
+        </Texture>
+      </Layer>
+      <Layer level="ARTWORK">
+        <Texture name="$parentTop" parentKey="ScrollBarTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+          <Size x="27" y="48"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" x="-4" y="17"/>
+          </Anchors>
+          <TexCoords left="0" right="0.484375" top="0" bottom=".20"/>
+        </Texture>
+        <Texture name="$parentBottom" parentKey="ScrollBarBottom" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+          <Size x="27" y="64"/>
+          <Anchors>
+            <Anchor point="BOTTOMLEFT" x="-4" y="-15"/>
+          </Anchors>
+          <TexCoords left="0.515625" right="1.0" top="0.1440625" bottom="0.4140625"/>
+        </Texture>
+        <Texture name="$parentMiddle" parentKey="ScrollBarMiddle" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent.ScrollBarTop" relativePoint="BOTTOMLEFT"/>
+            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.ScrollBarBottom" relativePoint="TOPRIGHT"/>
+          </Anchors>
+          <TexCoords left="0" right="0.484375" top="0.1640625" bottom="1"/>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Button name="$parentScrollUpButton" parentKey="ScrollUpButton" inherits="ArmoryUIPanelScrollUpButtonTemplate">
+        <Anchors>
+          <Anchor point="BOTTOM" relativePoint="TOP" x="0" y="-2"/>
+        </Anchors>
+        <Scripts>
+          <OnLoad function="ArmoryHybridScrollFrameScrollUp_OnLoad"/>
+          <OnClick function ="ArmoryHybridScrollFrameScrollButton_OnClick"/>
+        </Scripts>
+      </Button>
+      <Button name="$parentScrollDownButton" parentKey="ScrollDownButton" inherits="ArmoryUIPanelScrollDownButtonTemplate">
+        <Anchors>
+          <Anchor point="TOP" relativePoint="BOTTOM" x="0" y="2"/>
+        </Anchors>
+        <Scripts>
+          <OnLoad function="ArmoryHybridScrollFrameScrollDown_OnLoad"/>
+          <OnClick function="ArmoryHybridScrollFrameScrollButton_OnClick"/>
+        </Scripts>
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnValueChanged function="ArmoryHybridScrollFrame_OnValueChanged"/>
+    </Scripts>
+    <ThumbTexture name="$parentThumbTexture" inherits="HybridScrollBarButton" file="Interface\Buttons\UI-ScrollBar-Knob" parentKey="thumbTexture">
+      <Size x="18" y="24"/>
+      <TexCoords left="0.20" right="0.80" top="0.125" bottom="0.875"/>
+    </ThumbTexture>
+  </Slider>
+
+  <Frame name="ArmoryInsetFrameTemplate" useParentLevel="true" virtual="true">
+    <KeyValues>
+      <KeyValue key="layoutType" value="InsetFrameTemplate" type="string"/>
+    </KeyValues>
+    <Layers>
+      <Layer level="BACKGROUND" textureSubLevel="-5">
+        <!-- TODO: Convert this to atlas -->
+        <Texture parentKey="Bg" file="Interface\FrameGeneral\UI-Background-Marble" horizTile="true" vertTile="true" setAllPoints="true"/>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/>
+    </Frames>
+  </Frame>
+
+  <Frame name="ArmoryDialogBorderNoCenterTemplate" useParentLevel="true" inherits="NineSlicePanelTemplate" virtual="true">
+    <KeyValues>
+      <KeyValue key="layoutType" value="Dialog" type="string"/>
+    </KeyValues>
+  </Frame>
+
+    <Frame name="ArmoryDialogBorderDarkTemplate" inherits="ArmoryDialogBorderNoCenterTemplate" virtual="true">
+    <Layers>
+      <Layer level="BACKGROUND" textureSubLevel="-5">
+        <!-- TODO: Convert this to atlas -->
+        <Texture parentKey="Bg" file="Interface\DialogFrame\UI-DialogBox-Background-Dark" horizTile="true" vertTile="true">
+          <Anchors>
+            <Anchor point="TOPLEFT" x="7" y="-7"/>
+            <Anchor point="BOTTOMRIGHT" x="-7" y="7"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+  </Frame>
+
+  <Frame name="ArmoryPortraitFrameTemplateNoCloseButton" mixin="ArmoryPortraitFrameMixin" virtual="true">
+    <KeyValues>
+      <KeyValue key="layoutType" value="PortraitFrameTemplate" type="string"/>
+    </KeyValues>
+    <Size x="338" y="424"/>
+    <Layers>
+      <Layer level="BACKGROUND" textureSubLevel="-6">
+        <Texture name="$parentBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" parentKey="Bg">
+          <Anchors>
+            <Anchor point="TOPLEFT" x="2" y="-21"/>
+            <Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+      <Layer level="BORDER">
+        <Texture parentKey="TopTileStreaks" inherits="_UI-Frame-TopTileStreaks">
+          <Anchors>
+            <Anchor point="TOPLEFT" x="0" y="-21"/>
+            <Anchor point="TOPRIGHT" x="-2" y="-21"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+     </Layers>
+    <Frames>
+      <Frame parentKey="NineSlice" inherits="NineSlicePanelTemplate"/>
+      <Frame parentKey="PortraitContainer" frameLevel="400">
+        <Size x="1" y="1"/>
+        <Anchors>
+          <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+          <Layer level="OVERLAY">
+            <Texture name="$parentPortrait" parentKey="portrait">
+              <Size x="62" y="62"/>
+              <Anchors>
+                <Anchor point="TOPLEFT" x="-5" y="7" />
+              </Anchors>
+            </Texture>
+            <MaskTexture parentKey="CircleMask" file="Interface\CharacterFrame\TempPortraitAlphaMask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+              <Anchors>
+                <Anchor point="TOPLEFT" relativeKey="$parent.portrait" x="2" y="0"/>
+                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.portrait" x="-2" y="4"/>
+              </Anchors>
+              <MaskedTextures>
+                <MaskedTexture childKey="portrait"/>
+              </MaskedTextures>
+            </MaskTexture>
+          </Layer>
+        </Layers>
+      </Frame>
+      <Frame parentKey="TitleContainer" frameLevel="510">
+        <Size x="0" y="20"/>
+        <Anchors>
+          <Anchor point="TOPLEFT" x="58" y="-1"/>
+          <Anchor point="TOPRIGHT" x="-24" y="-1"/>
+        </Anchors>
+        <Layers>
+          <Layer level="OVERLAY">
+            <FontString name="$parentTitleText" inherits="GameFontNormal" text="" parentKey="TitleText" wordwrap="false">
+              <Anchors>
+                <Anchor point="TOP" x="0" y="-5"/>
+                <Anchor point="LEFT"/>
+                <Anchor point="RIGHT"/>
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+      </Frame>
+   </Frames>
+  </Frame>
+
+  <Frame name="ArmoryPortraitFrameTemplate" inherits="ArmoryPortraitFrameTemplateNoCloseButton" virtual="true">
+    <Frames>
+      <Button name="$parentCloseButton" parentKey="CloseButton" inherits="ArmoryUIPanelCloseButton">
+        <Anchors>
+          <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT"/>
+        </Anchors>
+      </Button>
+    </Frames>
+  </Frame>
+
+  <Frame name="ArmoryButtonFrameTemplate" inherits="ArmoryPortraitFrameTemplate" virtual="true">
+    <Frames>
+      <Frame name="$parentInset" parentKey="Inset" useParentLevel="true" inherits="ArmoryInsetFrameTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" x="4" y="-60" />
+          <Anchor point="BOTTOMRIGHT" x="-6" y="26" />
+        </Anchors>
+      </Frame>
+    </Frames>
+  </Frame>
+
+  <Frame name="ArmoryChildFrameTemplate" movable="true" parent="ArmoryFrame" inherits="ArmoryButtonFrameTemplate" enableMouse="true" virtual="true">
+    <Anchors>
+      <Anchor point="TOPLEFT" relativeTo="ArmoryFrame" relativePoint="TOPRIGHT" x="42"/>
+    </Anchors>
+    <HitRectInsets>
+      <AbsInset left="0" right="34" top="0" bottom="75"/>
+    </HitRectInsets>
+  </Frame>
+
+</Ui>

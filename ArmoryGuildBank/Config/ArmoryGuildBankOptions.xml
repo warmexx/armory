@@ -1,0 +1,67 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\..\FrameXML\UI.xsd">
+
+  <Script file="ArmoryGuildBankOptions.lua" />
+
+  <Frame name="ArmoryOptionsGuildBankPanel" hidden="true" inherits="ArmoryOptionsPanelTemplate" mixin="ArmoryOptionsGuildBankPanelMixin">
+    <Frames>
+      <CheckButton parentKey="ShowItemCount" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsGuildBankShowItemCountMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" x="-2" y="-8" />
+        </Anchors>
+        <Scripts>
+          <OnShow method="OnShow"/>
+        </Scripts>
+      </CheckButton>
+      <Frame parentKey="ShowItemCountColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsGuildBankShowItemCountColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ShowItemCount" x="376"/>
+        </Anchors>
+      </Frame>
+      <Frame parentKey="ShowItemCountNumberColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsGuildBankShowItemCountNumberColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ShowItemCountColor" relativePoint="RIGHT" x="20" />
+        </Anchors>
+      </Frame>
+
+      <CheckButton parentKey="UniItemCountColor" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsGuildBankUniItemCountColorMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowItemCount" relativePoint="BOTTOMLEFT" x="16" y="-8" />
+        </Anchors>
+        <Scripts>
+          <OnClick method="OnClick"/>
+        </Scripts>
+      </CheckButton>
+      <CheckButton parentKey="MyGuildItemCount" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsGuildBankMyGuildItemCountMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.UniItemCountColor" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="PersonalGuildItemCount" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsGuildBankPersonalGuildItemCountMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.MyGuildItemCount" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="GlobalItemCount" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsGuildBankGlobalItemCountMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.PersonalGuildItemCount" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="CrossFactionItemCount" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsGuildBankCrossFactionItemCountMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.GlobalItemCount" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="IncludeInFind" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsGuildBankIncludeInFindMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.CrossFactionItemCount" relativePoint="BOTTOMLEFT" x="-16" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Integrate" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsGuildBankIntegrateMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.IncludeInFind" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+    </Frames>
+  </Frame>
+</Ui>

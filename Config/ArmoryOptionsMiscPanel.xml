@@ -1,0 +1,76 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\FrameXML\UI.xsd">
+
+  <Script file="ArmoryOptionsMiscPanel.lua" />
+
+  <Frame name="ArmoryOptionsMiscPanel" hidden="true" inherits="ArmoryOptionsPanelTemplate" mixin="ArmoryOptionsMiscPanelMixin">
+    <Frames>
+      <CheckButton parentKey="LDBLabel" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscLDBLabelMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" x="-2" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Encoding" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscEncodingMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.LDBLabel" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="EnhancedTips" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscEnhancedTipsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Encoding" relativePoint="BOTTOMLEFT" y="-6" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="CooldownEvents" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscCooldownEventsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.EnhancedTips" relativePoint="BOTTOMLEFT" y="-6" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="CheckCooldowns" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscCheckCooldownsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.CooldownEvents" relativePoint="BOTTOMLEFT" x="16" y="-3" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="EventWarnings" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscEventWarningsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.CheckCooldowns" relativePoint="BOTTOMLEFT" x="-16" y="-6" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="UseEventLocalTime" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscUseEventLocalTimeMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.EventWarnings" relativePoint="BOTTOMLEFT" y="-6" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Overlay" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscOverlayMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.UseEventLocalTime" relativePoint="BOTTOMLEFT" y="-6" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Maziel" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscMazielMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Overlay" relativePoint="BOTTOMLEFT" x="16" y="-3" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Collapse" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscCollapseMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Maziel" relativePoint="BOTTOMLEFT" y="-3" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="CheckButton" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscCheckButtonMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Collapse" relativePoint="BOTTOMLEFT" y="-3" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="SystemWarnings" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscSystemWarningsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.CheckButton" relativePoint="BOTTOMLEFT" x="-16" y="-6" />
+        </Anchors>
+      </CheckButton>
+      <Frame name="$parentWarningSound" inherits="ArmoryOptionsDropDownTemplate" mixin="ArmoryMiscWarningSoundMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SystemWarnings" relativePoint="BOTTOMLEFT" x="-12" y="-24" />
+        </Anchors>
+      </Frame>
+    </Frames>
+  </Frame>
+
+</Ui>

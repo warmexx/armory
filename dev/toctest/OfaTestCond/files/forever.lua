@@ -1,0 +1,3 @@
+local _, ns = ...
+ns.files = ns.files or {}
+table.insert(ns.files, "forever")
