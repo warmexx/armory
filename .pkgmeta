@@ -1,4 +1,4 @@
-﻿package-as: Armory
+package-as: Armory
 
 externals:
     Libs/LibStub: https://repos.wowace.com/wow/libstub/trunk
@@ -13,6 +13,10 @@ externals:
     Libs/LibDBIcon-1.0: https://repos.wowace.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
 
 enable-nolib-creation: no
+
+ignore:
+    - dev
+    - docs
 
 move-folders:
     Armory/ArmoryGuildBank: ArmoryGuildBank

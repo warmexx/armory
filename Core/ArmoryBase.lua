@@ -35,6 +35,14 @@ ARMORY_TOOLTIP_TEXTURE_SEPARATOR = "\030";
 ARMORY_TOOLTIP_CONTENT_SEPARATOR = "\031";
 
 if ( not Armory ) then
+    -- The only place where WOW_PROJECT_ID is read; everything else uses the flags below.
+    -- Numbers instead of the WOW_PROJECT_* constants, because not every client defines all of them.
+    local projectId = WOW_PROJECT_ID;
+    local isRetail = projectId == 1;
+    local isForever = projectId == 18;
+    local isVanilla = projectId == 2;
+    local isTBC = projectId == 5;
+
     Armory = {
         messaging = true,
 
@@ -42,6 +50,12 @@ if ( not Armory ) then
         version = C_AddOns.GetAddOnMetadata("Armory", "Version"),
         dbVersion = 54,
         interface = _G.GetBuildInfo(),
+
+        isMainline = isRetail or isForever,
+        isForever = isForever,
+        isClassic = isVanilla or isTBC,
+        isVanilla = isVanilla,
+        isTBC = isTBC,
     };
 end
 
