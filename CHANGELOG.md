@@ -12,7 +12,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 
 ## Earlier versions
 Armory has been around since 2007. Until v20.0.0 every version of World of Warcraft had its own Armory:
-- Retail up to v19.4.1, on https://www.curseforge.com/wow/addons/armory
+- Retail up to v19.4.3, on https://www.curseforge.com/wow/addons/armory
 - Classic Era up to v1.17.0, on https://www.curseforge.com/wow/addons/armory-classic
 - Burning Crusade Classic and Anniversary up to v3.0.0, on https://www.curseforge.com/wow/addons/armory-bcc
 
