@@ -20,9 +20,14 @@
           <Anchor point="TOPLEFT" relativeKey="$parent.Encoding" relativePoint="BOTTOMLEFT" y="-6" />
         </Anchors>
       </CheckButton>
-      <CheckButton parentKey="CooldownEvents" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscCooldownEventsMixin">
+      <CheckButton parentKey="ExtendedTradeSkills" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscExtendedTradeSkillsMixin">
         <Anchors>
           <Anchor point="TOPLEFT" relativeKey="$parent.EnhancedTips" relativePoint="BOTTOMLEFT" y="-6" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="CooldownEvents" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscCooldownEventsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ExtendedTradeSkills" relativePoint="BOTTOMLEFT" y="-6" />
         </Anchors>
       </CheckButton>
       <CheckButton parentKey="CheckCooldowns" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscCheckCooldownsMixin">

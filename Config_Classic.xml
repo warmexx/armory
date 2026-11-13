@@ -10,5 +10,5 @@
   <Include file="Config\ArmoryOptionsFindPanel.xml"/>
   <Include file="Config\ArmoryOptionsExpirationPanel.xml"/>
   <Include file="Config\Classic\ArmoryOptionsSummaryPanel.xml"/>
-  <Include file="Config\Classic\ArmoryOptionsMiscPanel.xml"/>
+  <Include file="Config\ArmoryOptionsMiscPanel.xml"/>
 </Ui>

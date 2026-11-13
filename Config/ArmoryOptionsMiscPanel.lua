@@ -72,6 +72,13 @@ function ArmoryOptionsMiscEnhancedTipsMixin:GetKey()
 end
 
 
+ArmoryOptionsMiscExtendedTradeSkillsMixin = CreateFromMixins(ArmoryOptionsCheckButtonTemplateMixin);
+
+function ArmoryOptionsMiscExtendedTradeSkillsMixin:GetKey()
+    return "ARMORY_CMD_SET_EXTENDEDTRADE";
+end
+
+
 ArmoryOptionsMiscCooldownEventsMixin = CreateFromMixins(ArmoryOptionsCheckButtonTemplateMixin);
 
 function ArmoryOptionsMiscCooldownEventsMixin:GetKey()
@@ -142,7 +149,15 @@ function ArmoryOptionsMiscMazielMixin:OnCommit()
 end
 
 
+-- Classic's config has the keys of these two as well, but not the character frame
+-- collapse or the paper doll check button they set
+local function IsMainline()
+    return not Armory.isClassic;
+end
+
 ArmoryOptionsMiscCollapseMixin = CreateFromMixins(ArmoryOptionsCheckButtonTemplateMixin);
+
+ArmoryOptionsMiscCollapseMixin.IsAvailable = IsMainline;
 
 function ArmoryOptionsMiscCollapseMixin:GetKey()
     return "ARMORY_CMD_SET_COLLAPSE";
@@ -164,6 +179,8 @@ end
 
 
 ArmoryOptionsMiscCheckButtonMixin = CreateFromMixins(ArmoryOptionsCheckButtonTemplateMixin);
+
+ArmoryOptionsMiscCheckButtonMixin.IsAvailable = IsMainline;
 
 function ArmoryOptionsMiscCheckButtonMixin:GetKey()
     return "ARMORY_CMD_SET_CHECKBUTTON";

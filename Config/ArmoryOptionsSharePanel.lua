@@ -137,6 +137,11 @@ function ArmoryOptionsShareChannelNameMixin:OnEditFocusGained()
     end
 end
 
+-- Unlike other controls, the channel name may be set for the first time or cleared
+function ArmoryOptionsShareChannelNameMixin:IsDirty()
+    return self.value ~= self.origValue;
+end
+
 function ArmoryOptionsShareChannelNameMixin:OnCommit()
     if ( self:IsInitialized() and self:IsDirty() ) then
         if ( self:GetOriginalValue() ) then

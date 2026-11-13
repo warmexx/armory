@@ -2,7 +2,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
   <Script file="Core\ArmoryBackgroundUpdater.lua"/>
   <Script file="Core\Classic\ArmoryCommandHandler.lua"/>
-  <Script file="Core\Classic\ArmoryDbEntry.lua"/>
+  <Script file="Core\ArmoryDbEntry.lua"/>
   <Script file="Core\Classic\ArmoryBase.lua"/>
   <Script file="Core\Classic\ArmoryTooltip.lua"/>
   <Script file="Core\Classic\ArmoryLDB.lua"/>

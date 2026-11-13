@@ -31,6 +31,11 @@ local AC = LibStub("AceComm-3.0");
 local LC = LibStub("LibCompress");
 local Encoder = LC:GetAddonEncodeTable(ARMORY_MESSAGE_SEPARATOR);
 
+-- Classic does not allow addon messages in a channel (InvalidChatType), so there
+-- channel messages are sent as chat messages, encoded with Base64
+local CTL = Armory.isClassic and ChatThrottleLib;
+local Base64 = Armory.isClassic and LibStub("LibBase64-1.0");
+
 ARMORY_BROADCAST_DELAY = 180;
 
 local MESSAGE_UPDATE_DELAY = 0.5;
@@ -57,6 +62,9 @@ function ArmoryAddonMessageFrame_OnLoad(self)
     self.broadcastDelay = 0;
     self:RegisterEvent("VARIABLES_LOADED");
     self:RegisterEvent("CHAT_MSG_CHANNEL_NOTICE");
+    if ( CTL ) then
+        self:RegisterEvent("CHAT_MSG_CHANNEL");
+    end
 end
 
 function ArmoryAddonMessageFrame_OnEvent(self, event, ...)
@@ -69,6 +77,8 @@ function ArmoryAddonMessageFrame_OnEvent(self, event, ...)
         return;
     elseif ( event == "CHAT_MSG_CHANNEL_NOTICE" ) then
         ArmoryAddonMessageFrame_CheckNotice(arg1, arg9);
+    elseif ( event == "CHAT_MSG_CHANNEL" ) then
+        ArmoryAddonMessageFrame_ParseChatMessage(arg1, arg9, arg2);
     end
 end
 
@@ -89,7 +99,7 @@ function ArmoryAddonMessageFrame_OnUpdate(self, elapsed)
 
     local version = Armory.version:match("^v?([%d%.]+)");
     if ( version ) then
-        if ( Armory.channel ) then
+        if ( Armory.channel and not CTL ) then
             ArmoryAddonMessageFrame_SendMessage(version, "CHANNEL");
         end
         if ( IsInGuild() ) then
@@ -203,15 +213,30 @@ function ArmoryAddonMessageFrame_SendMessage(message, destination)
         destination = "WHISPER";
     end
     if ( Armory.messaging ) then
-        if ( destination == "CHANNEL" ) then
-            target = Armory.channel;
+        if ( destination == "CHANNEL" and CTL ) then
+            CTL:SendChatMessage("NORMAL", ARMORY_ID, ArmoryAddonMessageFrame_Encode(message), destination, nil, Armory.channel);
+        else
+            if ( destination == "CHANNEL" ) then
+                target = Armory.channel;
+            end
+            AC:SendCommMessage(ARMORY_ID, message, destination, target);
         end
-        AC:SendCommMessage(ARMORY_ID, message, destination, target);
     else
         ArmoryAddonMessageFrame_ParseMessage(message, "WHISPER", target or "test");
     end
 
     Armory:PrintDebug("Send", destination, target, message:gsub("%c", " "));
+end
+
+function ArmoryAddonMessageFrame_ParseChatMessage(message, channel, sender)
+    if ( channel ~= Armory:GetConfigChannelName() ) then
+        return;
+    elseif ( strsub(message, -8) == " ...hic!" ) then
+        message = ArmoryAddonMessageFrame_Decode(strsub(message, 1, -9));
+    else
+        message = ArmoryAddonMessageFrame_Decode(message);
+    end
+    ArmoryAddonMessageFrame_ParseMessage(message, "CHANNEL", sender);
 end
 
 local function GetNextField(fields)
@@ -402,4 +427,12 @@ function ArmoryAddonMessageFrame_Decompress(message)
     message = Encoder:Decode(message);
     message = LC:Decompress(message);
     return message;
+end
+
+function ArmoryAddonMessageFrame_Encode(message)
+    return Base64.Encode(message);
+end
+
+function ArmoryAddonMessageFrame_Decode(message)
+    return Base64.Decode(message);
 end
