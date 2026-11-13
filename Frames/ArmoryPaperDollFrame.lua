@@ -1924,8 +1924,9 @@ function ArmoryPaperDollFrame_UpdateTalent(overlay)
         end
     end
 
+    -- Tex coords cannot be set while the texture has a mask, which the portrait of the previous update may have left
+    _G[parent.."ButtonIcon"]:SetMask("");
     if ( role ) then
-        _G[parent.."ButtonIcon"]:SetMask("");
         _G[parent.."ButtonIcon"]:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-ROLES");
         _G[parent.."ButtonIcon"]:SetTexCoord(Armory:GetTexCoordsForRole(role));
     else
