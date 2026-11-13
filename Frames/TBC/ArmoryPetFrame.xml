@@ -1,0 +1,531 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\FrameXML\UI.xsd">
+  <Script file="ArmoryPetFrame.lua"/>
+  <CheckButton name="ArmoryPetSlotTemplate" virtual="true">
+    <Size>
+      <AbsDimension x="37" y="37"/>
+    </Size>
+    <Layers>
+      <Layer level="BORDER">
+        <Texture name="$parentIconTexture"/>
+      </Layer>
+      <Layer level="BACKGROUND">
+        <Texture name="$parentBackground" file="Interface\Buttons\UI-EmptySlot" parentKey="Background">
+          <Size>
+            <AbsDimension x="64" y="64"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOPLEFT">
+              <Offset>
+                <AbsDimension x="-13" y="13"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </Texture>
+      </Layer>
+      <Layer level="OVERLAY">
+        <FontString name="$parentPetName" inherits="GameFontHighlightSmall" parentKey="PetName">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="-12" y="-7"/>
+            <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" x="12" y="-7"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnLoad>
+        self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+      </OnLoad>
+      <OnEnter>
+        if ( self.tooltip ) then
+          GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+          GameTooltip:SetText(self.tooltip);
+          GameTooltip:AddLine(self.tooltipSubtext, "", 1.0, 1.0, 1.0);
+          Armory:TooltipAddHints(GameTooltip, self.hint);
+          GameTooltip:Show();
+        end
+      </OnEnter>
+      <OnLeave>
+        GameTooltip:Hide();
+      </OnLeave>
+      <OnClick>
+        ArmoryPetSlot_OnClick(self, button);
+      </OnClick>
+    </Scripts>
+    <NormalTexture name="$parentNormalTexture" file="Interface\Buttons\UI-Quickslot2">
+      <Size>
+        <AbsDimension x="64" y="64"/>
+      </Size>
+      <Anchors>
+        <Anchor point="CENTER">
+          <Offset>
+            <AbsDimension x="0" y="-1"/>
+          </Offset>
+        </Anchor>
+      </Anchors>
+    </NormalTexture>
+    <PushedTexture file="Interface\Buttons\UI-Quickslot-Depress"/>
+    <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+    <CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/>
+  </CheckButton>
+
+  <Frame name="ArmoryPetFrame" setAllPoints="true" enableMouse="true" movable="true" parent="ArmoryFrame" id="2" hidden="true">
+    <Size>
+      <AbsDimension x="384" y="512"/>
+    </Size>
+    <Anchors>
+      <Anchor point="TOPLEFT" x="-12" y="13"/>
+    </Anchors>
+    <HitRectInsets>
+      <AbsInset left="0" right="34" top="0" bottom="75"/>
+    </HitRectInsets>
+    <Layers>
+      <Layer level="OVERLAY">
+        <FontString name="$parentWarning" inherits="GameFontHighlight" text="ARMORY_NO_DATA">
+          <Anchors>
+            <Anchor point="CENTER" relativeKey="$parent.$parent.Inset.Bg" x="0" y="0"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+      <Layer level="ARTWORK">
+        <Texture file="Interface\PetStableFrame\UI-PetStable-TopLeft">
+          <Size>
+            <AbsDimension x="256" y="256"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOPLEFT"/>
+          </Anchors>
+        </Texture>
+        <Texture file="Interface\PetStableFrame\UI-PetStable-TopRight">
+          <Size>
+            <AbsDimension x="128" y="256"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOPRIGHT"/>
+          </Anchors>
+        </Texture>
+        <Texture name="$parentBottomLeft" file="Interface\PetStableFrame\UI-PetStable-BottomLeft">
+          <Size>
+            <AbsDimension x="256" y="256"/>
+          </Size>
+          <Anchors>
+            <Anchor point="BOTTOMLEFT"/>
+          </Anchors>
+        </Texture>
+        <Texture name="$parentBottomRight" file="Interface\PetStableFrame\UI-PetStable-BottomRight">
+          <Size>
+            <AbsDimension x="128" y="256"/>
+          </Size>
+          <Anchors>
+            <Anchor point="BOTTOMRIGHT"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+      <Layer level="OVERLAY">
+        <FontString name="$parentTitleText" inherits="GameFontHighlight" text="" parentKey="TitleText" wordwrap="false">
+          <Anchors>
+            <Anchor point="TOP" x="0" y="-18"/>
+            <Anchor point="LEFT" x="62"/>
+            <Anchor point="RIGHT" x="-40"/>
+          </Anchors>
+        </FontString>
+        <FontString name="$parentLevelText" inherits="GameFontNormalSmall" text="">
+          <Anchors>
+            <Anchor point="TOP" relativeTo="$parentTitleText" relativePoint="BOTTOM">
+              <Offset>
+                <AbsDimension x="0" y="-8"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+        <FontString name="$parentLoyaltyText" inherits="GameFontNormalSmall" text="">
+          <Anchors>
+            <Anchor point="TOP" relativeTo="$parentLevelText" relativePoint="BOTTOM">
+              <Offset>
+                <AbsDimension x="0" y="-1"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Frame name="ArmoryPetFramePetInfo">
+        <Size x="260" y="322"/>
+        <Anchors>
+          <Anchor point="TOPLEFT" x="40" y="-104"/>
+        </Anchors>
+        <Layers>
+          <Layer level="ARTWORK">
+            <FontString name="ArmoryPetFrameTrainingPointLabel" inherits="GameFontNormalSmall" text="TRAINING_POINTS">
+              <Anchors>
+                <Anchor point="BOTTOMLEFT" />
+              </Anchors>
+            </FontString>
+            <FontString name="ArmoryPetFrameTrainingPointText" inherits="GameFontHighlightSmall" text="0">
+              <Anchors>
+                <Anchor point="LEFT" relativeTo="ArmoryPetFrameTrainingPointLabel" relativePoint="RIGHT">
+                  <Offset>
+                    <AbsDimension x="5" y="0"/>
+                  </Offset>
+                </Anchor>
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+        <Frames>
+          <Frame name="ArmoryPetFrameDiet" enableMouse="true" hidden="true">
+            <Size>
+              <AbsDimension x="24" y="23"/>
+            </Size>
+            <Anchors>
+              <Anchor point="TOPLEFT" x="0" y="0"/>
+            </Anchors>
+            <Layers>
+              <Layer level="BACKGROUND">
+                <Texture name="ArmoryPetFrameHappinessTexture" file="Interface\PetPaperDollFrame\UI-PetHappiness" setAllPoints="true">
+                  <Size>
+                    <AbsDimension x="24" y="23"/>
+                  </Size>
+                  <TexCoords left="0" right="0.1875" top="0" bottom="0.359375"/>
+                </Texture>
+                <FontString name="ArmoryPetDietText" justifyH="LEFT" inherits="GameFontNormalSmall" text="">
+                  <Anchors>
+                    <Anchor point="TOPLEFT">
+                      <Offset>
+                        <AbsDimension x="0" y="-40"/>
+                      </Offset>
+                    </Anchor>
+                    <Anchor point="BOTTOMRIGHT">
+                      <Offset>
+                        <AbsDimension x="212" y="-60"/>
+                      </Offset>
+                    </Anchor>
+                  </Anchors>
+                </FontString>
+              </Layer>
+            </Layers>
+            <Scripts>
+              <OnEnter>
+                GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+                GameTooltip:SetText(self.tooltip);
+                if ( self.tooltipDamage ) then
+                  GameTooltip:AddLine(self.tooltipDamage, "", 1, 1, 1);
+                end
+                if ( self.tooltipLoyalty ) then
+                  GameTooltip:AddLine(self.tooltipLoyalty, "", 1, 1, 1);
+                end
+                GameTooltip:Show();
+              </OnEnter>
+              <OnLeave function="GameTooltip_Hide"/>
+            </Scripts>
+          </Frame>
+          <Frame name="ArmoryPetTalents">
+            <Size>
+              <AbsDimension x="30" y="30"/>
+            </Size>
+            <Anchors>
+              <Anchor point="BOTTOMLEFT" x="0" y="-125"/>
+            </Anchors>
+          </Frame>
+        </Frames>
+      </Frame>
+
+      <Frame name="ArmoryPetAttributesFrame">
+        <Size>
+          <AbsDimension x="230" y="78"/>
+        </Size>
+        <Anchors>
+          <Anchor point="TOPLEFT" x="67" y="-200"/>
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture file="Interface\PaperDollInfoFrame\UI-Character-StatBackground">
+              <Size>
+                <AbsDimension x="114" y="78"/>
+              </Size>
+              <Anchors>
+                <Anchor point="TOPLEFT">
+                  <Offset>
+                    <AbsDimension x="0" y="0"/>
+                  </Offset>
+                </Anchor>
+              </Anchors>
+              <TexCoords left="0" right="0.89" top="0" bottom="0.61"/>
+            </Texture>
+            <Texture file="Interface\PaperDollInfoFrame\UI-Character-StatBackground">
+              <Size>
+                <AbsDimension x="114" y="78"/>
+              </Size>
+              <Anchors>
+                <Anchor point="TOPLEFT">
+                  <Offset>
+                    <AbsDimension x="115" y="0"/>
+                  </Offset>
+                </Anchor>
+              </Anchors>
+              <TexCoords left="0" right="0.89" top="0" bottom="0.61"/>
+            </Texture>
+          </Layer>
+        </Layers>
+        <Frames>
+          <Frame name="ArmoryPetStatFrame1" inherits="ArmoryAttributeFrameTemplate" id="1">
+            <Anchors>
+              <Anchor point="TOPLEFT">
+                <Offset>
+                  <AbsDimension x="6" y="-5"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+          </Frame>
+          <Frame name="ArmoryPetStatFrame2" inherits="ArmoryAttributeFrameTemplate" id="2">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="ArmoryPetStatFrame1" relativePoint="BOTTOMLEFT">
+                <Offset>
+                  <AbsDimension x="0" y="-1"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+          </Frame>
+          <Frame name="ArmoryPetStatFrame3" inherits="ArmoryAttributeFrameTemplate" id="3">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="ArmoryPetStatFrame2" relativePoint="BOTTOMLEFT">
+                <Offset>
+                  <AbsDimension x="0" y="-1"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+          </Frame>
+          <Frame name="ArmoryPetStatFrame4" inherits="ArmoryAttributeFrameTemplate" id="4">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="ArmoryPetStatFrame3" relativePoint="BOTTOMLEFT">
+                <Offset>
+                  <AbsDimension x="0" y="-1"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+          </Frame>
+          <Frame name="ArmoryPetStatFrame5" inherits="ArmoryAttributeFrameTemplate" id="5">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="ArmoryPetStatFrame4" relativePoint="BOTTOMLEFT">
+                <Offset>
+                  <AbsDimension x="0" y="-1"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+          </Frame>
+          <Frame name="ArmoryPetAttackPowerFrame" inherits="StatFrameTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="ArmoryPetAttributesFrame" relativePoint="TOPLEFT">
+                <Offset>
+                  <AbsDimension x="122" y="-5"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+          </Frame>
+          <Frame name="ArmoryPetDamageFrame" inherits="StatFrameTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="ArmoryPetAttackPowerFrame" relativePoint="BOTTOMLEFT">
+                <Offset>
+                  <AbsDimension x="0" y="-1"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+            <Scripts>
+              <OnEnter>
+                CharacterDamageFrame_OnEnter(self);
+              </OnEnter>
+            </Scripts>
+          </Frame>
+          <Frame name="ArmoryPetSpellDamageFrame" inherits="StatFrameTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="ArmoryPetDamageFrame" relativePoint="BOTTOMLEFT">
+                <Offset>
+                  <AbsDimension x="0" y="-1"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+          </Frame>
+          <Frame name="ArmoryPetArmorFrame" inherits="StatFrameTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="ArmoryPetSpellDamageFrame" relativePoint="BOTTOMLEFT">
+                <Offset>
+                  <AbsDimension x="0" y="-1"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+          </Frame>
+        </Frames>
+      </Frame>
+      <Frame name="ArmoryPetResistanceFrame">
+        <Size>
+          <AbsDimension x="32" y="160"/>
+        </Size>
+        <Anchors>
+          <Anchor point="TOPRIGHT" relativeTo="ArmoryPetFrame" relativePoint="TOPLEFT" x="337" y="-77"/>
+        </Anchors>
+        <Frames>
+          <Frame name="ArmoryPetMagicResFrame1" inherits="ArmoryMagicResistanceFrameTemplate" id="6">
+            <Anchors>
+              <Anchor point="TOP"/>
+            </Anchors>
+            <Layers>
+              <Layer level="BACKGROUND">
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-ResistanceIcons">
+                  <TexCoords left="0" right="1.0" top="0.2265625" bottom="0.33984375"/>
+                </Texture>
+                <FontString name="ArmoryPetMagicResText1" inherits="GameFontHighlightSmall" text="X">
+                  <Anchors>
+                    <Anchor point="BOTTOM">
+                      <Offset>
+                        <AbsDimension x="0" y="3"/>
+                      </Offset>
+                    </Anchor>
+                  </Anchors>
+                </FontString>
+              </Layer>
+            </Layers>
+          </Frame>
+          <Frame name="ArmoryPetMagicResFrame2" inherits="ArmoryMagicResistanceFrameTemplate" id="2">
+            <Anchors>
+              <Anchor point="TOP" relativeTo="ArmoryPetMagicResFrame1" relativePoint="BOTTOM"/>
+            </Anchors>
+            <Layers>
+              <Layer level="BACKGROUND">
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-ResistanceIcons">
+                  <TexCoords left="0" right="1.0" top="0" bottom="0.11328125"/>
+                </Texture>
+                <FontString name="ArmoryPetMagicResText2" inherits="GameFontHighlightSmall" text="X">
+                  <Anchors>
+                    <Anchor point="BOTTOM">
+                      <Offset>
+                        <AbsDimension x="0" y="3"/>
+                      </Offset>
+                    </Anchor>
+                  </Anchors>
+                </FontString>
+              </Layer>
+            </Layers>
+          </Frame>
+          <Frame name="ArmoryPetMagicResFrame3" inherits="ArmoryMagicResistanceFrameTemplate" id="3">
+            <Anchors>
+              <Anchor point="TOP" relativeTo="ArmoryPetMagicResFrame2" relativePoint="BOTTOM"/>
+            </Anchors>
+            <Layers>
+              <Layer level="BACKGROUND">
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-ResistanceIcons">
+                  <TexCoords left="0" right="1.0" top="0.11328125" bottom="0.2265625"/>
+                </Texture>
+                <FontString name="ArmoryPetMagicResText3" inherits="GameFontHighlightSmall" text="X">
+                  <Anchors>
+                    <Anchor point="BOTTOM">
+                      <Offset>
+                        <AbsDimension x="0" y="3"/>
+                      </Offset>
+                    </Anchor>
+                  </Anchors>
+                </FontString>
+              </Layer>
+            </Layers>
+          </Frame>
+          <Frame name="ArmoryPetMagicResFrame4" inherits="ArmoryMagicResistanceFrameTemplate" id="4">
+            <Anchors>
+              <Anchor point="TOP" relativeTo="ArmoryPetMagicResFrame3" relativePoint="BOTTOM"/>
+            </Anchors>
+            <Layers>
+              <Layer level="BACKGROUND">
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-ResistanceIcons">
+                  <TexCoords left="0" right="1.0" top="0.33984375" bottom="0.453125"/>
+                </Texture>
+                <FontString name="ArmoryPetMagicResText4" inherits="GameFontHighlightSmall" text="X">
+                  <Anchors>
+                    <Anchor point="BOTTOM">
+                      <Offset>
+                        <AbsDimension x="0" y="3"/>
+                      </Offset>
+                    </Anchor>
+                  </Anchors>
+                </FontString>
+              </Layer>
+            </Layers>
+          </Frame>
+          <Frame name="ArmoryPetMagicResFrame5" inherits="ArmoryMagicResistanceFrameTemplate" id="5">
+            <Anchors>
+              <Anchor point="TOP" relativeTo="ArmoryPetMagicResFrame4" relativePoint="BOTTOM"/>
+            </Anchors>
+            <Layers>
+              <Layer level="BACKGROUND">
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-ResistanceIcons">
+                  <TexCoords left="0" right="1.0" top="0.453125" bottom="0.56640625"/>
+                </Texture>
+                <FontString name="ArmoryPetMagicResText5" inherits="GameFontHighlightSmall" text="X">
+                  <Anchors>
+                    <Anchor point="BOTTOM">
+                      <Offset>
+                        <AbsDimension x="0" y="3"/>
+                      </Offset>
+                    </Anchor>
+                  </Anchors>
+                </FontString>
+              </Layer>
+            </Layers>
+          </Frame>
+        </Frames>
+      </Frame>
+
+      <CheckButton name="ArmoryPetFramePet1" inherits="ArmoryPetSlotTemplate" id="1">
+        <Anchors>
+          <Anchor point="BOTTOMLEFT" x="72" y="136"/>
+        </Anchors>
+      </CheckButton>
+      <CheckButton name="ArmoryPetFramePet2" inherits="ArmoryPetSlotTemplate" id="2">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="ArmoryPetFramePet1" relativePoint="RIGHT">
+            <Offset>
+              <AbsDimension x="22" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+      <CheckButton name="ArmoryPetFramePet3" inherits="ArmoryPetSlotTemplate" id="3">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="ArmoryPetFramePet2" relativePoint="RIGHT">
+            <Offset>
+              <AbsDimension x="22" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+      <CheckButton name="ArmoryPetFramePet4" inherits="ArmoryPetSlotTemplate" id="4">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="ArmoryPetFramePet3" relativePoint="RIGHT">
+            <Offset>
+              <AbsDimension x="22" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+    </Frames>
+    <Scripts>
+      <OnLoad>
+        ArmoryPetFrame_OnLoad(self);
+      </OnLoad>
+      <OnEvent>
+        ArmoryPetFrame_OnEvent(self, event, ...);
+      </OnEvent>
+      <OnShow>
+        ArmoryPetFrame_OnShow(self);
+      </OnShow>
+      <OnHide>
+        ArmoryPetFrame_OnHide(self);
+      </OnHide>
+      <OnMouseUp>
+        ArmoryFrame_OnMouseUp(self, button);
+      </OnMouseUp>
+      <OnMouseDown>
+        ArmoryFrame_OnMouseDown(self, button);
+      </OnMouseDown>
+    </Scripts>
+  </Frame>
+</Ui>

@@ -1,0 +1,41 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\FrameXML\UI.xsd">
+
+  <Script file="ArmoryOptionsMiscPanel.lua" />
+
+  <Frame name="ArmoryOptionsMiscPanel" hidden="true" inherits="ArmoryOptionsPanelTemplate" mixin="ArmoryOptionsMiscPanelMixin">
+    <Frames>
+      <CheckButton parentKey="LDBLabel" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscLDBLabelMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" x="-2" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Encoding" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscEncodingMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.LDBLabel" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="EnhancedTips" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscEnhancedTipsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Encoding" relativePoint="BOTTOMLEFT" y="-6" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="ExtendedTradeSkills" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscExtendedTradeSkillsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.EnhancedTips" relativePoint="BOTTOMLEFT" y="-6" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="SystemWarnings" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsMiscSystemWarningsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ExtendedTradeSkills" relativePoint="BOTTOMLEFT" y="-6" />
+        </Anchors>
+      </CheckButton>
+      <Frame name="$parentWarningSound" inherits="ArmoryOptionsDropDownTemplate" mixin="ArmoryMiscWarningSoundMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SystemWarnings" relativePoint="BOTTOMLEFT" x="-12" y="-24" />
+        </Anchors>
+      </Frame>
+    </Frames>
+  </Frame>
+
+</Ui>

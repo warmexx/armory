@@ -1,0 +1,23 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+  <Include file="Tools\Classic\ArmoryFindFrame.xml"/>
+  <Include file="Frames\Classic\ArmoryFrame.xml"/>
+  <Include file="Frames\Classic\ArmoryBuffFrame.xml"/>
+  <Include file="Frames\TBC\ArmoryPaperDollFrame.xml"/>
+  <Include file="Frames\TBC\ArmoryTalentFrame.xml"/>
+  <Include file="Frames\TBC\ArmoryPetFrame.xml"/>
+  <Include file="Frames\TBC\ArmoryPVPFrame.xml"/>
+  <Include file="Frames\Classic\ArmoryOtherFrame.xml"/>
+  <Include file="Frames\Classic\ArmoryReputationFrame.xml"/>
+  <Include file="Frames\Classic\ArmorySkillFrame.xml"/>
+  <Include file="Frames\Classic\ArmoryRaidInfoFrame.xml"/>
+  <Include file="Frames\Classic\ArmoryTradeSkillFrame.xml"/>
+  <Include file="Frames\Classic\ArmoryInventoryFrame.xml"/>
+  <Include file="Frames\Classic\ArmoryInventoryIconViewFrame.xml"/>
+  <Include file="Frames\Classic\ArmoryInventoryListViewFrame.xml"/>
+  <Include file="Frames\TBC\ArmoryQuestLogFrame.xml"/>
+  <Include file="Frames\Classic\ArmorySpellBookFrame.xml"/>
+  <Include file="Frames\Classic\ArmorySocialFrame.xml"/>
+  <Include file="Tools\Classic\ArmoryAddonMessageFrame.xml"/>
+  <Include file="Tools\Classic\ArmoryLookupFrame.xml"/>
+</Ui>

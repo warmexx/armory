@@ -1,0 +1,58 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\FrameXML\UI.xsd">
+
+  <Script file="ArmoryOptionsExpirationPanel.lua" />
+
+  <Frame name="ArmoryOptionsExpirationPanel" hidden="true" inherits="ArmoryOptionsPanelTemplate" mixin="ArmoryOptionsExpirationPanelMixin">
+    <Frames>
+      <Slider parentKey="ExpDaysSlider" inherits="ArmoryOptionsPanelSliderTemplate" mixin="ArmoryOptionsExpirationDaysMixin">
+        <Size x="335" y="16" />
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" x="8" y="-24" />
+        </Anchors>
+      </Slider>
+      <CheckButton parentKey="IgnoreAlts" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsExpirationIgnoreAltsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ExpDaysSlider" relativePoint="BOTTOMLEFT" x="-8" y="-24" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="CheckVisit" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsExpirationCheckVisitMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.IgnoreAlts" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="ExcludeVisit" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsExpirationExcludeVisitMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.CheckVisit" relativePoint="BOTTOMLEFT" x="16" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="LogonVisit" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsExpirationLogonVisitMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ExcludeVisit" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="CheckCount" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsExpirationCheckCountMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.LogonVisit" relativePoint="BOTTOMLEFT" x="-16" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="HideCount" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsExpirationHideCountMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.CheckCount" relativePoint="BOTTOMLEFT" x="16" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="LogonCount" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsExpirationLogonCountMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.HideCount" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+
+      <Button parentKey="Check" inherits="ArmoryOptionsPanelButtonTemplate" text="ARMORY_CMD_CHECK_MENUTEXT" mixin="ArmoryOptionsExpirationCheckMixin">
+        <Anchors>
+          <Anchor point="BOTTOMLEFT" x="16" y="16" />
+        </Anchors>
+      </Button>
+    </Frames>
+  </Frame>
+
+</Ui>

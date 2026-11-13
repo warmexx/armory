@@ -1,0 +1,78 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\FrameXML\UI.xsd">
+
+  <Script file="ArmoryOptionsModulePanel.lua" />
+
+  <Frame name="ArmoryOptionsModulePanel" hidden="true" inherits="ArmoryOptionsPanelTemplate" mixin="ArmoryOptionsModulePanelMixin">
+    <Frames>
+      <CheckButton parentKey="Inventory" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsInventoryModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" x="-2" y="-8"/>
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="QuestLog" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsQuestLogModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Inventory" relativePoint="BOTTOMLEFT" y="-8"/>
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="SpellBook" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSpellBookModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.QuestLog" relativePoint="BOTTOMLEFT" y="-8"/>
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="TradeSkills" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTradeSkillsModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SpellBook" relativePoint="BOTTOMLEFT" y="-8"/>
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Social" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSocialModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.TradeSkills" relativePoint="BOTTOMLEFT" y="-8"/>
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Sharing" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSharingModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Social" relativePoint="BOTTOMLEFT" y="-8"/>
+        </Anchors>
+       </CheckButton>
+
+      <CheckButton parentKey="Pets" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsPetsModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" x="200" y="-8"/>
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Talents" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTalentsModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Pets" relativePoint="BOTTOMLEFT" y="-8"/>
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="PVP" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsPVPModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Talents" relativePoint="BOTTOMLEFT" y="-8"/>
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Reputation" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsReputationModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.PVP" relativePoint="BOTTOMLEFT" y="-8"/>
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Skills" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSkillsModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Reputation" relativePoint="BOTTOMLEFT" y="-8"/>
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Raid" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsRaidModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Skills" relativePoint="BOTTOMLEFT" y="-8"/>
+        </Anchors>
+      </CheckButton>
+
+      <CheckButton parentKey="Buffs" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsBuffsModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" x="400" y="-8"/>
+        </Anchors>
+      </CheckButton>
+    </Frames>
+  </Frame>
+
+</Ui>

@@ -1,0 +1,92 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\FrameXML\UI.xsd">
+
+  <Script file="ArmoryOptionsSharePanel.lua" />
+
+  <Frame name="ArmoryOptionsSharePanel" hidden="true" inherits="ArmoryOptionsPanelTemplate" mixin="ArmoryOptionsSharePanelMixin">
+    <Layers>
+      <Layer level="ARTWORK">
+        <FontString parentKey="SubText2" text="ARMORY_SHARE_SUBTEXT2" inherits="GameFontHighlightSmall" justifyH="LEFT" justifyV="TOP">
+          <Size y="18" x="0" />
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" y="-170" />
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <CheckButton parentKey="ShareProfessions" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsShareProfessionsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText" relativePoint="BOTTOMLEFT" x="-2" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="ShareQuests" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsShareQuestsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShareProfessions" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="ShareCharacter" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsShareCharacterMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShareQuests" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="ShareItems" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsShareItemsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShareCharacter" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="ShareAsAlt" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsShareAsAltMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShareItems" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+      <Frame parentKey="Channel">
+        <Size x="385" y="26" />
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShareAsAlt" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+        <Frames>
+          <CheckButton parentKey="Check" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsShareChannelEnableMixin">
+            <Anchors>
+              <Anchor point="LEFT" />
+            </Anchors>
+          </CheckButton>
+          <EditBox parentKey="Name" autoFocus="false" historyLines="0" inherits="InputBoxTemplate" mixin="ArmoryOptionsShareChannelNameMixin">
+            <Size x="150" y="20" />
+            <Anchors>
+              <Anchor point="RIGHT" x="-5" y="0" />
+            </Anchors>
+            <Scripts>
+              <OnLoad method="OnLoad" />
+              <OnShow method="OnShow" />
+              <OnTextChanged method="OnTextChanged" />
+              <OnEditFocusLost method="OnEditFocusLost" />
+              <OnEditFocusGained method="OnEditFocusGained" />
+            </Scripts>
+          </EditBox>
+        </Frames>
+      </Frame>
+      <CheckButton parentKey="ShareInInstance" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsShareInInstanceMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.SubText2" relativePoint="BOTTOMLEFT" x="-2" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="ShareInCombat" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsShareInCombatMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShareInInstance" relativePoint="BOTTOMLEFT" y="-6" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="ShowShareMessages" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsShareMessagesMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShareInCombat" relativePoint="BOTTOMLEFT" y="-6" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="ShareAll" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsShareAllMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowShareMessages" relativePoint="BOTTOMLEFT" y="-6" />
+        </Anchors>
+      </CheckButton>
+    </Frames>
+  </Frame>
+
+</Ui>
