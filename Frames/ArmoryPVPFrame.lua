@@ -410,7 +410,7 @@ function ArmoryPVPTalents_Update()
         button.Texture:Show();
         button.talentID = talentID;
         if ( name ) then
-            button.Texture:SetTexture(iconTexture);
+            Armory:SetPortraitToTexture(button.Texture, iconTexture);
             button.TalentName:SetText(name);
             button.TalentName:Show();
         else

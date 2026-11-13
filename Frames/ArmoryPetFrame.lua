@@ -469,7 +469,7 @@ function ArmoryPetFrame_UpdateSpec()
     if ( spec ) then
         local _, name, description, icon = Armory:GetSpecializationInfo(spec, false, true, nil, Armory:UnitSex("pet"));
         if ( name ) then
-            ArmoryPetSpecFrame.specIcon:SetTexture(icon);
+            Armory:SetPortraitToTexture(ArmoryPetSpecFrame.specIcon, icon);
             ArmoryPetSpecFrame.specName:SetText(name);
             local role = Armory:GetSpecializationRole(spec, false, true);
             ArmoryPetSpecFrame.roleIcon:SetTexCoord(Armory:GetTexCoordsForRole(role));
@@ -480,7 +480,7 @@ function ArmoryPetFrame_UpdateSpec()
                     local button = _G["ArmoryPetAbility"..i];
                     if ( i <= #spells ) then
                         local _, icon = C_Spell.GetSpellTexture(spells[i]);
-                        button.icon:SetTexture(icon);
+                        Armory:SetPortraitToTexture(button.icon, icon);
                         button.spellID = spells[i];
                         button.extraTooltip = nil;
                         local level = C_Spell.GetSpellLevelLearned(spells[i]);

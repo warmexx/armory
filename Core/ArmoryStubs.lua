@@ -833,6 +833,13 @@ function Armory:SetPortraitTexture(frame, unit)
     return "Portrait1";
 end
 
+-- Replaces Blizzard's removed SetPortraitToTexture: shows the texture as a circle.
+-- The mask has to be set before the texture, as Blizzard does.
+function Armory:SetPortraitToTexture(texture, file)
+    texture:SetMask("Interface\\CharacterFrame\\TempPortraitAlphaMask");
+    texture:SetTexture(file);
+end
+
 function Armory:SetPvpTalent(id)
     local link = _G.GetPvpTalentLink(id);
     if ( link ) then

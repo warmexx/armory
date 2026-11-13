@@ -6,6 +6,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 ## v20.0.0
 - One Armory for all versions of World of Warcraft: Retail, WoW Forever, Classic Era and Burning Crusade Anniversary now share one addon and one project page
 - Fixes the missing portrait for Earthen and Haranir characters (Retail)
+- Fixes the pet specialization, pet ability, PvP talent and profession icons no longer being round (Retail)
 
 ## Earlier versions
 Armory has been around since 2007. Until v20.0.0 every version of World of Warcraft had its own Armory:

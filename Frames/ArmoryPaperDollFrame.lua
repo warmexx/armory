@@ -1925,10 +1925,12 @@ function ArmoryPaperDollFrame_UpdateTalent(overlay)
     end
 
     if ( role ) then
+        _G[parent.."ButtonIcon"]:SetMask("");
         _G[parent.."ButtonIcon"]:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-ROLES");
         _G[parent.."ButtonIcon"]:SetTexCoord(Armory:GetTexCoordsForRole(role));
     else
-        _G[parent.."ButtonIcon"]:SetTexture("Interface\\Icons\\Ability_Marksmanship");
+        _G[parent.."ButtonIcon"]:SetTexCoord(0, 1, 0, 1);
+        Armory:SetPortraitToTexture(_G[parent.."ButtonIcon"], "Interface\\Icons\\Ability_Marksmanship");
     end
     _G[parent.."Text"]:SetText(strupper(specialism or NONE));
 end
@@ -1944,7 +1946,7 @@ local function UpdateSkillFrame(skillFrame, values)
     else
         local skillName, skillRank, skillMaxRank, texture = unpack(values);
 
-        icon:SetTexture(icon, texture or Armory:GetProfessionTexture(skillName));
+        Armory:SetPortraitToTexture(icon, texture or Armory:GetProfessionTexture(skillName));
         label:SetText(strupper(skillName));
         statusbar:SetMinMaxValues(0, skillMaxRank);
         statusbar:SetValue(skillRank);
