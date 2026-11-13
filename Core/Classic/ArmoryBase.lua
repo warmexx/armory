@@ -386,6 +386,7 @@ function Armory:InitializeMenu()
         Armory:MenuAddButton("ARMORY_CMD_SET_SHAREINCOMBAT");
         Armory:MenuAddButton("ARMORY_CMD_SET_SHOWSHAREMSG");
         Armory:MenuAddButton("ARMORY_CMD_SET_SHAREALL", true);
+        Armory:MenuAddButton("ARMORY_CMD_SET_SHAREGUILD");
         Armory:MenuAddButton("ARMORY_CMD_LOOKUP", true);
     else
         local info = {};

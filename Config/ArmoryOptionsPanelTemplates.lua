@@ -29,7 +29,7 @@
 
 local Armory, _ = Armory, nil;
 
-local table, next = table, next;
+local table, next, ipairs = table, next, ipairs;
 local error = error;
 
 local category;
@@ -42,12 +42,37 @@ local function Register(panel, name)
     Settings.RegisterCanvasLayoutSubcategory(category, panel, name);
 end
 
+-- Moves the frames anchored to a removed control into its place
+local function CloseGap(control)
+    local _, relativeTo, relativePoint = control:GetPoint(1);
+    for _, frame in ipairs({control:GetParent():GetChildren()}) do
+        for i = 1, frame:GetNumPoints() do
+            local point, anchor, _, x, y = frame:GetPoint(i);
+            if ( anchor == control ) then
+                frame:SetPoint(point, relativeTo, relativePoint, x, y);
+            end
+        end
+    end
+end
+
 local panelControls = {};
 
 ArmoryOptionsPanelTemplateMixin = {};
 
 function ArmoryOptionsPanelTemplateMixin:OnLoad()
     Register(self, self:GetID());
+
+    -- Controls load before their panel, so all their neighbours exist now
+    for _, control in ipairs(self.removedControls or {}) do
+        CloseGap(control);
+    end
+    self.removedControls = nil;
+end
+
+function ArmoryOptionsPanelTemplateMixin:RemoveControl(control)
+    control:Hide();
+    self.removedControls = self.removedControls or {};
+    table.insert(self.removedControls, control);
 end
 
 function ArmoryOptionsPanelTemplateMixin:GetID()

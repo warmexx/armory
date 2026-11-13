@@ -1,0 +1,11 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\FrameXML\UI.xsd">
+  <!--
+    Classic keeps Blizzard's own templates, which look like Classic. Shared XML uses the names
+    of Armory's Mainline templates, so here they point to Blizzard's.
+  -->
+  <Button name="ArmoryUIPanelButtonTemplate" inherits="UIPanelButtonTemplate" virtual="true"/>
+  <Button name="ArmoryUIPanelCloseButton" inherits="UIPanelCloseButton" virtual="true"/>
+  <EditBox name="ArmoryInputBoxTemplate" inherits="InputBoxTemplate" virtual="true"/>
+  <Frame name="ArmoryDialogBorderDarkTemplate" inherits="DialogBorderDarkTemplate" virtual="true"/>
+</Ui>

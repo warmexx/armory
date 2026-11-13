@@ -295,6 +295,13 @@ Armory.options = {
         disabled = function() return not Armory:HasDataSharing(); end,
         default = false
     },
+    ARMORY_CMD_SET_SHAREGUILD = {
+        type = "toggle",
+        set = function(value) Armory:SetConfigShareGuild(value and value ~= "0"); end,
+        get = function() return Armory:GetConfigShareGuild(); end,
+        disabled = function() return not Armory:HasDataSharing() or Armory:GetConfigShareAll(); end,
+        default = true
+    },
     ARMORY_CMD_SET_SHARECHANNEL = {
         type = "toggle",
         set = function(value) Armory:SetConfigShareChannel(value and value ~= "0"); end,
@@ -903,6 +910,14 @@ end
 
 function Armory:GetConfigShareAll()
     return self:Setting("General", "ShareAll") or nil;
+end
+
+function Armory:SetConfigShareGuild(on)
+    self:Setting("General", "ShareNonGuild", not on);
+end
+
+function Armory:GetConfigShareGuild()
+    return not self:Setting("General", "ShareNonGuild");
 end
 
 function Armory:SetConfigItemCountColor(r, g, b)

@@ -42,6 +42,12 @@ function ArmoryOptionControlBaseMixin:Register(panel)
 
     if ( key ) then
         self.entry = Armory.options[key];
+        if ( not self.entry ) then
+            -- Not every version has every option (Classic lacks some)
+            self.panel = panel;
+            self.panel:RemoveControl(self);
+            return;
+        end
         self.tooltipText = _G[key.."_TOOLTIP"];
 
         local text = _G[key.."_TEXT"];

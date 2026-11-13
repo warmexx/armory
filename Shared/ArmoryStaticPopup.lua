@@ -72,6 +72,10 @@ ArmoryStaticPopupDialogs["ARMORY_DELETE_PET"] = {
 };
 
 function ArmoryStaticPopup_OnLoad(self)
+    if ( Armory.isClassic ) then
+        -- Blizzard's close button in Classic is larger
+        self.closeButton:SetPoint("TOPRIGHT", -3, -3);
+    end
     self:RegisterEvent("DISPLAY_SIZE_CHANGED");
 end
 
