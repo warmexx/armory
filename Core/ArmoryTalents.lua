@@ -31,6 +31,9 @@ local container = "Talents";
 
 local SHOW_TALENT_LEVEL = 10;
 
+-- Raise it when the stored structure changes, so the structure is stored again
+local STRUCTURE_VERSION = 2;
+
 local PART_CLASS = "class";
 local PART_SPEC = "spec";
 local PART_HERO = "hero";
@@ -43,7 +46,7 @@ local PART_SELECTOR = "selector";
 local function GetTreeKey(treeID)
     local hash = C_Traits.GetTreeHash(treeID);
     if ( hash ) then
-        return select(2, _G.GetBuildInfo()).."-"..table.concat(hash, ".");
+        return STRUCTURE_VERSION..":"..select(2, _G.GetBuildInfo()).."-"..table.concat(hash, ".");
     end
 end
 
@@ -69,6 +72,21 @@ local function GetNodePart(nodeInfo, costID, currencies)
     elseif ( currencies[2] and costID == currencies[2].traitCurrencyID ) then
         return PART_SPEC;
     end
+end
+
+-- A node that is granted for free, like the first node of the class tree, has no cost and belongs to the part it is linked to
+local function GetLinkedPart(nodeID, parts, links)
+    for linkedID in pairs(links[nodeID] or {}) do
+        local part = parts[linkedID];
+        if ( part == PART_CLASS or part == PART_SPEC ) then
+            return part;
+        end
+    end
+end
+
+local function AddLink(links, nodeID, linkedID)
+    links[nodeID] = links[nodeID] or {};
+    links[nodeID][linkedID] = true;
 end
 
 -- The view config is shared with Blizzard's talent frame when it shows a loadout from a link
@@ -119,34 +137,51 @@ local function StoreSpecStructure(specID, treeID, level, edges)
 
     -- A spec can also report hero trees of other specs as visible
     local isOwnSubTree, subTreeCost = {}, {};
-    local subTreeIDs = C_ClassTalents.GetHeroTalentSpecsForClassSpec(configID, specID) or {};
+    local subTreeIDs, heroLevel = C_ClassTalents.GetHeroTalentSpecsForClassSpec(configID, specID);
+    subTreeIDs = subTreeIDs or {};
     for _, subTreeID in ipairs(subTreeIDs) do
         isOwnSubTree[subTreeID] = true;
     end
 
-    local specNodes = {};
+    local nodes, parts, links = {}, {}, {};
     for _, nodeID in ipairs(C_Traits.GetTreeNodes(treeID)) do
         local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID);
         if ( IsNodeValid(nodeInfo) and nodeInfo.isVisible and (not nodeInfo.subTreeID or isOwnSubTree[nodeInfo.subTreeID]) ) then
             local costID = GetNodeCostID(configID, nodeID);
-            local part = GetNodePart(nodeInfo, costID, currencies);
-            if ( part ) then
-                table.insert(specNodes, nodeID);
-                StoreNode(nodeID, nodeInfo, part, configID);
+            table.insert(nodes, nodeInfo);
+            parts[nodeID] = GetNodePart(nodeInfo, costID, currencies);
 
-                if ( nodeInfo.subTreeID ) then
-                    subTreeCost[nodeInfo.subTreeID] = costID;
-                end
+            if ( nodeInfo.subTreeID ) then
+                subTreeCost[nodeInfo.subTreeID] = subTreeCost[nodeInfo.subTreeID] or costID;
+            end
 
-                -- The edges of a node differ per spec, a target is only drawn when it is visible
-                for _, edge in ipairs(nodeInfo.visibleEdges) do
-                    edges[nodeID] = edges[nodeID] or {};
-                    edges[nodeID][edge.targetNode] = true;
-                end
+            for _, edge in ipairs(nodeInfo.visibleEdges) do
+                AddLink(links, nodeID, edge.targetNode);
+                AddLink(links, edge.targetNode, nodeID);
+            end
+        end
+    end
+
+    local specNodes = {};
+    for _, nodeInfo in ipairs(nodes) do
+        local nodeID = nodeInfo.ID;
+        local part = parts[nodeID];
+        if ( not part and #nodeInfo.entryIDs > 0 ) then
+            part = GetLinkedPart(nodeID, parts, links);
+        end
+        if ( part ) then
+            table.insert(specNodes, nodeID);
+            StoreNode(nodeID, nodeInfo, part, configID);
+
+            -- The edges of a node differ per spec, a target is only drawn when it is visible
+            for _, edge in ipairs(nodeInfo.visibleEdges) do
+                edges[nodeID] = edges[nodeID] or {};
+                edges[nodeID][edge.targetNode] = true;
             end
         end
     end
     Armory:SetClassValue("player", 4, container, "Specs", specID, "Nodes", specNodes);
+    Armory:SetClassValue("player", 4, container, "Specs", specID, "HeroLevel", heroLevel);
 
     local numSubTrees = 0;
     for _, subTreeID in ipairs(subTreeIDs) do
@@ -304,6 +339,11 @@ end
 -- returns subTreeID, name, iconElementID, posX, posY, currencyID
 function Armory:GetTalentHeroTreeInfo(specID, index)
     return self:GetClassValue("player", container, "Specs", specID, "HeroTrees", index);
+end
+
+-- The level from which a hero tree can be chosen
+function Armory:GetTalentHeroLevel(specID)
+    return self:GetClassValue("player", container, "Specs", specID, "HeroLevel");
 end
 
 -- A spec is only known after it has been active

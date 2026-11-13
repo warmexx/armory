@@ -131,9 +131,16 @@ local function IsActiveSpec(self, spec)
     return self.talentGroup == Armory:GetActiveSpecGroup() and spec == Armory:GetSpecialization(false, false, self.talentGroup);
 end
 
--- Without a choice the tree is shown without ranks; returns subTreeID, name, iconElementID, currencyID
+-- Without a choice the tree is shown without ranks, below the level of the choice there is none; returns subTreeID, name, iconElementID, currencyID
 local function GetShownHeroTree(specID)
     local activeTree = Armory:GetActiveTalentHeroTree(specID);
+    if ( not activeTree ) then
+        local heroLevel = Armory:GetTalentHeroLevel(specID);
+        if ( not heroLevel or Armory:UnitLevel("player") < heroLevel ) then
+            return;
+        end
+    end
+
     local index = 1;
     for i = 1, Armory:GetNumTalentHeroTrees(specID) or 0 do
         if ( Armory:GetTalentHeroTreeInfo(specID, i) == activeTree ) then
