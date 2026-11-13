@@ -28,9 +28,19 @@
 
 local Armory, _ = Armory, nil;
 
-ARMORY_OTHER_TABS = {REPUTATION_ABBR, RAID, CURRENCY};
-
-local OTHERFRAME_SUBFRAMES = { "ArmoryReputationFrame", "ArmoryRaidInfoFrame", "ArmoryTokenFrame" };
+-- Classic has skills where Mainline has currency
+local OTHERFRAME_SUBFRAMES, OTHERFRAME_ENABLED, MAX_TABS_WIDTH;
+if ( Armory.isClassic ) then
+    ARMORY_OTHER_TABS = {REPUTATION_ABBR, SKILLS, RAID};
+    OTHERFRAME_SUBFRAMES = { "ArmoryReputationFrame", "ArmorySkillFrame", "ArmoryRaidInfoFrame" };
+    OTHERFRAME_ENABLED = { "HasReputation", "SkillsEnabled", "RaidEnabled" };
+    MAX_TABS_WIDTH = 320;
+else
+    ARMORY_OTHER_TABS = {REPUTATION_ABBR, RAID, CURRENCY};
+    OTHERFRAME_SUBFRAMES = { "ArmoryReputationFrame", "ArmoryRaidInfoFrame", "ArmoryTokenFrame" };
+    OTHERFRAME_ENABLED = { "HasReputation", "RaidEnabled", "HasCurrency" };
+    MAX_TABS_WIDTH = 260;
+end
 
 function ArmoryOtherFrame_ShowSubFrame()
     for index, value in pairs(OTHERFRAME_SUBFRAMES) do
@@ -112,9 +122,9 @@ function ArmoryOtherFrameTab_Update()
     local numTabs = 0;
     local firstTab;
 
-    firstTab, numTabs = TabAdjust(1, Armory:HasReputation(), firstTab, numTabs);
-    firstTab, numTabs = TabAdjust(2, Armory:RaidEnabled(), firstTab, numTabs);
-    firstTab, numTabs = TabAdjust(3, Armory:HasCurrency(), firstTab, numTabs);
+    for id, enabled in ipairs(OTHERFRAME_ENABLED) do
+        firstTab, numTabs = TabAdjust(id, Armory[enabled](Armory), firstTab, numTabs);
+    end
 
     if ( numTabs > 0 ) then
         local tab;
@@ -132,7 +142,7 @@ function ArmoryOtherFrameTab_Update()
                 tab:Hide();
              end
         end
-        ArmoryPanelTemplates_ResizeTabsToFit(ArmoryOtherFrame.Tabs, totalTabWidth, 260, tabWidthCache);
+        ArmoryPanelTemplates_ResizeTabsToFit(ArmoryOtherFrame.Tabs, totalTabWidth, MAX_TABS_WIDTH, tabWidthCache);
 
         if ( numTabs == 1 ) then
             _G["ArmoryOtherFrameTab"..firstTab]:Hide();

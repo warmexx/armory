@@ -7,7 +7,7 @@
   <Include file="Frames\TBC\ArmoryTalentFrame.xml"/>
   <Include file="Frames\TBC\ArmoryPetFrame.xml"/>
   <Include file="Frames\TBC\ArmoryPVPFrame.xml"/>
-  <Include file="Frames\Classic\ArmoryOtherFrame.xml"/>
+  <Include file="Frames\ArmoryOtherFrame.xml"/>
   <Include file="Frames\Classic\ArmoryReputationFrame.xml"/>
   <Include file="Frames\Classic\ArmorySkillFrame.xml"/>
   <Include file="Frames\Classic\ArmoryRaidInfoFrame.xml"/>

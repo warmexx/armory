@@ -38,16 +38,16 @@ local tostring = tostring;
 ArmoryOptionControlBaseMixin = {}
 
 function ArmoryOptionControlBaseMixin:Register(panel)
-    local key = self:GetKey();
+    self.panel = panel;
 
+    if ( not self:IsAvailable() ) then
+        self.panel:RemoveControl(self);
+        return;
+    end
+
+    local key = self:GetKey();
     if ( key ) then
         self.entry = Armory.options[key];
-        if ( not self.entry ) then
-            -- Not every version has every option (Classic lacks some)
-            self.panel = panel;
-            self.panel:RemoveControl(self);
-            return;
-        end
         self.tooltipText = _G[key.."_TOOLTIP"];
 
         local text = _G[key.."_TEXT"];
@@ -56,8 +56,13 @@ function ArmoryOptionControlBaseMixin:Register(panel)
         end
     end
 
-    self.panel = panel;
     self.panel:RegisterControl(self);
+end
+
+-- Not every version has every option or module (Classic lacks some)
+function ArmoryOptionControlBaseMixin:IsAvailable()
+    local key = self:GetKey();
+    return not key or Armory.options[key] ~= nil;
 end
 
 function ArmoryOptionControlBaseMixin:Embed(parent)
@@ -400,6 +405,9 @@ ArmoryOptionsSliderTemplateMixin = CreateFromMixins(ArmoryOptionControlBaseMixin
 
 function ArmoryOptionsSliderTemplateMixin:Register(parent)
     ArmoryOptionControlBaseMixin.Register(self, parent);
+    if ( not self.entry ) then
+        return;
+    end
 
     self:SetMinMaxValues(self.entry.minValue, self.entry.maxValue);
     self:SetValueStep(self.entry.valueStep);

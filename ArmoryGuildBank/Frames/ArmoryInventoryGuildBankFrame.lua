@@ -29,8 +29,16 @@
 local AGB = AGB;
 local Armory, _ = Armory, nil;
 
+-- the guild bank is the last tab of the inventory, after the account bank in Mainline
+local GUILDBANK_TAB = Armory.isClassic and 3 or 4;
+local MoneyFrame_Update = Armory.isClassic and MoneyFrame_Update or ArmoryMoneyFrame_Update;
+
+local function GetGuildBankTab()
+    return _G["ArmoryInventoryFrameTab"..GUILDBANK_TAB];
+end
+
 function ArmoryInventoryGuildBankFrame_OnLoad(self)
-    ArmoryPanelTemplates_SetNumTabs(ArmoryInventoryFrame, 4);
+    ArmoryPanelTemplates_SetNumTabs(ArmoryInventoryFrame, GUILDBANK_TAB);
     ArmoryPanelTemplates_UpdateTabs(ArmoryInventoryFrame);
     self.collapsedTabs = {};
 end
@@ -40,7 +48,9 @@ function ArmoryInventoryGuildBankFrameTab_OnClick(self)
     ArmoryPanelTemplates_SetTab(ArmoryInventoryFrame, self:GetID());
     ArmoryInventoryIconViewFrame:Hide();
     ArmoryInventoryListViewFrame:Hide();
-    ArmoryInventoryAccountBankFrame:Hide();
+    if ( ArmoryInventoryAccountBankFrame ) then
+        ArmoryInventoryAccountBankFrame:Hide();
+    end
     ArmoryInventoryGuildBankFrame:Show();
 end
 
@@ -52,7 +62,7 @@ function ArmoryInventoryGuildBankFrame_OnShow(self)
     ArmoryInventoryGuildBankScrollFrameScrollBar:SetMinMaxValues(0, 0);
     ArmoryInventoryGuildBankScrollFrameScrollBar:SetValue(0);
 
-    ArmoryMoneyFrame_Update("ArmoryInventoryMoneyFrame", dbEntry and AGB:GetMoney(dbEntry) or 0);
+    MoneyFrame_Update("ArmoryInventoryMoneyFrame", dbEntry and AGB:GetMoney(dbEntry) or 0);
     ArmoryInventoryGuildBankFrame_Update();
 end
 
@@ -186,16 +196,16 @@ function ArmoryInventoryFrame_OnShow(...)
     local selected;
 
     if ( guild and AGB:GetConfigIntegrate() ) then
-        ArmoryInventoryFrameTab4:Show();
-        selected = ArmoryPanelTemplates_GetSelectedTab(ArmoryInventoryFrame) == 4;
+        GetGuildBankTab():Show();
+        selected = ArmoryPanelTemplates_GetSelectedTab(ArmoryInventoryFrame) == GUILDBANK_TAB;
     else
         ArmoryInventoryGuildBankFrame:Hide();
-        ArmoryInventoryFrameTab4:Hide();
+        GetGuildBankTab():Hide();
         selected = false;
     end
 
     if ( selected ) then
-        ArmoryPanelTemplates_SetTab(ArmoryInventoryFrame, 4);
+        ArmoryPanelTemplates_SetTab(ArmoryInventoryFrame, GUILDBANK_TAB);
         ArmoryInventoryGuildBankFrame:Show();
     else
         ArmoryInventoryGuildBankFrame:Hide();
@@ -205,7 +215,7 @@ end
 
 local Orig_ArmoryInventoryFrame_Update = ArmoryInventoryFrame_Update;
 function ArmoryInventoryFrame_Update(...)
-    if ( ArmoryPanelTemplates_GetSelectedTab(ArmoryInventoryFrame) == 4 ) then
+    if ( ArmoryPanelTemplates_GetSelectedTab(ArmoryInventoryFrame) == GUILDBANK_TAB ) then
         ArmoryInventoryGuildBankFrame_Update();
     else
         Orig_ArmoryInventoryFrame_Update(...);
@@ -214,7 +224,7 @@ end
 
 local Orig_ArmoryInventoryMoneyFrame_OnEnter = ArmoryInventoryMoneyFrame_OnEnter;
 function ArmoryInventoryMoneyFrame_OnEnter(...)
-    if ( ArmoryPanelTemplates_GetSelectedTab(ArmoryInventoryFrame) ~= 4 ) then
+    if ( ArmoryPanelTemplates_GetSelectedTab(ArmoryInventoryFrame) ~= GUILDBANK_TAB ) then
         Orig_ArmoryInventoryMoneyFrame_OnEnter(...);
     end
 end
@@ -227,7 +237,7 @@ end
 
 local Orig_ArmoryInventoryFrameButton_OnClick = ArmoryInventoryFrameButton_OnClick;
 function ArmoryInventoryFrameButton_OnClick(self, ...)
-    if ( ArmoryPanelTemplates_GetSelectedTab(ArmoryInventoryFrame) == 4 ) then
+    if ( ArmoryPanelTemplates_GetSelectedTab(ArmoryInventoryFrame) == GUILDBANK_TAB ) then
         local tab = self:GetID();
         if ( tab > 0 ) then
             AGB:SetTabLineState(ArmoryInventoryGuildBankFrame, tab, not self.isCollapsed);

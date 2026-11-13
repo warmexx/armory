@@ -56,9 +56,14 @@
           <Anchor point="TOPLEFT" relativeKey="$parent.PVP" relativePoint="BOTTOMLEFT" y="-8"/>
         </Anchors>
       </CheckButton>
-      <CheckButton parentKey="Raid" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsRaidModuleMixin">
+      <CheckButton parentKey="Skills" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsSkillsModuleMixin">
         <Anchors>
           <Anchor point="TOPLEFT" relativeKey="$parent.Reputation" relativePoint="BOTTOMLEFT" y="-8"/>
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="Raid" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsRaidModuleMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.Skills" relativePoint="BOTTOMLEFT" y="-8"/>
         </Anchors>
       </CheckButton>
       <CheckButton parentKey="Currency" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsCurrencyModuleMixin">

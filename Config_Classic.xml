@@ -4,7 +4,7 @@
   <Include file="Config\ArmoryOptionsPanelTemplates.xml"/>
   <Include file="Config\ArmoryOptionsPanel.xml"/>
   <Include file="Config\ArmoryOptionsMinimapPanel.xml"/>
-  <Include file="Config\Classic\ArmoryOptionsModulePanel.xml"/>
+  <Include file="Config\ArmoryOptionsModulePanel.xml"/>
   <Include file="Config\ArmoryOptionsSharePanel.xml"/>
   <Include file="Config\Classic\ArmoryOptionsTooltipPanel.xml"/>
   <Include file="Config\ArmoryOptionsFindPanel.xml"/>

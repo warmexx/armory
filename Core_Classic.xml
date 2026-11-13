@@ -17,6 +17,6 @@
   <Script file="Core\Classic\ArmoryTalents.lua"/>
   <Script file="Core\Classic\ArmoryTradeSkills.lua"/>
   <Script file="Core\ArmoryFriends.lua"/>
-  <Script file="Core\Classic\ArmoryBuffs.lua"/>
+  <Script file="Core\ArmoryBuffs.lua"/>
   <Script file="Core\Classic\ArmorySummary.lua"/>
 </Ui>

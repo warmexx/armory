@@ -80,7 +80,8 @@ end
 function ArmoryItemFilter_InitQuality()
     table.insert(Armory.itemFilter.options, { text = QUALITY, header = true });
 
-    for i = 0, #ITEM_QUALITY_COLORS - 2  do
+    -- Classic shows Poor up to Epic, Mainline up to Artifact
+    for i = 0, #ITEM_QUALITY_COLORS - (Armory.isClassic and 4 or 2) do
         table.insert(Armory.itemFilter.options,
             { text = _G["ITEM_QUALITY"..i.."_DESC"],
               type = "quality",
@@ -92,18 +93,19 @@ function ArmoryItemFilter_InitQuality()
     end
 end
 
+-- the third field marks classes that only Mainline shows
 local auctionItemClasses = {
     { AUCTION_CATEGORY_WEAPONS, Enum.ItemClass.Weapon },
     { AUCTION_CATEGORY_ARMOR, Enum.ItemClass.Armor },
     { AUCTION_CATEGORY_CONTAINERS, Enum.ItemClass.Container },
-    { AUCTION_CATEGORY_GEMS, Enum.ItemClass.Gem },
-    { AUCTION_CATEGORY_ITEM_ENHANCEMENT, Enum.ItemClass.ItemEnhancement },
+    { AUCTION_CATEGORY_GEMS, Enum.ItemClass.Gem, true },
+    { AUCTION_CATEGORY_ITEM_ENHANCEMENT, Enum.ItemClass.ItemEnhancement, true },
     { AUCTION_CATEGORY_CONSUMABLES, Enum.ItemClass.Consumable },
-    { AUCTION_CATEGORY_GLYPHS, Enum.ItemClass.Glyph },
+    { AUCTION_CATEGORY_GLYPHS, Enum.ItemClass.Glyph, true },
     { AUCTION_CATEGORY_TRADE_GOODS, Enum.ItemClass.Tradegoods },
     { AUCTION_CATEGORY_RECIPES, Enum.ItemClass.Recipe },
-    { AUCTION_CATEGORY_HOUSING, Enum.ItemClass.Housing },
-    { AUCTION_CATEGORY_BATTLE_PETS, Enum.ItemClass.Battlepet },
+    { AUCTION_CATEGORY_HOUSING, Enum.ItemClass.Housing, true },
+    { AUCTION_CATEGORY_BATTLE_PETS, Enum.ItemClass.Battlepet, true },
     { AUCTION_CATEGORY_QUEST_ITEMS,  Enum.ItemClass.Questitem },
     { AUCTION_CATEGORY_MISCELLANEOUS, Enum.ItemClass.Miscellaneous }
 }
@@ -112,13 +114,15 @@ function ArmoryItemFilter_InitClasses()
     table.insert(Armory.itemFilter.options, { text = TYPE, header = true });
 
     for i, itemClass in ipairs(auctionItemClasses) do
-        table.insert(Armory.itemFilter.options,
-            { text = itemClass[1],
-              type = "classes",
-              func = ArmoryItemFilter_Set,
-              value = itemClass[2],
-            }
-        );
+        if ( not (itemClass[3] and Armory.isClassic) ) then
+            table.insert(Armory.itemFilter.options,
+                { text = itemClass[1],
+                  type = "classes",
+                  func = ArmoryItemFilter_Set,
+                  value = itemClass[2],
+                }
+            );
+        end
     end
 end
 

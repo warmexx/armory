@@ -33,6 +33,9 @@ ARMORY_INVENTORY_HEIGHT = 16;
 
 local format = format;
 
+-- the first bag of the bank: a bank tab in Mainline, the bag after the bag slots in Classic
+local FIRST_BANK_BAG = Armory.isClassic and NUM_BAG_SLOTS + 1 or Enum.BagIndex.CharacterBankTab_1;
+
 function ArmoryInventoryListViewFrame_OnShow(self)
     FauxScrollFrame_SetOffset(ArmoryInventoryListViewScrollFrame, 0);
     ArmoryInventoryListViewScrollFrameScrollBar:SetMinMaxValues(0, 0);
@@ -103,8 +106,8 @@ function ArmoryInventoryListViewFrame_Update()
                 lineButton.isCollapsed = Armory:GetInventoryLineState(lineIndex, unit);
                 if ( numFreeSlots and id > ARMORY_MAIL_CONTAINER ) then
                     local prefix = "";
-                    if ( id >= Enum.BagIndex.CharacterBankTab_1 ) then
-                        prefix = ARMORY_BANK_CONTAINER_NAME.." #"..(id - Enum.BagIndex.CharacterBankTab_1 + 1).." - ";
+                    if ( id >= FIRST_BANK_BAG ) then
+                        prefix = ARMORY_BANK_CONTAINER_NAME.." #"..(id - FIRST_BANK_BAG + 1).." - ";
                     elseif ( id > 0 ) then
                         prefix = "#"..id.." - ";
                     end

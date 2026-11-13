@@ -53,6 +53,15 @@ function ArmoryOptionsModuleTemplateMixin:GetDefaultValue()
     return true;
 end
 
+-- For modules that only one family has
+local function IsClassic()
+    return Armory.isClassic;
+end
+
+local function IsMainline()
+    return not Armory.isClassic;
+end
+
 
 ArmoryOptionsInventoryModuleMixin = CreateFromMixins(ArmoryOptionsModuleTemplateMixin);
 
@@ -362,6 +371,39 @@ function ArmoryOptionsReputationModuleMixin:OnCommit()
 end
 
 
+ArmoryOptionsSkillsModuleMixin = CreateFromMixins(ArmoryOptionsModuleTemplateMixin);
+
+ArmoryOptionsSkillsModuleMixin.IsAvailable = IsClassic;
+
+function ArmoryOptionsSkillsModuleMixin:GetValue()
+    return Armory:SkillsEnabled();
+end
+
+function ArmoryOptionsSkillsModuleMixin:SetValue(value)
+    ArmoryOptionsModuleTemplateMixin.SetValue(self, value);
+    Armory:SkillsEnabled(value);
+end
+
+function ArmoryOptionsSkillsModuleMixin:OnLoad()
+    ArmoryOptionsCheckButtonTemplateMixin.OnLoad(self);
+    self:SetLabel(SKILLS);
+end
+
+function ArmoryOptionsSkillsModuleMixin:OnCommit()
+    if ( not self:IsDirty() ) then
+        return;
+    end
+
+    if ( self:GetValue() ) then
+        Armory:SetSkills();
+    else
+        Armory:ClearSkills();
+    end
+
+    Armory:Close();
+end
+
+
 ArmoryOptionsRaidModuleMixin = CreateFromMixins(ArmoryOptionsModuleTemplateMixin);
 
 function ArmoryOptionsRaidModuleMixin:GetValue()
@@ -397,6 +439,8 @@ end
 
 
 ArmoryOptionsCurrencyModuleMixin = CreateFromMixins(ArmoryOptionsModuleTemplateMixin);
+
+ArmoryOptionsCurrencyModuleMixin.IsAvailable = IsMainline;
 
 function ArmoryOptionsCurrencyModuleMixin:GetValue()
     return Armory:CurrencyEnabled();
@@ -463,6 +507,8 @@ end
 
 ArmoryOptionsAchievementsModuleMixin = CreateFromMixins(ArmoryOptionsModuleTemplateMixin);
 
+ArmoryOptionsAchievementsModuleMixin.IsAvailable = IsMainline;
+
 function ArmoryOptionsAchievementsModuleMixin:GetValue()
     return Armory:HasAchievements();
 end
@@ -494,6 +540,8 @@ end
 
 
 ArmoryOptionsStatisticsModuleMixin = CreateFromMixins(ArmoryOptionsModuleTemplateMixin);
+
+ArmoryOptionsStatisticsModuleMixin.IsAvailable = IsMainline;
 
 function ArmoryOptionsStatisticsModuleMixin:GetValue()
     return Armory:HasStatistics();
@@ -528,6 +576,8 @@ end
 
 
 ArmoryOptionsArtifactsModuleMixin = CreateFromMixins(ArmoryOptionsModuleTemplateMixin);
+
+ArmoryOptionsArtifactsModuleMixin.IsAvailable = IsMainline;
 
 function ArmoryOptionsArtifactsModuleMixin:GetValue()
     return Armory:ArtifactsEnabled();
