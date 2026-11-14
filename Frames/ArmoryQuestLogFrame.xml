@@ -70,11 +70,12 @@
   <Button name="ArmoryQuestInfoRewardSpellCodeTemplate" virtual="true">
     <Scripts>
       <OnEnter>
-        Armory:SetQuestLogRewardSpell();
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+        Armory:SetQuestLogRewardSpell(self.rewardSpellIndex);
       </OnEnter>
       <OnClick>
         if ( IsModifiedClick("CHATLINK") ) then
-          ChatFrameUtil.InsertLink(Armory:GetQuestLogSpellLink());
+          ChatFrameUtil.InsertLink(Armory:GetQuestLogSpellLink(self.rewardSpellIndex));
         end
       </OnClick>
       <OnLeave>
@@ -140,7 +141,7 @@
         </Anchors>
         <Layers>
           <Layer level="BACKGROUND">
-            <Texture atlas="QuestLogBackground" useAtlasSize="false">
+            <Texture parentKey="Bg" atlas="QuestLogBackground" useAtlasSize="false">
               <Anchors>
                 <Anchor point="TOPLEFT" relativeKey="$parent.$parent.bottomInset" x="0" y="0"/>
                 <Anchor point="BOTTOMRIGHT" relativeKey="$parent.$parent.bottomInset" x="-54" y="26"/>
@@ -165,6 +166,12 @@
             <FontString name="ArmoryQuestLogQuestCount" inherits="GameFontNormalSmall">
               <Anchors>
                 <Anchor point="TOPLEFT" />
+              </Anchors>
+            </FontString>
+            <!-- TBC -->
+            <FontString name="ArmoryQuestLogDailyQuestCount" inherits="GameFontNormalSmall" hidden="true">
+              <Anchors>
+                <Anchor point="TOPLEFT" x="123" y="0"/>
               </Anchors>
             </FontString>
           </Layer>
@@ -372,7 +379,8 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            ArmorySmallMoneyFrame_OnLoad(self);
+            self.small = 1;
+            ArmoryMoneyFrame_SetType(self, "STATIC");
           </OnLoad>
         </Scripts>
       </Frame>
@@ -409,6 +417,11 @@
         <Anchors>
           <Anchor point="LEFT" relativeKey="$parent.ItemReceiveText" relativePoint="RIGHT" x="15" y="0"/>
         </Anchors>
+        <Scripts>
+          <OnLoad>
+            ArmoryMoneyFrame_SetType(self, "STATIC");
+          </OnLoad>
+        </Scripts>
       </Frame>
       <Button parentKey="SkillPointFrame" name="ArmoryQuestInfoSkillPointFrame" inherits="ArmoryLargeItemButtonTemplate">
         <Layers>
@@ -485,7 +498,6 @@
           <OnLeave function="GameTooltip_Hide" />
         </Scripts>
       </Button>
-      <Button parentKey="WarModeBonusFrame" inherits="ArmoryLargeItemButtonTemplate, WarModeBonusFrameTemplate" hidden="true"/>
       <Frame parentKey="TitleFrame" name="ArmoryQuestInfoPlayerTitleFrame">
         <Size x="500" y="39"/>
         <Layers>
@@ -535,7 +547,12 @@
         self.spellRewardPool = CreateFramePool("BUTTON", self, "QuestSpellTemplate, ArmoryQuestInfoRewardSpellCodeTemplate");
         self.followerRewardPool = CreateFramePool("BUTTON", self, "LargeQuestInfoRewardFollowerTemplate");
         self.spellHeaderPool = CreateFontStringPool(self, "BACKGROUND", 0, "QuestInfoSpellHeaderTemplate");
-        self.reputationRewardPool = CreateFramePool("BUTTON", self, "LargeQuestInfoRewardReputationTemplate");
+        -- Classic has no major factions and no war mode
+        if ( not Armory.isClassic ) then
+          self.reputationRewardPool = CreateFramePool("BUTTON", self, "LargeQuestInfoRewardReputationTemplate");
+          self.WarModeBonusFrame = CreateFrame("Button", nil, self, "ArmoryLargeItemButtonTemplate, WarModeBonusFrameTemplate");
+          self.WarModeBonusFrame:Hide();
+        end
       </OnLoad>
     </Scripts>
   </Frame>

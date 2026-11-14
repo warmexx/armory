@@ -313,10 +313,6 @@ function Armory:IsCharacterBankSlot(index)
     end
 end
 
-function Armory:IsCharacterNewlyBoosted()
-    return self:SetGetCharacterValue("IsNewlyBoosted", _G.IsCharacterNewlyBoosted());
-end
-
 function Armory:IsFalling(unit)
     if ( self:IsPlayerSelected() ) then
         return _G.IsFalling(unit);

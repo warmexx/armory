@@ -364,6 +364,10 @@ function Armory:HasPetUI()
     end
 end
 
+function Armory:IsCharacterNewlyBoosted()
+    return self:SetGetCharacterValue("IsNewlyBoosted", _G.IsCharacterNewlyBoosted());
+end
+
 function Armory:IsResting()
    return self:SetGetCharacterValue("IsResting", _G.IsResting());
 end
@@ -503,8 +507,8 @@ function Armory:SetQuestLogItem(itemType, id)
     end
 end
 
-function Armory:SetQuestLogRewardSpell()
-    local link = self:GetQuestLogSpellLink();
+function Armory:SetQuestLogRewardSpell(id)
+    local link = self:GetQuestLogSpellLink(id);
     if ( link ) then
         self:SetHyperlink(GameTooltip, link);
     end

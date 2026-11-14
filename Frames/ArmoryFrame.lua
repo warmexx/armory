@@ -33,7 +33,7 @@ local MAX_LINE_TABS = 10;
 ARMORYFRAME_SUBFRAMES = { "ArmoryPaperDollFrame", "ArmoryPetFrame", "ArmoryTalentFrame", "ArmoryPVPFrame", "ArmoryOtherFrame" };
 if ( Armory.isClassic ) then
     ARMORYFRAME_MAINFRAMES = { "ArmoryFrame", "ArmoryLookupFrame", "ArmoryFindFrame" };
-    ARMORYFRAME_CHILDFRAMES = { "ArmoryTradeSkillFrame", "ArmoryInventoryFrame", "ArmoryQuestLogFrame", "ArmorySpellBookFrame", "ArmorySocialFrame" };
+    ARMORYFRAME_CHILDFRAMES = { "ArmoryTradeSkillFrame", "ArmoryInventoryFrame", "ArmoryQuestFrame", "ArmorySpellBookFrame", "ArmorySocialFrame" };
 else
     ARMORYFRAME_MAINFRAMES = { "ArmoryFrame", "ArmoryLookupFrame", "ArmoryFindFrame", "ArmoryArtifactFrame" };
     ARMORYFRAME_CHILDFRAMES = { "ArmoryTradeSkillFrame", "ArmoryInventoryFrame", "ArmoryQuestFrame", "ArmorySpellBookFrame", "ArmoryAchievementFrame", "ArmorySocialFrame" };
@@ -41,7 +41,6 @@ end
 
 ARMORYFRAME_SUBFRAME = "ArmoryPaperDollFrame";
 
-local QUEST_FRAME = Armory.isClassic and "ArmoryQuestLogFrame" or "ArmoryQuestFrame";
 local SPELLBOOK_PLAYER = Armory.isClassic and BOOKTYPE_SPELL or Enum.SpellBookSpellBank.Player;
 -- Classic has no artifact relics
 local ARTIFACT_RELIC = Enum.ItemGemSubclass.Artifactrelic or false;
@@ -543,7 +542,7 @@ function ArmoryFrame_UpdateLineTabs()
 
     if ( Armory:HasQuestLog() ) then
         ArmoryFrame_SetLineTab(tabId, "Quests", QUESTLOG_BUTTON, "Interface\\Icons\\INV_Misc_Book_08");
-        _G[QUEST_FRAME].enabled = true;
+        ArmoryQuestFrame.enabled = true;
         tabId = tabId + 1;
     end
 
@@ -615,7 +614,7 @@ function ArmoryFrameLineTab_OnClick(self)
     if ( self.tabType == "Inventory" ) then
         ArmoryInventoryFrame_Toggle();
     elseif ( self.tabType == "Quests" ) then
-        _G[QUEST_FRAME.."_Toggle"]();
+        ArmoryQuestFrame_Toggle();
     elseif ( self.tabType == "SpellBook" ) then
         ArmoryToggleSpellBook(SPELLBOOK_PLAYER);
     elseif ( self.tabType == "Social" ) then

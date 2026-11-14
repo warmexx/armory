@@ -39,7 +39,7 @@
     ArmoryFrame_OpenSideFrame(ArmoryInventoryFrame);
   </Binding>
   <Binding name="ARMORY_QUEST" category="ADDONS">
-    ArmoryFrame_OpenSideFrame(Armory.isClassic and ArmoryQuestLogFrame or ArmoryQuestFrame);
+    ArmoryFrame_OpenSideFrame(ArmoryQuestFrame);
   </Binding>
   <Binding name="ARMORY_SPELLBOOK" category="ADDONS">
     ArmoryFrame_OpenSideFrame(ArmorySpellBookFrame);

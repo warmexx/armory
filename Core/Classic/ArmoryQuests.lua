@@ -388,14 +388,6 @@ function Armory:GetQuestLogRewardMoney()
     return GetQuestLineValue(selectedQuestLine, "RewardMoney") or 0;
 end
 
-function Armory:GetQuestLogRewardHonor()
-    return GetQuestLineValue(selectedQuestLine, "RewardHonor") or 0;
-end
-
-function Armory:GetQuestLogRewardTitle()
-    return GetQuestLineValue(selectedQuestLine, "RewardTitle");
-end
-
 function Armory:GetNumQuestLogRewardSpells()
     local spells = GetQuestLineValue(selectedQuestLine, "RewardSpells");
     if ( spells ) then
@@ -408,13 +400,37 @@ function Armory:GetQuestLogRewardSpell(id)
     return GetQuestLineValue(selectedQuestLine, "RewardSpells", id);
 end
 
+function Armory:GetQuestLogRewardXP()
+    return GetQuestLineValue(selectedQuestLine, "RewardXP") or 0;
+end
+
+function Armory:GetQuestLogRewardArtifactXP()
+    return GetQuestLineValue(selectedQuestLine, "RewardArtifactXP") or 0;
+end
+
+function Armory:GetQuestLogRewardHonor()
+    return GetQuestLineValue(selectedQuestLine, "RewardHonor") or 0;
+end
+
+function Armory:GetQuestLogRewardSkillPoints()
+    return GetQuestLineValue(selectedQuestLine, "RewardSkillPoints");
+end
+
+function Armory:GetQuestLogRewardTitle()
+    return GetQuestLineValue(selectedQuestLine, "RewardTitle");
+end
+
 function Armory:GetQuestLogSpellLink(id)
     local link = select(12, self:GetQuestLogRewardSpell(id));
     return link;
 end
 
 function Armory:GetQuestLogGroupNum()
-    return GetQuestLineValue(selectedQuestLine, "GroupNum");
+    return GetQuestLineValue(selectedQuestLine, "GroupNum") or 0;
+end
+
+function Armory:GetQuestLogCriteriaSpell()
+    return GetQuestLineValue(selectedQuestLine, "CriteriaSpell");
 end
 
 function Armory:GetNumQuestLeaderBoards()
@@ -451,6 +467,18 @@ end
 
 function Armory:GetQuestLogChoiceInfo(id)
     return GetQuestLineValue(selectedQuestLine, "Choices", id);
+end
+
+function Armory:GetNumQuestLogRewardCurrencies()
+    local currencies = GetQuestLineValue(selectedQuestLine, "Currencies");
+    if ( currencies ) then
+        return #currencies;
+    end
+    return 0;
+end
+
+function Armory:GetQuestLogRewardCurrencyInfo(id)
+    return GetQuestLineValue(selectedQuestLine, "Currencies", id);
 end
 
 function Armory:GetQuestLogItemLink(itemType, id)

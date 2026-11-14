@@ -22,6 +22,7 @@
   <CheckButton name="ArmoryUICheckButtonTemplate" inherits="UICheckButtonTemplate" virtual="true"/>
   <ScrollFrame name="ArmoryUIPanelScrollFrameTemplate" inherits="UIPanelScrollFrameTemplate" virtual="true"/>
   <ScrollFrame name="ArmoryFauxScrollFrameTemplate" inherits="FauxScrollFrameTemplate" virtual="true"/>
+  <Frame name="ArmoryMoneyFrameTemplate" inherits="MoneyFrameTemplate" virtual="true"/>
   <!-- The same for the functions of those templates that shared Lua and XML call -->
   <Script>
     ArmorySearchBoxTemplate_OnTextChanged = SearchBoxTemplate_OnTextChanged;

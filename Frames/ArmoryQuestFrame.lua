@@ -30,10 +30,10 @@ local Armory, _ = Armory, nil;
 
 function ArmoryQuestFrame_Toggle()
     if ( ArmoryQuestFrame:IsShown() ) then
-        ArmoryQuestFrame:Hide();
+        Armory:HideFrame(ArmoryQuestFrame);
     else
         ArmoryCloseChildWindows();
-        ArmoryQuestFrame:Show();
+        Armory:ShowFrame(ArmoryQuestFrame);
     end
 end
 
@@ -69,7 +69,13 @@ function ArmoryQuestFrameCollapseAllButton_Update(allCollapsed)
 end
 
 function ArmoryQuestFrame_OnLoad(self)
-    self:SetPortraitToAsset("Interface\\QuestFrame\\UI-QuestLog-BookIcon");
+    if ( Armory.isClassic ) then
+        -- Blizzard's frame template in Classic has a button bar
+        ButtonFrameTemplate_HideButtonBar(self);
+        Armory:SetPortraitToTexture(ArmoryQuestFramePortrait, "Interface\\QuestFrame\\UI-QuestLog-BookIcon");
+    else
+        self:SetPortraitToAsset("Interface\\QuestFrame\\UI-QuestLog-BookIcon");
+    end
     self:SetTitle(QUEST_LOG);
 
     -- Tab Handling code
@@ -81,7 +87,8 @@ end
 function ArmoryQuestFrame_OnShow(self)
     PlaySound(SOUNDKIT.IG_QUEST_LOG_OPEN);
     ArmoryQuestFrameEditBox:SetText(Armory:GetQuestLogFilter());
-    if ( Armory:GetNumQuestHistoryEntries() == 0 ) then
+    -- Classic has no quest history
+    if ( Armory.isClassic or Armory:GetNumQuestHistoryEntries() == 0 ) then
         ArmoryQuestFrameTab_OnClick(ArmoryQuestFrameTab1);
         ArmoryQuestFrameTab1:Hide();
         ArmoryQuestFrameTab2:Hide();
@@ -109,7 +116,9 @@ function ArmoryQuestFrameEditBox_OnTextChanged(self)
     refresh = Armory:SetQuestLogFilter(text);
     if ( refresh ) then
         Armory:ExpandQuestHeader(0);
-        Armory:ExpandQuestHistoryHeader(0);
+        if ( not Armory.isClassic ) then
+            Armory:ExpandQuestHistoryHeader(0);
+        end
         Armory:SelectQuestLogEntry(0);
         ArmoryQuest_Update();
     end
@@ -132,7 +141,9 @@ function ArmoryQuestFrame_SelectSource(id)
     if ( id == 1 ) then
         ArmoryQuestFrame.selected = "current";
         ArmoryQuestLogFrame:Show();
-        ArmoryQuestHistoryFrame:Hide();
+        if ( ArmoryQuestHistoryFrame ) then
+            ArmoryQuestHistoryFrame:Hide();
+        end
     else
         ArmoryQuestFrame.selected = "history";
         ArmoryQuestLogFrame:Hide();

@@ -15,7 +15,8 @@
   <Include file="Frames\ArmoryInventoryFrame.xml"/>
   <Include file="Frames\ArmoryInventoryIconViewFrame.xml"/>
   <Include file="Frames\ArmoryInventoryListViewFrame.xml"/>
-  <Include file="Frames\TBC\ArmoryQuestLogFrame.xml"/>
+  <Include file="Frames\ArmoryQuestFrame.xml"/>
+  <Include file="Frames\ArmoryQuestLogFrame.xml"/>
   <Include file="Frames\Classic\ArmorySpellBookFrame.xml"/>
   <Include file="Frames\ArmorySocialFrame.xml"/>
   <Include file="Tools\ArmoryAddonMessageFrame.xml"/>

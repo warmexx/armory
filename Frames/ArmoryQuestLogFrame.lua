@@ -41,6 +41,26 @@ local select = select;
 local unpack = unpack;
 local type = type;
 
+-- Per family, chosen once
+local MoneyFrame_Update = Armory.isClassic and MoneyFrame_Update or ArmoryMoneyFrame_Update;
+local GetQuestDetailsTheme, QuestHasWarModeBonus, GetMajorFactionReputationRewards, QuestHasQuestSessionBonus, SetQuestLegendToFontString;
+local OBJECTIVE_FINISHED_COLOR; -- Mainline: QUEST_OBJECTIVE_DISABLED_FONT_COLOR
+if ( Armory.isClassic ) then
+    local function None() end
+    OBJECTIVE_FINISHED_COLOR = CreateColor(0.2, 0.2, 0.2);
+    GetQuestDetailsTheme = None;
+    QuestHasWarModeBonus = None;
+    GetMajorFactionReputationRewards = None;
+    QuestHasQuestSessionBonus = None;
+    SetQuestLegendToFontString = None;
+else
+    GetQuestDetailsTheme = C_QuestLog.GetQuestDetailsTheme;
+    QuestHasWarModeBonus = C_QuestLog.QuestHasWarModeBonus;
+    GetMajorFactionReputationRewards = C_QuestLog.GetQuestLogMajorFactionReputationRewards;
+    QuestHasQuestSessionBonus = C_QuestLog.QuestHasQuestSessionBonus;
+    SetQuestLegendToFontString = QuestUtil.SetQuestLegendToFontString;
+end
+
 function ArmoryQuestLogTitleButton_OnClick(self, button)
     local questName = self:GetText();
     local questIndex = self:GetID() + FauxScrollFrame_GetOffset(ArmoryQuestLogListScrollFrame);
@@ -51,7 +71,13 @@ function ArmoryQuestLogTitleButton_OnClick(self, button)
         end
         -- Otherwise put it into chat
         if ( IsModifiedClick("CHATLINK") and ChatFrameUtil.GetActiveWindow() ) then
-            local questLink = Armory:GetQuestLink(questIndex);
+            local questLink;
+            if ( Armory.isClassic ) then
+                -- Classic has no quest links: the title without the leading spaces, as Blizzard does
+                questLink = gsub(self:GetText(), " *(.*)", "%1");
+            else
+                questLink = Armory:GetQuestLink(questIndex);
+            end
             if ( questLink ) then
                 ChatFrameUtil.InsertLink(questLink);
             end
@@ -73,10 +99,79 @@ function ArmoryQuestLogTitleButton_OnLeave(self)
     GameTooltip:Hide();
 end
 
+-- Classic has no atlas for the empty quest log: the empty book of Blizzard's Classic quest log, 320x384 in four files.
+-- The cobwebs go into the upper inset and the book into the lower one, each filling its own inset.
+local CLASSIC_EMPTY_BOOK_FILES = {
+    -- file, left, top, width and height in the image
+    { "TopLeft", 0, 0, 256, 256 },
+    { "TopRight", 256, 0, 64, 256 },
+    { "BotLeft", 0, 256, 256, 128 },
+    { "BotRight", 256, 256, 64, 128 },
+};
+local CLASSIC_EMPTY_BOOK_REGIONS = {
+    -- left, top, right and bottom in the image; the rest of the image is transparent
+    { 0, 0, 302, 95 },      -- cobwebs, upper inset
+    { 0, 101, 302, 362 },   -- book, lower inset
+};
+local CLASSIC_EMPTY_BOOK_EDGE = 3;  -- inside the border of the insets
+
+-- In the empty frame itself, below the text: one texture per part of a file in a region
+local function CreateClassicEmptyBook(emptyFrame)
+    emptyFrame.Bg:Hide();
+    emptyFrame.book = {};
+    for regionIndex, region in ipairs(CLASSIC_EMPTY_BOOK_REGIONS) do
+        for _, file in ipairs(CLASSIC_EMPTY_BOOK_FILES) do
+            local left, top = max(region[1], file[2]), max(region[2], file[3]);
+            local right, bottom = min(region[3], file[2] + file[4]), min(region[4], file[3] + file[5]);
+            if ( right > left and bottom > top ) then
+                local texture = emptyFrame:CreateTexture(nil, "BACKGROUND", nil, -1);
+                texture:SetTexture("Interface\\QuestFrame\\UI-QuestLog-Empty-"..file[1]);
+                texture:SetTexCoord((left - file[2]) / file[4], (right - file[2]) / file[4], (top - file[3]) / file[5], (bottom - file[3]) / file[5]);
+                texture.region = regionIndex;
+                texture.left, texture.top, texture.width, texture.height = left - region[1], top - region[2], right - left, bottom - top;
+                tinsert(emptyFrame.book, texture);
+            end
+        end
+    end
+end
+
+local function LayoutClassicEmptyBook()
+    local insets = { ArmoryQuestFrame.Inset, ArmoryQuestFrame.bottomInset };
+    for _, texture in ipairs(ArmoryEmptyQuestLogFrame.book) do
+        local inset = insets[texture.region];
+        local region = CLASSIC_EMPTY_BOOK_REGIONS[texture.region];
+        local xScale = (inset:GetWidth() - 2 * CLASSIC_EMPTY_BOOK_EDGE) / (region[3] - region[1]);
+        local yScale = (inset:GetHeight() - 2 * CLASSIC_EMPTY_BOOK_EDGE) / (region[4] - region[2]);
+        texture:ClearAllPoints();
+        texture:SetPoint("TOPLEFT", inset, "TOPLEFT", CLASSIC_EMPTY_BOOK_EDGE + texture.left * xScale, -(CLASSIC_EMPTY_BOOK_EDGE + texture.top * yScale));
+        texture:SetSize(texture.width * xScale, texture.height * yScale);
+    end
+    ArmoryQuestLogNoQuestsText:ClearAllPoints();
+    ArmoryQuestLogNoQuestsText:SetPoint("CENTER", insets[1]);
+end
+
+-- Without the button bar the lower inset runs further down in Classic than the details:
+-- it ends just below them, as in Retail, with the quest count below it
+local CLASSIC_DETAIL_BOTTOM = 4;
+local function LayoutClassicDetails()
+    local frame = ArmoryQuestFrame;
+    local bottom, frameBottom = ArmoryQuestLogDetailScrollFrame:GetBottom(), frame:GetBottom();
+    if ( bottom and frameBottom ) then
+        frame.bottomInset:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -6, bottom - CLASSIC_DETAIL_BOTTOM - frameBottom);
+    end
+end
+
 function ArmoryQuestLogFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("QUEST_LOG_UPDATE");
     self:RegisterEvent("UNIT_QUEST_LOG_CHANGED");
+    if ( Armory.isClassic ) then
+        self:RegisterEvent("UPDATE_FACTION");
+        CreateClassicEmptyBook(ArmoryEmptyQuestLogFrame);
+        -- below the lower inset, which runs further down in Classic
+        ArmoryQuestLogCount:ClearAllPoints();
+        ArmoryQuestLogCount:SetPoint("TOPLEFT", ArmoryQuestFrame.bottomInset, "BOTTOMLEFT", 11, -4);
+    end
 end
 
 function ArmoryQuestLogFrame_OnEvent(self, event, ...)
@@ -103,9 +198,21 @@ function ArmoryQuestLogFrame_UpdateQuests()
     end
 end
 
+local function SetClassicParchment(texture)
+    -- Classic has no parchment atlas; Blizzard uses this file, at its own size
+    texture:SetTexture("Interface\\QuestFrame\\QuestBG");
+    local width, height = texture:GetSize();
+    texture:SetTexCoord(0, min(width / 512, 1), 0, min(height / 512, 1));
+end
+
 function ArmoryQuestLogFrame_OnShow(self)
     self:GetParent().bottomInset:Show();
     self:GetParent().Inset:SetPoint("BOTTOMRIGHT", self:GetParent(), "TOPRIGHT", -6, -162);
+    if ( Armory.isClassic ) then
+        SetClassicParchment(self.Bg);
+        LayoutClassicDetails();
+        LayoutClassicEmptyBook();
+    end
 
     Armory:SelectQuestLogEntry(0);
     ArmoryQuestLog_SetSelection(Armory:GetQuestLogSelection());
@@ -134,6 +241,10 @@ function ArmoryQuestLog_Update()
         ArmoryQuestLogDetailScrollFrame:Show();
         ArmoryQuestFrameExpandButtonFrame:Show();
     end
+    if ( Armory.isClassic ) then
+        -- the parchment would show next to the empty book
+        ArmoryQuestLogFrame.Bg:SetShown(numQuests > 0);
+    end
 
     -- Update Quest Count
     ArmoryQuestLogUpdateQuestCount(numQuests);
@@ -145,6 +256,10 @@ function ArmoryQuestLog_Update()
     ArmoryQuestLogHighlightFrame:Hide();
 
     if ( numQuests == 0 ) then
+        -- the list may still show the quests of the previous character
+        for i = 1, QUESTS_DISPLAYED do
+            _G["ArmoryQuestLogTitle"..i]:Hide();
+        end
         return;
     end
 
@@ -193,7 +308,8 @@ function ArmoryQuestLog_Update()
             -- Save if its a header or not
             questLogTitle.isHeader = isHeader;
 
-            local questTag = ArmoryQuestLog_GetQuestTag(questID, questIndex, isComplete, frequency);
+            -- In Classic the third value is the quest tag
+            local questTag = ArmoryQuestLog_GetQuestTag(questID, questIndex, isComplete, frequency, suggestedGroup);
             if ( questTag ) then
                 questTitleTag:SetText("("..questTag..")");
                 -- Shrink text to accomdate quest tags without wrapping
@@ -248,29 +364,47 @@ function ArmoryQuestLog_Update()
     ArmoryQuestFrameCollapseAllButton_Update(notExpanded ~= numHeaders);
 end
 
-function ArmoryQuestLog_GetQuestTag(questID, questIndex, isComplete, frequency)
-    local tagInfo = Armory:GetQuestTagInfo(questIndex);
-    local questTagID = tagInfo and tagInfo.tagID;
-    local questTag = tagInfo and tagInfo.tagName;
-
-    if ( isComplete and isComplete < 0 ) then
-        questTag = FAILED;
-    elseif ( isComplete and isComplete > 0 ) then
-        questTag = COMPLETE;
-    elseif( questTagID and questTagID == Enum.QuestTag.Account ) then
-        local factionGroup = GetQuestFactionGroup(questID);
-        if( factionGroup ) then
-            questTag = FACTION_ALLIANCE;
-            if ( factionGroup == LE_QUEST_FACTION_HORDE ) then
-                questTag = FACTION_HORDE;
+if ( Armory.isClassic ) then
+    -- Classic stores the quest tag itself
+    function ArmoryQuestLog_GetQuestTag(questID, questIndex, isComplete, frequency, questTag)
+        if ( isComplete and isComplete < 0 ) then
+            questTag = FAILED;
+        elseif ( isComplete and isComplete > 0 ) then
+            questTag = COMPLETE;
+        elseif ( Armory.isTBC and frequency == LE_QUEST_FREQUENCY_DAILY ) then
+            if ( questTag ) then
+                questTag = format(DAILY_QUEST_TAG_TEMPLATE, questTag);
+            else
+                questTag = DAILY;
             end
         end
-    elseif( frequency == Enum.QuestFrequency.Daily and (not isComplete or isComplete == 0) ) then
-        questTag = DAILY;
-    elseif( frequency == Enum.QuestFrequency.Weekly and (not isComplete or isComplete == 0) )then
-        questTag = WEEKLY;
+        return questTag;
     end
-    return questTag;
+else
+    function ArmoryQuestLog_GetQuestTag(questID, questIndex, isComplete, frequency)
+        local tagInfo = Armory:GetQuestTagInfo(questIndex);
+        local questTagID = tagInfo and tagInfo.tagID;
+        local questTag = tagInfo and tagInfo.tagName;
+
+        if ( isComplete and isComplete < 0 ) then
+            questTag = FAILED;
+        elseif ( isComplete and isComplete > 0 ) then
+            questTag = COMPLETE;
+        elseif( questTagID and questTagID == Enum.QuestTag.Account ) then
+            local factionGroup = GetQuestFactionGroup(questID);
+            if( factionGroup ) then
+                questTag = FACTION_ALLIANCE;
+                if ( factionGroup == LE_QUEST_FACTION_HORDE ) then
+                    questTag = FACTION_HORDE;
+                end
+            end
+        elseif( frequency == Enum.QuestFrequency.Daily and (not isComplete or isComplete == 0) ) then
+            questTag = DAILY;
+        elseif( frequency == Enum.QuestFrequency.Weekly and (not isComplete or isComplete == 0) )then
+            questTag = WEEKLY;
+        end
+        return questTag;
+    end
 end
 
 function ArmoryQuestLog_SetSelection(questIndex)
@@ -324,11 +458,25 @@ function ArmoryQuestLog_UpdateQuestDetails(resetScrollBar)
     ArmoryQuestLogDetailScrollFrame:Show();
 end
 
-function ArmoryQuestLogUpdateQuestCount(numQuests)
-    if (numQuests > MAX_QUESTLOG_QUESTS) then
-        ArmoryQuestLogQuestCount:SetFormattedText(QUEST_LOG_COUNT_TEMPLATE, RED_FONT_COLOR_CODE, numQuests, MAX_QUESTLOG_QUESTS);
-    else
-        ArmoryQuestLogQuestCount:SetFormattedText(QUEST_LOG_COUNT_TEMPLATE, "|cffffffff", numQuests, MAX_QUESTLOG_QUESTS);
+if ( Armory.isClassic ) then
+    -- Classic's template has no color, and TBC counts the dailies
+    function ArmoryQuestLogUpdateQuestCount(numQuests)
+        ArmoryQuestLogQuestCount:SetFormattedText(QUEST_LOG_COUNT_TEMPLATE, numQuests, MAX_QUESTLOG_QUESTS);
+        local dailyQuestsComplete = Armory.isTBC and Armory:GetDailyQuestsCompleted() or 0;
+        if ( dailyQuestsComplete > 0 ) then
+            ArmoryQuestLogDailyQuestCount:SetFormattedText(QUEST_LOG_DAILY_COUNT_TEMPLATE, dailyQuestsComplete, Armory:GetMaxDailyQuests());
+            ArmoryQuestLogDailyQuestCount:Show();
+        else
+            ArmoryQuestLogDailyQuestCount:Hide();
+        end
+    end
+else
+    function ArmoryQuestLogUpdateQuestCount(numQuests)
+        if (numQuests > MAX_QUESTLOG_QUESTS) then
+            ArmoryQuestLogQuestCount:SetFormattedText(QUEST_LOG_COUNT_TEMPLATE, RED_FONT_COLOR_CODE, numQuests, MAX_QUESTLOG_QUESTS);
+        else
+            ArmoryQuestLogQuestCount:SetFormattedText(QUEST_LOG_COUNT_TEMPLATE, "|cffffffff", numQuests, MAX_QUESTLOG_QUESTS);
+        end
     end
 end
 
@@ -357,7 +505,7 @@ function ArmoryQuestInfo_Display(template, parentFrame)
     local material = "Parchment";
 
     if ( questID ) then
-        ArmoryQuestInfoSealFrame.theme = C_QuestLog.GetQuestDetailsTheme(questID);
+        ArmoryQuestInfoSealFrame.theme = GetQuestDetailsTheme(questID);
     end
 
     if ( ArmoryQuestInfoFrame.material ~= material ) then
@@ -414,7 +562,7 @@ end
 
 function ArmoryQuestInfo_ShowType()
     local questID = select(8, Armory:GetQuestLogTitle(Armory:GetQuestLogSelection()));
-    local added = QuestUtil.SetQuestLegendToFontString(questID, ArmoryQuestInfoQuestType);
+    local added = SetQuestLegendToFontString(questID, ArmoryQuestInfoQuestType);
     ArmoryQuestInfoQuestType:SetShown(added);
 
     if ( added ) then
@@ -450,7 +598,7 @@ function ArmoryQuestInfo_ShowObjectives()
                 text = type;
             end
             if ( finished ) then
-                objective:SetTextColor(QUEST_OBJECTIVE_DISABLED_FONT_COLOR:GetRGB());
+                objective:SetTextColor((OBJECTIVE_FINISHED_COLOR or QUEST_OBJECTIVE_DISABLED_FONT_COLOR):GetRGB());
                 text = text.." ("..COMPLETE..")";
             else
                 objective:SetTextColor(0, 0, 0);
@@ -537,7 +685,7 @@ end
 function ArmoryQuestInfo_ShowRequiredMoney()
     local requiredMoney = Armory:GetQuestLogRequiredMoney();
     if ( requiredMoney > 0 ) then
-        ArmoryMoneyFrame_Update("ArmoryQuestInfoRequiredMoneyDisplay", requiredMoney);
+        MoneyFrame_Update("ArmoryQuestInfoRequiredMoneyDisplay", requiredMoney);
         if ( requiredMoney > Armory:GetMoney() ) then
             -- Not enough money
             ArmoryQuestInfoRequiredMoneyText:SetTextColor(0, 0, 0);
@@ -669,8 +817,8 @@ function ArmoryQuestInfo_ShowRewards()
     local honor = Armory:GetQuestLogRewardHonor();
     local playerTitle = Armory:GetQuestLogRewardTitle();
     local numSpellRewards = Armory:GetNumQuestLogRewardSpells();
-    local hasWarModeBonus = C_QuestLog.QuestHasWarModeBonus(questID);
-    local majorFactionRepRewards = C_QuestLog.GetQuestLogMajorFactionReputationRewards(questID);
+    local hasWarModeBonus = QuestHasWarModeBonus(questID);
+    local majorFactionRepRewards = GetMajorFactionReputationRewards(questID);
 
     for rewardSpellIndex = 1, numSpellRewards do
         local texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID, genericUnlock, spellID, knownSpell, isFollowerCollected = Armory:GetQuestLogRewardSpell(rewardSpellIndex);
@@ -795,8 +943,11 @@ function ArmoryQuestInfo_ShowRewards()
     rewardsFrame.spellRewardPool:ReleaseAll();
     rewardsFrame.followerRewardPool:ReleaseAll();
     rewardsFrame.spellHeaderPool:ReleaseAll();
-    rewardsFrame.reputationRewardPool:ReleaseAll();
-    rewardsFrame.WarModeBonusFrame:Hide();
+    -- Classic has no major factions and no war mode
+    if ( rewardsFrame.reputationRewardPool ) then
+        rewardsFrame.reputationRewardPool:ReleaseAll();
+        rewardsFrame.WarModeBonusFrame:Hide();
+    end
 
     -- Setup spell rewards
     if ( numQuestSpellRewards > 0 ) then
@@ -886,7 +1037,7 @@ function ArmoryQuestInfo_ShowRewards()
     end
 
     -- Setup mandatory rewards
-    local hasChanceForQuestSessionBonusReward = C_QuestLog.QuestHasQuestSessionBonus(questID);
+    local hasChanceForQuestSessionBonusReward = QuestHasQuestSessionBonus(questID);
     if ( numQuestRewards > 0 or numQuestCurrencies > 0 or money > 0 or xp > 0 or honor > 0 or majorFactionRepRewards or hasChanceForQuestSessionBonusReward ) then
         -- receive text, will either say "You will receive" or "You will also receive"
         local questItemReceiveText = rewardsFrame.ItemReceiveText;
@@ -899,7 +1050,7 @@ function ArmoryQuestInfo_ShowRewards()
 
         -- Money rewards
         if ( money > 0 ) then
-            ArmoryMoneyFrame_Update(rewardsFrame.MoneyFrame, money);
+            MoneyFrame_Update(rewardsFrame.MoneyFrame, money);
             rewardsFrame.MoneyFrame:Show();
         else
             rewardsFrame.MoneyFrame:Hide();
@@ -959,36 +1110,38 @@ function ArmoryQuestInfo_ShowRewards()
             rewardsCount = rewardsCount + 1;
         end
 
-        -- currency
-        baseIndex = rewardsCount;
-        local foundCurrencies = 0;
-        for i = 1, GetMaxRewardCurrencies(), 1 do
-            buttonIndex = buttonIndex + 1;
-            index = i + baseIndex;
-            questItem = QuestInfo_GetRewardButton(rewardsFrame, index);
-            questItem.type = "reward";
-            questItem.objectType = "currency";
-            local currencyID;
-            name, texture, numItems, currencyID, quality = Armory:GetQuestLogRewardCurrencyInfo(i);
-            if ( name and texture and numItems ) then
-                name, texture, numItems, quality = CurrencyContainerUtil.GetCurrencyContainerInfo(currencyID, numItems, name, texture, quality);
-                questItem.quality = quality;
-                questItem:SetID(i)
-                -- For the tooltip
-                questItem.Name:SetText(name);
-                SetItemButtonCount(questItem, numItems, true);
-                local currencyColor = GetColorForCurrencyReward(currencyID, numItems);
-                questItem.Count:SetTextColor(currencyColor:GetRGB());
-                SetItemButtonTexture(questItem, texture);
-                SetItemButtonTextureVertexColor(questItem, 1.0, 1.0, 1.0);
-                SetItemButtonNameFrameVertexColor(questItem, 1.0, 1.0, 1.0);
-                SetItemButtonQuality(questItem, quality, currencyID);
+        -- currency (none in Classic)
+        if ( numQuestCurrencies > 0 ) then
+            baseIndex = rewardsCount;
+            local foundCurrencies = 0;
+            for i = 1, GetMaxRewardCurrencies(), 1 do
+                buttonIndex = buttonIndex + 1;
+                index = i + baseIndex;
+                questItem = QuestInfo_GetRewardButton(rewardsFrame, index);
+                questItem.type = "reward";
+                questItem.objectType = "currency";
+                local currencyID;
+                name, texture, numItems, currencyID, quality = Armory:GetQuestLogRewardCurrencyInfo(i);
+                if ( name and texture and numItems ) then
+                    name, texture, numItems, quality = CurrencyContainerUtil.GetCurrencyContainerInfo(currencyID, numItems, name, texture, quality);
+                    questItem.quality = quality;
+                    questItem:SetID(i)
+                    -- For the tooltip
+                    questItem.Name:SetText(name);
+                    SetItemButtonCount(questItem, numItems, true);
+                    local currencyColor = GetColorForCurrencyReward(currencyID, numItems);
+                    questItem.Count:SetTextColor(currencyColor:GetRGB());
+                    SetItemButtonTexture(questItem, texture);
+                    SetItemButtonTextureVertexColor(questItem, 1.0, 1.0, 1.0);
+                    SetItemButtonNameFrameVertexColor(questItem, 1.0, 1.0, 1.0);
+                    SetItemButtonQuality(questItem, quality, currencyID);
 
-                AddRewardElement(questItem);
-                rewardsCount = rewardsCount + 1;
-                foundCurrencies = foundCurrencies + 1;
-                if ( foundCurrencies == numQuestCurrencies ) then
-                    break;
+                    AddRewardElement(questItem);
+                    rewardsCount = rewardsCount + 1;
+                    foundCurrencies = foundCurrencies + 1;
+                    if ( foundCurrencies == numQuestCurrencies ) then
+                        break;
+                    end
                 end
             end
         end
@@ -1011,7 +1164,11 @@ function ArmoryQuestInfo_ShowRewards()
         rewardsFrame.HonorFrame:ClearAllPoints();
         if ( honor > 0 ) then
             local icon;
-            if ( Armory:UnitFactionGroup("player") == PLAYER_FACTION_GROUP[PLAYER_FACTION_GROUP.Horde] ) then
+            local isHorde = Armory:UnitFactionGroup("player") == PLAYER_FACTION_GROUP[PLAYER_FACTION_GROUP.Horde];
+            if ( Armory.isClassic ) then
+                -- the icons of Blizzard's quest info in TBC
+                icon = isHorde and "Interface\\TargetingFrame\\UI-PVP-Horde" or "Interface\\TargetingFrame\\UI-PVP-Alliance";
+            elseif ( isHorde ) then
                 icon = "Interface\\Icons\\PVPCurrency-Honor-Horde";
             else
                 icon = "Interface\\Icons\\PVPCurrency-Honor-Alliance";
