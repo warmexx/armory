@@ -146,9 +146,21 @@ function Armory:HasPetSpells()
     end
 end
 
-function Armory:GetNumSpellTabs()
+function Armory:GetNumSpellTabs(bookType)
+    if ( bookType == BOOKTYPE_PET ) then
+        -- Classic's pet spellbook has no tabs
+        return 0;
+    end
     local dbEntry = self.selectedDbBaseEntry;
     return dbEntry and dbEntry:GetNumValues(container, "Tabs");
+end
+
+-- Asked by the shared spellbook frame. Classic stores no slot type, glyphs or level-link locks,
+-- and its spellbook only holds known spells.
+function Armory:GetSpellBookItemInfo(id, bookType)
+    if ( GetSpellBookInfo(id, bookType) ) then
+        return "SPELL";
+    end
 end
 
 function Armory:GetSpellAutocast(id, bookType)

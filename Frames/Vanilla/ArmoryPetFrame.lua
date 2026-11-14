@@ -131,7 +131,7 @@ function ArmoryPetFrame_InitPets()
 end
 
 function ArmoryPetFrame_Update(petChanged)
-    if ( (not Armory:PetsEnabled() or petChanged) and ArmorySpellBookFrame:IsShown() and ArmorySpellBookFrame.bookType == BOOKTYPE_PET ) then
+    if ( (not Armory:PetsEnabled() or petChanged) and ArmorySpellBookFrame:IsShown() and ArmorySpellBookFrame.spellBank == BOOKTYPE_PET ) then
         ArmorySpellBookFrame:Hide();
         ArmorySpellBookFrame:Show();
     end

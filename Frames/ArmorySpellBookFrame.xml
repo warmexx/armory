@@ -247,21 +247,11 @@
         <Anchors>
           <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="11" y="2"/>
         </Anchors>
-        <Scripts>
-          <OnLoad>
-            ArmoryPanelTemplates_SelectTab(self);
-          </OnLoad>
-        </Scripts>
       </Button>
       <Button name="ArmorySpellBookFrameTabButton2" inherits="ArmorySpellBookFrameTabButtonTemplate" id="2">
         <Anchors>
           <Anchor point="LEFT" relativeTo="ArmorySpellBookFrameTabButton1" relativePoint="RIGHT" x="-16" y="0"/>
         </Anchors>
-        <Scripts>
-          <OnLoad>
-            ArmoryPanelTemplates_DeselectTab(self);
-          </OnLoad>
-        </Scripts>
       </Button>
       <Frame name="ArmorySpellBookNavigationFrame" setAllPoints="true">
         <Layers>

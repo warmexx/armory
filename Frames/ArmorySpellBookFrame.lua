@@ -41,8 +41,21 @@ local SPELLFLYOUT_FINAL_SPACING = 9;
 local ceil = ceil;
 local strlen = strlen;
 
+-- Per family, chosen once at load: Classic's spellbook API still takes a book type,
+-- and Classic has no pet specializations
+local BANK_PLAYER, BANK_PET, GetPetSpec;
+if ( Armory.isClassic ) then
+    BANK_PLAYER = BOOKTYPE_SPELL;
+    BANK_PET = BOOKTYPE_PET;
+    GetPetSpec = function() end;
+else
+    BANK_PLAYER = Enum.SpellBookSpellBank.Player;
+    BANK_PET = Enum.SpellBookSpellBank.Pet;
+    GetPetSpec = function() return Armory:GetSpecialization(false, true) or 1; end;
+end
+
 function ArmoryToggleSpellBook(spellBank)
-    if ( spellBank == Enum.SpellBookSpellBank.Pet and (not Armory:PetsEnabled() or not Armory:HasPetSpells() or not Armory:PetHasSpellbook()) ) then
+    if ( spellBank == BANK_PET and (not Armory:PetsEnabled() or not Armory:HasPetSpells() or not Armory:PetHasSpellbook()) ) then
         return;
     end
 
@@ -51,11 +64,11 @@ function ArmoryToggleSpellBook(spellBank)
         ArmorySpellBookFrame.suppressCloseSound = true;
     end
 
-    ArmorySpellBookFrame:Hide();
+    Armory:HideFrame(ArmorySpellBookFrame);
     if ( (not isShown or (ArmorySpellBookFrame.spellBank ~= spellBank)) ) then
         ArmorySpellBookFrame.spellBank = spellBank;
         ArmoryCloseChildWindows();
-        ArmorySpellBookFrame:Show();
+        Armory:ShowFrame(ArmorySpellBookFrame);
     end
     ArmorySpellBookFrame_UpdatePages();
 
@@ -63,7 +76,19 @@ function ArmoryToggleSpellBook(spellBank)
 end
 
 function ArmorySpellBookFrame_OnLoad(self)
-    self:SetPortraitToAsset("Interface\\Spellbook\\Spellbook-Icon");
+    if ( Armory.isClassic ) then
+        -- Blizzard's frame template in Classic has a button bar
+        ButtonFrameTemplate_HideButtonBar(self);
+        Armory:SetPortraitToTexture(ArmorySpellBookFramePortrait, "Interface\\Spellbook\\Spellbook-Icon");
+
+        self:RegisterEvent("PET_BAR_UPDATE");
+        self:RegisterEvent("TRADE_SKILL_CLOSE");
+    else
+        self:SetPortraitToAsset("Interface\\Spellbook\\Spellbook-Icon");
+
+        self:RegisterEvent("PLAYER_GUILD_UPDATE");
+        self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED");
+    end
     self:SetTitle(SPELLBOOK);
 
     self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", PANEL_DEFAULT_WIDTH + PANEL_INSET_RIGHT_OFFSET, PANEL_INSET_BOTTOM_OFFSET);
@@ -71,10 +96,8 @@ function ArmorySpellBookFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("SPELLS_CHANGED");
     self:RegisterEvent("UPDATE_SHAPESHIFT_FORM");
-    self:RegisterEvent("PLAYER_GUILD_UPDATE");
-    self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED");
 
-    self.spellBank = Enum.SpellBookSpellBank.Player;
+    self.spellBank = BANK_PLAYER;
 
     ArmoryPanelTemplates_SetNumTabs(self, 2);
     ArmoryPanelTemplates_SetTab(self, 1);
@@ -99,7 +122,7 @@ function ArmorySpellBookFrame_UpdateSpells()
 end
 
 function ArmorySpellBookFrame_OnShow(self)
-    ArmorySpellBookFrame.selectedPetSpec = Armory:GetSpecialization(false, true) or 1;
+    ArmorySpellBookFrame.selectedPetSpec = GetPetSpec();
 
     -- Init page nums
     SPELLBOOK_PAGENUMBERS[1] = 1;
@@ -129,8 +152,8 @@ function ArmorySpellBookFrame_Update(showing)
         hasPetSpells, petToken = Armory:HasPetSpells(ArmorySpellBookFrame.selectedPetSpec);
         hasPetSpells = hasPetSpells and Armory:PetHasSpellbook(ArmorySpellBookFrame.selectedPetSpec);
     end
-    if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Pet and not hasPetSpells ) then
-        ArmorySpellBookFrame.spellBank = Enum.SpellBookSpellBank.Player;
+    if ( ArmorySpellBookFrame.spellBank == BANK_PET and not hasPetSpells ) then
+        ArmorySpellBookFrame.spellBank = BANK_PLAYER;
     end
 
     -- Hide all tabs
@@ -139,7 +162,7 @@ function ArmorySpellBookFrame_Update(showing)
 
     -- Setup skillline tabs
     if ( showing ) then
-        if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Pet ) then
+        if ( ArmorySpellBookFrame.spellBank == BANK_PET ) then
             ArmorySpellBookSkillLineTab_OnClick(nil, ArmorySpellBookFrame.selectedPetSkillLine, ArmorySpellBookFrame.selectedPetSpec);
         else
             ArmorySpellBookSkillLineTab_OnClick(nil, ArmorySpellBookFrame.selectedSkillLine);
@@ -151,17 +174,20 @@ function ArmorySpellBookFrame_Update(showing)
     -- Setup tabs
     ArmorySpellBookFrame.petTitle = nil;
     if ( hasPetSpells ) then
-        ArmorySpellBookFrame_SetTabType(ArmorySpellBookFrameTabButton1, Enum.SpellBookSpellBank.Player);
-        ArmorySpellBookFrame_SetTabType(ArmorySpellBookFrameTabButton2, Enum.SpellBookSpellBank.Pet, petToken);
+        ArmorySpellBookFrame_SetTabType(ArmorySpellBookFrameTabButton1, BANK_PLAYER);
+        ArmorySpellBookFrame_SetTabType(ArmorySpellBookFrameTabButton2, BANK_PET, petToken);
     else
-        ArmorySpellBookFrame_SetTabType(ArmorySpellBookFrameTabButton1, Enum.SpellBookSpellBank.Player);
-        if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Pet ) then
+        ArmorySpellBookFrame_SetTabType(ArmorySpellBookFrameTabButton1, BANK_PLAYER);
+        if ( ArmorySpellBookFrame.spellBank == BANK_PET ) then
             -- if has no pet spells but trying to show the pet spellbook close the window;
-            ArmorySpellBookFrame:Hide();
-            ArmorySpellBookFrame.spellBank = Enum.SpellBookSpellBank.Player;
+            Armory:HideFrame(ArmorySpellBookFrame);
+            ArmorySpellBookFrame.spellBank = BANK_PLAYER;
         end
     end
-    if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Pet ) then
+    -- The selected tab follows the book that is shown, also when the book changes without a click on the tab
+    ArmoryPanelTemplates_SetTab(ArmorySpellBookFrame, ArmorySpellBookFrame.spellBank == BANK_PET and 2 or 1);
+
+    if ( ArmorySpellBookFrame.spellBank == BANK_PET ) then
         ArmorySpellBookFrame:SetTitle(ArmorySpellBookFrame.petTitle);
         ArmorySpellBookFrame_SetSelectedPetInfo();
         ArmorySpellBookPetInfo:Show();
@@ -239,7 +265,7 @@ function ArmorySpellBookFrame_UpdatePages()
         return;
     end
     if ( currentPage > maxPages ) then
-        if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Pet ) then
+        if ( ArmorySpellBookFrame.spellBank == BANK_PET ) then
             SPELLBOOK_PAGENUMBERS["pet"][ArmorySpellBookFrame.selectedPetSkillLine] = maxPages;
         else
             SPELLBOOK_PAGENUMBERS[ArmorySpellBookFrame.selectedSkillLine] = maxPages;
@@ -271,24 +297,19 @@ function ArmorySpellBookFrame_UpdatePages()
 end
 
 function ArmorySpellBookFrame_SetTabType(tabButton, spellBank, token)
-    if ( spellBank == Enum.SpellBookSpellBank.Pet ) then
-        tabButton.spellBank = Enum.SpellBookSpellBank.Pet;
+    if ( spellBank == BANK_PET ) then
+        tabButton.spellBank = BANK_PET;
         tabButton:SetText(_G["PET_TYPE_"..token]);
         ArmorySpellBookFrame.petTitle = _G["PET_TYPE_"..token];
     else
-        tabButton.spellBank = Enum.SpellBookSpellBank.Player;
+        tabButton.spellBank = BANK_PLAYER;
         tabButton:SetText(SPELLBOOK);
-    end
-    if ( ArmorySpellBookFrame.spellBank == spellBank ) then
-        tabButton:Disable();
-    else
-        tabButton:Enable();
     end
     tabButton:Show();
 end
 
 function ArmorySpellBookFrame_PlayOpenSound()
-    if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Pet ) then
+    if ( ArmorySpellBookFrame.spellBank == BANK_PET ) then
         -- Need to change to pet book open sound
         PlaySound(SOUNDKIT.IG_ABILITY_OPEN);
     else
@@ -298,7 +319,7 @@ end
 
 function ArmorySpellBookFrame_PlayCloseSound()
     if ( not ArmorySpellBookFrame.suppressCloseSound ) then
-        if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Player ) then
+        if ( ArmorySpellBookFrame.spellBank == BANK_PLAYER ) then
             PlaySound(SOUNDKIT.IG_SPELLBOOK_CLOSE);
         else
             -- Need to change to pet book close sound
@@ -337,7 +358,7 @@ end
 
 function ArmorySpellButton_UpdateButton(self)
     local offset, numSlots, offSpecID;
-    if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Pet ) then
+    if ( ArmorySpellBookFrame.spellBank == BANK_PET ) then
         if ( not ArmorySpellBookFrame.selectedPetSkillLine ) then
             ArmorySpellBookFrame.selectedPetSkillLine = 1;
         end
@@ -350,7 +371,7 @@ function ArmorySpellButton_UpdateButton(self)
     end
     ArmorySpellBookFrame.selectedSkillLineNumSlots = numSlots;
     ArmorySpellBookFrame.selectedSkillLineOffset = offset;
-    local isOffSpec = (offSpecID ~= 0) and (ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Player);
+    local isOffSpec = (offSpecID ~= 0) and (ArmorySpellBookFrame.spellBank == BANK_PLAYER);
     self.offSpecID = offSpecID;
 
     local slot, slotType, attachedGlyph, isDisabled, isLocked = ArmorySpellBook_GetSpellBookSlot(self);
@@ -367,7 +388,7 @@ function ArmorySpellButton_UpdateButton(self)
         ArmorySpellFlyout:Hide();
     end
 
-    if ( (ArmorySpellBookFrame.spellBank ~= Enum.SpellBookSpellBank.Pet) and not slot ) then
+    if ( (ArmorySpellBookFrame.spellBank ~= BANK_PET) and not slot ) then
         self:Disable();
         iconTexture:Hide();
         levelLinkLockTexture:Hide();
@@ -497,7 +518,7 @@ end
 
 function ArmorySpellBookPrevPageButton_OnClick(self)
     local pageNum = ArmorySpellBook_GetCurrentPage() - 1;
-    if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Player ) then
+    if ( ArmorySpellBookFrame.spellBank == BANK_PLAYER ) then
         PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN);
         SPELLBOOK_PAGENUMBERS[ArmorySpellBookFrame.selectedSkillLine] = pageNum;
     else
@@ -513,7 +534,7 @@ end
 
 function ArmorySpellBookNextPageButton_OnClick(self)
     local pageNum = ArmorySpellBook_GetCurrentPage() + 1;
-    if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Player ) then
+    if ( ArmorySpellBookFrame.spellBank == BANK_PLAYER ) then
         PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN);
         SPELLBOOK_PAGENUMBERS[ArmorySpellBookFrame.selectedSkillLine] = pageNum;
     else
@@ -529,7 +550,7 @@ end
 
 function ArmorySpellBook_GetSpellBookSlot(spellButton)
     local id = spellButton:GetID();
-    if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Pet ) then
+    if ( ArmorySpellBookFrame.spellBank == BANK_PET ) then
         return id + (SPELLS_PER_PAGE * (SPELLBOOK_PAGENUMBERS["pet"][ArmorySpellBookFrame.selectedPetSkillLine] - 1));
     else
         local relativeSlot = id + ( SPELLS_PER_PAGE * (SPELLBOOK_PAGENUMBERS[ArmorySpellBookFrame.selectedSkillLine] - 1));
@@ -560,10 +581,10 @@ end
 function ArmorySpellBook_GetCurrentPage()
     local currentPage, maxPages;
     local numPetSpells = Armory:HasPetSpells(ArmorySpellBookFrame.selectedPetSpec);
-    if ( numPetSpells and Armory:HasPetUI() and ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Pet ) then
+    if ( numPetSpells and Armory:HasPetUI() and ArmorySpellBookFrame.spellBank == BANK_PET ) then
         currentPage = SPELLBOOK_PAGENUMBERS["pet"][ArmorySpellBookFrame.selectedPetSkillLine];
         maxPages = ceil(numPetSpells / SPELLS_PER_PAGE);
-    elseif ( ArmorySpellBookFrame.spellBank ==  Enum.SpellBookSpellBank.Player) then
+    elseif ( ArmorySpellBookFrame.spellBank ==  BANK_PLAYER) then
         currentPage = SPELLBOOK_PAGENUMBERS[ArmorySpellBookFrame.selectedSkillLine];
         local name, texture, offset, numSpells = Armory:GetSpellTabInfo(ArmorySpellBookFrame.selectedSkillLine);
         if ( numSpells ) then
@@ -582,7 +603,7 @@ function ArmorySpellBook_UpdateSpells()
     for i = 1, SPELLS_PER_PAGE do
        ArmorySpellButton_UpdateButton(_G["ArmorySpellButton"..i]);
     end
-    if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Pet ) then
+    if ( ArmorySpellBookFrame.spellBank == BANK_PET ) then
         ArmorySpellBook_DesaturateBackground(_G["ArmorySpellBookSkillLineTab"..ArmorySpellBookFrame.selectedPetSkillLine].isOffSpec);
     else
         ArmorySpellBook_DesaturateBackground(_G["ArmorySpellBookSkillLineTab"..ArmorySpellBookFrame.selectedSkillLine].isOffSpec);
@@ -604,7 +625,7 @@ function ArmorySpellBookFrame_UpdateSkillLineTabs()
     local skillLineTab, prevTab;
     local selectedTab;
 
-    if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Pet ) then
+    if ( ArmorySpellBookFrame.spellBank == BANK_PET ) then
         selectedTab = ArmorySpellBookFrame.selectedPetSkillLine;
     else
         selectedTab = ArmorySpellBookFrame.selectedSkillLine;
@@ -613,15 +634,15 @@ function ArmorySpellBookFrame_UpdateSkillLineTabs()
     for i = 1, MAX_SKILLLINE_TABS do
         skillLineTab = _G["ArmorySpellBookSkillLineTab"..i];
         prevTab = _G["ArmorySpellBookSkillLineTab"..i-1];
-        --if ( i <= numSkillLineTabs and ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Player ) then
+        --if ( i <= numSkillLineTabs and ArmorySpellBookFrame.spellBank == BANK_PLAYER ) then
         if ( i <= numSkillLineTabs ) then
             name, texture, _, _, isGuild, offSpecID = Armory:GetSpellTabInfo(i, ArmorySpellBookFrame.spellBank);
             local isOffSpec = (offSpecID ~= 0);
             skillLineTab.tooltip = name;
             skillLineTab:Show();
             skillLineTab.isOffSpec = isOffSpec;
-            if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Pet ) then
-                skillLineTab.petSpec = isOffSpec and offSpecID or Armory:GetSpecialization(false, true) or 1;
+            if ( ArmorySpellBookFrame.spellBank == BANK_PET ) then
+                skillLineTab.petSpec = isOffSpec and offSpecID or GetPetSpec();
             end
             if ( texture ) then
                 skillLineTab:SetNormalTexture(texture);
@@ -662,7 +683,7 @@ end
 
 function ArmorySpellBookSkillLineTab_OnClick(self, id, spec)
     local selectedTab;
-    if ( ArmorySpellBookFrame.spellBank == Enum.SpellBookSpellBank.Pet ) then
+    if ( ArmorySpellBookFrame.spellBank == BANK_PET ) then
         ArmorySpellBookFrame.selectedPetSkillLine = id or self:GetID();
         selectedTab = ArmorySpellBookFrame.selectedPetSkillLine;
 
