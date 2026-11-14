@@ -68,6 +68,15 @@ function ArmoryPetFrame_OnLoad(self)
     self:RegisterEvent("UNIT_ATTACK");
     self:RegisterEvent("UNIT_PET_TRAINING_POINTS");
     self:RegisterEvent("UNIT_HAPPINESS");
+
+    if ( Armory.isTBC ) then
+        -- Spell damage instead of attack and defense
+        ArmoryPetAttackFrame:Hide();
+        ArmoryPetDefenseFrame:Hide();
+        ArmoryPetSpellDamageFrame:Show();
+        ArmoryPetAttackPowerFrame:SetPoint("TOPLEFT", ArmoryPetAttributesFrame, "TOPLEFT", 122, -5);
+        ArmoryPetArmorFrame:SetPoint("TOPLEFT", ArmoryPetSpellDamageFrame, "BOTTOMLEFT", 0, -1);
+    end
 end
 
 function ArmoryPetFrame_OnEvent(self, event, ...)
@@ -100,16 +109,6 @@ function ArmoryPetFrame_OnEvent(self, event, ...)
     elseif ( arg1 == "pet" ) then
         Armory:Execute(ArmoryPetFrame_UpdateStats);
     end
-end
-
-function ArmoryPetFrame_HasPetData()
-    for i = 1, NUM_PET_STATS do
-        local stat, effectiveStat = UnitStat("pet", i);
-        if ( not (stat and effectiveStat) ) then
-            return false;
-        end
-    end
-    return GetCritChanceFromAgility("pet") and GetUnitHealthModifier("pet") and GetUnitPowerModifier("pet") and GetUnitHealthRegenRateFromSpirit("pet");
 end
 
 function ArmoryPetFrame_OnShow(self)
@@ -322,16 +321,75 @@ function ArmoryPetFrame_SetResistances()
     end
 end
 
-function ArmoryPetFrame_SetStats()
+----------------------------------------------------------
+-- Stats per game, like Blizzard's pet frames: Vanilla shows
+-- attack and defense, TBC spell damage and buffed stats
+----------------------------------------------------------
+
+local function HasPetDataVanilla()
+    local stat, effectiveStat = UnitStat("pet", 3);
+    return stat and effectiveStat;
+end
+
+local function SetStatsVanilla()
     for i = 1, NUM_PET_STATS do
-        local label = getglobal("ArmoryPetStatFrame"..i.."Label");
-        local text = getglobal("ArmoryPetStatFrame"..i.."StatText");
-        local frame = getglobal("ArmoryPetStatFrame"..i);
+        local label = _G["ArmoryPetStatFrame"..i.."Label"];
+        local text = _G["ArmoryPetStatFrame"..i.."StatText"];
+        local frame = _G["ArmoryPetStatFrame"..i];
+        label:SetText(_G["SPELL_STAT"..i.."_NAME"]..":");
+        local _, effectiveStat = Armory:UnitStat("pet", i);
+        effectiveStat = effectiveStat or 0;
+
+        -- Get class specific tooltip for that stat, if can't find one use the default
+        local classStatText;
+        local classFileName = select(2, Armory:UnitClass("pet"));
+        if ( classFileName ) then
+            classStatText = _G[strupper(classFileName).."_"..frame.stat.."_TOOLTIP"];
+        end
+        if ( not classStatText ) then
+            classStatText = _G["DEFAULT_"..frame.stat.."_TOOLTIP"];
+        end
+
+        --[[ In 1.12, UnitStat didn't report positive / negative buffs for units that weren't the active player.
+             To replicate this, we just won't include modifiers (e.g. green / red coloring) in the UI. ]]
+        text:SetText(effectiveStat);
+        frame.tooltip = HIGHLIGHT_FONT_COLOR_CODE.._G["SPELL_STAT"..i.."_NAME"].." "..effectiveStat..FONT_COLOR_CODE_CLOSE;
+        frame.tooltip2 = classStatText;
+    end
+end
+
+local function UpdateStatsVanilla()
+    ArmoryPetFrame_SetResistances();
+    SetStatsVanilla();
+    ArmoryPaperDollFrame_SetDamage("pet", "Pet");
+    ArmoryPaperDollFrame_SetRangedDamage("pet", "Pet");
+    ArmoryPaperDollFrame_SetAttackPower("pet", "Pet");
+    ArmoryPaperDollFrame_SetRangedAttackPower("pet", "Pet");
+    ArmoryPaperDollFrame_SetArmor("pet", "Pet");
+    ArmoryPaperDollFrame_SetAttackBothHands("pet", "Pet");
+    ArmoryPaperDollFrame_SetDefense("pet", "Pet");
+end
+
+local function HasPetDataTBC()
+    for i = 1, NUM_PET_STATS do
+        local stat, effectiveStat = UnitStat("pet", i);
+        if ( not (stat and effectiveStat) ) then
+            return false;
+        end
+    end
+    return GetCritChanceFromAgility("pet") and GetUnitHealthModifier("pet") and GetUnitPowerModifier("pet") and GetUnitHealthRegenRateFromSpirit("pet");
+end
+
+local function SetStatsTBC()
+    for i = 1, NUM_PET_STATS do
+        local label = _G["ArmoryPetStatFrame"..i.."Label"];
+        local text = _G["ArmoryPetStatFrame"..i.."StatText"];
+        local frame = _G["ArmoryPetStatFrame"..i];
         local stat, effectiveStat, posBuff, negBuff;
-        label:SetText(getglobal("SPELL_STAT"..i.."_NAME")..":");
+        label:SetText(_G["SPELL_STAT"..i.."_NAME"]..":");
         stat, effectiveStat, posBuff, negBuff = Armory:UnitStat("pet", i);
         -- Set the tooltip text
-        local tooltipText = HIGHLIGHT_FONT_COLOR_CODE..getglobal("SPELL_STAT"..i.."_NAME").." ";
+        local tooltipText = HIGHLIGHT_FONT_COLOR_CODE.._G["SPELL_STAT"..i.."_NAME"].." ";
 
         if ( ( posBuff == 0 ) and ( negBuff == 0 ) ) then
             text:SetText(effectiveStat);
@@ -362,7 +420,7 @@ function ArmoryPetFrame_SetStats()
         end
 
         -- Second tooltip line
-        frame.tooltip2 = getglobal("DEFAULT_STAT"..i.."_TOOLTIP");
+        frame.tooltip2 = _G["DEFAULT_STAT"..i.."_TOOLTIP"];
         if ( i == 1 ) then
             local attackPower = 2 * effectiveStat - 20;
             frame.tooltip2 = format(frame.tooltip2, attackPower);
@@ -394,7 +452,7 @@ function ArmoryPetFrame_SetStats()
     end
 end
 
-function ArmoryPetPaperDollFrame_SetSpellBonusDamage()
+local function SetSpellBonusDamage()
     local _, unitClass = Armory:UnitClass("player");
     unitClass = strupper(unitClass);
     local spellDamageBonus = 0;
@@ -427,11 +485,14 @@ function ArmoryPetPaperDollFrame_SetSpellBonusDamage()
     ArmoryPetSpellDamageFrame:Show();
 end
 
-function ArmoryPetFrame_UpdateStats()
+local function UpdateStatsTBC()
     ArmoryPetFrame_SetResistances();
-    ArmoryPetFrame_SetStats();
+    SetStatsTBC();
     ArmoryPaperDollFrame_SetDamage(ArmoryPetDamageFrame, "Pet");
     ArmoryPaperDollFrame_SetArmor(ArmoryPetArmorFrame, "Pet");
     ArmoryPaperDollFrame_SetAttackPower(ArmoryPetAttackPowerFrame, "Pet");
-    ArmoryPetPaperDollFrame_SetSpellBonusDamage();
+    SetSpellBonusDamage();
 end
+
+ArmoryPetFrame_HasPetData = Armory.isTBC and HasPetDataTBC or HasPetDataVanilla;
+ArmoryPetFrame_UpdateStats = Armory.isTBC and UpdateStatsTBC or UpdateStatsVanilla;
