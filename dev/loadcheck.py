@@ -251,3 +251,8 @@ for t in sorted(used_templates):
     if t in gone_templates and t not in ok_templates and t not in own_defs:
         src = sorted(gone_templates[t])[0]
         print(f"{t:45s} only in {src}  <- {', '.join(sorted(used_templates[t])[:3])}")
+
+print(f"\n=== XML templates that Armory inherits, defined nowhere in what {CLIENT} loads")
+for t in sorted(used_templates):
+    if t not in gone_templates and t not in ok_templates and t not in own_defs:
+        print(f"{t:45s} <- {', '.join(sorted(used_templates[t])[:3])}")

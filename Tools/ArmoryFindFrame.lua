@@ -52,11 +52,11 @@ function ArmoryFindFrame_OnLoad(self)
         Armory:SetPortraitToTexture(ArmoryFindFramePortrait, "Interface\\Icons\\INV_Misc_QuestionMark");
     else
         self:SetPortraitToAsset("Interface\\Icons\\INV_Misc_QuestionMark");
-        self:SetTitle(ARMORY_CMD_FIND_MENUTEXT);
-
-        self.Inset:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 4, 332);
-        self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -4, 120);
     end
+    self:SetTitle(ARMORY_CMD_FIND_MENUTEXT);
+
+    self.Inset:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 4, 332);
+    self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -4, 120);
 
     table.insert(UISpecialFrames, "ArmoryFindFrame");
 end

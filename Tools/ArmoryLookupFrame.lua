@@ -69,11 +69,11 @@ function ArmoryLookupFrame_OnLoad(self)
         Armory:SetPortraitToTexture(ArmoryLookupFramePortrait, "Interface\\Icons\\INV_Misc_QuestionMark");
     else
         self:SetPortraitToAsset("Interface\\Icons\\INV_Misc_QuestionMark");
-        self:SetTitle(ARMORY_LOOKUP_TITLE);
-
-        self.Inset:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 4, 344);
-        self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -4, 33);
     end
+    self:SetTitle(ARMORY_LOOKUP_TITLE);
+
+    self.Inset:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 4, 344);
+    self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -4, 33);
 
     ArmoryDropDownMenu_Initialize(ArmoryLookupChannelDropDown, ArmoryLookupChannelDropDown_Initialize);
     ArmoryDropDownMenu_SetWidth(ArmoryLookupChannelDropDown, 75);

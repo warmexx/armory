@@ -1,6 +1,6 @@
 <!-- Revision: @file-revision@ @file-date-iso@ -->
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
-  <Include file="Tools\Classic\ArmoryFindFrame.xml"/>
+  <Include file="Tools\ArmoryFindFrame.xml"/>
   <Include file="Frames\ArmoryFrame.xml"/>
   <Include file="Frames\ArmoryBuffFrame.xml"/>
   <Include file="Frames\Vanilla\ArmoryPaperDollFrame.xml"/>
@@ -19,5 +19,6 @@
   <Include file="Frames\Classic\ArmorySpellBookFrame.xml"/>
   <Include file="Frames\Classic\ArmorySocialFrame.xml"/>
   <Include file="Tools\ArmoryAddonMessageFrame.xml"/>
-  <Include file="Tools\Classic\ArmoryLookupFrame.xml"/>
+  <Script file="Tools\Classic\ArmoryLookupProtocol.lua"/>
+  <Include file="Tools\ArmoryLookupFrame.xml"/>
 </Ui>

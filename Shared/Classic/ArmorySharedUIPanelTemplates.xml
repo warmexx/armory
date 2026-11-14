@@ -9,6 +9,7 @@
   <EditBox name="ArmoryInputBoxTemplate" inherits="InputBoxTemplate" virtual="true"/>
   <Frame name="ArmoryDialogBorderDarkTemplate" inherits="DialogBorderDarkTemplate" virtual="true"/>
   <Frame name="ArmoryButtonFrameTemplate" inherits="ButtonFrameTemplate" virtual="true"/>
+  <Frame name="ArmoryInsetFrameTemplate" inherits="InsetFrameTemplate" useParentLevel="true" virtual="true"/>
   <Frame name="ArmoryChildFrameTemplate" movable="true" parent="ArmoryFrame" inherits="ButtonFrameTemplate" enableMouse="true" virtual="true">
     <Anchors>
       <Anchor point="TOPLEFT" relativeTo="ArmoryFrame" relativePoint="TOPRIGHT" x="42"/>
