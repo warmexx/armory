@@ -29,8 +29,8 @@
 local Armory, _ = Armory;
 
 ARMORY_MAX_TALENT_TABS = 5;
-ARMORY_MAX_NUM_TALENTS = Armory.isTBC and 40 or 20;
-ARMORY_MAX_NUM_TALENT_TIERS = Armory.isTBC and 10 or 8;
+ARMORY_MAX_NUM_TALENTS = 40;
+ARMORY_MAX_NUM_TALENT_TIERS = 10;
 ARMORY_NUM_TALENT_COLUMNS = 4;
 ARMORY_TALENT_BRANCH_ARRAY = {};
 ARMORY_TALENT_BUTTON_SIZE = 32;
@@ -555,9 +555,7 @@ end
 -- Helper functions
 function ArmoryTalentFrame_UpdateTalentPoints()
     local talentPoints = Armory:UnitCharacterPoints("player");
-    if ( Armory.isTBC ) then
-        ArmoryTalentFrameTalentPointsText:SetText(talentPoints);
-    end
+    ArmoryTalentFrameTalentPointsText:SetText(talentPoints);
     ArmoryTalentFrame.talentPoints = talentPoints;
 end
 

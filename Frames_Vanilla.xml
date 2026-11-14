@@ -4,7 +4,7 @@
   <Include file="Frames\ArmoryFrame.xml"/>
   <Include file="Frames\ArmoryBuffFrame.xml"/>
   <Include file="Frames\Vanilla\ArmoryPaperDollFrame.xml"/>
-  <Include file="Frames\Vanilla\ArmoryTalentFrame.xml"/>
+  <Include file="Frames\Classic\ArmoryTalentFrame.xml"/>
   <Include file="Frames\Vanilla\ArmoryPetFrame.xml"/>
   <Include file="Frames\Vanilla\ArmoryPVPFrame.xml"/>
   <Include file="Frames\ArmoryOtherFrame.xml"/>
