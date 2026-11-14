@@ -51,7 +51,7 @@ if ( not Armory ) then
         title = ARMORY_TITLE,
         version = C_AddOns.GetAddOnMetadata("Armory", "Version"),
         -- per family: the SavedVariables of Classic have their own history
-        dbVersion = (isVanilla or isTBC) and 1 or 54,
+        dbVersion = (isVanilla or isTBC) and 2 or 54,
         interface = _G.GetBuildInfo(),
 
         isMainline = isRetail or isForever,
@@ -704,6 +704,39 @@ function Armory:IsDbCompatible()
             for _, v in pairs(ArmoryShared) do
                 if ( v.Talents ) then
                     v.Talents = nil;
+                end
+            end
+
+            upgraded = true;
+
+        -- convert from 1 to 2 (Classic; the versions of Mainline start at 50)
+        elseif ( dbVersion == 1 ) then
+            -- the inventory is now stored as in Mainline:
+            -- container info without bagSlots, and room for tinker and anchor before the timestamp of an item
+            for realm in pairs(ArmoryDB) do
+                for character in pairs(ArmoryDB[realm]) do
+                    entry = ArmoryDB[realm][character];
+                    if ( entry.Inventory ) then
+                        for _, value in pairs(entry.Inventory) do
+                            if ( type(value) == "table" ) then
+                                if ( value["Info"] ) then
+                                    local name, numSlots, bagSlots, remaining, timestamp = ArmoryDbEntry.Load(value["Info"]);
+                                    if ( type(remaining) ~= "number" ) then
+                                        remaining = nil;
+                                    end
+                                    value["Info"] = ArmoryDbEntry.Save(name, numSlots, remaining, timestamp);
+                                end
+                                for index, item in pairs(value) do
+                                    if ( type(index) == "number" ) then
+                                        local texture, count, quality, link, expires, equipable, slotId, ignorable, timestamp = ArmoryDbEntry.Load(item);
+                                        if ( timestamp ) then
+                                            value[index] = ArmoryDbEntry.Save(texture, count, quality, link, expires, equipable, slotId, ignorable, nil, nil, timestamp);
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
                 end
             end
 

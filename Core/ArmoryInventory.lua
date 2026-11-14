@@ -56,26 +56,6 @@ local issecretvalue = issecretvalue;
 -- Inventory Internals
 ----------------------------------------------------------
 
-local function IsBagContainer(id)
-    return id >= Enum.BagIndex.Backpack and id <= NUM_TOTAL_BAG_FRAMES;
-end
-
-local function IsGenericBagContainer(id)
-    return id >= Enum.BagIndex.Backpack and id <= Constants.InventoryConstants.NumBagSlots;
-end
-
-local function IsCharacterContainer(id)
-    return id >= Enum.BagIndex.CharacterBankTab_1 and id <= Enum.BagIndex.CharacterBankTab_6;
-end
-
-local function IsAccountContainer(id)
-    return id >= Enum.BagIndex.AccountBankTab_1 and id <= Enum.BagIndex.AccountBankTab_5;
-end
-
-local function IsBankContainer(id)
-    return IsCharacterContainer(id) or IsAccountContainer(id);
-end
-
 local function GetCharacterBankTabData(id)
     local tab = id - Enum.BagIndex.CharacterBankTab_1 + 1;
     local tabs = C_Bank.FetchPurchasedBankTabData(Enum.BankType.Character);
@@ -92,6 +72,109 @@ local function GetAccountBankTabData(id)
         return tabs[tab];
     end
     return {};
+end
+
+-- Containers per family: Classic has the bank itself (BANK_CONTAINER) with bank bags,
+-- Mainline has bank tabs and an account bank
+local HAS_BANK_TABS = not Armory.isClassic;
+local IsBagContainer, IsGenericBagContainer, IsCharacterContainer, IsAccountContainer, IsReagentContainer;
+local HasBagSlot, GetBagItemLink, GetContainerName, GetNumProfessionGearSlots, CountProfessionGear;
+if ( Armory.isClassic ) then
+    IsBagContainer = function(id)
+        return id >= BACKPACK_CONTAINER and id <= NUM_BAG_SLOTS;
+    end
+    IsGenericBagContainer = IsBagContainer;
+    IsCharacterContainer = function(id)
+        return id == BANK_CONTAINER or (id > NUM_BAG_SLOTS and id <= NUM_BAG_SLOTS + NUM_BANKBAGSLOTS);
+    end
+    IsAccountContainer = function(id)
+        return false;
+    end
+    -- reagents only count in the bags
+    IsReagentContainer = IsBagContainer;
+
+    -- a container that is a bag in an inventory slot, including the bank bags
+    HasBagSlot = function(id)
+        return id > BACKPACK_CONTAINER and id <= NUM_BAG_SLOTS + NUM_BANKBAGSLOTS;
+    end
+
+    -- the item of a bag itself; the bank bags are in the bank's own slots
+    GetBagItemLink = function(id)
+        if ( id > BACKPACK_CONTAINER and id <= NUM_BAG_SLOTS ) then
+            return Armory:GetInventoryItemLink("player", C_Container.ContainerIDToInventoryID(id));
+        elseif ( id > NUM_BAG_SLOTS and id <= NUM_BAG_SLOTS + NUM_BANKBAGSLOTS ) then
+            return Armory:GetContainerItemLink(BANK_CONTAINER, NUM_BANKGENERIC_SLOTS + id - NUM_BAG_SLOTS);
+        end
+    end
+    GetContainerName = function(id, name)
+        return C_Container.GetBagName(id) or name;
+    end
+
+    -- no profession gear
+    GetNumProfessionGearSlots = function()
+        return 0;
+    end
+    CountProfessionGear = function(itemId)
+        return 0;
+    end
+
+    function Armory:GetCharacterContainerIndex(id)
+        return id == BANK_CONTAINER and 0 or id - NUM_BAG_SLOTS;
+    end
+else
+    IsBagContainer = function(id)
+        return id >= Enum.BagIndex.Backpack and id <= NUM_TOTAL_BAG_FRAMES;
+    end
+    IsGenericBagContainer = function(id)
+        return id >= Enum.BagIndex.Backpack and id <= Constants.InventoryConstants.NumBagSlots;
+    end
+    IsCharacterContainer = function(id)
+        return id >= Enum.BagIndex.CharacterBankTab_1 and id <= Enum.BagIndex.CharacterBankTab_6;
+    end
+    IsAccountContainer = function(id)
+        return id >= Enum.BagIndex.AccountBankTab_1 and id <= Enum.BagIndex.AccountBankTab_5;
+    end
+    IsReagentContainer = function(id)
+        return IsBagContainer(id) or IsCharacterContainer(id);
+    end
+
+    HasBagSlot = IsBagContainer;
+
+    GetBagItemLink = function(id)
+        if ( IsBagContainer(id) ) then
+            return Armory:GetInventoryItemLink("player", C_Container.ContainerIDToInventoryID(id));
+        end
+    end
+    GetContainerName = function(id, name)
+        if ( IsCharacterContainer(id ) ) then
+            return GetCharacterBankTabData(id).name or name;
+        elseif ( IsAccountContainer(id) ) then
+            return GetAccountBankTabData(id).name or name;
+        end
+        return C_Container.GetBagName(id) or name;
+    end
+
+    -- the slots are defined by the paperdoll frame, which loads later
+    GetNumProfessionGearSlots = function()
+        return ARMORY_GEARSLOT_LAST_EQUIPPED - ARMORY_GEARSLOT_FIRST_EQUIPPED + 1;
+    end
+    CountProfessionGear = function(itemId)
+        local count = 0;
+        for slot = ARMORY_GEARSLOT_FIRST_EQUIPPED, ARMORY_GEARSLOT_LAST_EQUIPPED do
+            if ( Armory:GetUniqueItemId(Armory:GetProfessionItems(slot)) == itemId ) then
+                count = count + 1;
+            end
+        end
+        return count;
+    end
+
+    function Armory:GetCharacterContainerIndex(id)
+        return id - Enum.BagIndex.CharacterBankTab_1 + 1;
+    end
+end
+
+local function IsBankContainer(id)
+    return IsCharacterContainer(id) or IsAccountContainer(id);
 end
 
 local function InventoryContainerName(id)
@@ -341,6 +424,29 @@ local function UpdateContainerName(dbEntry, id, containerName)
     SetContainerInfo(dbEntry, itemContainer, containerName or name, numSlots, remaining, timestamp);
 end
 
+-- Tinkers (engineering on gloves, belt and cloak) only exist in Mainline
+local GetTinker;
+if ( Armory.isClassic ) then
+    GetTinker = function(id, slotId, link)
+    end
+else
+    GetTinker = function(id, slotId, link)
+        if ( link and (IsGenericBagContainer(id) or IsCharacterContainer(id) or IsAccountContainer(id)) and C_Item.IsEquippableItem(link) ) then
+            local _, _, _, equipLoc = C_Item.GetItemInfoInstant(link);
+            if ( equipLoc == "INVTYPE_HAND" or equipLoc == "INVTYPE_WAIST" or equipLoc == "INVTYPE_CLOAK" ) then
+                local tooltip1 = Armory:AllocateTooltip();
+                local tooltip2 = Armory:AllocateTooltip();
+                tooltip1:SetBagItem(id, slotId);
+                tooltip2:SetHyperlink(link);
+                local tinker, anchor = Armory:GetTinkerFromTooltip(tooltip1, tooltip2);
+                Armory:ReleaseTooltip(tooltip2);
+                Armory:ReleaseTooltip(tooltip1);
+                return tinker, anchor;
+            end
+        end
+    end
+end
+
 local function SetSlotInfo(id, index, texture, count, quality, link, expires, equipable, slotId, ignorable)
     local dbEntry = IsAccountContainer(id) and Armory.sharedDbEntry or Armory.playerDbBaseEntry;
     local itemContainer = InventoryContainerName(id);
@@ -352,19 +458,7 @@ local function SetSlotInfo(id, index, texture, count, quality, link, expires, eq
         link = nil;
     end
 
-    local tinker, anchor;
-    if ( link and (IsGenericBagContainer(id) or IsCharacterContainer(id) or IsAccountContainer(id)) and C_Item.IsEquippableItem(link) ) then
-        local _, _, _, equipLoc = C_Item.GetItemInfoInstant(link);
-        if ( equipLoc == "INVTYPE_HAND" or equipLoc == "INVTYPE_WAIST" or equipLoc == "INVTYPE_CLOAK" ) then
-            local tooltip1 = Armory:AllocateTooltip();
-            local tooltip2 = Armory:AllocateTooltip();
-            tooltip1:SetBagItem(id, slotId);
-            tooltip2:SetHyperlink(link);
-            tinker, anchor = Armory:GetTinkerFromTooltip(tooltip1, tooltip2);
-            Armory:ReleaseTooltip(tooltip2);
-            Armory:ReleaseTooltip(tooltip1);
-        end
-    end
+    local tinker, anchor = GetTinker(id, slotId, link);
 
     SetInventoryValue(dbEntry, itemContainer, index, texture, count, quality, link, expires, equipable, slotId, ignorable, tinker, anchor);
 end
@@ -396,6 +490,34 @@ function Armory:ClearInventory()
     dirty.account = true;
 end
 
+-- Owned auctions per family: Classic still has the old auction house API
+local GetNumOwnedAuctions, GetOwnedAuction;
+if ( Armory.isClassic ) then
+    GetNumOwnedAuctions = function()
+        return _G.GetNumAuctionItems("owner");
+    end
+    GetOwnedAuction = function(index)
+        local _, texture, count, quality, _, _, _, _, _, _, _, _, _, _, _, saleStatus = _G.GetAuctionItemInfo("owner", index);
+        if ( texture and saleStatus ~= 1 ) then
+            return texture, count, quality, _G.GetAuctionItemLink("owner", index), _G.GetAuctionItemTimeLeft("owner", index);
+        end
+    end
+else
+    GetNumOwnedAuctions = function()
+        return C_AuctionHouse.GetNumOwnedAuctions();
+    end
+    GetOwnedAuction = function(index)
+        local info = C_AuctionHouse.GetOwnedAuctionInfo(index);
+        if ( info and info.itemKey and info.status ~= Enum.AuctionStatus.Sold ) then
+            local link, timeLeft, count = info.itemLink, info.timeLeftSeconds, info.quantity;
+            info = C_AuctionHouse.GetItemKeyInfo(info.itemKey);
+            if ( info and info.iconFileID ) then
+                return info.iconFileID, count, info.quality, link, timeLeft;
+            end
+        end
+    end
+end
+
 function Armory:SetContainer(id)
     local itemContainer = InventoryContainerName(id);
     local dbEntry = IsAccountContainer(id) and self.sharedDbEntry or self.playerDbBaseEntry;
@@ -415,8 +537,8 @@ function Armory:SetContainer(id)
     end
 
     -- bank tabs can be read while the bank is closed, but the client does not always have the data;
-    -- do not wipe what is stored in that case
-    if ( IsBankContainer(id) and C_Container.GetContainerNumSlots(id) == 0 ) then
+    -- do not wipe what is stored in that case (in Classic an empty bank bag slot is 0 as well)
+    if ( HAS_BANK_TABS and IsBankContainer(id) and C_Container.GetContainerNumSlots(id) == 0 ) then
         local _, oldNum = GetContainerInfo(dbEntry, itemContainer);
         if ( (oldNum or 0) > 0 ) then
             return;
@@ -426,7 +548,7 @@ function Armory:SetContainer(id)
     -- signal some update triggers
     local name, numSlots = self:GetInventoryContainerInfo(id, "player");
     local link, texture;
-    if ( IsBagContainer(id) ) then
+    if ( HasBagSlot(id) ) then
         -- if stored within container, see below
         local bagSlot = C_Container.ContainerIDToInventoryID(id);
         link = self:GetInventoryItemLink("player", bagSlot);
@@ -490,23 +612,12 @@ function Armory:SetContainer(id)
             end
 
         elseif ( id == ARMORY_AUCTIONS_CONTAINER or id == ARMORY_NEUTRAL_AUCTIONS_CONTAINER ) then
-            local info;
-            for i = 1, C_AuctionHouse.GetNumOwnedAuctions() do
-                info = C_AuctionHouse.GetOwnedAuctionInfo(i);
-                if ( info and info.itemKey and info.status ~= Enum.AuctionStatus.Sold ) then
-                    link = info.itemLink;
-                    timeLeft = info.timeLeftSeconds;
-                    count = info.quantity;
-
-                    info = C_AuctionHouse.GetItemKeyInfo(info.itemKey);
-                    if ( info and info.iconFileID ) then
-                        texture = info.iconFileID;
-                        quality = info.quality;
-
-                        SetSlotInfo(id, nextSlot, texture, count, quality, link, timeLeft);
-                        SetItemCache(itemContainer, link, count, unit);
-                        nextSlot = nextSlot + 1;
-                    end
+            for i = 1, GetNumOwnedAuctions() do
+                texture, count, quality, link, timeLeft = GetOwnedAuction(i);
+                if ( texture ) then
+                    SetSlotInfo(id, nextSlot, texture, count, quality, link, timeLeft);
+                    SetItemCache(itemContainer, link, count, unit);
+                    nextSlot = nextSlot + 1;
                 end
             end
 
@@ -526,15 +637,12 @@ function Armory:SetContainer(id)
             ClearSlotInfo(itemContainer, index, unit);
         end
 
-        if ( id > ARMORY_MAIL_CONTAINER ) then
+        if ( id == BANK_CONTAINER ) then
+            -- Classic: the bank itself
+            numSlots = NUM_BANKGENERIC_SLOTS;
+        elseif ( id > ARMORY_MAIL_CONTAINER ) then
             numSlots = C_Container.GetContainerNumSlots(id);
-            if ( IsCharacterContainer(id ) ) then
-                name = GetCharacterBankTabData(id).name or name;
-            elseif ( IsAccountContainer(id) ) then
-                name = GetAccountBankTabData(id).name or name;
-            else
-                name = C_Container.GetBagName(id) or name;
-            end
+            name = GetContainerName(id, name);
         else
             numSlots = nextSlot - 1;
         end
@@ -777,10 +885,6 @@ function Armory:UpdateAccountContainerName(id)
     UpdateContainerName(self.sharedDbEntry, id, GetAccountBankTabData(id).name);
 end
 
-function Armory:GetCharacterContainerIndex(id)
-    return id - Enum.BagIndex.CharacterBankTab_1 + 1;
-end
-
 function Armory:GetAccountContainerIndex(id)
     return id - Enum.BagIndex.AccountBankTab_1 + 1;
 end
@@ -798,8 +902,7 @@ function Armory:GetInventoryContainerInfo(id, unit)
     local name, numSlots, timestamp, outOfSync;
     if ( id == ARMORY_EQUIPMENT_CONTAINER ) then
         name = ARMORY_EQUIPMENT;
-        numSlots = INVSLOT_LAST_EQUIPPED - INVSLOT_FIRST_EQUIPPED + 1;
-        numSlots = numSlots + ARMORY_GEARSLOT_LAST_EQUIPPED - ARMORY_GEARSLOT_FIRST_EQUIPPED + 1;
+        numSlots = INVSLOT_LAST_EQUIPPED - INVSLOT_FIRST_EQUIPPED + 1 + GetNumProfessionGearSlots();
     elseif ( dbEntry ) then
         name, numSlots, _, timestamp, outOfSync = GetContainerInfo(dbEntry, itemContainer);
     end
@@ -811,7 +914,10 @@ function Armory:GetInventoryContainerInfoEx(id, unit)
     local containerName, numSlots, isCollapsed, _, outOfSync = self:GetInventoryContainerInfo(id, unit);
     local name;
 
-    if ( id == ARMORY_MAIL_CONTAINER ) then
+    if ( id == BANK_CONTAINER ) then
+        -- Classic: the bank itself
+        name = ARMORY_BANK_CONTAINER_NAME;
+    elseif ( id == ARMORY_MAIL_CONTAINER ) then
         name = INBOX;
     elseif ( id == ARMORY_AUCTIONS_CONTAINER ) then
         name = AUCTIONS;
@@ -823,8 +929,8 @@ function Armory:GetInventoryContainerInfoEx(id, unit)
         name = ACCOUNT_BANK_PANEL_TITLE;
     elseif ( containerName ) then
         local prefix = "";
-        if ( id >= Enum.BagIndex.CharacterBankTab_1 ) then
-            prefix = ARMORY_BANK_CONTAINER_NAME.." #"..(id - Enum.BagIndex.CharacterBankTab_1 + 1).." - ";
+        if ( IsCharacterContainer(id) ) then
+            prefix = ARMORY_BANK_CONTAINER_NAME.." #"..self:GetCharacterContainerIndex(id).." - ";
             if ( outOfSync ) then
                 -- contents were corrected without reading the bank itself
                 prefix = "~"..prefix;
@@ -1254,7 +1360,7 @@ function Armory:ScanInventoryItems(items, scanType)
 
         if ( scanType ~= "account" ) then
             for _, id in ipairs(ArmoryInventoryPlayerContainers) do
-                if ( (reagentScan and (IsBagContainer(id) or IsCharacterContainer(id))) or (not reagentScan and not self:IsDummyContainer(id)) ) then
+                if ( (reagentScan and IsReagentContainer(id)) or (not reagentScan and not self:IsDummyContainer(id)) ) then
                     scanContainerItems(result[k], id);
                 end
             end
@@ -1285,14 +1391,7 @@ function Armory:GetEquipCount(link)
         end
     end
 
-    for slot = ARMORY_GEARSLOT_FIRST_EQUIPPED, ARMORY_GEARSLOT_LAST_EQUIPPED do
-        link = self:GetProfessionItems(slot)
-        if ( self:GetUniqueItemId(link) == itemId ) then
-            count = count + 1;
-        end
-    end
-
-    return count;
+    return count + CountProfessionGear(itemId);
 end
 
 function Armory:IsBankContainer(id)
@@ -1308,6 +1407,14 @@ function Armory:IsBankOutOfSync()
                 return true;
             end
         end
+    end
+end
+
+if ( not HAS_BANK_TABS ) then
+    -- Classic's bank can only be counted while it is open, so there is nothing to correct
+    ReconcileBankCount = function(result, itemString)
+    end
+    function Armory:IsBankOutOfSync()
     end
 end
 
@@ -1450,10 +1557,7 @@ function Armory:FindInventoryItem(itemList, ...)
     for _, id in ipairs(ArmoryInventoryPlayerContainers) do
         self:FindContainerItem(id, list, ...);
 
-        local link, text;
-        if ( IsBagContainer(id) ) then
-            link = self:GetInventoryItemLink("player", C_Container.ContainerIDToInventoryID(id));
-        end
+        local link, text = GetBagItemLink(id);
         if ( link ) then
             if ( self:GetConfigExtendedSearch() ) then
                 text = self:GetFindText(link);
@@ -1461,7 +1565,7 @@ function Armory:FindInventoryItem(itemList, ...)
                 text = self:GetNameFromLink(link);
             end
             if ( self:FindTextParts(text, ...) ) then
-                table.insert(list, {label=ARMORY_EQUIPPED, name=container, link=link})
+                table.insert(list, {label=ARMORY_EQUIPPED, name=(self:GetInventoryContainerInfoEx(id)), link=link})
             end
         end
     end
