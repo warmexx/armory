@@ -1098,7 +1098,7 @@ function Armory:FindSkill(itemList, ...)
                     if ( IsRecipe(skillType) ) then
                         link = dbEntry:GetValue(container, name, itemContainer, i, "ItemLink");
                         if ( link and self:GetConfigExtendedSearch() ) then
-                            text = self:GetTextFromLink(link);
+                            text = self:GetFindText(link);
                         else
                             text = skillName;
                         end
@@ -1109,6 +1109,8 @@ function Armory:FindSkill(itemList, ...)
                             end
                             table.insert(list, {label=name, name=skillName, link=link});
                         end
+
+                        self:FindYield();
                     end
                 end
             end

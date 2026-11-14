@@ -518,7 +518,7 @@ function Armory:FindQuest(...)
                 if ( not isHeader ) then
                     link = dbEntry:GetValue(container, tostring(questID), "Link");
                     if ( self:GetConfigExtendedSearch() ) then
-                        text = self:GetTextFromLink(link);
+                        text = self:GetFindText(link);
                     else
                         text = name;
                     end
@@ -527,6 +527,8 @@ function Armory:FindQuest(...)
                         table.insert(list, {label=QUEST_LOG, name=name, link=link});
                     end
                 end
+
+                self:FindYield();
             end
         end
     end
@@ -541,7 +543,7 @@ function Armory:FindQuestItem(itemList, ...)
     if ( dbEntry ) then
         local numEntries = dbEntry:GetNumValues(container);
         if ( numEntries ) then
-            local questLogTitleText, level, isHeader;
+            local questLogTitleText, level, isHeader, questID;
             local text, label, name, link, id;
 
             for index = 1, numEntries do
@@ -553,13 +555,15 @@ function Armory:FindQuestItem(itemList, ...)
                         for i = 1, dbEntry:GetNumValues(container, id, key) do
                             name, _, _, _, _, link = dbEntry:GetValue(container, id, key, i);
                             if ( self:GetConfigExtendedSearch() ) then
-                                text = self:GetTextFromLink(link);
+                                text = self:GetFindText(link);
                             else
                                 text = name;
                             end
                             if ( self:FindTextParts(text, ...) ) then
                                 table.insert(list, {label=label, name=name, link=link});
                             end
+
+                            self:FindYield();
                         end
                     end
                 end
@@ -577,7 +581,7 @@ function Armory:FindQuestSpell(spellList, ...)
     if ( dbEntry ) then
         local numEntries = dbEntry:GetNumValues(container);
         if ( numEntries ) then
-            local questLogTitleText, level, isHeader;
+            local questLogTitleText, level, isHeader, questID;
             local text, label, name, link, id;
 
             for index = 1, numEntries do
@@ -588,7 +592,7 @@ function Armory:FindQuestSpell(spellList, ...)
                         _, name = dbEntry:GetValue(container, id, "RewardSpell");
                         link = dbEntry:GetValue(container, id, "SpellLink");
                         if ( self:GetConfigExtendedSearch() ) then
-                            text = self:GetTextFromLink(link);
+                            text = self:GetFindText(link);
                         else
                             text = name;
                         end
@@ -598,6 +602,8 @@ function Armory:FindQuestSpell(spellList, ...)
                         end
                     end
                 end
+
+                self:FindYield();
             end
         end
     end

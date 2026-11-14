@@ -15,6 +15,7 @@
 ## Author: Warmexx [Neighbours]
 ## Dependencies: Armory
 ## SavedVariables: AgbDB, AgbDBRealms
+## IconTexture: Interface\AddOns\Armory\Artwork\Logo
 ## X-Donate: PayPal:warmexx AT wow-neighbours DOT com
 ## X-Website: http://www.wow-neighbours.com/
 ## X-Category: Inventory

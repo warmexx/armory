@@ -15,6 +15,7 @@
 ## Author: Warmexx [Neighbours]
 ## SavedVariables: ArmoryDB, ArmorySettings, ArmoryModules, ArmoryCache, ArmoryShared
 ## SavedVariablesPerCharacter: ArmoryLocalSettings
+## IconTexture: Interface\AddOns\Armory\Artwork\Logo
 ## X-Donate: PayPal:warmexx AT wow-neighbours DOT com
 ## X-Website: http://www.wow-neighbours.com/
 ## X-Category: Inventory

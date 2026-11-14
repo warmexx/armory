@@ -227,6 +227,8 @@ function Armory:FindSpell(spellList, ...)
                         table.insert(list, {label=SPELLBOOK.." "..tabName, name=spellName, tooltipLines=tooltipLines});
                     end
                 end
+
+                self:FindYield();
             end
         end
     end
@@ -251,6 +253,8 @@ function Armory:FindSpell(spellList, ...)
                     table.insert(list, {label=SPELLBOOK.." "..self.selectedPet, name=spellName, tooltipLines=tooltipLines});
                 end
             end
+
+            self:FindYield();
         end
     end
     self.selectedPet = currentPet;
