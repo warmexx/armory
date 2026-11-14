@@ -3,7 +3,7 @@
   <Include file="Shared\Classic\ArmorySharedUIPanelTemplates.xml"/>
   <Include file="Shared\ArmoryFrameTemplates.xml"/>
   <Include file="Shared\ArmoryItemButtonTemplate.xml"/>
-  <Include file="Shared\Classic\ArmoryDropDownMenu.xml"/>
+  <Include file="Shared\ArmoryDropDownMenu.xml"/>
   <Include file="Shared\ArmoryStaticPopup.xml"/>
   <Include file="Shared\ArmoryItemFilter.xml"/>
 </Ui>

@@ -19,6 +19,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - Mail warnings as in Retail: one message per mailbox, or one per item with the new option Detailed mail warnings, and a warning when a character has never opened the mailbox (Classic Era and Burning Crusade Anniversary)
 - The total line of the item count in tooltips also shows how many are in the guild bank, as in Retail (Burning Crusade Anniversary)
 - The inventory, quest log, spellbook, social, tradeskill, find and lookup windows have the same frame as the main window, as in Retail (Classic Era and Burning Crusade Anniversary)
+- Drop-down menus look like Blizzard's menus, with check boxes and radio buttons, as in Retail (Classic Era and Burning Crusade Anniversary)
 - The talent window shows your unspent talent points, as in Burning Crusade Anniversary (Classic Era)
 - Shift-click on a recipe in the tradeskill window links the item it makes, as in Retail (Classic Era and Burning Crusade Anniversary)
 - Fixes Enchanting not being saved when Extended tradeskills is turned off (Classic Era and Burning Crusade Anniversary)

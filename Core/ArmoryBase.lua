@@ -102,9 +102,6 @@ else
     function Armory:HideFrame(frame) frame:Hide(); end
 end
 
--- Classic's dropdown has no unchecked boxes; notCheckable would only move the text to the left
-local MENU_NOT_CHECKABLE = not Armory.isClassic or nil;
-
 local iconProvider, cellPrototype, baseCellPrototype = QTip:CreateCellProvider(QTip.LabelProvider)
 
 function cellPrototype:InitializeCell()
@@ -461,7 +458,7 @@ function Armory:InitializeMenu()
         Armory:MenuAddButton("ARMORY_CMD_FIND", true);
         Armory:MenuAddButton("ARMORY_CMD_RESET_FRAME");
 
-        ArmoryDropDownMenu_AddButton({text=ARMORY_SHARE_LABEL, hasArrow=1, notCheckable=MENU_NOT_CHECKABLE, owner=Armory.menu});
+        ArmoryDropDownMenu_AddButton({text=ARMORY_SHARE_LABEL, hasArrow=1, notCheckable=true, owner=Armory.menu});
     end
 end
 
@@ -486,7 +483,7 @@ function Armory:MenuAddButton(label, closeMenu)
     else
         info.runFunc = entry.run;
         info.func = function() info.runFunc() end;
-        info.notCheckable = MENU_NOT_CHECKABLE;
+        info.notCheckable = true;
     end
     if ( entry.disabled ) then
         info.disabled = entry.disabled();
