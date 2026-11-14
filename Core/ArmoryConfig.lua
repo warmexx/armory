@@ -508,6 +508,13 @@ Armory.options = {
         get = function() return Armory:GetConfigShowEnhancedTips(); end,
         default = true
     },
+    ARMORY_CMD_SET_EXTENDEDTRADE = {
+        type = "toggle",
+        set = function(value) Armory:SetConfigExtendedTradeSkills(value and value ~= "0"); end,
+        get = function() return Armory:GetConfigExtendedTradeSkills(); end,
+        disabled = function() return not Armory:HasTradeSkills(); end,
+        default = true
+    },
     ARMORY_CMD_SET_SHOWSUMMARY = {
         type = "toggle",
         set = function(value) Armory:SetConfigShowSummary(value and value ~= "0"); end,
@@ -571,6 +578,34 @@ Armory.options = {
         default = false
     },
 };
+
+-- Options a family does not have; an options panel hides the control of a missing key
+local unavailableOptions;
+if ( Armory.isClassic ) then
+    unavailableOptions = {
+        "ARMORY_CMD_SET_SHOWSKILLRANK",
+        "ARMORY_CMD_SET_SHOW2NDSKILLRANK",
+        "ARMORY_CMD_SET_SHOWQUESTALTS",
+        "ARMORY_CMD_SET_SHOWACHIEVEMENTS",
+        "ARMORY_CMD_SET_USEINPROGRESSCOLOR",
+        "ARMORY_CMD_SET_SHOWGEARSETS",
+        "ARMORY_CMD_SET_SHOWGEMS",
+        "ARMORY_CMD_SET_MAILCHECKVERBOSE",
+        "ARMORY_CMD_SET_USEOVERLAY",
+        "ARMORY_CMD_SET_USEMAZIEL",
+        "ARMORY_CMD_SET_COOLDOWNEVENTS",
+        "ARMORY_CMD_SET_EVENTWARNINGS",
+        "ARMORY_CMD_SET_EVENTLOCALTIME",
+        "ARMORY_CMD_SET_CHECKCOOLDOWNS",
+    };
+else
+    unavailableOptions = {
+        "ARMORY_CMD_SET_EXTENDEDTRADE",
+    };
+end
+for _, key in ipairs(unavailableOptions) do
+    Armory.options[key] = nil;
+end
 
 function Armory:SetConfigShowEnhancedTips(on)
     self:Setting("General", "HideEnhancedTips", not on);
@@ -1342,6 +1377,14 @@ end
 
 function Armory:GetConfigMailVerboseCount()
     return self:Setting("General", "MailVerboseCount") or nil;
+end
+
+function Armory:SetConfigExtendedTradeSkills(on)
+    self:Setting("General", "SimpleTrade", not on);
+end
+
+function Armory:GetConfigExtendedTradeSkills()
+    return not self:Setting("General", "SimpleTrade");
 end
 
 function Armory:SetConfigShowSummary(on)
