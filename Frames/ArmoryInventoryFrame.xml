@@ -179,7 +179,7 @@
               </Anchor>
             </Anchors>
             <Frames>
-              <Button name="$parentCopperButton" inherits="ArmoryInventoryMoneyFrameButtonTemplate">
+              <Button name="$parentCopperButton" parentKey="CopperButton" inherits="ArmoryInventoryMoneyFrameButtonTemplate">
                 <Size>
                   <AbsDimension x="32" y="13"/>
                 </Size>
@@ -199,7 +199,7 @@
                   </Anchors>
                   <TexCoords left="0.5" right="0.75" top="0" bottom="1"/>
                 </NormalTexture>
-                <ButtonText name="$parentText">
+                <ButtonText name="$parentText" parentKey="Text">
                   <Anchors>
                     <Anchor point="RIGHT">
                       <Offset>
@@ -213,7 +213,7 @@
                   <AbsDimension x="0" y="0"/>
                 </PushedTextOffset>
               </Button>
-              <Button name="$parentSilverButton" inherits="ArmoryInventoryMoneyFrameButtonTemplate">
+              <Button name="$parentSilverButton" parentKey="SilverButton" inherits="ArmoryInventoryMoneyFrameButtonTemplate">
                 <Size>
                   <AbsDimension x="32" y="13"/>
                 </Size>
@@ -233,7 +233,7 @@
                   </Anchors>
                   <TexCoords left="0.25" right="0.5" top="0" bottom="1"/>
                 </NormalTexture>
-                <ButtonText name="$parentText">
+                <ButtonText name="$parentText" parentKey="Text">
                   <Anchors>
                     <Anchor point="RIGHT">
                       <Offset>
@@ -247,7 +247,7 @@
                   <AbsDimension x="0" y="0"/>
                 </PushedTextOffset>
               </Button>
-              <Button name="$parentGoldButton" inherits="ArmoryInventoryMoneyFrameButtonTemplate">
+              <Button name="$parentGoldButton" parentKey="GoldButton" inherits="ArmoryInventoryMoneyFrameButtonTemplate">
                 <Size>
                   <AbsDimension x="32" y="13"/>
                 </Size>
@@ -267,7 +267,7 @@
                   </Anchors>
                   <TexCoords left="0" right="0.25" top="0" bottom="1"/>
                 </NormalTexture>
-                <ButtonText name="$parentText">
+                <ButtonText name="$parentText" parentKey="Text">
                   <Anchors>
                     <Anchor point="RIGHT">
                       <Offset>

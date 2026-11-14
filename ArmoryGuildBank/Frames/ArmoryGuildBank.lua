@@ -739,13 +739,21 @@ end
 -- Hooks
 ----------------------------------------------------------
 
--- FIXME Mainline: see if HandleModifiedItemClick can be used
 if ( Armory.isClassic ) then
+    -- Classic's HandleModifiedItemClick only gets the link
     hooksecurefunc("ContainerFrameItemButton_OnModifiedClick",
         function(self, button)
             local bag = self:GetParent():GetID();
             local slot = self:GetID();
-            ArmoryGuildBankFramePasteItem(button, C_Container.GetContainerItemLink(bag, slot));
+            ArmoryGuildBankFramePasteItem(button, C_Container.GetContainerItemLink(bag, slot), true);
+        end
+    );
+else
+    hooksecurefunc("HandleModifiedItemClick",
+        function(link, itemButton)
+            if ( type(itemButton) == "table" and itemButton.bagID ) then
+                ArmoryGuildBankFramePasteItem("LeftButton", C_Container.GetContainerItemLink(itemButton.bagID, itemButton.slotIndex), true);
+            end
         end
     );
 end
@@ -958,10 +966,10 @@ function Armory:GetMultipleItemCount(items)
     return itemCounts;
 end
 
-function ArmoryGuildBankFramePasteItem(button, link)
+function ArmoryGuildBankFramePasteItem(button, link, isBagItem)
     if ( not ArmoryGuildBankFrameEditBox:IsVisible() ) then
         return;
-    elseif ( IsModifiedClick("CHATLINK") ) then
+    elseif ( ArmoryInventoryFrame_IsPasteClick(button, isBagItem) ) then
         local itemName = C_Item.GetItemInfo(link);
         if ( itemName ) then
             ArmoryGuildBankFrameEditBox:SetText(itemName);

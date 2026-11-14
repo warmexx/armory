@@ -8,7 +8,7 @@
       </OnLoad>
       <OnClick>
         if ( self.link ) then
-          if ( button == "RightButton" and IsShiftKeyDown() ) then
+          if ( ArmoryArtifactFrame and button == "RightButton" and IsShiftKeyDown() ) then
             ArmoryArtifactFrame:ShowArtifact(self.link);
           elseif ( IsModifiedClick("CHATLINK") ) then
             HandleModifiedItemClick(self.link);

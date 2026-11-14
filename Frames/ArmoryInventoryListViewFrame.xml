@@ -7,7 +7,7 @@
         self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
       </OnLoad>
       <OnClick inherit="append">
-        if ( self.link and button == "RightButton" and IsShiftKeyDown() ) then
+        if ( self.link and ArmoryArtifactFrame and button == "RightButton" and IsShiftKeyDown() ) then
             ArmoryArtifactFrame:ShowArtifact(self.link);
         end
       </OnClick>

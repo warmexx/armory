@@ -12,9 +12,9 @@
   <Include file="Frames\Classic\ArmorySkillFrame.xml"/>
   <Include file="Frames\Classic\ArmoryRaidInfoFrame.xml"/>
   <Include file="Frames\Classic\ArmoryTradeSkillFrame.xml"/>
-  <Include file="Frames\Classic\ArmoryInventoryFrame.xml"/>
-  <Include file="Frames\Classic\ArmoryInventoryIconViewFrame.xml"/>
-  <Include file="Frames\Classic\ArmoryInventoryListViewFrame.xml"/>
+  <Include file="Frames\ArmoryInventoryFrame.xml"/>
+  <Include file="Frames\ArmoryInventoryIconViewFrame.xml"/>
+  <Include file="Frames\ArmoryInventoryListViewFrame.xml"/>
   <Include file="Frames\Vanilla\ArmoryQuestLogFrame.xml"/>
   <Include file="Frames\Classic\ArmorySpellBookFrame.xml"/>
   <Include file="Frames\Classic\ArmorySocialFrame.xml"/>

@@ -106,7 +106,11 @@ function ArmoryInventoryFrame_OnLoad(self)
         self:RegisterEvent("PLAYERBANKSLOTS_CHANGED");
         self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE");
 
+        -- Blizzard's frame template in Classic has a button bar
+        ButtonFrameTemplate_HideButtonBar(self);
         Armory:SetPortraitToTexture(ArmoryInventoryFramePortrait, "Interface\\Buttons\\Button-Backpack-Up");
+        -- Classic has no account bank
+        ArmoryInventoryFrameTab3:Hide();
     else
         self:RegisterEvent("BANK_TAB_SETTINGS_UPDATED");
         self:RegisterEvent("TRADE_SKILL_SHOW");
@@ -116,11 +120,11 @@ function ArmoryInventoryFrame_OnLoad(self)
         self:RegisterEvent("OWNED_AUCTIONS_UPDATED");
 
         self:SetPortraitToAsset("Interface\\Buttons\\Button-Backpack-Up");
-        self:SetTitle(INVENTORY_TOOLTIP);
-
-        self.Inset:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 4, 338);
-        self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", PANEL_DEFAULT_WIDTH + PANEL_INSET_RIGHT_OFFSET, PANEL_INSET_BOTTOM_OFFSET);
     end
+    self:SetTitle(INVENTORY_TOOLTIP);
+
+    self.Inset:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 4, 338);
+    self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", PANEL_DEFAULT_WIDTH + PANEL_INSET_RIGHT_OFFSET, PANEL_INSET_BOTTOM_OFFSET);
 
     -- Tab Handling code
     ArmoryPanelTemplates_SetNumTabs(self, 2);
@@ -132,14 +136,14 @@ function ArmoryInventoryFrame_OnLoad(self)
             function(self, button)
                 local bag = self:GetParent():GetID();
                 local slot = self:GetID();
-                ArmoryInventoryFramePasteItem(button, C_Container.GetContainerItemLink(bag, slot));
+                ArmoryInventoryFramePasteItem(button, C_Container.GetContainerItemLink(bag, slot), true);
             end
         );
     else
         hooksecurefunc("HandleModifiedItemClick",
             function(link, itemButton)
                 if ( type(itemButton) == "table" and itemButton.bagID ) then
-                    ArmoryInventoryFramePasteItem("LeftButton", C_Container.GetContainerItemLink(itemButton.bagID, itemButton.slotIndex));
+                    ArmoryInventoryFramePasteItem("LeftButton", C_Container.GetContainerItemLink(itemButton.bagID, itemButton.slotIndex), true);
                 end
             end
         );
@@ -366,20 +370,20 @@ function ArmoryInventoryFrame_OnShow(self)
         ArmoryPanelTemplates_SetTab(self, 1);
     end
 
-    if ( not Armory.isClassic ) then
-        local tab;
-        local totalTabWidth = 0;
-        local tabWidthCache = {};
-        for i, tab in ipairs(self.Tabs) do
-            tabWidthCache[i] = 0;
+    -- only the visible tabs: no account bank in Classic, and the guild bank tab only with a guild
+    local tabs = {};
+    local totalTabWidth = 0;
+    local tabWidthCache = {};
+    for _, tab in ipairs(self.Tabs) do
+        if ( tab:IsShown() ) then
             ArmoryPanelTemplates_TabResize(tab, 0);
             tab.Text:SetWidth(0);
-            tabWidthCache[i] = ArmoryPanelTemplates_GetTabWidth(tab);
-            totalTabWidth = totalTabWidth + tabWidthCache[i];
-            tab:Show();
+            table.insert(tabs, tab);
+            table.insert(tabWidthCache, ArmoryPanelTemplates_GetTabWidth(tab));
+            totalTabWidth = totalTabWidth + tabWidthCache[#tabWidthCache];
         end
-        ArmoryPanelTemplates_ResizeTabsToFit(self.Tabs, totalTabWidth, self:GetWidth(), tabWidthCache);
     end
+    ArmoryPanelTemplates_ResizeTabsToFit(tabs, totalTabWidth, self:GetWidth(), tabWidthCache);
 
     ArmoryInventoryFrame_Update();
 end
@@ -524,10 +528,19 @@ function ArmoryInventoryFilterDropDown_OnShow(self)
     ArmoryItemFilter_SelectDropDown(self, ArmoryInventoryFrame_Update);
 end
 
-function ArmoryInventoryFramePasteItem(button, link)
+-- Alt-click on an item in the bags (Shift-click also opens Blizzard's stack split there),
+-- Shift-click on a chat link (Alt-click on a chat link can start a search with /find)
+function ArmoryInventoryFrame_IsPasteClick(button, isBagItem)
+    if ( isBagItem ) then
+        return button == "LeftButton" and IsAltKeyDown();
+    end
+    return IsModifiedClick("CHATLINK");
+end
+
+function ArmoryInventoryFramePasteItem(button, link, isBagItem)
     if ( not ArmoryInventoryFrameEditBox:IsVisible() ) then
         return;
-    elseif ( IsModifiedClick("CHATLINK") ) then
+    elseif ( ArmoryInventoryFrame_IsPasteClick(button, isBagItem) ) then
         local itemName = C_Item.GetItemInfo(link);
         if ( itemName ) then
             ArmoryInventoryFrameEditBox:SetText(itemName);

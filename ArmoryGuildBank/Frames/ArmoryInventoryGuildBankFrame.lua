@@ -29,15 +29,18 @@
 local AGB = AGB;
 local Armory, _ = Armory, nil;
 
--- the guild bank is the last tab of the inventory, after the account bank in Mainline
-local GUILDBANK_TAB = Armory.isClassic and 3 or 4;
+-- the guild bank is the last tab of the inventory, after the account bank (hidden in Classic)
+local GUILDBANK_TAB = 4;
 local MoneyFrame_Update = Armory.isClassic and MoneyFrame_Update or ArmoryMoneyFrame_Update;
 
 local function GetGuildBankTab()
-    return _G["ArmoryInventoryFrameTab"..GUILDBANK_TAB];
+    return ArmoryInventoryFrameTab4;
 end
 
 function ArmoryInventoryGuildBankFrame_OnLoad(self)
+    if ( Armory.isClassic ) then
+        ArmoryInventoryFrameTab4:SetPoint("LEFT", ArmoryInventoryFrameTab2, "RIGHT", -16, 0);
+    end
     ArmoryPanelTemplates_SetNumTabs(ArmoryInventoryFrame, GUILDBANK_TAB);
     ArmoryPanelTemplates_UpdateTabs(ArmoryInventoryFrame);
     self.collapsedTabs = {};
