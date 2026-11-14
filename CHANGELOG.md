@@ -11,6 +11,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - Fixes an error when guild members look up your data, and adds the option to share with your guild (Classic Era and Burning Crusade Anniversary)
 - Fixes an error when the buff frame shows a debuff (Classic Era and Burning Crusade Anniversary)
 - Fixes the channel name in the Share options not being saved when no channel name was set before
+- Fixes an error in the icon view of the inventory when the bag layout is on (Retail)
 
 ## Earlier versions
 Armory has been around since 2007. Until v20.0.0 every version of World of Warcraft had its own Armory:

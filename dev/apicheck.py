@@ -1,4 +1,7 @@
-"""Which global functions and events does Armory use that a client does not know at all?
+"""Which global functions, events and Enum values does Armory use that a client does not know at all?
+
+Enum values are checked against the generated API documentation; Classic names some of them
+differently (Enum.ItemQuality.Standard where Mainline has Common).
 
 loadcheck.py finds names that Blizzard defines only in files a client does not load.
 This script finds names that are defined nowhere: not in Blizzard's Lua or XML code
@@ -47,11 +50,15 @@ def strip_lua(t):
 
 known = set(LUA_GLOBALS)
 events = set()
+enums = {}
 for dp, _, fns in os.walk(BASE):
     for fn in fns:
         p = os.path.join(dp, fn)
         if fn.endswith(".lua"):
             t = read(p)
+            if "APIDocumentation" in dp:
+                for m in re.finditer(r'Name\s*=\s*"(\w+)",\s*Type\s*=\s*"Enumeration".*?Fields\s*=\s*\{(.*?)\n\t*\},', t, re.S):
+                    enums.setdefault(m.group(1), set()).update(re.findall(r'Name\s*=\s*"(\w+)"', m.group(2)))
             known |= set(re.findall(r"\bfunction\s+([A-Za-z_]\w*)\s*\(", t))
             known |= set(re.findall(r"^\s*([A-Za-z_]\w*)\s*=", t, re.M))
             known |= set(re.findall(r"^\s*(?:local\s+)?([A-Za-z_]\w*)\s*=", t, re.M))
@@ -103,7 +110,7 @@ def toc_files():
     return out
 
 
-hits, ev_hits = {}, {}
+hits, ev_hits, enum_hits = {}, {}, {}
 for p in toc_files():
     rel = os.path.relpath(p, ROOT)
     t = read(p)
@@ -120,6 +127,12 @@ for p in toc_files():
     for n in re.findall(r'RegisterEvent\(\s*"(\w+)"', raw):
         if n not in events:
             ev_hits.setdefault(n, set()).add(rel)
+    # Enum.X.Y with a field this client does not have (Classic: ItemQuality.Standard, not Common);
+    # "Enum.X.Y or ..." and "... or Enum.X.Y" are a fallback or a branch per version, and do not count
+    for m in re.finditer(r"(?<!\bor )\bEnum\.(\w+)\.(\w+)\b(?!\s+or\b)", t):
+        e, v = m.groups()
+        if e not in enums or v not in enums[e]:
+            enum_hits.setdefault(f"Enum.{e}.{v}", set()).add(rel)
 
 print(f"Client: {CLIENT}, Armory source: {ROOT}\n")
 print("=== Global functions used by Armory that this client does not define")
@@ -128,3 +141,6 @@ for n in sorted(hits):
 print("\n=== Events registered by Armory that this client does not know")
 for n in sorted(ev_hits):
     print(f"{n:45s} <- {', '.join(sorted(ev_hits[n])[:3])}")
+print("\n=== Enum values used by Armory that this client does not have")
+for n in sorted(enum_hits):
+    print(f"{n:45s} <- {', '.join(sorted(enum_hits[n])[:3])}")

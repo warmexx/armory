@@ -40,6 +40,17 @@ local mod = mod;
 local format = format;
 local floor = floor;
 
+-- Classic calls it Standard
+local QUALITY_COMMON = Enum.ItemQuality.Common or Enum.ItemQuality.Standard;
+
+-- Containers shown in the bag layout: the bags, and in Classic the bank bags too
+local HasBagLayout;
+if ( Armory.isClassic ) then
+    HasBagLayout = function(id) return id >= BACKPACK_CONTAINER and id <= NUM_BAG_SLOTS + NUM_BANKBAGSLOTS; end;
+else
+    HasBagLayout = function(id) return Armory:IsBag(id); end;
+end
+
 function ArmoryInventoryIconViewFrame_OnLoad(self)
     ArmoryInventoryIconViewFrameScrollBarScrollDownButton:SetScript("OnClick", ArmoryInventoryIconViewFrameDownArrow_OnClick);
     ArmoryInventoryIconViewFrameScrollBar:SetValue(0);
@@ -83,7 +94,7 @@ function ArmoryInventoryIconViewFrame_ShowContainer(containerFrame)
     local buttonTemplate = "ArmoryInventoryFrameItemButtonTemplate";
     local rowHeight = CONTAINER_ROW_HEIGHT;
 
-    if ( Armory:GetInventoryBagLayout() and self:IsBag(id) ) then
+    if ( Armory:GetInventoryBagLayout() and HasBagLayout(id) ) then
         columns = NUM_CONTAINER_COLUMNS;
         isPlusTwoBag = (mod(numSlots, columns) == 2);
     else
@@ -201,7 +212,7 @@ function ArmoryInventoryIconViewFrame_ShowContainer(containerFrame)
                         itemButton.searchOverlay:Show();
                     end
 
-                    if ( quality and quality > Enum.ItemQuality.Common and BAG_ITEM_QUALITY_COLORS[quality] ) then
+                    if ( quality and quality > QUALITY_COMMON and BAG_ITEM_QUALITY_COLORS[quality] ) then
                         itemButton.IconBorder:Show();
                         itemButton.IconBorder:SetVertexColor(BAG_ITEM_QUALITY_COLORS[quality].r, BAG_ITEM_QUALITY_COLORS[quality].g, BAG_ITEM_QUALITY_COLORS[quality].b);
                     else

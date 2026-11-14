@@ -34,7 +34,14 @@ local FIND_LINES_DISPLAYED = 13;
 local FIND_RESULTS = {};
 
 function ArmoryFindFrame_Toggle()
-    if ( ArmoryFindFrame:IsShown() ) then
+    if ( Armory.isClassic ) then
+        -- Classic still opens its frames as UI panels
+        if ( ArmoryFindFrame:IsShown() ) then
+            HideUIPanel(ArmoryFindFrame);
+        else
+            ShowUIPanel(ArmoryFindFrame);
+        end
+    elseif ( ArmoryFindFrame:IsShown() ) then
         ArmoryFindFrame:Hide();
     else
         ArmoryFindFrame:Show();
@@ -48,11 +55,15 @@ function ArmoryFindFrame_OnLoad(self)
     self:SetAttribute("UIPanelLayout-pushable", 5);
     self:SetAttribute("UIPanelLayout-whileDead", true);
 
-    self:SetPortraitToAsset("Interface\\Icons\\INV_Misc_QuestionMark");
-    self:SetTitle(ARMORY_CMD_FIND_MENUTEXT);
+    if ( Armory.isClassic ) then
+        Armory:SetPortraitToTexture(ArmoryFindFramePortrait, "Interface\\Icons\\INV_Misc_QuestionMark");
+    else
+        self:SetPortraitToAsset("Interface\\Icons\\INV_Misc_QuestionMark");
+        self:SetTitle(ARMORY_CMD_FIND_MENUTEXT);
 
-    self.Inset:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 4, 332);
-    self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -4, 120);
+        self.Inset:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 4, 332);
+        self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -4, 120);
+    end
 
     table.insert(UISpecialFrames, "ArmoryFindFrame");
 end
@@ -134,8 +145,9 @@ function ArmoryFindFrame_Finalize()
     end
 end
 
-function ArmoryFindFrame_Add(who, where, what, link, tinker, anchor, count)
-    table.insert(FIND_RESULTS, {who=who, where=where, what=what, link=link, tinker=tinker, anchor=anchor, count=count});
+-- tooltipLines: a stored tooltip for results without a link (spells in Classic)
+function ArmoryFindFrame_Add(who, where, what, link, tinker, anchor, count, tooltipLines)
+    table.insert(FIND_RESULTS, {who=who, where=where, what=what, link=link, tinker=tinker, anchor=anchor, count=count, tooltipLines=tooltipLines});
 end
 
 function ArmoryFindFrame_Sort(sortType)
@@ -220,9 +232,14 @@ function ArmoryFindFrameButton_OnEnter(self)
         local link = FIND_RESULTS[index].link;
         local tinker = FIND_RESULTS[index].tinker;
         local anchor = FIND_RESULTS[index].anchor;
+        local tooltipLines = FIND_RESULTS[index].tooltipLines;
         if ( link ) then
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
             Armory:SetHyperlink(GameTooltip, link, tinker, anchor);
+        elseif ( tooltipLines ) then
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+            Armory:Table2Tooltip(GameTooltip, tooltipLines, 2);
+            GameTooltip:Show();
         end
 
         if ( ArmoryFindFrame.simpleView ) then

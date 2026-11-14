@@ -41,6 +41,8 @@ ArmoryInventoryContainers = {
     ARMORY_AUCTIONS_CONTAINER, ARMORY_NEUTRAL_AUCTIONS_CONTAINER,
     ARMORY_EQUIPMENT_CONTAINER
 };
+-- Shared code uses the Mainline name; Classic has no account containers
+ArmoryInventoryPlayerContainers = ArmoryInventoryContainers;
 
 function ArmoryInventoryFrame_Toggle()
     if ( ArmoryInventoryFrame:IsShown() ) then

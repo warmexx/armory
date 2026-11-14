@@ -21,6 +21,6 @@
 ## X-Part-Of: Armory
 
 Locales.xml
-Core_TBC.xml
+Core.xml
 Config.xml
 Frames_TBC.xml

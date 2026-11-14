@@ -8,4 +8,8 @@
   <Button name="ArmoryUIPanelCloseButton" inherits="UIPanelCloseButton" virtual="true"/>
   <EditBox name="ArmoryInputBoxTemplate" inherits="InputBoxTemplate" virtual="true"/>
   <Frame name="ArmoryDialogBorderDarkTemplate" inherits="DialogBorderDarkTemplate" virtual="true"/>
+  <!-- The same for the functions of those templates that shared Lua calls -->
+  <Script>
+    ArmorySearchBoxTemplate_OnTextChanged = SearchBoxTemplate_OnTextChanged;
+  </Script>
 </Ui>

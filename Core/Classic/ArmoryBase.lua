@@ -156,7 +156,7 @@ function Armory:PrintSearchResult(who, line)
                 count = count.." ("..line.extra..")";
             end
         end
-        ArmoryFindFrame_Add(who, line.label, what, line.link, line.tooltipLines, count);
+        ArmoryFindFrame_Add(who, line.label, what, line.link, nil, nil, count, line.tooltipLines);
     else
         if ( line.extra ) then
             what = what.." ("..line.extra..")";
