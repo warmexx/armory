@@ -28,20 +28,36 @@
 
 local Armory, _ = Armory, nil;
 
-local NUM_FRAME_TABS = 5;
 local MAX_LINE_TABS = 10;
 
-ARMORYFRAME_MAINFRAMES = { "ArmoryFrame", "ArmoryLookupFrame", "ArmoryFindFrame", "ArmoryArtifactFrame" };
 ARMORYFRAME_SUBFRAMES = { "ArmoryPaperDollFrame", "ArmoryPetFrame", "ArmoryTalentFrame", "ArmoryPVPFrame", "ArmoryOtherFrame" };
-ARMORYFRAME_CHILDFRAMES = { "ArmoryTradeSkillFrame", "ArmoryInventoryFrame", "ArmoryQuestFrame", "ArmorySpellBookFrame", "ArmoryAchievementFrame", "ArmorySocialFrame" };
+if ( Armory.isClassic ) then
+    ARMORYFRAME_MAINFRAMES = { "ArmoryFrame", "ArmoryLookupFrame", "ArmoryFindFrame" };
+    ARMORYFRAME_CHILDFRAMES = { "ArmoryTradeSkillFrame", "ArmoryInventoryFrame", "ArmoryQuestLogFrame", "ArmorySpellBookFrame", "ArmorySocialFrame" };
+else
+    ARMORYFRAME_MAINFRAMES = { "ArmoryFrame", "ArmoryLookupFrame", "ArmoryFindFrame", "ArmoryArtifactFrame" };
+    ARMORYFRAME_CHILDFRAMES = { "ArmoryTradeSkillFrame", "ArmoryInventoryFrame", "ArmoryQuestFrame", "ArmorySpellBookFrame", "ArmoryAchievementFrame", "ArmorySocialFrame" };
+end
 
 ARMORYFRAME_SUBFRAME = "ArmoryPaperDollFrame";
-ArmoryFrameTabButtonMixin = CreateFromMixins(ArmoryPanelTabButtonMixin);
 
-function ArmoryFrameTabButtonMixin:OnShow()
-    ArmoryPanelTabButtonMixin.OnShow(self);
-    ArmoryFrame_TabBoundsCheck(self);
+local QUEST_FRAME = Armory.isClassic and "ArmoryQuestLogFrame" or "ArmoryQuestFrame";
+local SPELLBOOK_PLAYER = Armory.isClassic and BOOKTYPE_SPELL or Enum.SpellBookSpellBank.Player;
+-- Classic has no artifact relics
+local ARTIFACT_RELIC = Enum.ItemGemSubclass.Artifactrelic or false;
+local GetInventorySlotInfo = C_PaperDollInfo.GetInventorySlotInfo or GetInventorySlotInfo;
+
+-- Classic still opens its frames as UI panels, which do not open in combat
+local ShowFrame, HideFrame;
+if ( Armory.isClassic ) then
+    ShowFrame = function(frame) ShowUIPanel(frame); end;
+    HideFrame = function(frame) HideUIPanel(frame); end;
+else
+    ShowFrame = function(frame) frame:Show(); end;
+    HideFrame = function(frame) frame:Hide(); end;
 end
+
+ArmoryFrameTabButtonMixin = CreateFromMixins(ArmoryPanelTabButtonMixin);
 
 function ArmoryFrameTabButtonMixin:OnClick()
     ArmoryPanelTabButtonMixin.OnClick(self);
@@ -54,13 +70,13 @@ function ArmoryFrame_ToggleArmory(tab)
         ArmoryPanelTemplates_SetTab(ArmoryFrame, subFrame:GetID());
         if ( ArmoryFrame:IsVisible() ) then
             if ( subFrame:IsVisible() ) then
-                ArmoryFrame:Hide();
+                HideFrame(ArmoryFrame);
             else
                 PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
                 ArmoryFrame_ShowSubFrame(tab);
             end
         else
-            ArmoryFrame:Show();
+            ShowFrame(ArmoryFrame);
             ArmoryFrame_ShowSubFrame(tab);
         end
     end
@@ -73,41 +89,6 @@ function ArmoryFrame_ShowSubFrame(frameName)
             ARMORYFRAME_SUBFRAME = value;
         else
             _G[value]:Hide();
-        end
-    end
-end
-
-local function CompareFrameSize(frame1, frame2)
-    return frame1:GetWidth() > frame2:GetWidth();
-end
-local Tabtable = {};
-function ArmoryFrame_TabBoundsCheck(self)
-    if ( string.sub(self:GetName(), 1, 17) ~= "ArmoryFrameTab" ) then
-        return;
-    end
-
-    for i=1, NUM_FRAME_TABS do
-        _G["ArmoryFrameTab"..i.."Text"]:SetWidth(0);
-        ArmoryPanelTemplates_TabResize(_G["ArmoryFrameTab"..i], 0, nil, 36, 88);
-    end
-
-    local diff = _G["ArmoryFrameTab"..NUM_FRAME_TABS]:GetRight() - ArmoryFrame:GetRight();
-
-    if ( diff > 0 and ArmoryFrameTab3:IsShown() ) then
-        --Find the biggest tab
-        for i=1, NUM_FRAME_TABS do
-            Tabtable[i]=_G["ArmoryFrameTab"..i];
-        end
-        table.sort(Tabtable, CompareFrameSize);
-
-        local i=1;
-        while ( diff > 0 and i <= NUM_FRAME_TABS) do
-            local tabText = _G[Tabtable[i]:GetName().."Text"]
-            local change = min(10, diff);
-            diff = diff - change;
-            tabText:SetWidth(0);
-            ArmoryPanelTemplates_TabResize(Tabtable[i], -change, nil, 36-change, 88);
-            i = i+1;
         end
     end
 end
@@ -125,11 +106,11 @@ function ArmoryFrame_OpenSideFrame(frame)
     ArmoryFrame_UpdateLineTabs();
     if ( frame.enabled ) then
         if ( not ArmoryFrame:IsShown() ) then
-            ArmoryFrame:Show();
+            ShowFrame(ArmoryFrame);
         end
         if ( not frame:IsVisible() ) then
             ArmoryCloseChildWindows();
-            frame:Show();
+            ShowFrame(frame);
         end
     end
 end
@@ -162,9 +143,20 @@ function ArmoryFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_REGEN_DISABLED");
     self:RegisterEvent("PLAYER_REGEN_ENABLED");
 
+    local titleOffset = 70;
+    if ( Armory.isClassic ) then
+        -- Blizzard's frame template in Classic: a button bar, a wider portrait and no raised portrait and title
+        ButtonFrameTemplate_HideButtonBar(self);
+        titleOffset = 84;
+        ArmorySelectCharacter:SetPoint("TOPLEFT", 54, 1);
+        ArmorySelectCharacter:SetFrameLevel(self:GetFrameLevel() + 1);
+        ArmoryFrameLeftButton:SetFrameLevel(self:GetFrameLevel() + 5);
+        ArmoryFrameRightButton:SetFrameLevel(self:GetFrameLevel() + 5);
+    end
+
     self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", PANEL_DEFAULT_WIDTH + PANEL_INSET_RIGHT_OFFSET, PANEL_INSET_BOTTOM_OFFSET);
 
-    self:GetTitleText():SetPoint("LEFT", self, "LEFT", 70, 0);
+    self:GetTitleText():SetPoint("LEFT", self, "LEFT", titleOffset, 0);
     self:GetTitleText():SetPoint("RIGHT", self, "RIGHT", -40, 0);
     self:GetTitleText():SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 
@@ -194,23 +186,6 @@ function ArmoryFrame_OnEvent(self, event, ...)
         --Armory:RegisterTooltipHooks(ArmoryComparisonTooltip2);
 
         Armory:ExecuteDelayed(5, ArmoryFrame_Initialize);
-
-        if ( C_AddOns.IsAddOnLoaded("oGlow") ) then
-            Armory_oGlow_OnLoad();
-        end
-        if ( C_AddOns.IsAddOnLoaded("EnhTooltip") ) then
-            Armory_EnhTooltip_OnLoad();
-        end
-        if ( C_AddOns.IsAddOnLoaded("ManyItemTooltips") ) then
-            Armory_MIT_OnLoad();
-        end
-        if ( C_AddOns.IsAddOnLoaded("LinkWrangler") ) then
-            Armory_LW_OnLoad();
-        end
-        if ( C_AddOns.IsAddOnLoaded("GearScore") ) then
-            -- PlayerScore
-            Armory_PS_OnLoad();
-        end
     elseif ( not Armory:CanHandleEvents() ) then
         return;
     elseif ( (event == "UNIT_NAME_UPDATE" and arg1 == "player") or event == "PLAYER_PVP_RANK_CHANGED" ) then
@@ -419,7 +394,7 @@ function ArmoryFrameTab_Update()
             totalTabWidth = totalTabWidth + tabWidthCache[i];
         end
     end
-    ArmoryPanelTemplates_ResizeTabsToFit(ArmoryFrame.Tabs, totalTabWidth, ArmoryFrame:GetWidth(), tabWidthCache);
+    ArmoryPanelTemplates_ResizeTabsToFit(ArmoryFrame.Tabs, totalTabWidth, Armory.isClassic and 384 or ArmoryFrame:GetWidth(), tabWidthCache);
 end
 
 function ArmorySelectCharacter_OnEnter(self)
@@ -437,6 +412,10 @@ function ArmorySelectCharacter_OnClick(self)
     if ( self.characterList and self.characterList:IsVisible() ) then
         ArmorySelectCharacter_OnHide(self);
         return;
+    end
+
+    if ( Armory.isClassic ) then
+        SharedTooltip_SetBackdropStyle(GameTooltip);
     end
 
     self.characterList = Armory.qtip:Acquire("ArmoryCharacterList", 2);
@@ -574,7 +553,7 @@ function ArmoryFrame_UpdateLineTabs()
 
     if ( Armory:HasQuestLog() ) then
         ArmoryFrame_SetLineTab(tabId, "Quests", QUESTLOG_BUTTON, "Interface\\Icons\\INV_Misc_Book_08");
-        ArmoryQuestFrame.enabled = true;
+        _G[QUEST_FRAME].enabled = true;
         tabId = tabId + 1;
     end
 
@@ -584,7 +563,7 @@ function ArmoryFrame_UpdateLineTabs()
         tabId = tabId + 1;
     end
 
-    if ( Armory:HasAchievements() and _G.GetTotalAchievementPoints() > 0 ) then
+    if ( Armory.isMainline and Armory:HasAchievements() and _G.GetTotalAchievementPoints() > 0 ) then
         ArmoryFrame_SetLineTab(tabId, "Achievements", ACHIEVEMENT_BUTTON, "Interface\\Icons\\Achievement_Level_10");
         ArmoryAchievementFrame.enabled = true;
         tabId = tabId + 1;
@@ -646,9 +625,9 @@ function ArmoryFrameLineTab_OnClick(self)
     if ( self.tabType == "Inventory" ) then
         ArmoryInventoryFrame_Toggle();
     elseif ( self.tabType == "Quests" ) then
-        ArmoryQuestFrame_Toggle();
+        _G[QUEST_FRAME.."_Toggle"]();
     elseif ( self.tabType == "SpellBook" ) then
-        ArmoryToggleSpellBook(Enum.SpellBookSpellBank.Player);
+        ArmoryToggleSpellBook(SPELLBOOK_PLAYER);
     elseif ( self.tabType == "Social" ) then
         ArmorySocialFrame_Toggle();
     elseif ( self.tabType == "Achievements" ) then
@@ -939,7 +918,7 @@ function ArmoryShowCompareItem(tooltip, link)
     end
 
     local setItemFunc;
-    if ( subtype == Enum.ItemGemSubclass.Artifactrelic ) then
+    if ( subtype == ARTIFACT_RELIC ) then
         local relic = Armory:FindTooltipText(tooltip, relicPattern);
         local relicSlotType = relic and relic:match(relicPattern);
         if ( not relicSlotType ) then
@@ -983,7 +962,7 @@ function ArmoryShowCompareItem(tooltip, link)
             compareSlots[2] = nil;
         end
 
-        local slotId = C_PaperDollInfo.GetInventorySlotInfo(compareSlots[1]);
+        local slotId = GetInventorySlotInfo(compareSlots[1]);
         local itemLink = Armory:GetInventoryItemLink("player", slotId);
         if ( not itemLink ) then
             compareSlots[1] = compareSlots[2];
@@ -991,7 +970,7 @@ function ArmoryShowCompareItem(tooltip, link)
         end
 
         setItemFunc = function(tooltip, slot)
-            Armory:SetInventoryItem("player", C_PaperDollInfo.GetInventorySlotInfo(slot), nil, tooltip);
+            Armory:SetInventoryItem("player", GetInventorySlotInfo(slot), nil, tooltip);
         end
     end
     if ( not compareSlots[1] ) then
@@ -1078,299 +1057,5 @@ function Armory_EQC_Refresh()
 
     if ( EquipCompare_PostClearTooltip ) then
         EquipCompare_PostClearTooltip();
-    end
-end
-
-----------------------------------------------------------
--- EnhTooltip support
-----------------------------------------------------------
-
-function Armory_EnhTooltip_OnLoad()
-    Stubby.RegisterFunctionHook("Armory.SetQuestLogItem", 200, Armory_EnhTooltip_HookSetQuestLogItem);
-    Stubby.RegisterFunctionHook("Armory.SetInventoryItem", 200, Armory_EnhTooltip_HookSetInventoryItem);
-    Stubby.RegisterFunctionHook("Armory.SetBagItem", 200, Armory_EnhTooltip_HookSetBagItem);
-    Stubby.RegisterFunctionHook("Armory.SetTradeSkillItem", 200, Armory_EnhTooltip_HookSetTradeSkillItem);
-end
-
-function Armory_EnhTooltip_HookSetQuestLogItem(funcArgs, retVal, frame, qtype, slot)
-    local link = Armory:GetQuestLogItemLink(qtype, slot);
-    if ( link ) then
-        local name, texture, quantity, quality, usable = Armory:GetQuestLogRewardInfo(slot);
-        name = name or Armory:GetNameFromLink(link);
-        quality = Armory:GetQualityFromLink(link);
-        return EnhTooltip.TooltipCall(GameTooltip, name, link, quality, quantity);
-    end
-end
-
-function Armory_EnhTooltip_HookSetInventoryItem(funcArgs, retVal, frame, unit, slot, dontShow, tooltip, link)
-    if ( (link or Armory:GetInventoryItem(slot)) and not dontShow and not tooltip ) then
-        link = link or Armory:GetInventoryItemLink(unit, slot);
-        if ( link ) then
-            local name = Armory:GetNameFromLink(link);
-            local quantity = 1;
-            local quality = Armory:GetQualityFromLink(link);
-            return EnhTooltip.TooltipCall(GameTooltip, name, link, quality, quantity);
-        end
-    end
-end
-
-function Armory_EnhTooltip_HookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
-    local link = Armory:GetContainerItemLink(frameID, buttonID);
-    local name = Armory:GetNameFromLink(link);
-    if ( name ) then
-        local texture, itemCount, locked, quality, readable = Armory:GetContainerItemInfo(frameID, buttonID);
-        if ( not (quality and quality ~= -1) ) then
-            quality = Armory:GetQualityFromLink(link);
-        end
-        return EnhTooltip.TooltipCall(GameTooltip, name, link, quality, itemCount);
-    end
-end
-
-function Armory_EnhTooltip_HookSetTradeSkillItem(funcArgs, retVal, frame, skill, slot)
-    local link;
-    if ( slot ) then
-        link = Armory:GetTradeSkillReagentItemLink(skill, slot);
-        if ( link ) then
-            local name, texture, quantity = Armory:GetTradeSkillReagentInfo(skill, slot);
-            local quality = Armory:GetQualityFromLink(link);
-            return EnhTooltip.TooltipCall(GameTooltip, name, link, quality, quantity);
-        end
-    else
-        link = Armory:GetTradeSkillItemLink(skill);
-        if ( link ) then
-            local name = Armory:GetNameFromLink(link);
-            local quality = Armory:GetQualityFromLink(link);
-            return EnhTooltip.TooltipCall(GameTooltip, name, link, quality);
-        end
-    end
-end
-
-----------------------------------------------------------
--- oGlow support
-----------------------------------------------------------
-
-local alertSlots = {
-    "ArmoryHeadSlot",
-    "ArmoryShoulderSlot",
-    "ArmoryChestSlot",
-    "ArmoryWaistSlot",
-    "ArmoryLegsSlot",
-    "ArmoryFeetSlot",
-    "ArmoryWristSlot",
-    "ArmoryHandsSlot",
-    "ArmoryMainHandSlot",
-    "ArmorySecondaryHandSlot"
-};
-
-local function GetAlertStatus(buttonName)
-    for index, value in pairs(alertSlots) do
-        if ( value == buttonName ) then
-            return Armory:GetInventoryAlertStatus(index) or 2;
-        end
-    end
-    return 2;
-end
-
-function Armory_oGlow_OnLoad()
-    hooksecurefunc("ArmoryPaperDollItemSlotButton_Update", Armory_oGlow_PaperDollItemSlotButton_Update);
-    hooksecurefunc(Armory, "SetItemLink", Armory_oGlow_SetItemLink);
-end
-
-function Armory_oGlow_PaperDollItemSlotButton_Update(button)
-    if ( oGlow.CallFilters ) then
-        oGlow:CallFilters("char", button, button.link);
-    else
-        local slotId = button:GetID();
-        local quality = -1;
-        local status = 2;
-        local isBroken;
-
-        if ( button.itemId ~= nil ) then
-            if ( button.itemId ~= 0 ) then
-                _, _, quality = C_Item.GetItemInfo(button.itemId);
-            end
-        else
-            quality = Armory:GetInventoryItemQuality("player", slotId) or Armory:GetQualityFromLink(button.link);
-            isBroken = Armory:GetInventoryItemBroken("player", slotId);
-            status = GetAlertStatus(button:GetName());
-
-            if ( isBroken ) then
-                quality = 100;
-            elseif ( status == 3 ) then
-                quality = 99;
-            end
-        end
-
-        oGlow(button, quality);
-    end
-end
-
-function Armory_oGlow_SetItemLink(self, button, link)
-    local icon = _G[(button:GetName() or "").."IconTexture"] or button;
-    if ( icon and icon.IsDesaturated and icon:IsDesaturated() ) then
-        return;
-    elseif ( oGlow.CallFilters ) then
-        oGlow:CallFilters("bags", icon, link);
-    elseif ( link ) then
-        local _, _, quality = C_Item.GetItemInfo(link);
-        oGlow(button, quality or Armory:GetQualityFromLink(link), icon);
-    elseif ( button.bc ) then
-        button.bc:Hide();
-    end
-end
-
-----------------------------------------------------------
--- ManyItemTooltips (MIT) support
-----------------------------------------------------------
-
-function Armory_MIT_OnLoad()
-    Armory.MIT_tooltips = {};
-    MIT:AddHook("Armory", "OnCreate", function (tooltip)
-        table.insert(Armory.MIT_tooltips, tooltip);
-        Armory:RegisterTooltipHooks(tooltip);
-    end);
-end
-
-----------------------------------------------------------
--- LinkWrangler support
-----------------------------------------------------------
-
-function Armory_LW_OnLoad()
-    Armory.LW_tooltips = {};
-    LinkWrangler.RegisterCallback("Armory",
-        function (tooltip)
-            table.insert(Armory.LW_tooltips, tooltip);
-            Armory:RegisterTooltipHooks(tooltip);
-        end,
-        "allocate");
-end
-
-----------------------------------------------------------
--- GearScore support
-----------------------------------------------------------
-
-function Armory_GS_OnLoad()
-    ArmoryGS = {};
-    setmetatable(ArmoryGS, {__index = _G});
-
-    ArmoryGS.UnitIsPlayer = function(unit) return true;    end;
-    ArmoryGS.UnitClass = function(unit) return Armory:UnitClass(unit); end;
-    ArmoryGS.UnitName = function(unit) return Armory:UnitName(unit); end;
-    ArmoryGS.GetInventoryItemLink = function(unit, index) return (Armory:GetInventoryItemLink(unit, index)) or false; end;
-
-    ArmoryGS.UnitRace = function(unit) return Armory:UnitRace(unit); end;
-    ArmoryGS.UnitLevel = function(unit) return Armory:UnitLevel(unit); end;
-    ArmoryGS.UnitFactionGroup = function(unit) return Armory:UnitFactionGroup(unit); end;
-    ArmoryGS.UnitSex = function(unit) return Armory:UnitSex(unit); end;
-    ArmoryGS.GetZoneText = function() return Armory:GetZoneText(); end;
-    ArmoryGS.GetGuildInfo = function(unit) return Armory:GetGuildInfo(unit); end;
-    ArmoryGS.GetRealmName = function() return Armory.characterRealm; end;
-
-    ArmoryGS.GetItemInfo = function(link)
-        local text = Armory:GetTextFromLink(link);
-        if ( text == "" or text:find(RETRIEVING_ITEM_INFO) or not C_Item.GetItemInfo(link) ) then
-            ArmoryGS.noData = true;
-            return "", link, 0, 0, 0, "", "", 0, "", "", 0;
-        else
-            return C_Item.GetItemInfo(link);
-        end
-    end
-
-    ArmoryGS.ArmoryFrame_Update = ArmoryFrame_Update;
-    ArmoryGS.GearScore_HookItem = GearScore_HookItem;
-    ArmoryGS.GearScore_EquipCompare = function() end;
-    ArmoryGS.GearScore_HookCompareItem = function(tooltip)
-        local name, link = Armory:GetItemFromTooltip(tooltip);
-        local Orig_CalculateClasicItemScore = CalculateClasicItemScore;
-        CalculateClasicItemScore = function() end;
-        GearScore_HookItem(name, link, tooltip);
-        CalculateClasicItemScore = Orig_CalculateClasicItemScore;
-    end
-
-    ArmoryFrame_Update = function(...)
-        ArmoryGS.ArmoryFrame_Update(...);
-        setfenv(GearScore_GetScore, ArmoryGS);
-        setfenv(GearScore_GetItemScore, ArmoryGS);
-        ArmoryGS.noData = false;
-        local success, score, avg = pcall(GearScore_GetScore, Armory:UnitName("player"), "player");
-        if ( not success ) then
-            Armory:PrintDebug(score);
-            score = 0;
-        end
-        local r, g, b = GearScore_GetQuality(score);
-        if ( ArmoryGS.noData ) then
-            score = "?";
-            r, g, b = GetTableColor(RED_FONT_COLOR);
-        end
-        ArmoryGearScore:SetText("GS:"..score);
-        ArmoryGearScore:SetTextColor(r, g, b);
-        setfenv(GearScore_GetScore, _G);
-        setfenv(GearScore_GetItemScore, _G);
-    end
-
-    GearScore_HookItem = function(...)
-        local frame = GetMouseFoci()[1];
-        if ( IsAltKeyDown() or (frame and frame:GetName() and frame:GetName():sub(1, 6) == "Armory") ) then
-            setfenv(ArmoryGS.GearScore_HookItem, ArmoryGS);
-            if ( CalculateClasicItemScore ) then
-                setfenv(CalculateClasicItemScore, ArmoryGS);
-            end
-        end
-        ArmoryGS.GearScore_HookItem(...);
-        setfenv(ArmoryGS.GearScore_HookItem, _G);
-        if ( CalculateClasicItemScore ) then
-            setfenv(CalculateClasicItemScore, _G);
-        end
-    end
-
-    ArmoryPaperDollFrame:CreateFontString("ArmoryGearScore");
-    ArmoryGearScore:SetFontObject("ArmoryFontHighlightExtraSmall");
-    ArmoryGearScore:SetText("GS:0");
-    ArmoryGearScore:SetPoint("BOTTOMRIGHT", ArmoryPaperDollFrame, "BOTTOMRIGHT", -45, 85);
-    ArmoryGearScore:Show();
-
-    ArmoryComparisonTooltip1:HookScript("OnTooltipSetItem", ArmoryGS.GearScore_HookCompareItem);
-    ArmoryComparisonTooltip2:HookScript("OnTooltipSetItem", ArmoryGS.GearScore_HookCompareItem);
-end
-
-function Armory_PS_OnLoad()
-    ArmoryPS = {};
-    setmetatable(ArmoryPS, {__index = _G});
-
-    ArmoryPS.UnitClass = function(unit) return Armory:UnitClass(unit); end;
-    ArmoryPS.UnitLevel = function(unit) return Armory:UnitLevel(unit); end;
-    ArmoryPS.UnitName = function(unit) return Armory:UnitName(unit); end;
-    ArmoryPS.GetActiveSpecGroup = function(inspect) return Armory:GetActiveSpecGroup(); end;
-    ArmoryPS.GetSpecialization = function(inspect, pet, talentGroup) return Armory:GetSpecialization(inspect, pet, talentGroup); end;
-    ArmoryPS.GetSpecializationInfo = function(index, inspect, pet, dummy, sex) return Armory:GetSpecializationInfo(index, inspect, pet, dummy, sex); end;
-    ArmoryPS.GetInventoryItemLink = function(unit, index) return (Armory:GetInventoryItemLink(unit, index)) or nil; end;
-
-    local categoryInfo = ARMORY_PAPERDOLL_STATCATEGORIES["PLAYERSCORE"];
-    if ( categoryInfo and not ARMORY_PLAYERSTAT_DROPDOWN_OPTIONS["PLAYERSCORE"] ) then
-        table.insert(ARMORY_PLAYERSTAT_DROPDOWN_OPTIONS, "PLAYERSCORE");
-        for index, stat in next, categoryInfo.stats do
-            local updateFunc = PAPERDOLL_STATINFO[stat].updateFunc;
-            ARMORY_PAPERDOLL_STATINFO[stat] = {
-                updateFunc = function(statFrame, unit)
-                    if ( Armory:IsPlayerSelected() ) then
-                       return updateFunc(statFrame, unit);
-                    end
-                    local Orig_Realm = TenTonHammer.Realm;
-                    TenTonHammer.Realm = Armory.characterRealm;
-                    if not ( TenTonHammer_Database[TenTonHammer.Realm] ) then
-                        TenTonHammer_Database[TenTonHammer.Realm] = {};
-                    end;
-                    local Orig_GetComparisonStatistic = GetComparisonStatistic;
-                    GetComparisonStatistic = function(id) return tonumber(Armory:GetStatistic(id)); end;
-                    setfenv(TenTonHammer.GetPlayerInfo, ArmoryPS);
-                    pcall(TenTonHammer.GetPlayerInfo, TenTonHammer);
-                    pcall(updateFunc, statFrame, unit);
-                    setfenv(TenTonHammer.GetPlayerInfo, _G);
-                    GetComparisonStatistic = Orig_GetComparisonStatistic;
-                    TenTonHammer.Realm = Orig_Realm;
-                    TenTonHammer.PlayerInfo = nil;
-                end
-            };
-        end
     end
 end

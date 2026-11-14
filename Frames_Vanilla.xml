@@ -1,7 +1,7 @@
 <!-- Revision: @file-revision@ @file-date-iso@ -->
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
   <Include file="Tools\Classic\ArmoryFindFrame.xml"/>
-  <Include file="Frames\Classic\ArmoryFrame.xml"/>
+  <Include file="Frames\ArmoryFrame.xml"/>
   <Include file="Frames\ArmoryBuffFrame.xml"/>
   <Include file="Frames\Vanilla\ArmoryPaperDollFrame.xml"/>
   <Include file="Frames\Vanilla\ArmoryTalentFrame.xml"/>

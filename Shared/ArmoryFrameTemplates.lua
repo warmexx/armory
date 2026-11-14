@@ -30,7 +30,25 @@ local Armory, _ = Armory, nil;
 
 ArmoryPanelTabButtonMixin = {};
 
+-- Classic's UI-Character-ActiveTab is 128x32 instead of 128x64: show the selected tab
+-- like Blizzard's CharacterFrameTabButtonTemplate in Classic does
+local function SetClassicActiveTab(tab)
+    local name = tab:GetName();
+    local left = _G[name.."LeftDisabled"];
+    left:SetPoint("TOPLEFT", 0, 4);
+    left:SetHeight(32);
+    left:SetTexCoord(0, 0.15625, 0, 1.0);
+    _G[name.."MiddleDisabled"]:SetHeight(32);
+    _G[name.."MiddleDisabled"]:SetTexCoord(0.15625, 0.84375, 0, 1.0);
+    _G[name.."RightDisabled"]:SetHeight(32);
+    _G[name.."RightDisabled"]:SetTexCoord(0.84375, 1.0, 0, 1.0);
+    tab.selectedTextY = 4;
+end
+
 function ArmoryPanelTabButtonMixin:OnLoad()
+    if ( Armory.isClassic ) then
+        SetClassicActiveTab(self);
+    end
     self:SetFrameLevel(self:GetFrameLevel() + 4);
     self:RegisterEvent("DISPLAY_SIZE_CHANGED");
 end

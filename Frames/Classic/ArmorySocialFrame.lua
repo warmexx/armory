@@ -38,6 +38,7 @@ ARMORY_SOCIALFRAME_FRIEND_HEIGHT = 34;
 ARMORY_IGNORES_TO_DISPLAY = 21;
 ARMORY_SOCIALFRAME_IGNORE_HEIGHT = 16;
 
+local tabs = {};
 local tabWidthCache = {};
 
 function ArmorySocialFrame_ShowSubFrame(frameName)
@@ -81,13 +82,14 @@ function ArmorySocialFrame_OnShow(self)
     for i = 1, ARMORY_SOCIAL_TABS do
         tabWidthCache[i] = 0;
         tab = _G["ArmorySocialFrameTab"..i];
+        tabs[i] = tab;
         PanelTemplates_TabResize(tab, 0);
         tab.textWidth = tab:GetTextWidth();
         tabWidthCache[i] = PanelTemplates_GetTabWidth(tab);
         totalTabWidth = totalTabWidth + tabWidthCache[i];
         tab:Show();
     end
-    ArmoryFrame_CheckTabBounds("ArmorySocialFrameTab", totalTabWidth, 270, tabWidthCache);
+    ArmoryPanelTemplates_ResizeTabsToFit(tabs, totalTabWidth, 270, tabWidthCache);
 
     ArmorySocialFrame_ShowSubFrame();
 end

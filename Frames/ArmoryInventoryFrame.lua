@@ -339,18 +339,6 @@ end
 
 function ArmoryInventoryFrame_UpdateTooltips()
     Armory:RefreshTooltip(ItemRefTooltip);
-    if ( Armory.MIT_tooltips ) then
-        for _, tooltip in ipairs(Armory.MIT_tooltips) do
-             Armory:RefreshTooltip(tooltip);
-        end
-    end
-    if ( Armory.LW_tooltips ) then
-        for _, tooltip in ipairs(Armory.LW_tooltips) do
-            if ( tooltip:NumLines() > 1 ) then
-                Armory:RefreshTooltip(tooltip);
-            end
-        end
-    end
 end
 
 function ArmoryInventoryFrameButton_OnClick(self)
