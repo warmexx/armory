@@ -59,10 +59,10 @@ end
 
 function ArmorySocialFrame_Toggle()
     if ( ArmorySocialFrame:IsShown() or not Armory:HasSocial() ) then
-        ArmorySocialFrame:Hide();
+        Armory:HideFrame(ArmorySocialFrame);
     else
         ArmoryCloseChildWindows();
-        ArmorySocialFrame:Show();
+        Armory:ShowFrame(ArmorySocialFrame);
     end
 end
 
@@ -73,14 +73,23 @@ function ArmorySocialFrameTab_OnClick(self)
 end
 
 function ArmorySocialFrame_OnLoad(self)
-    self:SetPortraitToAsset("Interface\\FriendsFrame\\FriendsFrameScrollIcon");
+    if ( Armory.isClassic ) then
+        -- Blizzard's frame template in Classic has a button bar
+        ButtonFrameTemplate_HideButtonBar(self);
+        Armory:SetPortraitToTexture(ArmorySocialFramePortrait, "Interface\\FriendsFrame\\FriendsFrameScrollIcon");
+        -- Classic has no events (calendar and cooldowns)
+        ArmorySocialFrameTab3:Hide();
+    else
+        self:SetPortraitToAsset("Interface\\FriendsFrame\\FriendsFrameScrollIcon");
+
+        self:RegisterEvent("PLAYER_ENTERING_WORLD");
+        self:RegisterEvent("CALENDAR_UPDATE_EVENT_LIST");
+        self:RegisterEvent("CALENDAR_CLOSE_EVENT");
+    end
     self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", PANEL_DEFAULT_WIDTH + PANEL_INSET_RIGHT_OFFSET, PANEL_INSET_BOTTOM_OFFSET);
 
-    self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("FRIENDLIST_UPDATE");
     self:RegisterEvent("IGNORELIST_UPDATE");
-    self:RegisterEvent("CALENDAR_UPDATE_EVENT_LIST");
-    self:RegisterEvent("CALENDAR_CLOSE_EVENT");
 
     ArmoryPanelTemplates_SetNumTabs(self, 3);
     ArmoryPanelTemplates_SetTab(self, 1);
@@ -90,18 +99,20 @@ function ArmorySocialFrame_OnShow(self)
     PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
     ArmoryPanelTemplates_SetTab(self, ArmoryPanelTemplates_GetSelectedTab(self));
 
-    local tab;
+    -- only the visible tabs: no events in Classic
+    local tabs = {};
     local totalTabWidth = 0;
     local tabWidthCache = {};
-    for i, tab in ipairs(self.Tabs) do
-        tabWidthCache[i] = 0;
-        ArmoryPanelTemplates_TabResize(tab, 0);
-        tab.Text:SetWidth(0);
-        tabWidthCache[i] = ArmoryPanelTemplates_GetTabWidth(tab);
-        totalTabWidth = totalTabWidth + tabWidthCache[i];
-        tab:Show();
+    for _, tab in ipairs(self.Tabs) do
+        if ( tab:IsShown() ) then
+            ArmoryPanelTemplates_TabResize(tab, 0);
+            tab.Text:SetWidth(0);
+            table.insert(tabs, tab);
+            table.insert(tabWidthCache, ArmoryPanelTemplates_GetTabWidth(tab));
+            totalTabWidth = totalTabWidth + tabWidthCache[#tabWidthCache];
+        end
     end
-    ArmoryPanelTemplates_ResizeTabsToFit(self.Tabs, totalTabWidth, self:GetWidth(), tabWidthCache);
+    ArmoryPanelTemplates_ResizeTabsToFit(tabs, totalTabWidth, self:GetWidth(), tabWidthCache);
 
     ArmorySocialFrame_ShowSubFrame();
 end

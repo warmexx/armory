@@ -18,7 +18,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - Searching with /find runs in the background and stops when you close the window, as in Retail, and in Burning Crusade Anniversary it also searches the guild bank (Classic Era and Burning Crusade Anniversary)
 - Mail warnings as in Retail: one message per mailbox, or one per item with the new option Detailed mail warnings, and a warning when a character has never opened the mailbox (Classic Era and Burning Crusade Anniversary)
 - The total line of the item count in tooltips also shows how many are in the guild bank, as in Retail (Burning Crusade Anniversary)
-- The inventory, find and lookup windows have the same frame as the main window, as in Retail (Classic Era and Burning Crusade Anniversary)
+- The inventory, social, find and lookup windows have the same frame as the main window, as in Retail (Classic Era and Burning Crusade Anniversary)
 - Fixes the remaining time of items you mailed to your other characters, which was counted from their last visit to the mailbox instead of from the moment the item was sent (Classic Era and Burning Crusade Anniversary)
 - Fixes the channel name in the Share options not being saved when no channel name was set before
 - Fixes the pet selection, which switched to another stored pet instead of the summoned one (Retail)

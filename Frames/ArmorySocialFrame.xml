@@ -204,31 +204,16 @@
         <Anchors>
           <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="11" y="2"/>
         </Anchors>
-        <Scripts>
-          <OnLoad>
-            ArmoryPanelTemplates_SelectTab(self);
-          </OnLoad>
-        </Scripts>
       </Button>
       <Button name="ArmorySocialFrameTab2" inherits="ArmorySocialTabTemplate" text="IGNORE" id="2">
         <Anchors>
           <Anchor point="LEFT" relativeTo="ArmorySocialFrameTab1" relativePoint="RIGHT" x="-16" y="0"/>
         </Anchors>
-        <Scripts>
-          <OnShow>
-            ArmoryPanelTemplates_DeselectTab(self);
-          </OnShow>
-        </Scripts>
       </Button>
       <Button name="ArmorySocialFrameTab3" inherits="ArmorySocialTabTemplate" text="EVENTS_LABEL" id="3">
         <Anchors>
           <Anchor point="LEFT" relativeTo="ArmorySocialFrameTab2" relativePoint="RIGHT" x="-16" y="0"/>
         </Anchors>
-        <Scripts>
-          <OnShow>
-            ArmoryPanelTemplates_DeselectTab(self);
-          </OnShow>
-        </Scripts>
       </Button>
       <Frame name="ArmoryFriendsListFrame" hidden="true" setAllPoints="true">
         <Frames>
