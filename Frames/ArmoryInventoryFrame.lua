@@ -543,18 +543,10 @@ function ArmoryInventoryFilterDropDown_OnShow(self)
     ArmoryItemFilter_SelectDropDown(self, ArmoryInventoryFrame_Update);
 end
 
--- Classic pastes with Alt-click, Mainline with the chat link modifier
-local PasteModifier;
-if ( Armory.isClassic ) then
-    PasteModifier = function(button) return button == "LeftButton" and IsAltKeyDown(); end;
-else
-    PasteModifier = function(button) return IsModifiedClick("CHATLINK"); end;
-end
-
 function ArmoryInventoryFramePasteItem(button, link)
     if ( not ArmoryInventoryFrameEditBox:IsVisible() ) then
         return;
-    elseif ( PasteModifier(button) ) then
+    elseif ( IsModifiedClick("CHATLINK") ) then
         local itemName = C_Item.GetItemInfo(link);
         if ( itemName ) then
             ArmoryInventoryFrameEditBox:SetText(itemName);

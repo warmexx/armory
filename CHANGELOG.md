@@ -10,6 +10,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - Fixes an error when opening the options and the Defaults button of the options panel (Classic Era and Burning Crusade Anniversary)
 - Fixes an error when guild members look up your data, and adds the option to share with your guild (Classic Era and Burning Crusade Anniversary)
 - Fixes an error when the buff frame shows a debuff (Classic Era and Burning Crusade Anniversary)
+- Shift-click instead of Alt-click copies the name of an item in your bags or a chat link into the search box of the inventory and the guild bank, as in Retail; Alt-click on a chat link is left for the search (Classic Era and Burning Crusade Anniversary)
 - Fixes the channel name in the Share options not being saved when no channel name was set before
 - Fixes an error in the icon view of the inventory when the bag layout is on (Retail)
 
