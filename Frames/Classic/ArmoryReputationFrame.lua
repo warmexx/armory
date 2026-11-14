@@ -99,8 +99,8 @@ function ArmoryReputationFrame_Update()
                 factionBar:Hide();
                 factionHeader:Show();
             else
-                factionStanding = GetText("FACTION_STANDING_LABEL"..standingID, gender);
-                factionName = _G["ArmoryReputationBar"..i.."FactionName"];
+                local factionStanding = GetText("FACTION_STANDING_LABEL"..standingID, gender);
+                local factionName = _G["ArmoryReputationBar"..i.."FactionName"];
                 factionName:SetText(name);
                 _G["ArmoryReputationBar"..i.."FactionStanding"]:SetText(factionStanding);
 
@@ -118,7 +118,7 @@ function ArmoryReputationFrame_Update()
 
                 factionBar.index = factionIndex;
                 factionBar.standingText = factionStanding;
-                factionBar.tooltip = HIGHLIGHT_FONT_COLOR_CODE.." "..barValue.." / "..barMax..FONT_COLOR_CODE_CLOSE;
+                factionBar.standingProgress = HIGHLIGHT_FONT_COLOR_CODE.." "..barValue.." / "..barMax..FONT_COLOR_CODE_CLOSE;
                 factionBar:SetMinMaxValues(0, barMax);
                 factionBar:SetValue(barValue);
                 local color = FACTION_BAR_COLORS[standingID];
@@ -147,6 +147,33 @@ function ArmoryReputationFrame_Update()
     end
     if ( ArmoryReputationFrame.selectedFaction == 0 ) then
         ArmoryReputationDetailFrame:Hide();
+    end
+end
+
+function ArmoryReputationBar_OnEnter(self)
+    local name = self:GetName();
+
+    if ( self.standingProgress ) then
+        _G[name.."FactionStanding"]:SetText(self.standingProgress);
+    end
+    _G[name.."Highlight1"]:Show();
+    _G[name.."Highlight2"]:Show();
+
+    self.tooltip = Armory:ShowFactionStandings(self, _G[name.."FactionName"]:GetText());
+end
+
+function ArmoryReputationBar_OnLeave(self)
+    local name = self:GetName();
+
+    _G[name.."FactionStanding"]:SetText(self.standingText);
+    if ( (ArmoryReputationFrame.selectedFaction ~= self.index) or (not ArmoryReputationDetailFrame:IsShown()) ) then
+        _G[name.."Highlight1"]:Hide();
+        _G[name.."Highlight2"]:Hide();
+    end
+
+    if ( self.tooltip ) then
+        Armory.qtip:Release(self.tooltip);
+        self.tooltip = nil;
     end
 end
 

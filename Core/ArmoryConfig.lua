@@ -583,8 +583,6 @@ Armory.options = {
 local unavailableOptions;
 if ( Armory.isClassic ) then
     unavailableOptions = {
-        "ARMORY_CMD_SET_SHOWSKILLRANK",
-        "ARMORY_CMD_SET_SHOW2NDSKILLRANK",
         "ARMORY_CMD_SET_SHOWQUESTALTS",
         "ARMORY_CMD_SET_SHOWACHIEVEMENTS",
         "ARMORY_CMD_SET_USEINPROGRESSCOLOR",

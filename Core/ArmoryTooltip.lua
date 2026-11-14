@@ -671,8 +671,8 @@ local function EnhanceSpellTooltip(tooltip, id, link)
             return;
         end
 
-        -- Smelting
-        if ( id == 2656 ) then
+        -- Smelting; the id is a number in Mainline and a string from Classic's tooltip hook
+        if ( tonumber(id) == 2656 ) then
             name = ARMORY_TRADE_MINING;
         end
 
@@ -684,7 +684,6 @@ local function EnhanceSpellTooltip(tooltip, id, link)
             Armory:SelectProfile(profile);
 
             local rank, maxRank;
-            local tradeSkillLink = select(2, C_Spell.GetSpellLink(id));
 
             if ( Armory:GetConfigShowSecondaryTradeSkillRanks() ) then
                 rank, maxRank = Armory:GetTradeSkillRank(name);
@@ -816,7 +815,7 @@ if ( Armory.isClassic ) then
         end);
 
         SetTooltipHook(tooltip, "OnTooltipSetSpell", function(self)
-            local id = select(3, self:GetSpell());
+            local _, id = self:GetSpell();
             if ( id ) then
                 return _G.GetSpellLink(id);
             end
@@ -899,6 +898,7 @@ end
 if ( Armory.isClassic ) then
     function Armory:RegisterTooltipHooks(tooltip)
         RegisterTooltipHook(tooltip, "item", EnhanceItemTooltip);
+        RegisterTooltipHook(tooltip, "spell", EnhanceSpellTooltip);
         RegisterTooltipHook(tooltip, "enchant", EnhanceRecipeTooltip);
     end
 else
@@ -923,6 +923,93 @@ else
         RegisterTooltipHook(tooltip, "glyph", EnhanceGlyphTooltip);
         RegisterTooltipHook(tooltip, "currency", EnhanceCurrencyTooltip);
     end
+end
+
+-- The standing a character has at a faction. Classic stores the faction's description where
+-- Mainline stores the standing text, and has no paragon.
+local GetStanding;
+if ( Armory.isClassic ) then
+    GetStanding = function(description, standingID, barMin, barMax, barValue, factionID)
+        return GetText("FACTION_STANDING_LABEL"..standingID, Armory:UnitSex("player")), barMin, barMax, barValue, NORMAL_FONT_COLOR;
+    end;
+else
+    GetStanding = function(description, standingID, barMin, barMax, barValue, factionID)
+        local color = NORMAL_FONT_COLOR;
+        if ( not description ) then
+            description = GetText("FACTION_STANDING_LABEL"..standingID, Armory:UnitSex("player"));
+        end
+        if ( factionID and Armory:IsFactionParagon(factionID) ) then
+            local currentValue, threshold, _, hasRewardPending = Armory:GetFactionParagonInfo(factionID);
+            if ( currentValue and threshold ) then
+                local value = mod(currentValue, threshold);
+                -- show overflow if reward is pending
+                if ( hasRewardPending ) then
+                    value = value + threshold;
+                    color = RED_FONT_COLOR;
+                end
+                barMin = 0;
+                barMax = threshold;
+                barValue = value;
+            end
+        end
+        return description, barMin, barMax, barValue, color;
+    end;
+end
+
+-- Shows the standing of all characters at a faction next to its reputation bar
+local standings = {};
+function Armory:ShowFactionStandings(owner, factionName)
+    local currentProfile = self:CurrentProfile();
+
+    table.wipe(standings);
+
+    for _, profile in ipairs(self:GetConnectedProfiles()) do
+        self:SelectProfile(profile);
+
+        for index = 1, self:GetNumFactions() do
+            local name, description, standingID, barMin, barMax, barValue, _, _, _, _, _, _, _, factionID = self:GetFactionInfo(index);
+            if ( name and name == factionName ) then
+                local standing, color;
+                standing, barMin, barMax, barValue, color = GetStanding(description, standingID, barMin, barMax, barValue, factionID);
+                table.insert(standings, {name=self:GetQualifiedCharacterName(), description=standing, barMin=barMin, barMax=barMax, barValue=barValue, color=color});
+                break;
+            end
+        end
+    end
+    self:SelectProfile(currentProfile);
+
+    if ( #standings == 0 ) then
+        return;
+    end
+
+    table.sort(standings, function(a, b) return a.barValue < b.barValue; end);
+
+    local tooltip = self.qtip:Acquire("ArmoryStandingsTooltip", 3);
+    tooltip:Clear();
+    tooltip:SetScale(self:GetConfigFrameScale());
+    tooltip:SetFrameLevel(owner:GetFrameLevel() + 1);
+    tooltip:ClearAllPoints();
+    tooltip:SetClampedToScreen(1);
+    tooltip:SetPoint("TOPLEFT", owner, "TOPRIGHT");
+
+    local index, column = tooltip:AddLine();
+    tooltip:SetCell(index, column, factionName, GameTooltipHeaderText, "LEFT", 3);
+
+    tooltip:AddSeparator(3);
+    local barMax, barValue, myColumn;
+    for _, standing in ipairs(standings) do
+        -- Normalize Values
+        barMax = standing.barMax - standing.barMin;
+        barValue = standing.barValue - standing.barMin;
+
+        index, column = tooltip:AddLine();
+        myColumn = column; index, column = tooltip:SetCell(index, myColumn, standing.name);
+        myColumn = column; index, column = tooltip:SetCell(index, myColumn, standing.description);
+        myColumn = column; index, column = tooltip:SetCell(index, myColumn, standing.color:WrapTextInColorCode(barValue.." / "..barMax), nil, "RIGHT");
+    end
+    tooltip:Show();
+
+    return tooltip;
 end
 
 function Armory:ResetTooltipHook()

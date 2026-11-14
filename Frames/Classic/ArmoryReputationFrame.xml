@@ -175,20 +175,8 @@
       </Frame>
     </Frames>
     <Scripts>
-      <OnEnter>
-        if (self.tooltip) then
-          _G[self:GetName().."FactionStanding"]:SetText(self.tooltip);
-        end
-        _G[self:GetName().."Highlight1"]:Show();
-        _G[self:GetName().."Highlight2"]:Show();
-      </OnEnter>
-      <OnLeave>
-        _G[self:GetName().."FactionStanding"]:SetText(self.standingText);
-        if ((self.selectedFaction ~= self.index) or (not ArmoryReputationDetailFrame:IsShown())) then
-          _G[self:GetName().."Highlight1"]:Hide();
-          _G[self:GetName().."Highlight2"]:Hide();
-        end
-      </OnLeave>
+      <OnEnter function="ArmoryReputationBar_OnEnter"/>
+      <OnLeave function="ArmoryReputationBar_OnLeave"/>
       <OnMouseUp>
         ArmoryReputationBar_OnClick(self, button, down);
       </OnMouseUp>
@@ -548,7 +536,7 @@
         <Anchors>
           <Anchor point="TOPLEFT" relativeTo="ArmoryReputationFrame" relativePoint="TOPRIGHT">
             <Offset>
-              <AbsDimension x="-33" y="-28"/>
+              <AbsDimension x="0" y="-28"/>
             </Offset>
           </Anchor>
         </Anchors>

@@ -281,7 +281,6 @@ function ArmoryReputationBar_OnClick(self)
     end
 end
 
-local standings = {};
 function ArmoryReputationBar_OnEnter(self)
     local name = self:GetName();
     local factionName = _G[name.."FactionName"]:GetText();
@@ -292,85 +291,14 @@ function ArmoryReputationBar_OnEnter(self)
     _G[name.."ReputationBarHighlight1"]:Show();
     _G[name.."ReputationBarHighlight2"]:Show();
 
-    table.wipe(standings);
-
     if ( self.hasRep ) then
-        local currentProfile = Armory:CurrentProfile();
-
-        for _, profile in ipairs(Armory:GetConnectedProfiles()) do
-            Armory:SelectProfile(profile);
-
-            local numFactions = Armory:GetNumFactions();
-            local name, description, standingID, barMin, barMax, barValue, factionID;
-            local currentValue, threshold, hasRewardPending, value;
-            local color;
-            for index = 1, Armory:GetNumFactions() do
-                name, description, standingID, barMin, barMax, barValue, _, _, _, _, _, _, _, factionID = Armory:GetFactionInfo(index);
-                color = NORMAL_FONT_COLOR;
-                if ( name and name == factionName ) then
-                    if ( not description ) then
-                        description = GetText("FACTION_STANDING_LABEL"..standingID, Armory:UnitSex("player"));
-                    end
-
-                    if ( factionID and Armory:IsFactionParagon(factionID) ) then
-                        currentValue, threshold, _, hasRewardPending = Armory:GetFactionParagonInfo(factionID);
-                        if ( currentValue and threshold ) then
-                            value = mod(currentValue, threshold);
-                            -- show overflow if reward is pending
-                            if ( hasRewardPending ) then
-                                value = value + threshold;
-                                color = RED_FONT_COLOR;
-                            end
-                            barMin = 0;
-                            barMax = threshold;
-                            barValue = value;
-                        end
-                    end
-
-                    name = Armory:GetQualifiedCharacterName();
-                    table.insert(standings, {name=name, description=description, barMin=barMin, barMax=barMax, barValue=barValue, color=color});
-                    break;
-                end
-            end
-        end
-        Armory:SelectProfile(currentProfile);
-
-        table.sort(standings, function(a, b) return a.barValue < b.barValue; end);
+        self.tooltip = Armory:ShowFactionStandings(self, factionName);
     end
 
-    if ( #standings > 0 ) then
-        local index, column, myColumn;
-
-        self.tooltip = Armory.qtip:Acquire("ArmoryStandingsTooltip", 3);
-        self.tooltip:Clear();
-        self.tooltip:SetScale(Armory:GetConfigFrameScale());
-        self.tooltip:SetFrameLevel(self:GetFrameLevel() + 1);
-        self.tooltip:ClearAllPoints();
-        self.tooltip:SetClampedToScreen(1);
-        self.tooltip:SetPoint("TOPLEFT", self, "TOPRIGHT");
-
-        index, column = self.tooltip:AddLine();
-        myColumn = column; index, column = self.tooltip:SetCell(index, myColumn, factionName, GameTooltipHeaderText, "LEFT", 3);
-
-        self.tooltip:AddSeparator(3);
-        local barMax, barValue;
-        for _, standing in next, standings do
-            -- Normalize Values
-            barMax = standing.barMax - standing.barMin;
-            barValue = standing.barValue - standing.barMin;
-
-            index, column = self.tooltip:AddLine();
-            myColumn = column; index, column = self.tooltip:SetCell(index, myColumn, standing.name);
-            myColumn = column; index, column = self.tooltip:SetCell(index, myColumn, standing.description);
-            myColumn = column; index, column = self.tooltip:SetCell(index, myColumn, standing.color:WrapTextInColorCode(barValue.." / "..barMax), nil, "RIGHT");
-        end
-        self.tooltip:Show();
-
-    elseif ( _G[name.."FactionName"]:IsTruncated() ) then
+    if ( not self.tooltip and _G[name.."FactionName"]:IsTruncated() ) then
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
         GameTooltip:SetText(factionName, nil, nil, nil, nil, true);
         GameTooltip:Show();
-
     end
 end
 

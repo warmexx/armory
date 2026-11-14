@@ -237,6 +237,14 @@ function ArmoryOptionsTooltipShowSecondarySkillRankMixin:OnLoad()
 end
 
 
+-- A color has no option of its own; it goes with the option it depends on, which Classic
+-- does not have for quests and achievements
+local function OptionAvailable(key)
+    return function()
+        return Armory.options[key] ~= nil;
+    end;
+end
+
 ArmoryOptionsTooltipShowQuestAltsMixin = CreateFromMixins(ArmoryOptionsCheckButtonTemplateMixin);
 
 function ArmoryOptionsTooltipShowQuestAltsMixin:GetKey()
@@ -244,6 +252,8 @@ function ArmoryOptionsTooltipShowQuestAltsMixin:GetKey()
 end
 
 ArmoryOptionsTooltipShowQuestAltsColorMixin = CreateFromMixins(ArmoryOptionsColorTemplateMixin);
+
+ArmoryOptionsTooltipShowQuestAltsColorMixin.IsAvailable = OptionAvailable("ARMORY_CMD_SET_SHOWQUESTALTS");
 
 function ArmoryOptionsTooltipShowQuestAltsColorMixin:OnLoad()
     self:ColorSetter(function(r, g, b) Armory:SetConfigQuestAltsColor(r, g, b); end);
@@ -256,11 +266,15 @@ end
 
 ArmoryOptionsTooltipShowAchievementsMixin = CreateFromMixins(ArmoryOptionsCheckButtonTemplateMixin);
 
+local HasAchievements = OptionAvailable("ARMORY_CMD_SET_SHOWACHIEVEMENTS");
+
 function ArmoryOptionsTooltipShowAchievementsMixin:GetKey()
     return "ARMORY_CMD_SET_SHOWACHIEVEMENTS";
 end
 
 ArmoryOptionsTooltipShowAchievementsColorMixin = CreateFromMixins(ArmoryOptionsColorTemplateMixin);
+
+ArmoryOptionsTooltipShowAchievementsColorMixin.IsAvailable = HasAchievements;
 
 function ArmoryOptionsTooltipShowAchievementsColorMixin:OnLoad()
     self:ColorSetter(function(r, g, b) Armory:SetConfigAchievementsColor(r, g, b); end);
@@ -283,6 +297,8 @@ function ArmoryOptionsTooltipAchievementInProgressMixin:OnLoad()
 end
 
 ArmoryOptionsTooltipAchievementInProgressColorMixin = CreateFromMixins(ArmoryOptionsColorTemplateMixin);
+
+ArmoryOptionsTooltipAchievementInProgressColorMixin.IsAvailable = HasAchievements;
 
 function ArmoryOptionsTooltipAchievementInProgressColorMixin:OnLoad()
     self:ColorSetter(function(r, g, b) Armory:SetConfigAchievementInProgressColor(r, g, b); end);
