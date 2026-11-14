@@ -246,7 +246,7 @@ local function EnhanceItemTooltip(tooltip, id, link)
             mailCount = mailCount + (v.mail or 0);
             auctionCount = auctionCount + (v.auction or 0);
             equipCount = equipCount + (v.equipped or 0);
-            details = v.details or Armory:GetCountDetails(v.bags, v.bank, v.mail, v.auction, nil, v.equipped, v.perSlot, numColor);
+            details = v.details or Armory:GetCountDetails(v.bags, v.bank, v.mail, v.auction, nil, nil, v.equipped, nil, v.perSlot, numColor);
 
             local r, g, b = GetTableColor(v);
             if ( not r ) then
@@ -258,7 +258,7 @@ local function EnhanceItemTooltip(tooltip, id, link)
         if ( Armory:HasInventory() and count > 0 and Armory:GetConfigShowItemCountTotals() ) then
             local r, g, b = Armory:GetConfigItemCountTotalsColor();
             numColor = Armory:HexColor(Armory:GetConfigItemCountTotalsNumberColor());
-            details = Armory:GetCountDetails(bagCount, bankCount, mailCount, auctionCount, nil, equipCount, nil, numColor);
+            details = Armory:GetCountDetails(bagCount, bankCount, mailCount, auctionCount, nil, nil, equipCount, nil, nil, numColor);
 
             tooltip:AddDoubleLine(format(Armory:FormatCount(ARMORY_TOTAL, numColor), count), details, r, g, b, r, g, b);
         end

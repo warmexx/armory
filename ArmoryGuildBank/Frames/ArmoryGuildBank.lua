@@ -79,23 +79,14 @@ do
     end
 end
 
--- Classic still opens its frames as UI panels
-local ShowFrame, HideFrame;
-if ( Armory.isClassic ) then
-    ShowFrame, HideFrame = ShowUIPanel, HideUIPanel;
-else
-    ShowFrame = function(frame) frame:Show(); end;
-    HideFrame = function(frame) frame:Hide(); end;
-end
-
 function ArmoryGuildBankFrame_Toggle()
     if ( ArmoryListGuildBankFrame:IsShown() or ArmoryIconGuildBankFrame:IsShown() ) then
-        HideFrame(ArmoryListGuildBankFrame);
-        HideFrame(ArmoryIconGuildBankFrame);
+        Armory:HideFrame(ArmoryListGuildBankFrame);
+        Armory:HideFrame(ArmoryIconGuildBankFrame);
     elseif ( AGB:GetIconViewMode() ) then
-        ShowFrame(ArmoryIconGuildBankFrame);
+        Armory:ShowFrame(ArmoryIconGuildBankFrame);
     else
-        ShowFrame(ArmoryListGuildBankFrame);
+        Armory:ShowFrame(ArmoryListGuildBankFrame);
     end
 end
 
@@ -286,11 +277,11 @@ end
 function ArmoryGuildBankFrameEnableIconView(checked)
     AGB:SetIconViewMode(checked);
     if ( checked ) then
-        HideFrame(ArmoryListGuildBankFrame);
-        ShowFrame(ArmoryIconGuildBankFrame);
+        Armory:HideFrame(ArmoryListGuildBankFrame);
+        Armory:ShowFrame(ArmoryIconGuildBankFrame);
     else
-        HideFrame(ArmoryIconGuildBankFrame);
-        ShowFrame(ArmoryListGuildBankFrame);
+        Armory:HideFrame(ArmoryIconGuildBankFrame);
+        Armory:ShowFrame(ArmoryListGuildBankFrame);
     end
 end
 

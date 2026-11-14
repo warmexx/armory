@@ -34,17 +34,10 @@ local FIND_LINES_DISPLAYED = 13;
 local FIND_RESULTS = {};
 
 function ArmoryFindFrame_Toggle()
-    if ( Armory.isClassic ) then
-        -- Classic still opens its frames as UI panels
-        if ( ArmoryFindFrame:IsShown() ) then
-            HideUIPanel(ArmoryFindFrame);
-        else
-            ShowUIPanel(ArmoryFindFrame);
-        end
-    elseif ( ArmoryFindFrame:IsShown() ) then
-        ArmoryFindFrame:Hide();
+    if ( ArmoryFindFrame:IsShown() ) then
+        Armory:HideFrame(ArmoryFindFrame);
     else
-        ArmoryFindFrame:Show();
+        Armory:ShowFrame(ArmoryFindFrame);
     end
 end
 

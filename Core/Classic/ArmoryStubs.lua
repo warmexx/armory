@@ -448,6 +448,12 @@ function Armory:GetWeeklyResetDay()
     return day;
 end
 
+function Armory:IsInWeek(timestamp, weekOffset)
+    local eow = self:GetWeeklyResetTime() + (weekOffset or 0) * 7 * 24 * 60 * 60;
+    local bow = eow - 7 * 24 * 60 * 60;
+    return timestamp > bow and timestamp < eow;
+end
+
 function Armory:GetXPExhaustion()
     return self:SetGetCharacterValue("XPExhaustion", _G.GetXPExhaustion(), time());
 end
@@ -479,6 +485,15 @@ function Armory:IsBankBagSlot(index)
     if ( index ) then
         return index >= C_Container.ContainerIDToInventoryID(NUM_BAG_SLOTS + 1) and index <= C_Container.ContainerIDToInventoryID(NUM_BAG_SLOTS + NUM_BANKBAGSLOTS);
     end
+end
+
+-- Classic has no currency module
+function Armory:CountCurrency(link)
+    return 0;
+end
+
+function Armory:IsXPUserDisabled()
+   return self:SetGetCharacterValue("IsXPUserDisabled", _G.IsXPUserDisabled());
 end
 
 function Armory:IsPersistentPet()

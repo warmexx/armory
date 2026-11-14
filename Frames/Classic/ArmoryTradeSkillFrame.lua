@@ -574,7 +574,7 @@ local function GetNumAvailable(id)
             if ( reagentLink ) then
                 local _, _, reagentCount = Armory:GetTradeSkillReagentInfo(id, i);
                 if ( reagentCount and reagentCount > 0 ) then
-                    table.insert(scanned, floor(Armory:ScanInventory(reagentLink, true) / reagentCount));
+                    table.insert(scanned, floor(Armory:ScanInventory(reagentLink, "reagent") / reagentCount));
                 end
             end
         end
@@ -825,7 +825,7 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
 
             if ( Armory:HasInventory() ) then
                 -- use count from inventory
-                playerReagentCount = Armory:ScanInventory(reagentButton.link, true);
+                playerReagentCount = Armory:ScanInventory(reagentButton.link, "reagent");
 
                 if ( playerReagentCount < reagentCount ) then
                     reagentButton.Icon:SetVertexColor(0.5, 0.5, 0.5);

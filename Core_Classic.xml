@@ -3,7 +3,7 @@
   <Script file="Core\ArmoryBackgroundUpdater.lua"/>
   <Script file="Core\Classic\ArmoryCommandHandler.lua"/>
   <Script file="Core\ArmoryDbEntry.lua"/>
-  <Script file="Core\Classic\ArmoryBase.lua"/>
+  <Script file="Core\ArmoryBase.lua"/>
   <Script file="Core\Classic\ArmoryTooltip.lua"/>
   <Script file="Core\Classic\ArmoryLDB.lua"/>
   <Script file="Core\ArmoryConfig.lua"/>

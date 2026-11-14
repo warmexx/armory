@@ -26,6 +26,8 @@
         http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
+ARMORY_ID = "Armory";
+
 ARMORY_MESSAGE_SEPARATOR = "\v";
 ARMORY_LOOKUP_SEPARATOR = "\n";
 ARMORY_LOOKUP_FIELD_SEPARATOR = "\r";
@@ -48,7 +50,8 @@ if ( not Armory ) then
 
         title = ARMORY_TITLE,
         version = C_AddOns.GetAddOnMetadata("Armory", "Version"),
-        dbVersion = 54,
+        -- per family: the SavedVariables of Classic have their own history
+        dbVersion = (isVanilla or isTBC) and 1 or 54,
         interface = _G.GetBuildInfo(),
 
         isMainline = isRetail or isForever,
@@ -89,6 +92,18 @@ local gsub  = gsub;
 local max = max;
 local issecrettable = issecrettable;
 local hasanysecretvalues = hasanysecretvalues;
+
+-- Classic still opens its frames as UI panels, which do not open in combat
+if ( Armory.isClassic ) then
+    function Armory:ShowFrame(frame) ShowUIPanel(frame); end
+    function Armory:HideFrame(frame) HideUIPanel(frame); end
+else
+    function Armory:ShowFrame(frame) frame:Show(); end
+    function Armory:HideFrame(frame) frame:Hide(); end
+end
+
+-- Classic's dropdown has no unchecked boxes; notCheckable would only move the text to the left
+local MENU_NOT_CHECKABLE = not Armory.isClassic or nil;
 
 local iconProvider, cellPrototype, baseCellPrototype = QTip:CreateCellProvider(QTip.LabelProvider)
 
@@ -181,7 +196,7 @@ function Armory:PrintSearchResult(who, line)
                 count = count.." ("..line.extra..")";
             end
         end
-        ArmoryFindFrame_Add(who, line.label, what, line.link, line.tinker, line.anchor, count);
+        ArmoryFindFrame_Add(who, line.label, what, line.link, line.tinker, line.anchor, count, line.tooltipLines);
     else
         if ( line.extra ) then
             what = what.." ("..line.extra..")";
@@ -446,12 +461,16 @@ function Armory:InitializeMenu()
         Armory:MenuAddButton("ARMORY_CMD_FIND", true);
         Armory:MenuAddButton("ARMORY_CMD_RESET_FRAME");
 
-        ArmoryDropDownMenu_AddButton({text=ARMORY_SHARE_LABEL, hasArrow=1, notCheckable=true, owner=Armory.menu});
+        ArmoryDropDownMenu_AddButton({text=ARMORY_SHARE_LABEL, hasArrow=1, notCheckable=MENU_NOT_CHECKABLE, owner=Armory.menu});
     end
 end
 
 function Armory:MenuAddButton(label, closeMenu)
     local entry = self.options[label];
+    if ( not entry ) then
+        -- an option this version doesn't have
+        return;
+    end
     local info = {};
 
     info.text = _G[label.."_MENUTEXT"];
@@ -467,7 +486,7 @@ function Armory:MenuAddButton(label, closeMenu)
     else
         info.runFunc = entry.run;
         info.func = function() info.runFunc() end;
-        info.notCheckable = true;
+        info.notCheckable = MENU_NOT_CHECKABLE;
     end
     if ( entry.disabled ) then
         info.disabled = entry.disabled();
@@ -1111,7 +1130,7 @@ function Armory:SelectDefaultProfile()
                 end
             end
         end
-        ArmoryFrame:Hide();
+        self:HideFrame(ArmoryFrame);
     end
 end
 
@@ -1217,9 +1236,9 @@ function Armory:Toggle()
     if ( table.getn(self:SelectableProfiles()) == 0 ) then
         self:PrintRed(ARMORY_NO_DATA);
     elseif ( ArmoryFrame:IsVisible()  ) then
-        ArmoryFrame:Hide();
+        self:HideFrame(ArmoryFrame);
     else
-        ArmoryFrame:Show();
+        self:ShowFrame(ArmoryFrame);
     end
 end
 
@@ -2328,6 +2347,13 @@ function Armory:ReputationEnabled(value)
     return self:GetModule("Reputation");
 end
 
+function Armory:SkillsEnabled(value)
+    if ( value ~= nil ) then
+        self:SetModule("Skills", value);
+    end
+    return self:GetModule("Skills");
+end
+
 function Armory:RaidEnabled(value)
     if ( value ~= nil ) then
         self:SetModule("Raid", value);
@@ -2638,8 +2664,11 @@ end
 -- General Hooks
 ----------------------------------------------------------
 
-local Orig_PetAbandon = C_PetInfo.PetAbandon;
-function C_PetInfo.PetAbandon(...)
+-- Classic has these as globals
+local PetInfo = Armory.isClassic and _G or C_PetInfo;
+
+local Orig_PetAbandon = PetInfo.PetAbandon;
+function PetInfo.PetAbandon(...)
     local pet = UnitName("pet");
     Armory:Lock("Pets");
     Armory:DeletePet(pet, "player");
@@ -2648,8 +2677,8 @@ function C_PetInfo.PetAbandon(...)
     Armory:PrintDebug("PetAbandon", pet);
 end
 
-local Orig_PetRename = C_PetInfo.PetRename;
-function C_PetInfo.PetRename(name, ...)
+local Orig_PetRename = PetInfo.PetRename;
+function PetInfo.PetRename(name, ...)
     local dbEntry = Armory.playerDbBaseEntry;
     local pet = UnitName("pet");
     Armory:Lock("Pets");
@@ -2814,7 +2843,7 @@ function Armory:Find(...)
 
             if ( windowMode ) then
                 ArmoryFindFrame_Initialize(where, numArgs == 1, strtrim(self:ToString(1, unpack(searchArgs, 1, numArgs))));
-                ArmoryFindFrame:Show();
+                self:ShowFrame(ArmoryFindFrame);
             end
 
             if ( flags[ARMORY_CMD_FIND_INVENTORY] and self:HasInventory() ) then
@@ -2913,13 +2942,13 @@ function Armory:Find(...)
             end
         elseif ( windowMode ) then
             ArmoryFindFrame_Initialize(where);
-            ArmoryFindFrame:Show();
+            self:ShowFrame(ArmoryFindFrame);
         else
             invalidCommand = true;
         end
     elseif ( windowMode ) then
          ArmoryFindFrame_Initialize();
-         ArmoryFindFrame:Show();
+         self:ShowFrame(ArmoryFindFrame);
     else
         invalidCommand = true;
     end

@@ -28,8 +28,6 @@
 
 local Armory = Armory;
 
-ARMORY_ID = "Armory";
-
 function ArmoryUIPanelCloseButton_OnClick(self)
     local parent = self:GetParent();
     if ( parent ) then

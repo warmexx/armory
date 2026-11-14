@@ -47,16 +47,6 @@ local SPELLBOOK_PLAYER = Armory.isClassic and BOOKTYPE_SPELL or Enum.SpellBookSp
 local ARTIFACT_RELIC = Enum.ItemGemSubclass.Artifactrelic or false;
 local GetInventorySlotInfo = C_PaperDollInfo.GetInventorySlotInfo or GetInventorySlotInfo;
 
--- Classic still opens its frames as UI panels, which do not open in combat
-local ShowFrame, HideFrame;
-if ( Armory.isClassic ) then
-    ShowFrame = function(frame) ShowUIPanel(frame); end;
-    HideFrame = function(frame) HideUIPanel(frame); end;
-else
-    ShowFrame = function(frame) frame:Show(); end;
-    HideFrame = function(frame) frame:Hide(); end;
-end
-
 ArmoryFrameTabButtonMixin = CreateFromMixins(ArmoryPanelTabButtonMixin);
 
 function ArmoryFrameTabButtonMixin:OnClick()
@@ -70,13 +60,13 @@ function ArmoryFrame_ToggleArmory(tab)
         ArmoryPanelTemplates_SetTab(ArmoryFrame, subFrame:GetID());
         if ( ArmoryFrame:IsVisible() ) then
             if ( subFrame:IsVisible() ) then
-                HideFrame(ArmoryFrame);
+                Armory:HideFrame(ArmoryFrame);
             else
                 PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
                 ArmoryFrame_ShowSubFrame(tab);
             end
         else
-            ShowFrame(ArmoryFrame);
+            Armory:ShowFrame(ArmoryFrame);
             ArmoryFrame_ShowSubFrame(tab);
         end
     end
@@ -106,11 +96,11 @@ function ArmoryFrame_OpenSideFrame(frame)
     ArmoryFrame_UpdateLineTabs();
     if ( frame.enabled ) then
         if ( not ArmoryFrame:IsShown() ) then
-            ShowFrame(ArmoryFrame);
+            Armory:ShowFrame(ArmoryFrame);
         end
         if ( not frame:IsVisible() ) then
             ArmoryCloseChildWindows();
-            ShowFrame(frame);
+            Armory:ShowFrame(frame);
         end
     end
 end

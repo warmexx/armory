@@ -42,8 +42,9 @@ if ( Armory.isClassic ) then
         ARMORY_AUCTIONS_CONTAINER, ARMORY_NEUTRAL_AUCTIONS_CONTAINER,
         ARMORY_EQUIPMENT_CONTAINER
     };
-    -- Shared code uses the Mainline name; Classic has no account containers
+    -- Shared code uses the Mainline names; Classic has no account containers
     ArmoryInventoryPlayerContainers = ArmoryInventoryContainers;
+    ArmoryInventoryAccountContainers = {};
 else
     ArmoryInventoryPlayerContainers = {
         Enum.BagIndex.Backpack,
@@ -84,19 +85,11 @@ local NUM_BAGS = Armory.isClassic and NUM_BAG_SLOTS or NUM_TOTAL_BAG_FRAMES;
 local MoneyFrame_Update = Armory.isClassic and MoneyFrame_Update or ArmoryMoneyFrame_Update;
 
 function ArmoryInventoryFrame_Toggle()
-    if ( Armory.isClassic ) then
-        -- Classic still opens its frames as UI panels
-        if ( ArmoryInventoryFrame:IsShown() ) then
-            HideUIPanel(ArmoryInventoryFrame);
-        else
-            ArmoryCloseChildWindows();
-            ShowUIPanel(ArmoryInventoryFrame);
-        end
-    elseif ( ArmoryInventoryFrame:IsShown() ) then
-        ArmoryInventoryFrame:Hide();
+    if ( ArmoryInventoryFrame:IsShown() ) then
+        Armory:HideFrame(ArmoryInventoryFrame);
     else
         ArmoryCloseChildWindows();
-        ArmoryInventoryFrame:Show();
+        Armory:ShowFrame(ArmoryInventoryFrame);
     end
 end
 

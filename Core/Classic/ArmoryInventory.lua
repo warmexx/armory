@@ -915,12 +915,12 @@ function Armory:GetInventorySearchAllFilter()
 end
 
 local scanItem = {};
-function Armory:ScanInventory(link, reagentScan)
+function Armory:ScanInventory(link, scanType)
     local count, bagCount, bankCount, mailCount, auctionCount = 0, 0, 0, 0, 0;
     local perSlotCount, result;
     if ( link ) then
         scanItem[1] = link;
-        result = self:ScanInventoryItems(scanItem, reagentScan)[1];
+        result = self:ScanInventoryItems(scanItem, scanType)[1];
         count = result.count;
         bagCount = result.bags;
         bankCount = result.bank;
@@ -928,11 +928,13 @@ function Armory:ScanInventory(link, reagentScan)
         auctionCount = result.auction;
         perSlotCount = result.perSlot;
     end
-    return count, bagCount, bankCount, mailCount, auctionCount, perSlotCount;
+    -- Classic has no account bank
+    return count, bagCount, bankCount, mailCount, auctionCount, perSlotCount, 0;
 end
 
 local scanResult = {};
-function Armory:ScanInventoryItems(items, reagentScan)
+function Armory:ScanInventoryItems(items, scanType)
+    local reagentScan = (scanType == "reagent");
     local result = scanResult;
     local id, itemCount, name, link, itemString;
     local itemContainer;
@@ -995,7 +997,8 @@ function Armory:ScanInventoryItems(items, reagentScan)
 
         for i = 1, #ArmoryInventoryContainers do
             id = ArmoryInventoryContainers[i];
-            if ( (reagentScan and id >= BACKPACK_CONTAINER and id <= NUM_BAG_SLOTS) or (not reagentScan and not self:IsDummyContainer(id)) ) then
+            -- Classic has no account bank
+            if ( scanType ~= "account" and ((reagentScan and id >= BACKPACK_CONTAINER and id <= NUM_BAG_SLOTS) or (not reagentScan and not self:IsDummyContainer(id))) ) then
                 itemContainer = InventoryContainerName(id);
                 if ( result[k].item and ItemCacheExists(itemContainer) ) then
                     itemCount = GetCachedItemCount(itemContainer, result[k].item);
@@ -1048,7 +1051,7 @@ end
 -- Find Methods
 ----------------------------------------------------------
 
-function Armory:FindInventory(...)
+function Armory:FindInventory(callback, ...)
     local currentProfile = self:CurrentProfile();
     local id, numSlots, link, name, itemId, text, itemCount;
     local list = {};
@@ -1100,7 +1103,7 @@ function Armory:FindInventory(...)
 
     local name;
     for _, info in pairs(items) do
-        text = self:GetCountDetails(info.bags, info.bank, info.mail, nil, info.alts, info.equipped);
+        text = self:GetCountDetails(info.bags, info.bank, info.mail, nil, info.alts, nil, info.equipped);
         name = self:GetNameFromLink(info.link);
         table.insert(list, {label="", name=name, extra=text, link=info.link, count=info.count});
     end
@@ -1110,7 +1113,7 @@ function Armory:FindInventory(...)
         self:PrintSearchResult("", line);
     end
 
-    return #list;
+    callback(#list);
 end
 
 function Armory:FindInventoryItem(itemList, ...)

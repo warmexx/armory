@@ -37,18 +37,9 @@ local LOOKUP_LINES_DISPLAYED = 19;
 
 function ArmoryLookupFrame_Toggle()
     if ( ArmoryLookupFrame:IsShown() ) then
-        if ( Armory.isClassic ) then
-            -- Classic still opens its frames as UI panels
-            HideUIPanel(ArmoryLookupFrame);
-        else
-            ArmoryLookupFrame:Hide();
-        end
+        Armory:HideFrame(ArmoryLookupFrame);
     elseif ( Armory:HasDataSharing() ) then
-        if ( Armory.isClassic ) then
-            ShowUIPanel(ArmoryLookupFrame);
-        else
-            ArmoryLookupFrame:Show();
-        end
+        Armory:ShowFrame(ArmoryLookupFrame);
     else
         Armory:PrintRed(ARMORY_LOOKUP_DISABLED);
     end
@@ -782,9 +773,7 @@ function ArmoryLookupFrame_FindItem(exact, search)
         end
 
         countItems(ArmoryInventoryPlayerContainers);
-        if ( ArmoryInventoryAccountContainers ) then
-            countItems(ArmoryInventoryAccountContainers);
-        end
+        countItems(ArmoryInventoryAccountContainers);
 
         for itemId, count in pairs(itemCounts) do
             table.insert(result, Armory:Join(ARMORY_LOOKUP_CONTENT_SEPARATOR, itemId, count));

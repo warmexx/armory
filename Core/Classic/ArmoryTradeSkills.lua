@@ -190,7 +190,7 @@ local function CanCraftFromInventory(dbEntry, index)
 
     for i = 1, numReagents do
         local _, _, count, link = GetRecentInfo(index, i);
-        if ( (count or 0) > 0 and Armory:ScanInventory(link, true) < count ) then
+        if ( (count or 0) > 0 and Armory:ScanInventory(link, "reagent") < count ) then
             return false;
         end
     end

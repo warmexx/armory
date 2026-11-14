@@ -10,8 +10,12 @@ the Ofa names.
 The first install takes Libs and Locales from the released Armory and ArmoryGuildBank in that
 client, and copies their SavedVariables (ArmoryOfa.lua and so on), each only when it is missing.
 Copies every file that is new or changed, and removes Lua, XML and TOC files that are
-no longer in the repo, so a stale file can never be loaded. Libs and Locales are left
-alone: they come from the packager (externals and CurseForge translations).
+no longer in the repo, so a stale file can never be loaded. Libs are left alone: they come
+from the packager (externals). A file in Locales without an @localization template, such as
+Localization.lua, is source code and is installed like any other file; the released one of
+Era or BCC lacks globals that the shared code uses. The translations (the files with a
+template) come in every client from the released Armory and ArmoryGuildBank in Retail, since
+v20 takes all of them from the Retail project on CurseForge.
 Revision lines are ignored when comparing, so a packaged file with an expanded
 revision counts as unchanged. In TOCs, @project-version@ becomes the newest version in
 CHANGELOG.md plus "-dev" (for example v20.0.0-dev), as the packager would fill it in.
@@ -37,6 +41,8 @@ SEED_DIRS = ("Libs", "Locales")
 SKIP_DIRS = {".git", ".release", ".vscode", ".tokensave", ".claude", "dev", "docs", "Libs", "Locales"}
 SKIP_FILES = {".gitignore", ".pkgmeta", ".gitattributes"}
 CODE = (".lua", ".xml", ".toc")
+# The translations of every client come from the released addon in Retail (CurseForge project 5195)
+TRANSLATIONS = os.path.join(WOW, CLIENTS["retail"], "Interface", "AddOns")
 
 
 def dev_version():
@@ -69,8 +75,30 @@ def content(path):
     return data
 
 
-def files(base, skip_sub=()):
+def is_source_locale(path):
+    """A file in Locales that is code in the repo, not a template for the CurseForge translations."""
+    with open(path, "rb") as f:
+        return b"@localization(" not in f.read()
+
+
+def translations(src, released):
+    """(installed path, Retail file) for each translation that the repo has as a template."""
+    out = []
+    for p in glob.glob(os.path.join(src, "Locales", "*.lua")):
+        if not is_source_locale(p):
+            name = os.path.basename(p)
+            t = os.path.join(TRANSLATIONS, released, "Locales", name)
+            if os.path.exists(t):
+                out.append((os.path.join("Locales", name), t))
+    return out
+
+
+def files(base, skip_sub=(), repo=False):
     out = set()
+    if repo:
+        for p in glob.glob(os.path.join(base, "Locales", "*.lua")):
+            if is_source_locale(p):
+                out.add(os.path.relpath(p, base))
     for dp, dns, fns in os.walk(base):
         rel_dir = os.path.relpath(dp, base)
         dns[:] = [d for d in dns if d not in SKIP_DIRS and os.path.normpath(os.path.join(rel_dir, d)) not in skip_sub]
@@ -125,7 +153,7 @@ def sync(client, dry):
         skip_sub = {"ArmoryGuildBank"} if src_sub == "" else set()
         # A TOC is named after its folder: Armory_Mainline.toc becomes ArmoryOfa_Mainline.toc
         wanted = {}
-        for rel in files(src, skip_sub):
+        for rel in files(src, skip_sub, repo=True):
             if rel.lower().endswith(".toc") and rel.startswith(released + "_"):
                 wanted[addon + rel[len(released):]] = rel
             else:
@@ -142,6 +170,15 @@ def sync(client, dry):
                 os.makedirs(os.path.dirname(d), exist_ok=True)
                 with open(d, "wb") as f:
                     f.write(content(s))
+        for rel, t in translations(src, released):
+            d = os.path.join(dst, rel)
+            if os.path.exists(d) and filecmp.cmp(t, d, shallow=False):
+                continue
+            print(f"  copy   {addon}\{rel} (Retail translation)")
+            copied += 1
+            if not dry:
+                os.makedirs(os.path.dirname(d), exist_ok=True)
+                shutil.copyfile(t, d)
         for rel in sorted(present - set(wanted)):
             if rel.lower().endswith(CODE):
                 print(f"  remove {addon}\\{rel}")
