@@ -35,42 +35,64 @@ ARMORY_EQUIPMENT_CONTAINER = -6;
 
 ARMORY_CACHE_CONTAINER = "Cache";
 
-ArmoryInventoryPlayerContainers = {
-    Enum.BagIndex.Backpack,
-    Enum.BagIndex.Bag_1,
-    Enum.BagIndex.Bag_2,
-    Enum.BagIndex.Bag_3,
-    Enum.BagIndex.Bag_4,
-    Enum.BagIndex.ReagentBag,
-    Enum.BagIndex.CharacterBankTab_1,
-    Enum.BagIndex.CharacterBankTab_2,
-    Enum.BagIndex.CharacterBankTab_3,
-    Enum.BagIndex.CharacterBankTab_4,
-    Enum.BagIndex.CharacterBankTab_5,
-    Enum.BagIndex.CharacterBankTab_6,
-    ARMORY_MAIL_CONTAINER,
-    ARMORY_AUCTIONS_CONTAINER, ARMORY_NEUTRAL_AUCTIONS_CONTAINER,
-    ARMORY_EQUIPMENT_CONTAINER
-};
+if ( Armory.isClassic ) then
+    ArmoryInventoryContainers = {
+        BACKPACK_CONTAINER, 1, 2, 3, 4, BANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11,
+        ARMORY_MAIL_CONTAINER,
+        ARMORY_AUCTIONS_CONTAINER, ARMORY_NEUTRAL_AUCTIONS_CONTAINER,
+        ARMORY_EQUIPMENT_CONTAINER
+    };
+    -- Shared code uses the Mainline name; Classic has no account containers
+    ArmoryInventoryPlayerContainers = ArmoryInventoryContainers;
+else
+    ArmoryInventoryPlayerContainers = {
+        Enum.BagIndex.Backpack,
+        Enum.BagIndex.Bag_1,
+        Enum.BagIndex.Bag_2,
+        Enum.BagIndex.Bag_3,
+        Enum.BagIndex.Bag_4,
+        Enum.BagIndex.ReagentBag,
+        Enum.BagIndex.CharacterBankTab_1,
+        Enum.BagIndex.CharacterBankTab_2,
+        Enum.BagIndex.CharacterBankTab_3,
+        Enum.BagIndex.CharacterBankTab_4,
+        Enum.BagIndex.CharacterBankTab_5,
+        Enum.BagIndex.CharacterBankTab_6,
+        ARMORY_MAIL_CONTAINER,
+        ARMORY_AUCTIONS_CONTAINER, ARMORY_NEUTRAL_AUCTIONS_CONTAINER,
+        ARMORY_EQUIPMENT_CONTAINER
+    };
 
-ArmoryInventoryAccountContainers = { 
-    Enum.BagIndex.AccountBankTab_1,
-    Enum.BagIndex.AccountBankTab_2,
-    Enum.BagIndex.AccountBankTab_3,
-    Enum.BagIndex.AccountBankTab_4,
-    Enum.BagIndex.AccountBankTab_5
-};
+    ArmoryInventoryAccountContainers = {
+        Enum.BagIndex.AccountBankTab_1,
+        Enum.BagIndex.AccountBankTab_2,
+        Enum.BagIndex.AccountBankTab_3,
+        Enum.BagIndex.AccountBankTab_4,
+        Enum.BagIndex.AccountBankTab_5
+    };
 
-ArmoryInventoryContainers = {};
-for i, v in ipairs(ArmoryInventoryPlayerContainers) do
-    table.insert(ArmoryInventoryContainers, v)
+    ArmoryInventoryContainers = {};
+    for i, v in ipairs(ArmoryInventoryPlayerContainers) do
+        table.insert(ArmoryInventoryContainers, v)
+    end
+    for i, v in ipairs(ArmoryInventoryAccountContainers) do
+        table.insert(ArmoryInventoryContainers, v)
+    end
 end
-for i, v in ipairs(ArmoryInventoryAccountContainers) do
-    table.insert(ArmoryInventoryContainers, v)
-end
+
+local NUM_BAGS = Armory.isClassic and NUM_BAG_SLOTS or NUM_TOTAL_BAG_FRAMES;
+local MoneyFrame_Update = Armory.isClassic and MoneyFrame_Update or ArmoryMoneyFrame_Update;
 
 function ArmoryInventoryFrame_Toggle()
-    if ( ArmoryInventoryFrame:IsShown() ) then
+    if ( Armory.isClassic ) then
+        -- Classic still opens its frames as UI panels
+        if ( ArmoryInventoryFrame:IsShown() ) then
+            HideUIPanel(ArmoryInventoryFrame);
+        else
+            ArmoryCloseChildWindows();
+            ShowUIPanel(ArmoryInventoryFrame);
+        end
+    elseif ( ArmoryInventoryFrame:IsShown() ) then
         ArmoryInventoryFrame:Hide();
     else
         ArmoryCloseChildWindows();
@@ -83,34 +105,53 @@ function ArmoryInventoryFrame_OnLoad(self)
     self:RegisterEvent("BAG_UPDATE");
     self:RegisterEvent("BANKFRAME_OPENED");
     self:RegisterEvent("BANKFRAME_CLOSED");
-    self:RegisterEvent("BANK_TAB_SETTINGS_UPDATED");
-    self:RegisterEvent("TRADE_SKILL_SHOW");
-    self:RegisterEvent("TRADE_SKILL_CLOSE");
     self:RegisterEvent("MAIL_SHOW");
     self:RegisterEvent("MAIL_SEND_SUCCESS");
     self:RegisterEvent("SECURE_TRANSFER_CANCEL");
-    self:RegisterEvent("AUCTION_HOUSE_AUCTION_CREATED");
-    self:RegisterEvent("COMMODITY_SEARCH_RESULTS_UPDATED");
-    self:RegisterEvent("OWNED_AUCTIONS_UPDATED");
 
-    self:SetPortraitToAsset("Interface\\Buttons\\Button-Backpack-Up");
-    self:SetTitle(INVENTORY_TOOLTIP);
+    if ( Armory.isClassic ) then
+        self:RegisterEvent("PLAYERBANKSLOTS_CHANGED");
+        self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE");
 
-    self.Inset:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 4, 338);
-    self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", PANEL_DEFAULT_WIDTH + PANEL_INSET_RIGHT_OFFSET, PANEL_INSET_BOTTOM_OFFSET);
+        Armory:SetPortraitToTexture(ArmoryInventoryFramePortrait, "Interface\\Buttons\\Button-Backpack-Up");
+    else
+        self:RegisterEvent("BANK_TAB_SETTINGS_UPDATED");
+        self:RegisterEvent("TRADE_SKILL_SHOW");
+        self:RegisterEvent("TRADE_SKILL_CLOSE");
+        self:RegisterEvent("AUCTION_HOUSE_AUCTION_CREATED");
+        self:RegisterEvent("COMMODITY_SEARCH_RESULTS_UPDATED");
+        self:RegisterEvent("OWNED_AUCTIONS_UPDATED");
+
+        self:SetPortraitToAsset("Interface\\Buttons\\Button-Backpack-Up");
+        self:SetTitle(INVENTORY_TOOLTIP);
+
+        self.Inset:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 4, 338);
+        self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", PANEL_DEFAULT_WIDTH + PANEL_INSET_RIGHT_OFFSET, PANEL_INSET_BOTTOM_OFFSET);
+    end
 
     -- Tab Handling code
     ArmoryPanelTemplates_SetNumTabs(self, 2);
     ArmoryPanelTemplates_SetTab(self, 1);
 
-    hooksecurefunc("HandleModifiedItemClick",
-        function(link, itemButton)
-            if ( type(itemButton) == "table" and itemButton.bagID ) then
-                ArmoryInventoryFramePasteItem("LeftButton", C_Container.GetContainerItemLink(itemButton.bagID, itemButton.slotIndex));
+    if ( Armory.isClassic ) then
+        -- Classic's HandleModifiedItemClick only gets the link
+        hooksecurefunc("ContainerFrameItemButton_OnModifiedClick",
+            function(self, button)
+                local bag = self:GetParent():GetID();
+                local slot = self:GetID();
+                ArmoryInventoryFramePasteItem(button, C_Container.GetContainerItemLink(bag, slot));
             end
-        end
-    );
-    
+        );
+    else
+        hooksecurefunc("HandleModifiedItemClick",
+            function(link, itemButton)
+                if ( type(itemButton) == "table" and itemButton.bagID ) then
+                    ArmoryInventoryFramePasteItem("LeftButton", C_Container.GetContainerItemLink(itemButton.bagID, itemButton.slotIndex));
+                end
+            end
+        );
+    end
+
     DEFAULT_CHAT_FRAME:HookScript("OnHyperlinkClick",
         function(self, link, text, button)
             ArmoryInventoryFramePasteItem(button, link);
@@ -137,6 +178,102 @@ local function UpdateBankContainers()
     end
 end
 
+-- Bag, bank and auction events per family; returns false if the frame needs no update
+local OnContainerEvent;
+
+if ( Armory.isClassic ) then
+    OnContainerEvent = function(self, event, arg1)
+        if ( event == "BAG_UPDATE" and arg1 >= BACKPACK_CONTAINER and arg1 <= NUM_BAG_SLOTS ) then
+            if ( self.mailOpen ) then
+                Armory:Execute(ArmoryInventoryFrame_UpdateContainer(ARMORY_MAIL_CONTAINER));
+            end
+            Armory:Execute(ArmoryInventoryFrame_UpdateContainer, arg1);
+        elseif ( event == "BAG_UPDATE" and self.bankOpen ) then
+            -- Must execute immediately
+            ArmoryInventoryFrame_UpdateContainer(arg1);
+        elseif ( event == "PLAYERBANKSLOTS_CHANGED" and arg1 <= NUM_BANKGENERIC_SLOTS ) then
+            -- Must execute immediately
+            ArmoryInventoryFrame_UpdateContainer(BANK_CONTAINER);
+        elseif ( event == "BANKFRAME_OPENED" ) then
+            self.bankOpen = true;
+            -- Must execute immediately
+            ArmoryInventoryFrame_UpdateContainer(BANK_CONTAINER);
+            for i = NUM_BAG_SLOTS + 1, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS do
+                ArmoryInventoryFrame_UpdateContainer(i);
+            end
+        elseif ( event == "BANKFRAME_CLOSED" ) then
+            self.bankOpen = false;
+            return false;
+        elseif ( event == "AUCTION_OWNED_LIST_UPDATE" ) then
+            -- Must execute immediately
+            if ( GetAuctionHouseDepositRate() > 5 ) then
+                ArmoryInventoryFrame_UpdateContainer(ARMORY_NEUTRAL_AUCTIONS_CONTAINER);
+            else
+                ArmoryInventoryFrame_UpdateContainer(ARMORY_AUCTIONS_CONTAINER);
+            end
+        end
+        return true;
+    end;
+else
+    OnContainerEvent = function(self, event, arg1)
+        if ( event == "BAG_UPDATE" and Armory:IsBag(arg1) ) then
+            if ( self.mailOpen ) then
+                Armory:Execute(ArmoryInventoryFrame_UpdateContainer(ARMORY_MAIL_CONTAINER));
+            end
+            Armory:Execute(ArmoryInventoryFrame_UpdateContainer, arg1);
+            Armory:Execute(ArmoryGearSets_Update);
+            if ( self.tradeSkillOpen ) then
+                -- crafting may have taken reagents from the bank
+                Armory:Execute(UpdateBankContainers);
+            end
+        elseif ( event == "BAG_UPDATE" and self.bankOpen ) then
+            -- Must execute immediately
+            ArmoryInventoryFrame_UpdateContainer(arg1);
+        elseif ( event == "BAG_UPDATE" and Armory:IsBankContainer(arg1) ) then
+            -- bank tabs stay readable while the bank is closed (e.g. reagents taken from the bank while crafting)
+            Armory:Execute(ArmoryInventoryFrame_UpdateContainer, arg1);
+        elseif ( event == "BANKFRAME_OPENED" ) then
+            self.bankOpen = true;
+            -- Must execute immediately
+            UpdateBankContainers();
+        elseif ( event == "BANKFRAME_CLOSED" ) then
+            self.bankOpen = false;
+            return false;
+        elseif ( event == "BANK_TAB_SETTINGS_UPDATED" ) then
+            if ( arg1 == Enum.BankType.Character ) then
+                for i = 1, Constants.InventoryConstants.NumCharacterBankSlots do
+                    local bankTabID = Enum.BagIndex.CharacterBankTab_1 + i - 1;
+                    Armory:UpdateCharacterContainerName(bankTabID);
+                end
+            elseif ( arg1 == Enum.BankType.Account ) then
+                for i = 1, Constants.InventoryConstants.NumAccountBankSlots do
+                    local bankTabID = Enum.BagIndex.AccountBankTab_1 + i - 1;
+                    Armory:UpdateAccountContainerName(bankTabID);
+                end
+            end
+        elseif ( event == "TRADE_SKILL_SHOW" ) then
+            self.tradeSkillOpen = true;
+            -- bank tabs become readable while a profession is open
+            Armory:Execute(UpdateBankContainers);
+            return false;
+        elseif ( event == "TRADE_SKILL_CLOSE" ) then
+            self.tradeSkillOpen = false;
+            return false;
+        elseif ( event == "AUCTION_HOUSE_AUCTION_CREATED" ) then
+            self.queryOwnedAuctions = true;
+        elseif ( event == "COMMODITY_SEARCH_RESULTS_UPDATED" ) then
+            if ( self.queryOwnedAuctions ) then
+                Armory:ExecuteConditional(C_AuctionHouse.IsThrottledMessageSystemReady, QueryOwnedAuctions);
+            end
+        elseif ( event == "OWNED_AUCTIONS_UPDATED" ) then
+            self.queryOwnedAuctions = false;
+            -- Must execute immediately
+            ArmoryInventoryFrame_UpdateContainer(ARMORY_AUCTIONS_CONTAINER);
+        end
+        return true;
+    end;
+end
+
 function ArmoryInventoryFrame_OnEvent(self, event, ...)
     if ( not Armory:CanHandleEvents() ) then
         return;
@@ -145,7 +282,7 @@ function ArmoryInventoryFrame_OnEvent(self, event, ...)
         if ( Armory.forceScan or not Armory:ContainerExists(Enum.BagIndex.Backpack, "player") ) then
             Armory:Execute(ArmoryInventoryFrame_UpdateContainer, Enum.BagIndex.Backpack);
         end
-        for i = 1, NUM_TOTAL_BAG_FRAMES do
+        for i = 1, NUM_BAGS do
             if ( Armory.forceScan or not Armory:ContainerExists(i, "player") ) then
                 Armory:Execute(ArmoryInventoryFrame_UpdateContainer, i);
             end
@@ -161,50 +298,7 @@ function ArmoryInventoryFrame_OnEvent(self, event, ...)
         arg1 = arg1 * 100;
     end
 
-    if ( event == "BAG_UPDATE" and Armory:IsBag(arg1) ) then
-        if ( self.mailOpen ) then
-            Armory:Execute(ArmoryInventoryFrame_UpdateContainer(ARMORY_MAIL_CONTAINER));
-        end
-        Armory:Execute(ArmoryInventoryFrame_UpdateContainer, arg1);
-        Armory:Execute(ArmoryGearSets_Update);
-        if ( self.tradeSkillOpen ) then
-            -- crafting may have taken reagents from the bank
-            Armory:Execute(UpdateBankContainers);
-        end
-    elseif ( event == "BAG_UPDATE" and self.bankOpen ) then
-        -- Must execute immediately
-        ArmoryInventoryFrame_UpdateContainer(arg1);
-    elseif ( event == "BAG_UPDATE" and Armory:IsBankContainer(arg1) ) then
-        -- bank tabs stay readable while the bank is closed (e.g. reagents taken from the bank while crafting)
-        Armory:Execute(ArmoryInventoryFrame_UpdateContainer, arg1);
-    elseif ( event == "BANKFRAME_OPENED" ) then
-        self.bankOpen = true;
-        -- Must execute immediately
-        UpdateBankContainers();
-    elseif ( event == "BANKFRAME_CLOSED" ) then
-        self.bankOpen = false;
-        return;
-    elseif ( event == "BANK_TAB_SETTINGS_UPDATED" ) then
-        if ( arg1 == Enum.BankType.Character ) then
-            for i = 1, Constants.InventoryConstants.NumCharacterBankSlots do
-                local bankTabID = Enum.BagIndex.CharacterBankTab_1 + i - 1; 
-                Armory:UpdateCharacterContainerName(bankTabID);
-            end
-        elseif ( arg1 == Enum.BankType.Account ) then
-            for i = 1, Constants.InventoryConstants.NumAccountBankSlots do
-                local bankTabID = Enum.BagIndex.AccountBankTab_1 + i - 1; 
-                Armory:UpdateAccountContainerName(bankTabID);
-            end
-        end
-    elseif ( event == "TRADE_SKILL_SHOW" ) then
-        self.tradeSkillOpen = true;
-        -- bank tabs become readable while a profession is open
-        Armory:Execute(UpdateBankContainers);
-        return;
-    elseif ( event == "TRADE_SKILL_CLOSE" ) then
-        self.tradeSkillOpen = false;
-        return;
-    elseif ( event == "MAIL_SHOW" ) then
+    if ( event == "MAIL_SHOW" ) then
         self.mailOpen = true;
         return;
     elseif ( event == "MAIL_SEND_SUCCESS" ) then
@@ -224,16 +318,8 @@ function ArmoryInventoryFrame_OnEvent(self, event, ...)
                 end
             end
         end
-    elseif ( event == "AUCTION_HOUSE_AUCTION_CREATED" ) then
-        self.queryOwnedAuctions = true;
-    elseif ( event == "COMMODITY_SEARCH_RESULTS_UPDATED" ) then
-        if ( self.queryOwnedAuctions ) then
-            Armory:ExecuteConditional(C_AuctionHouse.IsThrottledMessageSystemReady, QueryOwnedAuctions);
-        end
-    elseif ( event == "OWNED_AUCTIONS_UPDATED" ) then
-        self.queryOwnedAuctions = false;
-        -- Must execute immediately
-        ArmoryInventoryFrame_UpdateContainer(ARMORY_AUCTIONS_CONTAINER);
+    elseif ( not OnContainerEvent(self, event, arg1) ) then
+        return;
     end
 
     ArmoryInventoryFrame_UpdateFrame(update);
@@ -272,7 +358,7 @@ function ArmoryInventoryFrameButton_OnClick(self)
     local unit;
     if ( ArmoryInventoryListViewFrame:IsShown() ) then
         unit = "player";
-    elseif ( ArmoryInventoryAccountBankFrame:IsShown() ) then
+    elseif ( ArmoryInventoryAccountBankFrame and ArmoryInventoryAccountBankFrame:IsShown() ) then
         unit = "account";
     end
     if ( unit ) then
@@ -299,33 +385,40 @@ function ArmoryInventoryFrame_OnShow(self)
         ArmoryPanelTemplates_SetTab(self, 1);
     end
 
-    local tab;
-    local totalTabWidth = 0;
-    local tabWidthCache = {};
-    for i, tab in ipairs(self.Tabs) do
-        tabWidthCache[i] = 0;
-        ArmoryPanelTemplates_TabResize(tab, 0);
-        tab.Text:SetWidth(0);
-        tabWidthCache[i] = ArmoryPanelTemplates_GetTabWidth(tab);
-        totalTabWidth = totalTabWidth + tabWidthCache[i];
-        tab:Show();
+    if ( not Armory.isClassic ) then
+        local tab;
+        local totalTabWidth = 0;
+        local tabWidthCache = {};
+        for i, tab in ipairs(self.Tabs) do
+            tabWidthCache[i] = 0;
+            ArmoryPanelTemplates_TabResize(tab, 0);
+            tab.Text:SetWidth(0);
+            tabWidthCache[i] = ArmoryPanelTemplates_GetTabWidth(tab);
+            totalTabWidth = totalTabWidth + tabWidthCache[i];
+            tab:Show();
+        end
+        ArmoryPanelTemplates_ResizeTabsToFit(self.Tabs, totalTabWidth, self:GetWidth(), tabWidthCache);
     end
-    ArmoryPanelTemplates_ResizeTabsToFit(self.Tabs, totalTabWidth, self:GetWidth(), tabWidthCache);
 
     ArmoryInventoryFrame_Update();
 end
 
 function ArmoryInventoryFrame_Update()
-    if ( ArmoryPanelTemplates_GetSelectedTab(ArmoryInventoryFrame) == 3 ) then
+    -- Classic has no account bank
+    local accountBankFrame = ArmoryInventoryAccountBankFrame;
+
+    if ( accountBankFrame and ArmoryPanelTemplates_GetSelectedTab(ArmoryInventoryFrame) == 3 ) then
         ArmoryInventoryIconViewFrame:Hide();
         ArmoryInventoryListViewFrame:Hide();
-        ArmoryInventoryAccountBankFrame:Show();
-        if ( ArmoryInventoryAccountBankFrame:IsShown() ) then
+        accountBankFrame:Show();
+        if ( accountBankFrame:IsShown() ) then
             ArmoryInventoryAccountBankFrame_Update();
         end
     elseif ( Armory:GetInventoryListViewMode() ) then
         ArmoryInventoryIconViewFrame:Hide();
-        ArmoryInventoryAccountBankFrame:Hide();
+        if ( accountBankFrame ) then
+            accountBankFrame:Hide();
+        end
         if ( ArmoryInventoryListViewFrame:IsShown() ) then
             ArmoryInventoryListViewFrame_Update();
         else
@@ -333,7 +426,9 @@ function ArmoryInventoryFrame_Update()
         end
     else
         ArmoryInventoryListViewFrame:Hide();
-        ArmoryInventoryAccountBankFrame:Hide();
+        if ( accountBankFrame ) then
+            accountBankFrame:Hide();
+        end
         if ( ArmoryInventoryIconViewFrame:IsShown() ) then
             ArmoryInventoryIconViewFrame_Update();
         else
@@ -354,7 +449,7 @@ function ArmoryInventoryFrameEnableListView(checked)
 end
 
 function ArmoryInventoryMoneyFrame_OnShow(self)
-    ArmoryMoneyFrame_Update("ArmoryInventoryMoneyFrame", Armory:GetMoney());
+    MoneyFrame_Update("ArmoryInventoryMoneyFrame", Armory:GetMoney());
 end
 
 function ArmoryInventoryMoneyFrame_OnEnter(self)
@@ -398,7 +493,8 @@ function ArmoryInventoryMoneyFrame_OnEnter(self)
             grandTotal = true;
         end
     end
-    if ( AGB ) then
+    -- TODO round 3: the personal guild bank money in Classic (TBC) too
+    if ( AGB and not Armory.isClassic ) then
         local pgbTotal = AGB:GetPGBMoney(currentRealm, currentFaction);
         if ( pgbTotal > 0 ) then
             GameTooltip:AddLine(format(ARMORY_MONEY_TOTAL, ARMORY_PERSONAL_GUILDBANK, currentFaction), "", 1, 1, 1);
@@ -447,10 +543,18 @@ function ArmoryInventoryFilterDropDown_OnShow(self)
     ArmoryItemFilter_SelectDropDown(self, ArmoryInventoryFrame_Update);
 end
 
+-- Classic pastes with Alt-click, Mainline with the chat link modifier
+local PasteModifier;
+if ( Armory.isClassic ) then
+    PasteModifier = function(button) return button == "LeftButton" and IsAltKeyDown(); end;
+else
+    PasteModifier = function(button) return IsModifiedClick("CHATLINK"); end;
+end
+
 function ArmoryInventoryFramePasteItem(button, link)
     if ( not ArmoryInventoryFrameEditBox:IsVisible() ) then
         return;
-    elseif ( IsModifiedClick("CHATLINK") ) then
+    elseif ( PasteModifier(button) ) then
         local itemName = C_Item.GetItemInfo(link);
         if ( itemName ) then
             ArmoryInventoryFrameEditBox:SetText(itemName);

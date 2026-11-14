@@ -52,6 +52,10 @@ local MAX_GUILDBANK_SLOTS_PER_TAB = 98;
 local NUM_SLOTS_PER_GUILDBANK_GROUP = 14;
 local NUM_GUILDBANK_COLUMNS = 7;
 
+-- Classic calls it Standard
+local QUALITY_COMMON = Enum.ItemQuality.Common or Enum.ItemQuality.Standard;
+local MoneyFrame_Update = Armory.isClassic and MoneyFrame_Update or ArmoryMoneyFrame_Update;
+
 ArmoryStaticPopupDialogs["ARMORY_DELETE_GUILDBANK"] = {
     text = ARMORY_DELETE_UNIT,
     button1 = YES,
@@ -75,14 +79,23 @@ do
     end
 end
 
+-- Classic still opens its frames as UI panels
+local ShowFrame, HideFrame;
+if ( Armory.isClassic ) then
+    ShowFrame, HideFrame = ShowUIPanel, HideUIPanel;
+else
+    ShowFrame = function(frame) frame:Show(); end;
+    HideFrame = function(frame) frame:Hide(); end;
+end
+
 function ArmoryGuildBankFrame_Toggle()
     if ( ArmoryListGuildBankFrame:IsShown() or ArmoryIconGuildBankFrame:IsShown() ) then
-        ArmoryListGuildBankFrame:Hide();
-        ArmoryIconGuildBankFrame:Hide();
+        HideFrame(ArmoryListGuildBankFrame);
+        HideFrame(ArmoryIconGuildBankFrame);
     elseif ( AGB:GetIconViewMode() ) then
-        ArmoryIconGuildBankFrame:Show();
+        ShowFrame(ArmoryIconGuildBankFrame);
     else
-        ArmoryListGuildBankFrame:Show();
+        ShowFrame(ArmoryListGuildBankFrame);
     end
 end
 
@@ -273,15 +286,16 @@ end
 function ArmoryGuildBankFrameEnableIconView(checked)
     AGB:SetIconViewMode(checked);
     if ( checked ) then
-        ArmoryListGuildBankFrame:Hide();
-        ArmoryIconGuildBankFrame:Show();
+        HideFrame(ArmoryListGuildBankFrame);
+        ShowFrame(ArmoryIconGuildBankFrame);
     else
-        ArmoryIconGuildBankFrame:Hide();
-        ArmoryListGuildBankFrame:Show();
+        HideFrame(ArmoryIconGuildBankFrame);
+        ShowFrame(ArmoryListGuildBankFrame);
     end
 end
 
-local function UpdateGuildIconViewInfo(dbEntry)
+-- The emblem textures of the icon view, and in Classic of the list view too
+local function UpdateGuildEmblem(dbEntry, frameName)
     local tabardBackgroundUpper, tabardBackgroundLower, tabardEmblemUpper, tabardEmblemLower, tabardBorderUpper, tabardBorderLower = AGB:GetTabardFiles(dbEntry);
 
     if ( not tabardEmblemUpper ) then
@@ -289,25 +303,26 @@ local function UpdateGuildIconViewInfo(dbEntry)
         tabardBackgroundLower = 180159; --"Textures\\GuildEmblems\\Background_49_TL_U";
     end
 
-    ArmoryIconGuildBankFrameEmblemBackgroundUL:SetTexture(tabardBackgroundUpper);
-    ArmoryIconGuildBankFrameEmblemBackgroundUR:SetTexture(tabardBackgroundUpper);
-    ArmoryIconGuildBankFrameEmblemBackgroundBL:SetTexture(tabardBackgroundLower);
-    ArmoryIconGuildBankFrameEmblemBackgroundBR:SetTexture(tabardBackgroundLower);
+    _G[frameName.."EmblemBackgroundUL"]:SetTexture(tabardBackgroundUpper);
+    _G[frameName.."EmblemBackgroundUR"]:SetTexture(tabardBackgroundUpper);
+    _G[frameName.."EmblemBackgroundBL"]:SetTexture(tabardBackgroundLower);
+    _G[frameName.."EmblemBackgroundBR"]:SetTexture(tabardBackgroundLower);
 
-    ArmoryIconGuildBankFrameEmblemUL:SetTexture(tabardEmblemUpper);
-    ArmoryIconGuildBankFrameEmblemUR:SetTexture(tabardEmblemUpper);
-    ArmoryIconGuildBankFrameEmblemBL:SetTexture(tabardEmblemLower);
-    ArmoryIconGuildBankFrameEmblemBR:SetTexture(tabardEmblemLower);
+    _G[frameName.."EmblemUL"]:SetTexture(tabardEmblemUpper);
+    _G[frameName.."EmblemUR"]:SetTexture(tabardEmblemUpper);
+    _G[frameName.."EmblemBL"]:SetTexture(tabardEmblemLower);
+    _G[frameName.."EmblemBR"]:SetTexture(tabardEmblemLower);
 
-    if ( ArmoryIconGuildBankFrameEmblemBorderUL ) then
-         ArmoryIconGuildBankFrameEmblemBorderUL:SetTexture(tabardBorderUpper);
-         ArmoryIconGuildBankFrameEmblemBorderUR:SetTexture(tabardBorderUpper);
-         ArmoryIconGuildBankFrameEmblemBorderBL:SetTexture(tabardBorderLower);
-         ArmoryIconGuildBankFrameEmblemBorderBR:SetTexture(tabardBorderLower);
+    if ( _G[frameName.."EmblemBorderUL"] ) then
+        _G[frameName.."EmblemBorderUL"]:SetTexture(tabardBorderUpper);
+        _G[frameName.."EmblemBorderUR"]:SetTexture(tabardBorderUpper);
+        _G[frameName.."EmblemBorderBL"]:SetTexture(tabardBorderLower);
+        _G[frameName.."EmblemBorderBR"]:SetTexture(tabardBorderLower);
     end
 end
 
-local function UpdateGuildListViewInfo(dbEntry)
+-- The tabard on the portrait of the list view (Mainline)
+local function UpdateGuildTabard(dbEntry)
     local emblemTexture = ArmoryListGuildBankFrame.PortraitOverlay.TabardEmblem;
     local backgroundTexture = ArmoryListGuildBankFrame.PortraitOverlay.TabardBackground;
     local borderTexture =  ArmoryListGuildBankFrame.PortraitOverlay.TabardBorder;
@@ -375,6 +390,17 @@ local function UpdateGuildListViewInfo(dbEntry)
     emblemTexture:SetWidth(hasEmblem and (emblemTexture:GetHeight() * (7 / 8)) or emblemTexture:GetHeight());
 end
 
+local UpdateGuildListViewInfo;
+if ( Armory.isClassic ) then
+    UpdateGuildListViewInfo = function(dbEntry) UpdateGuildEmblem(dbEntry, "ArmoryListGuildBankFrame"); end;
+else
+    UpdateGuildListViewInfo = UpdateGuildTabard;
+end
+
+local function UpdateGuildIconViewInfo(dbEntry)
+    UpdateGuildEmblem(dbEntry, "ArmoryIconGuildBankFrame");
+end
+
 function ArmoryGuildBankFrame_UpdateGuildInfo(dbEntry)
     if ( dbEntry ) then
         local factionGroup = AGB:GetFaction(dbEntry);
@@ -405,7 +431,7 @@ function ArmoryGuildBankFrame_Update()
 
     if ( AGB:GetIconViewMode() ) then
         ArmoryIconGuildBankFrame_UpdateTabs();
-        ArmoryMoneyFrame_Update("ArmoryIconGuildBankFrameMoneyFrame", AGB:GetMoney(dbEntry) or 0);
+        MoneyFrame_Update("ArmoryIconGuildBankFrameMoneyFrame", AGB:GetMoney(dbEntry) or 0);
         ArmoryIconGuildBankFramePersonalCheckButton:SetChecked(dbEntry and AGB:GetIsPersonalBank(dbEntry));
 
         if ( dbEntry and AGB:GetTabIcon(dbEntry, AGB.currentTab) ) then
@@ -439,7 +465,7 @@ function ArmoryGuildBankFrame_Update()
                 end
 
                 quality = Armory:GetQualityFromLink(link);
-                if ( quality and quality > Enum.ItemQuality.Common and BAG_ITEM_QUALITY_COLORS[quality] ) then
+                if ( quality and quality > QUALITY_COMMON and BAG_ITEM_QUALITY_COLORS[quality] ) then
                     button.IconBorder:Show();
                     button.IconBorder:SetVertexColor(BAG_ITEM_QUALITY_COLORS[quality].r, BAG_ITEM_QUALITY_COLORS[quality].g, BAG_ITEM_QUALITY_COLORS[quality].b);
                 else
@@ -455,7 +481,7 @@ function ArmoryGuildBankFrame_Update()
         end
     else
         AGB:UpdateItemLines(frame);
-        ArmoryMoneyFrame_Update("ArmoryListGuildBankFrameMoneyFrame", AGB:GetMoney(dbEntry) or 0);
+        MoneyFrame_Update("ArmoryListGuildBankFrameMoneyFrame", AGB:GetMoney(dbEntry) or 0);
         if ( dbEntry and AGB:GetIsPersonalBank(dbEntry) ) then
             ArmoryListGuildBankFrameTitleText:SetText(ARMORY_PERSONAL_GUILDBANK);
         else
@@ -557,6 +583,11 @@ end
 
 function ArmoryListGuildBankFrame_OnLoad(self)
     InitGuildBankFrame(self);
+
+    if ( Armory.isClassic ) then
+        Armory:SetPortraitToTexture(ArmoryListGuildBankFramePortrait, "Interface\\LFGFrame\\BattlenetWorking4");
+    end
+
     ArmoryListGuildBankFrame_ResetScrollBar();
 end
 
@@ -574,11 +605,19 @@ function ArmoryListGuildBankFrame_AllignCommonControls(self)
 
     ArmoryGuildBankFactionFrame:SetParent(self);
     ArmoryGuildBankFactionFrame:ClearAllPoints();
-    ArmoryGuildBankFactionFrame:SetPoint("TOPLEFT", self, "TOPLEFT", 16, -64);
+    if ( Armory.isClassic ) then
+        ArmoryGuildBankFactionFrame:SetPoint("TOPLEFT", self, "TOPLEFT", 28, -74);
+    else
+        ArmoryGuildBankFactionFrame:SetPoint("TOPLEFT", self, "TOPLEFT", 16, -64);
+    end
 
     ArmoryGuildBankFrameEditBox:SetParent(self);
     ArmoryGuildBankFrameEditBox:ClearAllPoints();
-    ArmoryGuildBankFrameEditBox:SetPoint("TOPRIGHT", self, "TOPRIGHT", -10, -36);
+    if ( Armory.isClassic ) then
+        ArmoryGuildBankFrameEditBox:SetPoint("TOPRIGHT", self, "TOPRIGHT", -45, -45);
+    else
+        ArmoryGuildBankFrameEditBox:SetPoint("TOPRIGHT", self, "TOPRIGHT", -10, -36);
+    end
 
     ArmoryGuildBankFilterDropDown:SetParent(self);
     ArmoryGuildBankFilterDropDown:ClearAllPoints();
@@ -709,14 +748,16 @@ end
 -- Hooks
 ----------------------------------------------------------
 
-    -- FIXME see if HandleModifiedItemClick can be used
--- hooksecurefunc("ContainerFrameItemButton_OnModifiedClick",
---     function(self, button)
---         local bag = self:GetParent():GetID();
---         local slot = self:GetID();
---         ArmoryGuildBankFramePasteItem(button, C_Container.GetContainerItemLink(bag, slot));
---     end
--- );
+-- FIXME Mainline: see if HandleModifiedItemClick can be used
+if ( Armory.isClassic ) then
+    hooksecurefunc("ContainerFrameItemButton_OnModifiedClick",
+        function(self, button)
+            local bag = self:GetParent():GetID();
+            local slot = self:GetID();
+            ArmoryGuildBankFramePasteItem(button, C_Container.GetContainerItemLink(bag, slot));
+        end
+    );
+end
 
 DEFAULT_CHAT_FRAME:HookScript("OnHyperlinkClick", 
     function(self, link, text, button)
@@ -737,6 +778,24 @@ local function IsTabViewable(tab)
     return view;
 end
 
+-- Caged pet? Classic has no battle pets
+local GetCagedPet;
+if ( Armory.isClassic ) then
+    GetCagedPet = function() end;
+else
+    GetCagedPet = function(tab, i)
+        local tooltip = Armory:AllocateTooltip();
+        tooltip:SetGuildBankItem(tab, i);
+        tooltip:RefreshData();
+        local tooltipData = tooltip.info and tooltip.info.tooltipData;
+        Armory:ReleaseTooltip(tooltip);
+        if ( tooltipData ) then
+            return tooltipData.battlePetSpeciesID, tooltipData.battlePetLevel, tooltipData.battlePetBreedQuality,
+                tooltipData.battlePetMaxHealth, tooltipData.battlePetPower, tooltipData.battlePetSpeed, tooltipData.battlePetName;
+        end
+    end;
+end
+
 local Orig_CloseGuildBankFrame = CloseGuildBankFrame;
 function CloseGuildBankFrame(...)
     if ( AGB.tabs ) then
@@ -746,28 +805,13 @@ function CloseGuildBankFrame(...)
             local name, icon = GetGuildBankTabInfo(tab);
             local items = {};
             local slots = {};
-            local itemString, link, texture, count, tooltip;
+            local itemString, link, texture, count;
             for i = 1, MAX_GUILDBANK_SLOTS_PER_TAB do
                 link = GetGuildBankItemLink(tab, i);
                 if ( link ) then
                     texture, count = GetGuildBankItemInfo(tab, i);
 
-                    -- Caged pet?
-                    tooltip = Armory:AllocateTooltip();
-                    tooltip:SetGuildBankItem(tab, i);
-                    tooltip:RefreshData();
-                    local tooltipData = tooltip.info and tooltip.info.tooltipData;
-                    local speciesID, level, breedQuality, maxHealth, power, speed, petName;
-                    if ( tooltipData ) then
-                        speciesID = tooltipData.battlePetSpeciesID;
-                        level = tooltipData.battlePetLevel;
-                        breedQuality = tooltipData.battlePetBreedQuality;
-                        maxHealth = tooltipData.battlePetMaxHealth;
-                        power = tooltipData.battlePetPower;
-                        speed = tooltipData.battlePetSpeed;
-                        petName = tooltipData.battlePetName;
-                    end
-                    Armory:ReleaseTooltip(tooltip);
+                    local speciesID, level, breedQuality, maxHealth, power, speed, petName = GetCagedPet(tab, i);
                     if ( speciesID and tonumber(speciesID) > 0 ) then
                         if ( type(texture) == "string" ) then
                             texture = strupper(texture):match("^INTERFACE\\ICONS\\(.+)") or "";
