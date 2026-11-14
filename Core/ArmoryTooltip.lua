@@ -201,15 +201,20 @@ local function UpdateItemCandidates(candidates)
     return result;
 end
 
+-- Classic has no gems option
+local SHOW_GEMS = Armory.isMainline;
+
 local gemInfo, crafters, itemCount, hasSkill, canLearn, candidates;
 local reagents = {};
-local function EnhanceItemTooltip(tooltip, id)
+-- Mainline passes the item id only, Classic also the link from the tooltip hook
+local function EnhanceItemTooltip(tooltip, id, link)
     local spaceAdded, name;
+    local key = link or id;
 
     if ( not (id and Armory:IsValidTooltip(tooltip)) ) then
         return;
 
-    elseif ( id ~= fetched ) then
+    elseif ( key ~= fetched ) then
         gemInfo = nil;
         knownBy = nil;
         canLearn = nil;
@@ -218,7 +223,7 @@ local function EnhanceItemTooltip(tooltip, id)
         candidates = nil;
 
         -- Need the fully qualified link
-        local name, link, _, itemLevel, minLevel, _, subType, _, equipLoc, _, _, itemType, itemSubType = C_Item.GetItemInfo(id);
+        local name, link, _, itemLevel, minLevel, _, subType, _, equipLoc, _, _, itemType, itemSubType = C_Item.GetItemInfo(key);
 
         if ( not itemType ) then
             return;
@@ -226,7 +231,7 @@ local function EnhanceItemTooltip(tooltip, id)
         elseif ( itemType == Enum.ItemClass.Recipe ) then
             local _, reqProfession, reqRank, reqReputation, reqStanding, reqSkill, _, _, reagents = GetRequirements(tooltip);
             -- Recipe tooltips are built in stages (last stage shows rank)
-            if ( not reqRank ) then
+            if ( not reqRank and not Armory.isTBC ) then
                 return;
             end
             local recipeType, recipeName = name:match("^(.-): (.+)$");
@@ -237,7 +242,7 @@ local function EnhanceItemTooltip(tooltip, id)
             crafters = Armory:GetInscribers(name, subType);
 
         elseif ( itemType ~= Enum.ItemClass.Miscellaneous ) then
-            if ( Armory:GetConfigShowGems() ) then
+            if ( SHOW_GEMS and Armory:GetConfigShowGems() ) then
                 local numGems;
                 gemInfo, numGems = Armory:GetSocketInfo(link);
                 if ( numGems == 0 ) then
@@ -268,7 +273,7 @@ local function EnhanceItemTooltip(tooltip, id)
         table.wipe(reagents);
 
         local parent = tooltip:GetOwner();
-        if ( not parent.reagentSlotSchematic ) then
+        if ( parent and not parent.reagentSlotSchematic ) then
             parent = parent:GetParent();
         end
         if ( parent and parent.reagentSlotSchematic and #parent.reagentSlotSchematic.reagents > 1 ) then
@@ -281,7 +286,7 @@ local function EnhanceItemTooltip(tooltip, id)
             itemCount = Armory:GetItemCount(link);
         end
 
-        fetched = id;
+        fetched = key;
     end
 
     if ( gemInfo ) then
@@ -752,6 +757,13 @@ local function SetTooltipHook(tooltip, name, func)
 
     if ( name == "OnTooltipCleared" ) then
         tooltip:HookScript(name, func);
+    elseif ( name:find("^On") ) then
+        tooltip:HookScript(name, function(self)
+            local hook = tooltipHooks[self];
+            self.alink = func(self);
+            Armory:PrintDebug(name, self.alink);
+            ExecuteHook(self, hook);
+        end);
     elseif ( tooltip[name] ) then
         hooksecurefunc(tooltip, name, function(self, ...)
             if ( select("#", ...) > 0 ) then
@@ -770,15 +782,48 @@ local function SetTooltipHook(tooltip, name, func)
     end
 end
 
-local function RegisterTooltipHook(tooltip, idType, hook, reset)
-    if ( not tooltip ) then
-        return;
-    elseif ( idType == "item" or idType == "spell" ) then
-        return;
-    elseif ( not tooltipHooks[tooltip] ) then
-        tooltipHooks[tooltip] = {};
-        tooltipHooks[tooltip].hooks = {};
+-- Item and spell tooltips: Mainline uses TooltipDataProcessor (see below), Classic hooks the tooltip
+local SetFamilyTooltipHooks;
+if ( Armory.isClassic ) then
+    SetFamilyTooltipHooks = function(tooltip)
+        SetTooltipHook(tooltip, "SetMerchantItem", _G.GetMerchantItemLink);
+        SetTooltipHook(tooltip, "SetAuctionItem", _G.GetAuctionItemLink);
 
+        SetTooltipHook(tooltip, "SetAction", function(action)
+            local actionType, actionID = _G.GetActionInfo(action);
+            if ( actionType == "item" ) then
+                return select(2, _G.GetItemInfo(actionID));
+            end
+        end);
+
+        SetTooltipHook(tooltip, "SetInboxItem", function(messageIndex, attachIndex)
+            if ( messageIndex and attachIndex ) then
+                return _G.GetInboxItemLink(messageIndex, attachIndex);
+            end
+        end);
+        SetTooltipHook(tooltip, "SetQuestItem", _G.GetQuestItemLink);
+
+        SetTooltipHook(tooltip, "SetItemByID", function(id)
+            return select(2, _G.GetItemInfo(id));
+        end);
+
+        SetTooltipHook(tooltip, "SetCraftItem", function(index, reagentIndex)
+            return _G.GetCraftReagentItemLink(index, reagentIndex);
+        end);
+
+        SetTooltipHook(tooltip, "OnTooltipSetItem", function(self)
+            return select(2, Armory:GetItemFromTooltip(self));
+        end);
+
+        SetTooltipHook(tooltip, "OnTooltipSetSpell", function(self)
+            local id = select(3, self:GetSpell());
+            if ( id ) then
+                return _G.GetSpellLink(id);
+            end
+        end);
+    end;
+else
+    SetFamilyTooltipHooks = function(tooltip)
         SetTooltipHook(tooltip, "SetCurrencyToken", function(index)
             if ( index ) then
                 return (C_CurrencyInfo.GetCurrencyListInfo(index) or {}).name;
@@ -794,6 +839,17 @@ local function RegisterTooltipHook(tooltip, idType, hook, reset)
                 return (C_QuestLog.GetQuestRewardCurrencyInfo(questID, index, true) or {}).name;
             end
         end);
+    end;
+end
+
+local function RegisterTooltipHook(tooltip, idType, hook, reset)
+    if ( not tooltip ) then
+        return;
+    elseif ( not tooltipHooks[tooltip] ) then
+        tooltipHooks[tooltip] = {};
+        tooltipHooks[tooltip].hooks = {};
+
+        SetFamilyTooltipHooks(tooltip);
 
         SetTooltipHook(tooltip, "SetMerchantCostItem", function(index, itemIndex)
             local _, _, link, currencyName = _G.GetMerchantItemCostItem(index, itemIndex);
@@ -840,26 +896,33 @@ end
 -- Tooltip Functions
 ----------------------------------------------------------
 
-TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip, data)
-    if ( tooltip == GameTooltip or tooltip == ItemRefTooltip ) then
-        local _, _, id = tooltip:GetItem();
-        pcall(EnhanceItemTooltip, tooltip, id);
+if ( Armory.isClassic ) then
+    function Armory:RegisterTooltipHooks(tooltip)
+        RegisterTooltipHook(tooltip, "item", EnhanceItemTooltip);
+        RegisterTooltipHook(tooltip, "enchant", EnhanceRecipeTooltip);
     end
-end);
+else
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip, data)
+        if ( tooltip == GameTooltip or tooltip == ItemRefTooltip ) then
+            local _, _, id = tooltip:GetItem();
+            pcall(EnhanceItemTooltip, tooltip, id);
+        end
+    end);
 
-TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, function(tooltip, data)
-    if ( tooltip == GameTooltip or tooltip == EmbeddedItemTooltip ) then
-        local _, id = tooltip:GetSpell();
-        pcall(EnhanceSpellTooltip, tooltip, id, id and C_Spell.GetSpellLink(id) or nil);
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, function(tooltip, data)
+        if ( tooltip == GameTooltip or tooltip == EmbeddedItemTooltip ) then
+            local _, id = tooltip:GetSpell();
+            pcall(EnhanceSpellTooltip, tooltip, id, id and C_Spell.GetSpellLink(id) or nil);
+        end
+    end);
+
+    function Armory:RegisterTooltipHooks(tooltip)
+        RegisterTooltipHook(tooltip, "enchant", EnhanceRecipeTooltip);
+        RegisterTooltipHook(tooltip, "quest", EnhanceQuestTooltip);
+        RegisterTooltipHook(tooltip, "achievement", EnhanceAchievementTooltip);
+        RegisterTooltipHook(tooltip, "glyph", EnhanceGlyphTooltip);
+        RegisterTooltipHook(tooltip, "currency", EnhanceCurrencyTooltip);
     end
-end);
-
-function Armory:RegisterTooltipHooks(tooltip)
-    RegisterTooltipHook(tooltip, "enchant", EnhanceRecipeTooltip);
-    RegisterTooltipHook(tooltip, "quest", EnhanceQuestTooltip);
-    RegisterTooltipHook(tooltip, "achievement", EnhanceAchievementTooltip);
-    RegisterTooltipHook(tooltip, "glyph", EnhanceGlyphTooltip);
-    RegisterTooltipHook(tooltip, "currency", EnhanceCurrencyTooltip);
 end
 
 function Armory:ResetTooltipHook()
@@ -988,6 +1051,27 @@ function Armory:Table2Tooltip(tooltip, t, firstWrap)
     end
 end
 
+function Armory:Table2Text(t)
+    local line, left, right;
+    local text = "";
+    for i = 1, #t do
+        line = strsplit(ARMORY_TOOLTIP_TEXTURE_SEPARATOR, t[i]);
+        if ( line ) then
+            left, right = strsplit(ARMORY_TOOLTIP_COLUMN_SEPARATOR, line);
+            if ( left ) then
+                text = text .. (select(4, self:String2Text(left)));
+                if ( right ) then
+                    text = text .. (select(4, self:String2Text(right)));
+                end
+            else
+                text = text .. line;
+            end
+            text = text .. "|";
+        end
+    end
+    return text;
+end
+
 function Armory:AllocateTooltip()
     local tooltip;
     if ( not self.dummyTips ) then
@@ -1080,7 +1164,7 @@ function Armory:GetRequirementsFromLink(link)
 end
 
 function Armory:SetHyperlink(tooltip, link, tinker, anchor)
-    if ( issecretvalue(link) ) then
+    if ( not (link and tooltip) or issecretvalue(link) ) then
         return;
     end
     

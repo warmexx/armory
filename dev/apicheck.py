@@ -11,6 +11,10 @@ names it. Typical hits are removed APIs (ChatFrame_OnHyperlinkShow, GuildRoster)
 events (LEARNED_SPELL_IN_TAB). Expect some noise: C functions that Blizzard never calls, and
 optional functions of other addons.
 
+It also lists methods (":Name(" or "Armory.Name(") that a loaded file calls, but that are
+defined only in Armory files this client does not load, for example a function that only
+exists in the copy of the other family.
+
 Usage: python -I dev/apicheck.py <client> [armory-source-folder]
   client: retail, forever, era or anniversary
 """
@@ -51,6 +55,7 @@ def strip_lua(t):
 known = set(LUA_GLOBALS)
 events = set()
 enums = {}
+blizzard_methods = set()  # widget and mixin methods Blizzard's code calls
 for dp, _, fns in os.walk(BASE):
     for fn in fns:
         p = os.path.join(dp, fn)
@@ -69,6 +74,7 @@ for dp, _, fns in os.walk(BASE):
             events |= set(re.findall(r'RegisterEvent\(\s*"(\w+)"', t))
             # whatever Blizzard's own code calls, the client has (C functions without documentation)
             known |= set(re.findall(r"(?<![\w.:])([A-Za-z_]\w*)\s*\(", strip_lua(t)))
+            blizzard_methods |= set(re.findall(r"[:.]([A-Za-z_]\w*)\s*\(", strip_lua(t)))
         elif fn.endswith(".xml"):
             known |= set(re.findall(r'name="([A-Za-z_]\w*)"', read(p)))
 
@@ -141,6 +147,31 @@ for p in toc_files():
         if e not in enums or v not in enums[e]:
             enum_hits.setdefault(f"Enum.{e}.{v}", set()).add(rel)
 
+# Methods that a loaded file calls, defined only in Armory files this client does not load
+METHOD_DEF = re.compile(r"function\s+[\w.]+[:.]([A-Za-z_]\w*)\s*\(|[\w\])]\.([A-Za-z_]\w*)\s*=(?!=)|^\s*([A-Za-z_]\w*)\s*=\s*function\b", re.M)
+
+
+def method_defs(paths):
+    out = set()
+    for q in paths:
+        for m in METHOD_DEF.finditer(strip_lua(read(q))):
+            out.add(m.group(1) or m.group(2) or m.group(3))
+    return out
+
+
+loaded = [q for q in toc_files() if q.endswith(".lua")]
+repo = []
+for d, dn, fn in os.walk(ROOT):
+    dn[:] = [x for x in dn if x.lower() not in ("libs", "dev", "docs", ".git")]
+    repo += [os.path.join(d, f) for f in fn if f.endswith(".lua")]
+loaded_defs = method_defs(loaded)
+other_defs = method_defs([q for q in repo if q not in set(loaded)]) - loaded_defs
+method_hits = {}
+for q in loaded:
+    for n in re.findall(r"(?::|\bArmory\.)([A-Za-z_]\w*)\s*\(", strip_lua(read(q))):
+        if n in other_defs and n not in blizzard_methods:
+            method_hits.setdefault(n, set()).add(os.path.relpath(q, ROOT))
+
 print(f"Client: {CLIENT}, Armory source: {ROOT}\n")
 print("=== Global functions used by Armory that this client does not define")
 for n in sorted(hits):
@@ -151,3 +182,6 @@ for n in sorted(ev_hits):
 print("\n=== Enum values used by Armory that this client does not have")
 for n in sorted(enum_hits):
     print(f"{n:45s} <- {', '.join(sorted(enum_hits[n])[:3])}")
+print("\n=== Methods called by Armory, defined only in Armory files this client does not load")
+for n in sorted(method_hits):
+    print(f"{n:45s} <- {', '.join(sorted(method_hits[n])[:3])}")

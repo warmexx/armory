@@ -4,9 +4,10 @@
   <Script file="Core\Classic\ArmoryCommandHandler.lua"/>
   <Script file="Core\ArmoryDbEntry.lua"/>
   <Script file="Core\ArmoryBase.lua"/>
-  <Script file="Core\Classic\ArmoryTooltip.lua"/>
+  <Script file="Core\ArmoryTooltip.lua"/>
   <Script file="Core\Classic\ArmoryLDB.lua"/>
   <Script file="Core\ArmoryConfig.lua"/>
+  <Script file="Core\ArmoryStubs.lua"/>
   <Script file="Core\Classic\ArmoryStubs.lua"/>
   <Script file="Core\Classic\ArmoryFactions.lua"/>
   <Script file="Core\ArmoryInventory.lua"/>

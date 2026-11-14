@@ -9,6 +9,7 @@
   <Script file="Core\ArmoryLDB.lua"/>
   <Script file="Core\ArmoryConfig.lua"/>
   <Script file="Core\ArmoryStubs.lua"/>
+  <Script file="Core\Mainline\ArmoryStubs.lua"/>
   <Script file="Core\ArmoryFactions.lua"/>
   <Script file="Core\ArmoryInventory.lua"/>
   <Script file="Core\ArmoryQuests.lua"/>
