@@ -26,6 +26,8 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - The colors of the tooltip lines can be set in the Tooltip options, as in Retail (Classic Era and Burning Crusade Anniversary)
 - Hovering over a reputation bar shows the standing of all your characters with that faction, as in Retail (Classic Era and Burning Crusade Anniversary)
 - Fixes the highlight of the selected faction disappearing after hovering over it (Classic Era and Burning Crusade Anniversary)
+- The raid info shows the difficulty, lists expired locks at the bottom and shows the killed bosses when hovering over a lock, as in Retail (Classic Era and Burning Crusade Anniversary)
+- Fixes an error when turning off the Raid module in the options (Classic Era and Burning Crusade Anniversary)
 - Fixes the command queue re-processing repeated updates, which could cause frame rate drops (e.g. during crafting) (Classic Era and Burning Crusade Anniversary)
 - The talent window shows your unspent talent points, as in Burning Crusade Anniversary (Classic Era)
 - Shift-click on a recipe in the tradeskill window links the item it makes, as in Retail (Classic Era and Burning Crusade Anniversary)

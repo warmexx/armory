@@ -37,7 +37,9 @@ local welcomed;
 function ArmoryRaidInfoFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("UPDATE_INSTANCE_INFO");
-    self:RegisterEvent("RAID_INSTANCE_WELCOME");
+    if ( not Armory.isClassic ) then
+        self:RegisterEvent("RAID_INSTANCE_WELCOME");
+    end
 end
 
 function ArmoryRaidInfoFrame_OnEvent(self, event, ...)
@@ -45,6 +47,11 @@ function ArmoryRaidInfoFrame_OnEvent(self, event, ...)
 
     if ( not Armory:CanHandleEvents() ) then
         return;
+
+    elseif ( event == "PLAYER_ENTERING_WORLD" and Armory.isClassic ) then
+        -- Classic has no Raid Finder
+        self:UnregisterEvent("PLAYER_ENTERING_WORLD");
+        RequestRaidInfo();
 
     elseif ( event == "PLAYER_ENTERING_WORLD" ) then
         --self:UnregisterEvent("PLAYER_ENTERING_WORLD");

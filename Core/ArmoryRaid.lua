@@ -68,6 +68,29 @@ local function GetInstanceLines()
     return instanceLines;
 end
 
+-- Classic's API documentation has no tooltip for the encounters of a lock, so Classic builds it as Blizzard's Classic raid frame does
+local SetEncounterTooltip;
+if ( Armory.isClassic ) then
+    SetEncounterTooltip = function(tooltip, index)
+        local instanceName, _, _, _, _, _, _, _, _, _, numEncounters = _G.GetSavedInstanceInfo(index);
+        if ( (numEncounters or 0) > 0 ) then
+            tooltip:AddLine(format(INSTANCE_LOCK_SS, _G.UnitName("player"), instanceName));
+            for i = 1, numEncounters do
+                local bossName, _, isKilled = _G.GetSavedInstanceEncounterInfo(index, i);
+                if ( isKilled ) then
+                    tooltip:AddDoubleLine(bossName, BOSS_DEAD, 1, 1, 1, RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b);
+                else
+                    tooltip:AddDoubleLine(bossName, BOSS_ALIVE, 1, 1, 1, GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b);
+                end
+            end
+        end
+    end;
+else
+    SetEncounterTooltip = function(tooltip, index)
+        tooltip:SetInstanceLockEncountersComplete(index);
+    end;
+end
+
 ----------------------------------------------------------
 -- Raid Info Storage
 ----------------------------------------------------------
@@ -107,7 +130,7 @@ function Armory:UpdateInstances()
                 else
                     local tooltipLines;
                     local tooltip = self:AllocateTooltip();
-                    tooltip:SetInstanceLockEncountersComplete(i);
+                    SetEncounterTooltip(tooltip, i);
                     tooltipLines = Armory:Tooltip2Table(tooltip);
                     self:ReleaseTooltip(tooltip);
 

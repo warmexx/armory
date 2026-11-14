@@ -92,6 +92,7 @@
   </Slider>
   <!-- The same for the functions of those templates that shared Lua and XML call -->
   <Script>
+    ArmoryHybridScrollFrame_OnLoad = HybridScrollFrame_OnLoad;
     ArmoryHybridScrollFrame_CreateButtons = HybridScrollFrame_CreateButtons;
     ArmoryHybridScrollFrame_GetOffset = HybridScrollFrame_GetOffset;
     ArmoryHybridScrollFrame_Update = HybridScrollFrame_Update;

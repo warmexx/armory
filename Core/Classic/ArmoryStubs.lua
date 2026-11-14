@@ -164,6 +164,35 @@ function Armory:CountCurrency(link)
     return 0;
 end
 
+-- Classic has no Raid Finder, and its world bosses have no lockout (GetNumSavedWorldBosses is always 0)
+function Armory:ClearRaidFinder()
+end
+
+function Armory:UpdateRaidFinderInfo()
+end
+
+function Armory:UpdateRaidFinderInProgress()
+    return false;
+end
+
+function Armory:GetNumRaidFinderDungeons()
+    return 0;
+end
+
+function Armory:ClearWorldBosses()
+end
+
+function Armory:UpdateWorldBosses()
+end
+
+function Armory:UpdateWorldBossesInProgress()
+    return false;
+end
+
+function Armory:GetNumSavedWorldBosses()
+    return 0;
+end
+
 function Armory:SetTalent(index, id, inspect)
     local tooltipLines = self:GetTalentTooltip(index, id);
     if ( tooltipLines ) then
