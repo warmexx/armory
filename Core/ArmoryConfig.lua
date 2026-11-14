@@ -590,10 +590,6 @@ if ( Armory.isClassic ) then
         "ARMORY_CMD_SET_SHOWGEMS",
         "ARMORY_CMD_SET_USEOVERLAY",
         "ARMORY_CMD_SET_USEMAZIEL",
-        "ARMORY_CMD_SET_COOLDOWNEVENTS",
-        "ARMORY_CMD_SET_EVENTWARNINGS",
-        "ARMORY_CMD_SET_EVENTLOCALTIME",
-        "ARMORY_CMD_SET_CHECKCOOLDOWNS",
     };
 else
     unavailableOptions = {

@@ -127,7 +127,7 @@ local function EvalCalendar(cvar, numDays, callback)
         local numEvents = C_Calendar.GetNumDayEvents(monthOffset, eventDate.day);
         for eventIndex = 1, numEvents do
             local ok, event = pcall(C_Calendar.GetDayEvent, monthOffset, eventDate.day, eventIndex);
-            if ( ok and event and not IsSecretEvent(event) and callback(eventIndex, Armory:MakeDate(eventDate.day, eventDate.month, eventDate.year, hour, minute), event) ) then
+            if ( ok and event and not IsSecretEvent(event) and callback(eventIndex, Armory:MakeDate(eventDate.day, eventDate.month, eventDate.year, event.startTime.hour, event.startTime.minute), event) ) then
                 RestoreCalendarState();
                 return;
             end
@@ -200,7 +200,7 @@ function Armory:UpdateEvents()
 
                 if ( event.calendarType ~= "HOLIDAY" and event.calendarType ~= "SYSTEM" ) then
                     local key = CreateKey(self:GetServerTimeAsLocalTime(eventTime), eventIndex);
-                    dbEntry:SetValue(2, container, key, event.title, event.calendarType, event.eventType, event.texture, event.modStatus,
+                    dbEntry:SetValue(2, container, key, event.title, event.calendarType, event.eventType, event.iconTexture, event.modStatus,
                         event.inviteStatus, event.invitedBy, event.difficulty, event.inviteType, event.difficultyName);
                 end
             end

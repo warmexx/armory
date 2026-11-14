@@ -77,19 +77,16 @@ function ArmorySocialFrame_OnLoad(self)
         -- Blizzard's frame template in Classic has a button bar
         ButtonFrameTemplate_HideButtonBar(self);
         Armory:SetPortraitToTexture(ArmorySocialFramePortrait, "Interface\\FriendsFrame\\FriendsFrameScrollIcon");
-        -- Classic has no events (calendar and cooldowns)
-        ArmorySocialFrameTab3:Hide();
     else
         self:SetPortraitToAsset("Interface\\FriendsFrame\\FriendsFrameScrollIcon");
-
-        self:RegisterEvent("PLAYER_ENTERING_WORLD");
-        self:RegisterEvent("CALENDAR_UPDATE_EVENT_LIST");
-        self:RegisterEvent("CALENDAR_CLOSE_EVENT");
     end
     self.Inset:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", PANEL_DEFAULT_WIDTH + PANEL_INSET_RIGHT_OFFSET, PANEL_INSET_BOTTOM_OFFSET);
 
+    self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("FRIENDLIST_UPDATE");
     self:RegisterEvent("IGNORELIST_UPDATE");
+    self:RegisterEvent("CALENDAR_UPDATE_EVENT_LIST");
+    self:RegisterEvent("CALENDAR_CLOSE_EVENT");
 
     ArmoryPanelTemplates_SetNumTabs(self, 3);
     ArmoryPanelTemplates_SetTab(self, 1);
@@ -99,20 +96,17 @@ function ArmorySocialFrame_OnShow(self)
     PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
     ArmoryPanelTemplates_SetTab(self, ArmoryPanelTemplates_GetSelectedTab(self));
 
-    -- only the visible tabs: no events in Classic
-    local tabs = {};
     local totalTabWidth = 0;
     local tabWidthCache = {};
-    for _, tab in ipairs(self.Tabs) do
-        if ( tab:IsShown() ) then
-            ArmoryPanelTemplates_TabResize(tab, 0);
-            tab.Text:SetWidth(0);
-            table.insert(tabs, tab);
-            table.insert(tabWidthCache, ArmoryPanelTemplates_GetTabWidth(tab));
-            totalTabWidth = totalTabWidth + tabWidthCache[#tabWidthCache];
-        end
+    for i, tab in ipairs(self.Tabs) do
+        tabWidthCache[i] = 0;
+        ArmoryPanelTemplates_TabResize(tab, 0);
+        tab.Text:SetWidth(0);
+        tabWidthCache[i] = ArmoryPanelTemplates_GetTabWidth(tab);
+        totalTabWidth = totalTabWidth + tabWidthCache[i];
+        tab:Show();
     end
-    ArmoryPanelTemplates_ResizeTabsToFit(tabs, totalTabWidth, self:GetWidth(), tabWidthCache);
+    ArmoryPanelTemplates_ResizeTabsToFit(self.Tabs, totalTabWidth, self:GetWidth(), tabWidthCache);
 
     ArmorySocialFrame_ShowSubFrame();
 end
@@ -305,22 +299,10 @@ local function GetEventColor(calendarType, modStatus, inviteStatus)
 end
 
 local eventTextures = {};
-local function GetEventTextures(...)
-    local numTextures = select("#", ...) / 4;
-    local param = 1;
-    local title, texture, expansionLevel, difficultyName;
+local function GetEventTextures(textures)
     table.wipe(eventTextures);
-    for index = 1, numTextures do
-        title = select(param, ...);
-        param = param + 1;
-        texture = select(param, ...);
-        param = param + 1;
-        expansionLevel = select(param, ...);
-        param = param + 1;
-        difficultyName = select(param, ...);
-        param = param + 1;
-        --eventTextures[texture] = format("%s (%s)", title, _G["EXPANSION_NAME"..expansionLevel]);
-        eventTextures[texture] = title;
+    for _, info in ipairs(textures or {}) do
+        eventTextures[info.iconTexture] = info.title;
     end
     return eventTextures;
 end
@@ -350,7 +332,7 @@ function ArmoryEventsList_GetEventDetail(eventIndex)
         title = format(CALENDAR_EVENTNAME_FORMAT_RAID_LOCKOUT, GetDungeonNameWithDifficulty(title, difficultyName));
         eventColor = NORMAL_FONT_COLOR;
     else
-        inviteStatusInfo = INVITESTATUS_INFO[inviteStatus] or INVITESTATUS_INFO["UNKNOWN"];
+        local inviteStatusInfo = INVITESTATUS_INFO[inviteStatus] or INVITESTATUS_INFO["UNKNOWN"];
         eventColor = GetEventColor(calendarType, modStatus, inviteStatus);
         status = Armory:HexColor(inviteStatusInfo.color)..inviteStatusInfo.name..FONT_COLOR_CODE_CLOSE;
         if ( texture ) then

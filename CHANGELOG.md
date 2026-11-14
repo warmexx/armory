@@ -28,6 +28,8 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - Fixes the highlight of the selected faction disappearing after hovering over it (Classic Era and Burning Crusade Anniversary)
 - The raid info shows the difficulty, lists expired locks at the bottom and shows the killed bosses when hovering over a lock, as in Retail (Classic Era and Burning Crusade Anniversary)
 - Fixes an error when turning off the Raid module in the options (Classic Era and Burning Crusade Anniversary)
+- The social window has the Events tab, with your calendar events, raid lockouts and tradeskill cooldowns, and warnings before they start, as in Retail (Classic Era and Burning Crusade Anniversary)
+- Fixes an error when turning the Social module on or off in the options (Classic Era and Burning Crusade Anniversary)
 - Fixes the command queue re-processing repeated updates, which could cause frame rate drops (e.g. during crafting) (Classic Era and Burning Crusade Anniversary)
 - The talent window shows your unspent talent points, as in Burning Crusade Anniversary (Classic Era)
 - Shift-click on a recipe in the tradeskill window links the item it makes, as in Retail (Classic Era and Burning Crusade Anniversary)

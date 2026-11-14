@@ -20,4 +20,5 @@
   <Script file="Core\ArmoryFriends.lua"/>
   <Script file="Core\ArmoryBuffs.lua"/>
   <Script file="Core\Classic\ArmorySummary.lua"/>
+  <Script file="Core\ArmoryEvents.lua"/>
 </Ui>

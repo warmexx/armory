@@ -187,6 +187,10 @@ if ( Armory.isClassic ) then
 
             ArmoryFrame_UpdateLineTabs();
         end
+
+        if ( Armory:GetConfigEnableCooldownEvents() ) then
+            Armory:Execute(ArmorySocialFrame_UpdateEvents);
+        end
     end
 else
     local function CanUpdate()
