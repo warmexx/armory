@@ -58,67 +58,182 @@ ArmoryTradeSkillTypeColor = {
 
 
 ----------------------------------------------------------
+-- Per family, chosen once at load
+----------------------------------------------------------
+
+-- The quality and link of the product: Mainline stores the quality, Classic only the link
+-- The requirements: Mainline stores them as one list, Classic stores a tool or a spell focus
+local GetProductQualityAndLink, GetRequirements;
+if ( Armory.isClassic ) then
+    GetProductQualityAndLink = function(index, recipeInfo)
+        local itemLink = Armory:GetTradeSkillItemLink(index);
+        return Armory:GetQualityFromLink(itemLink), itemLink;
+    end
+
+    GetRequirements = function(index)
+        local requirements = Armory:GetTradeSkillTools(index);
+        if ( requirements == "" ) then
+            requirements = Armory:GetTradeSkillSpellFocus(index);
+        end
+        if ( requirements and requirements ~= "" ) then
+            return BuildColoredListString(requirements);
+        end
+        return "";
+    end
+else
+    GetProductQualityAndLink = function(index, recipeInfo)
+        -- item quality of the product; data stored by older versions can hold a difficulty string instead
+        local productQuality = type(recipeInfo.productQuality) == "number" and recipeInfo.productQuality > 0 and recipeInfo.productQuality or nil;
+        return productQuality, C_TradeSkillUI.GetRecipeItemLink(recipeInfo.recipeID);
+    end
+
+    GetRequirements = function(index)
+        return Armory:GetTradeSkillTools(index);
+    end
+end
+
+-- The names of the active category filters: Classic has a subclass and an inventory slot
+local GetCategoryFilter;
+if ( Armory.isClassic ) then
+    GetCategoryFilter = function()
+        return Armory:GetTradeSkillSubClassFilter(), Armory:GetTradeSkillInvSlotFilter();
+    end
+else
+    GetCategoryFilter = function()
+        local categoryFilter = Armory:GetTradeSkillCategoryFilter();
+        if ( #categoryFilter > 1 ) then
+            return categoryFilter[1];
+        end
+    end
+end
+
+-- Blizzard has this function only in Mainline; Classic gets the same code
+local SetItemButtonReagentCount = SetItemButtonReagentCount or function(button, reagentCount, playerReagentCount)
+    local playerReagentCountAbbreviated = AbbreviateNumbers(playerReagentCount);
+    button.Count:SetFormattedText(TRADESKILL_REAGENT_COUNT, playerReagentCountAbbreviated, reagentCount);
+    --fix text overflow when the button count is too high
+    if ( math.floor(button.Count:GetStringWidth()) > math.floor(button.Icon:GetWidth() + .5) ) then
+        --round count width down because the leftmost number can overflow slightly without looking bad
+        --round icon width because it should always be an int, but sometimes it's a slightly off float
+        button.Count:SetFormattedText("%s\n/%s", playerReagentCountAbbreviated, reagentCount);
+    end
+end
+
+
+----------------------------------------------------------
 -- TradeSkillFrame Mixin
 ----------------------------------------------------------
 
 ArmoryTradeSkillFrameMixin = {}
 
 function ArmoryTradeSkillFrameMixin:OnLoad()
-    self:SetPortraitToAsset("Interface\\Spellbook\\Spellbook-Icon");
+    if ( Armory.isClassic ) then
+        -- Blizzard's frame template in Classic has a button bar
+        ButtonFrameTemplate_HideButtonBar(self);
+        Armory:SetPortraitToTexture(ArmoryTradeSkillFramePortrait, "Interface\\Spellbook\\Spellbook-Icon");
+
+        self:RegisterEvent("TRADE_SKILL_SHOW");
+        self:RegisterEvent("TRADE_SKILL_CLOSE");
+        self:RegisterEvent("CRAFT_SHOW");
+        self:RegisterEvent("CRAFT_CLOSE");
+    else
+        self:SetPortraitToAsset("Interface\\Spellbook\\Spellbook-Icon");
+        self.bottomInset.Bg:SetAtlas("Professions-Recipe-Background", false);
+
+        self:RegisterEvent("TRADE_SKILL_LIST_UPDATE");
+        self:RegisterEvent("TRADE_SKILL_DETAILS_UPDATE");
+        self:RegisterEvent("TRADE_SKILL_NAME_UPDATE");
+
+        ArmoryDropDownMenu_Initialize(self.FilterDropDown, function(...) self:InitFilterMenu(...) end, "MENU");
+    end
     self.Inset:SetPoint("TOPLEFT", self, "TOPLEFT", 4, -73);
     self.Inset:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", -6, -210);
-    self.bottomInset.Bg:SetAtlas("Professions-Recipe-Background", false);
 
     self.RecipeList:SetRecipeChangedCallback(function(...) self:OnRecipeChanged(...) end);
-
-    self:RegisterEvent("TRADE_SKILL_LIST_UPDATE");
-    self:RegisterEvent("TRADE_SKILL_DETAILS_UPDATE");
-    self:RegisterEvent("TRADE_SKILL_NAME_UPDATE");
-
-    ArmoryDropDownMenu_Initialize(self.FilterDropDown, function(...) self:InitFilterMenu(...) end, "MENU");
 end
 
-local function CanUpdate()
-    local professionInfo = Armory:GetCurrentProfessionInfo();
-    return C_TradeSkillUI.IsTradeSkillReady() and professionInfo ~= nil and professionInfo.professionID ~= 0;
-end
+if ( Armory.isClassic ) then
+    function ArmoryTradeSkillFrameMixin:OnEvent(event, ...)
+        local isCraft = event:sub(1, 5) == "CRAFT";
+        if ( not Armory:CanHandleEvents() ) then
+            return;
+        elseif ( event == "TRADE_SKILL_SHOW" or event == "CRAFT_SHOW" ) then
+            self.isOpen = true;
+            Armory:PullTradeSkillItems(isCraft);
+        elseif ( event == "TRADE_SKILL_CLOSE" or event == "CRAFT_CLOSE" ) then
+            self.isOpen = false;
+        end
 
-local doUpdate;
-function ArmoryTradeSkillFrameMixin:OnEvent(event, ...)
-    if ( not Armory:CanHandleEvents() ) then
-        return;
-    elseif ( C_TradeSkillUI.IsTradeSkillLinked() or C_TradeSkillUI.IsTradeSkillGuild() or C_TradeSkillUI.IsNPCCrafting() or C_TradeSkillUI.IsRuneforging() ) then
-        return;
+        if ( not Armory:GetConfigExtendedTradeSkills() ) then
+            Armory:Execute(function() self:Update(isCraft) end);
+        end
     end
 
-    if ( not doUpdate ) then
-        doUpdate = function() self:Update() end;
+    function ArmoryTradeSkillFrameMixin:Update(isCraft)
+        local currentSkill, modeChanged;
+
+        Armory:UnregisterTradeSkillUpdateEvents();
+        currentSkill, modeChanged = Armory:UpdateTradeSkill(isCraft);
+        Armory:RegisterTradeSkillUpdateEvents();
+
+        if ( Armory.character == Armory.player ) then
+            if ( self.lastTradeSkill == currentSkill and self:IsShown() ) then
+                if ( modeChanged ) then
+                    self:Refresh();
+                else
+                    self:SetSelectedRecipe(self:GetSelectedRecipe());
+                end
+            end
+
+            ArmoryFrame_UpdateLineTabs();
+        end
     end
-    Armory:ExecuteConditional(CanUpdate, doUpdate);
+else
+    local function CanUpdate()
+        local professionInfo = Armory:GetCurrentProfessionInfo();
+        return C_TradeSkillUI.IsTradeSkillReady() and professionInfo ~= nil and professionInfo.professionID ~= 0;
+    end
+
+    local doUpdate;
+    function ArmoryTradeSkillFrameMixin:OnEvent(event, ...)
+        if ( not Armory:CanHandleEvents() ) then
+            return;
+        elseif ( C_TradeSkillUI.IsTradeSkillLinked() or C_TradeSkillUI.IsTradeSkillGuild() or C_TradeSkillUI.IsNPCCrafting() or C_TradeSkillUI.IsRuneforging() ) then
+            return;
+        end
+
+        if ( not doUpdate ) then
+            doUpdate = function() self:Update() end;
+        end
+        Armory:ExecuteConditional(CanUpdate, doUpdate);
+    end
+
+    function ArmoryTradeSkillFrameMixin:Update()
+        local currentSkill = Armory:UpdateTradeSkill();
+
+        if ( Armory.character == Armory.player ) then
+            if ( self.lastTradeSkill == currentSkill and self:IsShown() ) then
+                self:SetSelectedRecipe(self:GetSelectedRecipe());
+            end
+
+            ArmoryFrame_UpdateLineTabs();
+        end
+
+        if ( Armory:GetConfigEnableCooldownEvents() ) then
+            Armory:Execute(ArmorySocialFrame_UpdateEvents);
+        end
+    end
 end
 
 function ArmoryTradeSkillFrameMixin:OnShow()
+    if ( Armory.isClassic ) then
+        ArmoryDropDownMenu_Initialize(self.FilterDropDown, function(...) self:InitFilterMenu(...) end, "MENU");
+    end
     PlaySound(SOUNDKIT.UI_PROFESSIONS_WINDOW_OPEN);
 end
 
 function ArmoryTradeSkillFrameMixin:OnHide()
     PlaySound(SOUNDKIT.UI_PROFESSIONS_WINDOW_CLOSE);
-end
-
-function ArmoryTradeSkillFrameMixin:Update()
-    local currentSkill = Armory:UpdateTradeSkill();
-
-    if ( Armory.character == Armory.player ) then
-        if ( self.lastTradeSkill == currentSkill and self:IsShown() ) then
-            self:SetSelectedRecipe(self:GetSelectedRecipe());
-        end
-
-        ArmoryFrame_UpdateLineTabs();
-    end
-
-    if ( Armory:GetConfigEnableCooldownEvents() ) then
-        Armory:Execute(ArmorySocialFrame_UpdateEvents);
-    end
 end
 
 function ArmoryTradeSkillFrameMixin:SetSelectedRecipe(id)
@@ -158,7 +273,7 @@ function ArmoryTradeSkillFrameMixin:Refresh()
 
     ArmoryCloseDropDownMenus();
     ArmoryCloseChildWindows();
-    self:Show();
+    Armory:ShowFrame(self);
 
     self:OnDataSourceChanged();
 
@@ -186,23 +301,44 @@ function ArmoryTradeSkillFrameMixin:ClearFilters()
     self:SetSelectedRecipe(Armory:GetFirstTradeSkill());
 end
 
-function ArmoryTradeSkillFrameMixin:ClearCategoryFilter()
-    Armory:SetTradeSkillCategoryFilter(0);
-end
-
-function ArmoryTradeSkillFrameMixin:SetCategoryFilter(categoryID)
-    self:ClearCategoryFilter();
-
-    if ( categoryID ) then
-        Armory:SetTradeSkillCategoryFilter(categoryID);
+if ( Armory.isClassic ) then
+    -- Classic filters on a subclass or an inventory slot instead of a category
+    function ArmoryTradeSkillFrameMixin:ClearCategoryFilter()
+        Armory:SetTradeSkillSubClassFilter(0);
+        Armory:SetTradeSkillInvSlotFilter(0);
     end
 
-    self:SetSelectedRecipe(Armory:GetFirstTradeSkill());
+    function ArmoryTradeSkillFrameMixin:SetSlotFilter(inventorySlotIndex, subClassIndex)
+        self:ClearCategoryFilter();
+
+        if ( inventorySlotIndex ) then
+            Armory:SetTradeSkillInvSlotFilter(inventorySlotIndex);
+        end
+
+        if ( subClassIndex ) then
+            Armory:SetTradeSkillSubClassFilter(subClassIndex);
+        end
+
+        self:SetSelectedRecipe(Armory:GetFirstTradeSkill());
+    end
+else
+    function ArmoryTradeSkillFrameMixin:ClearCategoryFilter()
+        Armory:SetTradeSkillCategoryFilter(0);
+    end
+
+    function ArmoryTradeSkillFrameMixin:SetCategoryFilter(categoryID)
+        self:ClearCategoryFilter();
+
+        if ( categoryID ) then
+            Armory:SetTradeSkillCategoryFilter(categoryID);
+        end
+
+        self:SetSelectedRecipe(Armory:GetFirstTradeSkill());
+    end
 end
 
 function ArmoryTradeSkillFrameMixin:RefreshSkillTitleAndRank()
     local skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier = Armory:GetTradeSkillLine();
-    local color = ArmoryTradeSkillTypeColor[skillType];
 
     self:SetTitleFormatted(TRADE_SKILL_TITLE, skillLineName);
 
@@ -211,7 +347,8 @@ function ArmoryTradeSkillFrameMixin:RefreshSkillTitleAndRank()
     self.RankFrame.Background:SetVertexColor(0.0, 0.0, 0.75, 0.5);
     self.RankFrame:SetMinMaxValues(0, skillLineMaxRank);
     self.RankFrame:SetValue(skillLineRank);
-    if ( skillLineModifier > 0 ) then
+    -- Blizzard's Classic code does not use this format, so it may be missing there
+    if ( skillLineModifier > 0 and TRADESKILL_RANK_WITH_MODIFIER ) then
         self.RankFrame.SkillRank:SetFormattedText(TRADESKILL_RANK_WITH_MODIFIER, skillLineRank, skillLineModifier, skillLineMaxRank);
     else
         self.RankFrame.SkillRank:SetFormattedText(TRADESKILL_RANK, skillLineRank, skillLineMaxRank);
@@ -281,58 +418,115 @@ function ArmoryTradeSkillFrameMixin:CollapseAllButtonClicked(button)
     self:SetSelectedRecipe(Armory:GetFirstTradeSkill());
 end
 
-function ArmoryTradeSkillFrameMixin:InitFilterMenu(dropdown, level)
-    local info = ArmoryDropDownMenu_CreateInfo();
-    if ( level == 1 ) then
-        --[[ Only show makeable recipes ]]--
-        info.text = CRAFT_IS_MAKEABLE;
-        info.func = function()
-            Armory:SetOnlyShowMakeableRecipes(not Armory:GetOnlyShowMakeableRecipes());
-            self:SetSelectedRecipe(Armory:GetFirstTradeSkill());
-        end;
+local function AddCheckFilters(self, info, level)
+    --[[ Only show makeable recipes ]]--
+    info.text = CRAFT_IS_MAKEABLE;
+    info.func = function()
+        Armory:SetOnlyShowMakeableRecipes(not Armory:GetOnlyShowMakeableRecipes());
+        self:SetSelectedRecipe(Armory:GetFirstTradeSkill());
+    end;
 
-        info.keepShownOnClick = true;
-        info.checked = Armory:GetOnlyShowMakeableRecipes();
-        info.isNotRadio = true;
-        ArmoryDropDownMenu_AddButton(info, level)
+    info.keepShownOnClick = true;
+    info.checked = Armory:GetOnlyShowMakeableRecipes();
+    info.isNotRadio = true;
+    ArmoryDropDownMenu_AddButton(info, level)
 
-        --[[ Only show recipes that provide skill ups ]]--
-        info.text = TRADESKILL_FILTER_HAS_SKILL_UP;
-        info.func = function()
-            Armory:SetOnlyShowSkillUpRecipes(not Armory:GetOnlyShowSkillUpRecipes());
-            self:SetSelectedRecipe(Armory:GetFirstTradeSkill());
-        end;
-        info.keepShownOnClick = true;
-        info.checked = Armory:GetOnlyShowSkillUpRecipes();
-        info.isNotRadio = true;
-        ArmoryDropDownMenu_AddButton(info, level);
+    --[[ Only show recipes that provide skill ups ]]--
+    info.text = TRADESKILL_FILTER_HAS_SKILL_UP;
+    info.func = function()
+        Armory:SetOnlyShowSkillUpRecipes(not Armory:GetOnlyShowSkillUpRecipes());
+        self:SetSelectedRecipe(Armory:GetFirstTradeSkill());
+    end;
+    info.keepShownOnClick = true;
+    info.checked = Armory:GetOnlyShowSkillUpRecipes();
+    info.isNotRadio = true;
+    ArmoryDropDownMenu_AddButton(info, level);
+end
 
-        ArmoryDropDownMenu_AddSpace(level);
+if ( Armory.isClassic ) then
+    -- Classic filters on a subclass or an inventory slot, in a submenu
+    function ArmoryTradeSkillFrameMixin:InitFilterMenu(dropdown, level)
+        local info = ArmoryDropDownMenu_CreateInfo();
+        if ( level == 1 ) then
+            AddCheckFilters(self, info, level);
 
-        -- [[ Parent categories ]]--
-        local categories = Armory:GetTradeSkillCategories();
-
-        for i, categoryInfo in ipairs(categories) do
-            info.text = categoryInfo.name;
-            info.func = function() self:SetCategoryFilter(categoryInfo.categoryID); end
-            info.keepShownOnClick = false;
+            info.checked = nil;
+            info.isNotRadio = nil;
+            info.func = nil;
             info.notCheckable = true;
-            info.value = categoryInfo.categoryID;
-            ArmoryDropDownMenu_AddButton(info, level);
+            info.keepShownOnClick = true;
+            info.hasArrow = true;
+
+            --[[ Filter recipes by inventory slot ]]--
+            if ( Armory:GetTradeSkillInvSlots() ) then
+                info.text = TRADESKILL_FILTER_SLOTS;
+                info.value = 1;
+                ArmoryDropDownMenu_AddButton(info, level);
+            end
+
+            --[[ Filter recipes by parent category ]]--
+            if ( Armory:GetTradeSkillSubClasses() ) then
+                info.text = TRADESKILL_FILTER_CATEGORY;
+                info.value = 2;
+                ArmoryDropDownMenu_AddButton(info, level);
+            end
+
+        elseif ( level == 2 ) then
+            --[[ Inventory slots ]]--
+            if ( ARMORY_DROPDOWNMENU_MENU_VALUE == 1 ) then
+                local inventorySlots = { Armory:GetTradeSkillInvSlots() };
+                for i, inventorySlot in ipairs(inventorySlots) do
+                    info.text = inventorySlot;
+                    info.func = function() self:SetSlotFilter(i, nil); end;
+                    info.notCheckable = true;
+                    info.hasArrow = false;
+                    info.keepShownOnClick = true;
+                    ArmoryDropDownMenu_AddButton(info, level);
+                end
+            elseif ( ARMORY_DROPDOWNMENU_MENU_VALUE == 2 ) then
+                -- [[ Sub classes ]]--
+                local subClasses = { Armory:GetTradeSkillSubClasses() };
+                for i, subClass in ipairs(subClasses) do
+                    info.text = subClass;
+                    info.func = function() self:SetSlotFilter(nil, i); end;
+                    info.notCheckable = true;
+                    info.hasArrow = false;
+                    info.keepShownOnClick = true;
+                    ArmoryDropDownMenu_AddButton(info, level);
+                end
+            end
+        end
+    end
+else
+    function ArmoryTradeSkillFrameMixin:InitFilterMenu(dropdown, level)
+        local info = ArmoryDropDownMenu_CreateInfo();
+        if ( level == 1 ) then
+            AddCheckFilters(self, info, level);
+
+            ArmoryDropDownMenu_AddSpace(level);
+
+            -- [[ Parent categories ]]--
+            local categories = Armory:GetTradeSkillCategories();
+
+            for i, categoryInfo in ipairs(categories) do
+                info.text = categoryInfo.name;
+                info.func = function() self:SetCategoryFilter(categoryInfo.categoryID); end
+                info.keepShownOnClick = false;
+                info.notCheckable = true;
+                info.value = categoryInfo.categoryID;
+                ArmoryDropDownMenu_AddButton(info, level);
+            end
         end
     end
 end
 
 function ArmoryTradeSkillFrameMixin:UpdateLayout()
-    if ( self.RecipeList.extended ) then
-        self.ExpandButtonFrame:Show();
-        self.FilterButton:Show();
-        self.FilterDropDown:Show();
-    else
-        self.ExpandButtonFrame:Hide();
-        self.FilterButton:Hide();
-        self.FilterDropDown:Hide();
-    end
+    local extended = self.RecipeList.extended;
+    -- Classic can filter recipes without headers too
+    local canFilter = extended or Armory.isClassic;
+    self.ExpandButtonFrame:SetShown(extended);
+    self.FilterButton:SetShown(canFilter);
+    self.FilterDropDown:SetShown(canFilter);
 end
 
 
@@ -407,11 +601,15 @@ function ArmoryTradeSkillRecipeListMixin:UpdateFilterBar()
         filters[#filters + 1] = TRADESKILL_FILTER_HAS_SKILL_UP;
     end
 
-    local categoryFilter = Armory:GetTradeSkillCategoryFilter();
-    if ( #categoryFilter > 1 ) then
-        local categoryName = categoryFilter[1];
+    local categoryName, slotName = GetCategoryFilter();
+    if ( categoryName ) then
         filters = filters or {};
         filters[#filters + 1] = categoryName;
+    end
+
+    if ( slotName ) then
+        filters = filters or {};
+        filters[#filters + 1] = slotName;
     end
 
     if ( filters ) then
@@ -482,7 +680,8 @@ function ArmoryTradeSkillRecipeListMixin:UpdateSkillButtonIndent()
 end
 
 function ArmoryTradeSkillRecipeListMixin:UpdateLayout()
-    if ( self.extended ) then
+    -- Classic can filter recipes without headers too
+    if ( self.extended or Armory.isClassic ) then
         if ( self.filtered ) then
             self.FilterBar:SetPoint("TOPLEFT", ArmoryTradeSkillFrame.Inset, "TOPLEFT", 8, -4);
             self.FilterBar:Show();
@@ -873,9 +1072,7 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
         self.Contents.RecipeName:SetText(recipeInfo.name);
         self.recipeID = recipeInfo.recipeID;
 
-        local recipeLink = C_TradeSkillUI.GetRecipeItemLink(recipeInfo.recipeID);
-        -- item quality of the product; data stored by older versions can hold a difficulty string instead
-        local productQuality = type(recipeInfo.productQuality) == "number" and recipeInfo.productQuality > 0 and recipeInfo.productQuality or nil;
+        local productQuality, recipeLink = GetProductQualityAndLink(self.selectedRecipe, recipeInfo);
         if ( productQuality ) then
             local r, g, b = C_Item.GetItemQualityColor(productQuality);
             self.Contents.RecipeName:SetTextColor(r, g, b);
@@ -933,7 +1130,7 @@ function ArmoryTradeSkillDetailsMixin:RefreshDisplay()
         end
         self:AddContentWidget(self.Contents.Description);
 
-        local requiredToolsString = Armory:GetTradeSkillTools(self.selectedRecipe);
+        local requiredToolsString = GetRequirements(self.selectedRecipe);
         if ( requiredToolsString and requiredToolsString ~= "" ) then
             self.Contents.RequirementLabel:Show();
             self.Contents.RequirementText:SetText(requiredToolsString);
@@ -1267,10 +1464,40 @@ end
 
 ----------------------------------------------------------
 
+if ( Armory.isClassic ) then
+    -- With extended tradeskills Classic reads the window when it closes
+    local function UpdateWhenClosing(closeFunc, isCraft)
+        if ( not ArmoryTradeSkillFrame.isOpen or ArmoryTradeSkillFrame.closing ) then
+            return;
+        end
+
+        ArmoryTradeSkillFrame.closing = true;
+
+        if ( Armory:GetConfigExtendedTradeSkills() ) then
+            ArmoryTradeSkillFrame:Update(isCraft);
+        end
+
+        closeFunc();
+
+        ArmoryTradeSkillFrame.closing = false;
+        ArmoryTradeSkillFrame.isOpen = false;
+    end
+
+    local Orig_CloseCraft = CloseCraft;
+    function CloseCraft()
+        UpdateWhenClosing(Orig_CloseCraft, true);
+    end
+
+    local Orig_CloseTradeSkill = CloseTradeSkill;
+    function CloseTradeSkill()
+        UpdateWhenClosing(Orig_CloseTradeSkill, false);
+    end
+end
+
 function ArmoryTradeSkillFrame_Show()
     ArmoryTradeSkillFrame:Refresh();
 end
 
 function ArmoryTradeSkillFrame_Hide()
-    ArmoryTradeSkillFrame:Hide();
+    Armory:HideFrame(ArmoryTradeSkillFrame);
 end

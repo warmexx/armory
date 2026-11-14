@@ -171,6 +171,9 @@ function ArmoryQuestLogFrame_OnLoad(self)
         -- below the lower inset, which runs further down in Classic
         ArmoryQuestLogCount:ClearAllPoints();
         ArmoryQuestLogCount:SetPoint("TOPLEFT", ArmoryQuestFrame.bottomInset, "BOTTOMLEFT", 11, -4);
+    else
+        -- not in the XML: Classic has no such atlas and warns about it when loading
+        self.Bg:SetAtlas("QuestBG-Parchment", false);
     end
 end
 

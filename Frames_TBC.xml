@@ -11,7 +11,7 @@
   <Include file="Frames\Classic\ArmoryReputationFrame.xml"/>
   <Include file="Frames\Classic\ArmorySkillFrame.xml"/>
   <Include file="Frames\Classic\ArmoryRaidInfoFrame.xml"/>
-  <Include file="Frames\Classic\ArmoryTradeSkillFrame.xml"/>
+  <Include file="Frames\ArmoryTradeSkillFrame.xml"/>
   <Include file="Frames\ArmoryInventoryFrame.xml"/>
   <Include file="Frames\ArmoryInventoryIconViewFrame.xml"/>
   <Include file="Frames\ArmoryInventoryListViewFrame.xml"/>

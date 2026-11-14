@@ -216,7 +216,8 @@
   <Button name="ArmoryTradeSkillReagentTemplate" parentArray="Reagents" inherits="ArmoryLargeItemButtonTemplate" virtual="true">
     <Layers>
       <Layer level="OVERLAY" textureSubLevel="1">
-        <Texture parentKey="CropFrame" scale=".45" atlas="Professions-ChoiceReagent-Frame" useAtlasSize="true">
+        <!-- the atlas is set in OnLoad, only in Mainline: Classic has no such atlas -->
+        <Texture parentKey="CropFrame" scale=".45" hidden="true">
           <Anchors>
             <Anchor point="LEFT" x="-3" />
           </Anchors>
@@ -234,6 +235,9 @@
         GameTooltip:Hide();
       </OnLeave>
       <OnLoad>
+        if ( not Armory.isClassic ) then
+          self.CropFrame:SetAtlas("Professions-ChoiceReagent-Frame", true);
+        end
         -- Uses in Korean to fix Bug ID: 244689
         if TRADESKILL_REAGENT_FONT then
           self.Count:SetFontObject(TRADESKILL_REAGENT_FONT);
@@ -539,6 +543,9 @@
         </Layers>
         <Scripts>
           <OnLoad>
+            if ( Armory.isClassic ) then
+              UIPanelScrollFrame_OnLoad(self);
+            end
             self.scrollBarHideable = 1;
           </OnLoad>
         </Scripts>

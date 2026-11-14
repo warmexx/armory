@@ -124,7 +124,8 @@
     </Anchors>
     <Layers>
       <Layer level="BACKGROUND" >
-        <Texture parentKey="Bg" name="$parentBg" atlas="QuestBG-Parchment" useAtlasSize="false">
+        <!-- the parchment is set in OnLoad (Mainline) and OnShow (Classic) -->
+        <Texture parentKey="Bg" name="$parentBg">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeKey="$parent.$parent.bottomInset" x="5" y="0"/>
 						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.$parent.bottomInset" x="-24" y="0"/>

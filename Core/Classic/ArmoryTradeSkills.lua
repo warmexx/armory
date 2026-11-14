@@ -124,17 +124,22 @@ local function GetProfessionInfo(index)
     end
 end
 
-local function GetRecipeValue(index, ...)
-    return Armory.selectedDbBaseEntry:GetValue(container, selectedSkill, itemContainer, professionLines[index], ...);
+-- line: the position of a recipe in the stored profession; index: its position in the (filtered) list
+local function GetLineValue(line, ...)
+    return Armory.selectedDbBaseEntry:GetValue(container, selectedSkill, itemContainer, line, ...);
 end
 
-local function GetNumReagents(index)
-    local reagents = GetRecipeValue(index, "Reagents") or {};
+local function GetRecipeValue(index, ...)
+    return GetLineValue(professionLines[index], ...);
+end
+
+local function GetNumReagents(line)
+    local reagents = GetLineValue(line, "Reagents") or {};
     return #reagents;
 end
 
-local function GetReagentInfo(id, index)
-    local itemID, count = GetRecipeValue(id, "Reagents", index);
+local function GetReagentInfo(line, index)
+    local itemID, count = GetLineValue(line, "Reagents", index);
     if ( not tonumber(itemID) ) then
         return itemID or UNKNOWN, "Interface\\Icons\\INV_Misc_QuestionMark", count;
     end
@@ -178,19 +183,19 @@ local function GetProfessionNumValues(dbEntry)
     return numLines, extended;
 end
 
-local function CanCraftFromInventory(dbEntry, index)
+local function CanCraftFromInventory(line)
     if ( not Armory:HasInventory() ) then
         return false;
     end
 
-    local numReagents = GetNumReagents(index);
+    local numReagents = GetNumReagents(line);
     if ( (numReagents or 0) == 0 ) then
         return false;
     end
 
     for i = 1, numReagents do
-        local _, _, count, link = GetRecentInfo(index, i);
-        if ( (count or 0) > 0 and Armory:ScanInventory(link, "reagent") < count ) then
+        local _, _, count, link = GetReagentInfo(line, i);
+        if ( (count or 0) > 0 and (not link or Armory:ScanInventory(link, "reagent") < count) ) then
             return false;
         end
     end
@@ -252,7 +257,7 @@ local function GetProfessionLines()
                             if ( (numAvailable or 0) > 0 ) then
                                 isIncluded = true;
                             else
-                                isIncluded = CanCraftFromInventory(dbEntry, i);
+                                isIncluded = CanCraftFromInventory(i);
                             end
                         end
                         if ( isIncluded and onlyShowSkillUp ) then
@@ -429,6 +434,10 @@ local function GetProfessionLineValue(index)
             info.difficulty = info.type;
             info.type = "recipe";
         end
+
+        -- not stored in Classic, but the shared window asks for them
+        info.numIndents = 0;
+        info.numSkillUps = 0;
 
         info.icon = dbEntry:GetValue(container, selectedSkill, itemContainer, professionLines[index], "Icon");
 
@@ -819,11 +828,11 @@ function Armory:GetTradeSkillInfo(index)
     return info;
 end
 
-function Armory:ExpandTradeSkillSubClass(index)
+function Armory:ExpandTradeSkillCategory(index)
     UpdateTradeSkillHeaderState(index, false);
 end
 
-function Armory:CollapseTradeSkillSubClass(index)
+function Armory:CollapseTradeSkillCategory(index)
     UpdateTradeSkillHeaderState(index, true);
 end
 
@@ -836,7 +845,7 @@ function Armory:SetTradeSkillInvSlotFilter(index)
         tradeSkillInvSlotFilter = invSlots[index];
     end
 
-    self:ExpandTradeSkillSubClass(0);
+    self:ExpandTradeSkillCategory(0);
 end
 
 function Armory:GetTradeSkillInvSlotFilter()
@@ -856,7 +865,7 @@ function Armory:SetTradeSkillSubClassFilter(index)
         end
     end
 
-    self:ExpandTradeSkillSubClass(0);
+    self:ExpandTradeSkillCategory(0);
 end
 
 function Armory:GetTradeSkillSubClassFilter()
@@ -987,9 +996,14 @@ function Armory:GetTradeSkillInvSlots()
     return GetProfessionValue("InvSlots");
 end
 
+function Armory:GetTradeSkillDescription(index)
+    -- not stored in Classic
+end
+
 function Armory:GetTradeSkillCooldown(index)
     local info = GetProfessionLineValue(index);
-    return info.cooldown;
+    -- Classic has no day cooldowns and no charges
+    return info.cooldown, nil, 0, 0;
 end
 
 function Armory:GetTradeSkillNumMade(index)
@@ -998,7 +1012,7 @@ function Armory:GetTradeSkillNumMade(index)
 end
 
 function Armory:GetTradeSkillNumReagents(index)
-    return GetNumReagents(index);
+    return GetNumReagents(professionLines[index]);
 end
 
 function Armory:GetTradeSkillTools(index)
@@ -1009,12 +1023,27 @@ function Armory:GetTradeSkillItemLink(index)
     return GetRecipeValue(index, "ItemLink");
 end
 
+function Armory:GetTradeSkillRecipeLink(index)
+    -- Classic stores no recipe link; the link of the product is the closest
+    return GetRecipeValue(index, "ItemLink");
+end
+
 function Armory:GetTradeSkillSpellFocus(index)
     return GetRecipeValue(index, "SpellFocus");
 end
 
+function Armory:GetOptionalReagentSlots(index)
+    -- Classic has no optional reagents
+    return {};
+end
+
+function Armory:GetReagents(recipeID, index)
+    -- Classic has one item per reagent; an empty list makes the tooltip count that item
+    return {};
+end
+
 function Armory:GetTradeSkillReagentInfo(index, id)
-    return GetReagentInfo(index, id);
+    return GetReagentInfo(professionLines[index], id);
 end
 
 function Armory:GetTradeSkillReagentItemLink(index, id)
@@ -1162,7 +1191,7 @@ function Armory:GetRecipeAltInfo(name, link, profession, reqProfession, reqRank,
                         known = itemID == skillItemID;
                     else
                         skillName = dbEntry:GetValue(container, profession, itemContainer, i, "Info");
-                        known = IsSameRecipe(skillName, name, GetRecipeValue(i, "InvSlot"));
+                        known = IsSameRecipe(skillName, name, dbEntry:GetValue(container, profession, itemContainer, i, "InvSlot"));
                     end
                     if ( known ) then
                         warn = false;
@@ -1300,7 +1329,7 @@ function Armory:GetCrafters(itemId)
                 for profession in pairs(dbEntry:GetValue(container)) do
                     if ( not ItemCacheExists(dbEntry, profession) ) then
                         for i = 1, dbEntry:GetNumValues(container, profession, itemContainer) do
-                            link = GetRecipeValue(i, "ItemLink");
+                            link = dbEntry:GetValue(container, profession, itemContainer, i, "ItemLink");
                             SetItemCache(dbEntry, profession, link);
                             if ( itemId == self:GetItemId(link) ) then
                                 table.insert(crafters, character);
