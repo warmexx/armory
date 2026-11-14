@@ -10,7 +10,8 @@ de verschillende regels, met witruimte en Revision-regels genegeerd. Kleinste ee
 
 Laadt een Classic-client het gedeelde bestand ook (zoals Core\ArmoryStubs.lua naast
 Core\Classic\ArmoryStubs.lua), dan is het bestand in de familiemap een aanvulling en geen
-kopie. Zulke bestanden staan apart onderaan.
+kopie. Zulke bestanden staan apart onderaan. Dat geldt ook voor een bestand in Vanilla of TBC
+naast een bestand met dezelfde naam in Classic (zoals de stats van de paperdoll).
 """
 import os,sys,difflib
 root=sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -50,6 +51,8 @@ for d,dn,fn in os.walk(root):
     for f in fn:
         p=os.path.join(d,f); 
         cands=[os.path.join(parent,f),os.path.join(parent,"Mainline",f)]
+        if b in ("Vanilla","TBC") and supplement(p,os.path.join(parent,"Classic",f)):
+            supplements.append((os.path.relpath(p,root),os.path.relpath(os.path.join(parent,"Classic",f),root))); continue
         if parent.endswith("Frames") or parent.endswith("Tools") or parent.endswith("Core"):
             cands+= [os.path.join(os.path.dirname(parent),x,f) for x in ("Tools","Frames","Core")]
         s=next((c for c in cands if os.path.exists(c)),None)
