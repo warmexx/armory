@@ -30,6 +30,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - Fixes the reputation required for a recipe, which showed Unknown when the faction was under a collapsed header in the reputation window
 - Fixes the stored quest log becoming empty when the game had not loaded all quests yet, for example right after logging in
 - Saving the reputation, currencies and quest log is retried at most three times in a row when the game has not loaded them completely yet
+- A long title next to the character's name at the top of the main window uses a smaller font instead of being cut off right away
 - The raid info shows the difficulty, lists expired locks at the bottom and shows the killed bosses when hovering over a lock, as in Retail (Classic Era and Burning Crusade Anniversary)
 - Fixes an error when turning off the Raid module in the options (Classic Era and Burning Crusade Anniversary)
 - The social window has the Events tab, with your calendar events, raid lockouts and tradeskill cooldowns, and warnings before they start, as in Retail (Classic Era and Burning Crusade Anniversary)

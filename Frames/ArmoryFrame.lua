@@ -147,7 +147,8 @@ function ArmoryFrame_OnLoad(self)
 
     self:GetTitleText():SetPoint("LEFT", self, "LEFT", titleOffset, 0);
     self:GetTitleText():SetPoint("RIGHT", self, "RIGHT", -40, 0);
-    self:GetTitleText():SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+    self:GetTitleText():SetFontObject(GameFontHighlight);
+    self.titleMargin = titleOffset + 40;
 
     -- Tab Handling code
     ArmoryPanelTemplates_SetNumTabs(self, #ARMORYFRAME_SUBFRAMES);
@@ -214,7 +215,13 @@ function ArmoryFrame_OnEvent(self, event, ...)
 end
 
 function ArmoryFrame_UpdateName()
+    -- a name with a long title gets a smaller font, so it is not cut off as soon
+    local titleText = ArmoryFrame:GetTitleText();
+    titleText:SetFontObject(GameFontHighlight);
     ArmoryFrame:SetTitle(Armory:UnitPVPName("player"));
+    if ( titleText:GetUnboundedStringWidth() > ArmoryFrame:GetWidth() - ArmoryFrame.titleMargin ) then
+        titleText:SetFontObject(GameFontHighlightSmall);
+    end
 end
 
 function ArmoryFrame_UpdateResting()
