@@ -4,5 +4,5 @@
   <Include file="Frames\Classic\ArmoryTalentFrame.xml"/>
   <Include file="Frames\Classic\ArmoryPetFrame.xml"/>
   <Include file="Frames\Classic\ArmoryReputationFrame.xml"/>
-  <Include file="Frames\Classic\ArmorySkillFrame.xml"/>
+  <Include file="Frames\ArmorySkillFrame.xml"/>
 </Ui>

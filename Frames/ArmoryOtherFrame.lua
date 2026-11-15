@@ -28,13 +28,18 @@
 
 local Armory, _ = Armory, nil;
 
--- Classic has skills where Mainline has currency
+-- Classic has skills where Retail has currency; Forever has both
 local OTHERFRAME_SUBFRAMES, OTHERFRAME_ENABLED, MAX_TABS_WIDTH;
 if ( Armory.isClassic ) then
     ARMORY_OTHER_TABS = {REPUTATION_ABBR, SKILLS, RAID};
     OTHERFRAME_SUBFRAMES = { "ArmoryReputationFrame", "ArmorySkillFrame", "ArmoryRaidInfoFrame" };
     OTHERFRAME_ENABLED = { "HasReputation", "SkillsEnabled", "RaidEnabled" };
     MAX_TABS_WIDTH = 320;
+elseif ( Armory.isForever ) then
+    ARMORY_OTHER_TABS = {REPUTATION_ABBR, SKILLS, RAID, CURRENCY};
+    OTHERFRAME_SUBFRAMES = { "ArmoryReputationFrame", "ArmorySkillFrame", "ArmoryRaidInfoFrame", "ArmoryTokenFrame" };
+    OTHERFRAME_ENABLED = { "HasReputation", "SkillsEnabled", "RaidEnabled", "HasCurrency" };
+    MAX_TABS_WIDTH = 260;
 else
     ARMORY_OTHER_TABS = {REPUTATION_ABBR, RAID, CURRENCY};
     OTHERFRAME_SUBFRAMES = { "ArmoryReputationFrame", "ArmoryRaidInfoFrame", "ArmoryTokenFrame" };

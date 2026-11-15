@@ -86,6 +86,58 @@ local function UpdateSkillHeaderState(index, isCollapsed)
     dirty = true;
 end
 
+-- Forever has the skills in C_SkillInfo, with a table per line. Like Blizzard's skills frame
+-- (Camelot\SkillsFrame.lua) only the top-level lines and no Class Skills, with the defense
+-- modifier from UnitDefenseSkill. The list skips the hidden lines, so its index is not the
+-- index of C_SkillInfo; GetNumSkillLinesForever builds the mapping.
+local HIDDEN_SKILL_LINE_CATEGORIES = {
+    [7] = true, -- Class Skills
+};
+local DEFENSE_SKILL_ID = 95;
+local skillIndices = {};
+
+local function IsShownSkillLine(info)
+    if ( info.parentSkillLineID ~= 0 ) then
+        return false;
+    elseif ( info.isHeader ) then
+        return not HIDDEN_SKILL_LINE_CATEGORIES[info.skillID];
+    end
+    return not HIDDEN_SKILL_LINE_CATEGORIES[info.skillLineCategoryID];
+end
+
+local function GetNumSkillLinesForever()
+    table.wipe(skillIndices);
+    for index = 1, C_SkillInfo.GetNumSkillLines() do
+        local info = C_SkillInfo.GetSkillLineInfo(index);
+        if ( info and IsShownSkillLine(info) ) then
+            table.insert(skillIndices, index);
+        end
+    end
+    return #skillIndices;
+end
+
+-- Returns the values of Classic's GetSkillLineInfo; the costs are nil there when they do not apply
+local function GetSkillLineInfoForever(index)
+    local info = skillIndices[index] and C_SkillInfo.GetSkillLineInfo(skillIndices[index]);
+    if ( info ) then
+        local modifier = info.modifier;
+        if ( info.skillID == DEFENSE_SKILL_ID ) then
+            modifier = select(2, _G.UnitDefenseSkill("player")) or modifier;
+        end
+        local stepCost = info.stepCost > 0 and info.stepCost or nil;
+        local rankCost = info.rankCost > 0 and info.rankCost or nil;
+        return info.name, info.isHeader, not info.isCollapsed, info.rank, info.tempPoints, modifier, info.maxRank, info.isAbandonable, stepCost, rankCost, info.minLevel, info.costType, info.description;
+    end
+end
+
+local function ExpandSkillHeaderForever(index)
+    C_SkillInfo.ExpandSkillHeader(skillIndices[index]);
+end
+
+local function CollapseSkillHeaderForever(index)
+    C_SkillInfo.CollapseSkillHeader(skillIndices[index]);
+end
+
 ----------------------------------------------------------
 -- Skills Storage
 ----------------------------------------------------------
@@ -117,14 +169,22 @@ function Armory:SetSkills()
         self:PrintDebug("UPDATE", container);
 
         -- store the complete (expanded) list
-        local funcNumLines = _G.GetNumSkillLines;
-        local funcGetLineInfo = _G.GetSkillLineInfo;
+        local funcNumLines, funcGetLineInfo, funcExpand, funcCollapse;
+        if ( self.isClassic ) then
+            funcNumLines = _G.GetNumSkillLines;
+            funcGetLineInfo = _G.GetSkillLineInfo;
+            funcExpand = _G.ExpandSkillHeader;
+            funcCollapse = _G.CollapseSkillHeader;
+        else
+            funcNumLines = GetNumSkillLinesForever;
+            funcGetLineInfo = GetSkillLineInfoForever;
+            funcExpand = ExpandSkillHeaderForever;
+            funcCollapse = CollapseSkillHeaderForever;
+        end
         local funcGetLineState = function(index)
-            local _, isHeader, isExpanded = _G.GetSkillLineInfo(index);
+            local _, isHeader, isExpanded = funcGetLineInfo(index);
             return isHeader, isExpanded;
         end;
-        local funcExpand = _G.ExpandSkillHeader;
-        local funcCollapse = _G.CollapseSkillHeader;
 
         dbEntry:SetExpandableListValues(container, funcNumLines, funcGetLineState, funcGetLineInfo, funcExpand, funcCollapse);
 

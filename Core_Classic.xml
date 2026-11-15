@@ -3,7 +3,7 @@
   <Script file="Core\Classic\ArmoryStubs.lua"/>
   <Script file="Core\Classic\ArmoryQuests.lua"/>
   <Script file="Core\Classic\ArmorySpells.lua"/>
-  <Script file="Core\Classic\ArmorySkills.lua"/>
+  <Script file="Core\ArmorySkills.lua"/>
   <Script file="Core\Classic\ArmoryTalents.lua"/>
   <Script file="Core\Classic\ArmoryTradeSkills.lua"/>
 </Ui>

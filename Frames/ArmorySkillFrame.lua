@@ -28,7 +28,8 @@
 
 local Armory, _ = Armory;
 
-ARMORY_NUM_SKILLS_DISPLAYED = 19;
+-- Forever has the main window of Retail, which is smaller than the one of Classic: 18 rows instead of 19
+ARMORY_NUM_SKILLS_DISPLAYED = Armory.isForever and 18 or 19;
 ARMORY_SKILLFRAME_SKILL_HEIGHT = 15;
 
 function ArmorySkillFrame_OnLoad(self)
@@ -36,6 +37,16 @@ function ArmorySkillFrame_OnLoad(self)
     self:RegisterEvent("SKILL_LINES_CHANGED");
     self:RegisterEvent("CHARACTER_POINTS_CHANGED");
     self:RegisterEvent("SPELLS_CHANGED");
+
+    if ( Armory.isForever ) then
+        -- the rows within the inset of the main window and the scroll frame as in the reputation frame
+        ArmorySkillTypeLabel1:SetPoint("LEFT", self, "TOPLEFT", 8, -75);
+        ArmorySkillRankFrame1:SetPoint("TOPLEFT", self, "TOPLEFT", 24, -68);
+        ArmorySkillListScrollFrame:ClearAllPoints();
+        ArmorySkillListScrollFrame:SetPoint("TOPLEFT", ArmoryFrameInset, "TOPLEFT", 0, -4);
+        ArmorySkillListScrollFrame:SetPoint("BOTTOMRIGHT", ArmoryFrameInset, "BOTTOMRIGHT", -27, 2);
+        ArmorySkillTypeLabel19:Hide();
+    end
 
     ArmorySkillListScrollFrameScrollBar:SetValue(0);
     self.selectedSkill = 0;

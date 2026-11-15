@@ -53,17 +53,19 @@ function ArmoryOptionsModuleTemplateMixin:GetDefaultValue()
     return true;
 end
 
--- For modules that only one family has
-local function IsClassic()
-    return Armory.isClassic;
-end
-
+-- For modules that not every version has
 local function IsMainline()
     return not Armory.isClassic;
 end
 
+-- Forever has no artifacts
 local function IsRetail()
     return Armory.isMainline and not Armory.isForever;
+end
+
+-- Classic and Forever have skills
+local function HasSkills()
+    return Armory.isClassic or Armory.isForever;
 end
 
 
@@ -377,7 +379,7 @@ end
 
 ArmoryOptionsSkillsModuleMixin = CreateFromMixins(ArmoryOptionsModuleTemplateMixin);
 
-ArmoryOptionsSkillsModuleMixin.IsAvailable = IsClassic;
+ArmoryOptionsSkillsModuleMixin.IsAvailable = HasSkills;
 
 function ArmoryOptionsSkillsModuleMixin:GetValue()
     return Armory:SkillsEnabled();
