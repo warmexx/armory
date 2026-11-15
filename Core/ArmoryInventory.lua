@@ -177,6 +177,19 @@ local function IsBankContainer(id)
     return IsCharacterContainer(id) or IsAccountContainer(id);
 end
 
+-- The containers of the character bank: the bank itself and the bank bags in Classic, the bank tabs in Mainline
+local CharacterBankContainers = {};
+if ( Armory.isClassic ) then
+    table.insert(CharacterBankContainers, BANK_CONTAINER);
+    for id = NUM_BAG_SLOTS + 1, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS do
+        table.insert(CharacterBankContainers, id);
+    end
+else
+    for id = Enum.BagIndex.CharacterBankTab_1, Enum.BagIndex.CharacterBankTab_6 do
+        table.insert(CharacterBankContainers, id);
+    end
+end
+
 function Armory:IsBag(id)
     if ( id ) then
         return IsBagContainer(id);
@@ -923,6 +936,9 @@ function Armory:GetInventoryContainerInfoEx(id, unit)
     if ( id == BANK_CONTAINER ) then
         -- Classic: the bank itself
         name = ARMORY_BANK_CONTAINER_NAME;
+        if ( outOfSync ) then
+            name = "~"..name;
+        end
     elseif ( id == ARMORY_MAIL_CONTAINER ) then
         name = INBOX;
     elseif ( id == ARMORY_AUCTIONS_CONTAINER ) then
@@ -1164,7 +1180,7 @@ function Armory:GetInventorySearchAllFilter()
 end
 
 local function SetBankOutOfSync(dbEntry)
-    for id = Enum.BagIndex.CharacterBankTab_1, Enum.BagIndex.CharacterBankTab_6 do
+    for _, id in ipairs(CharacterBankContainers) do
         local itemContainer = InventoryContainerName(id);
         if ( dbEntry:Contains(container, itemContainer) ) then
             local name, numSlots, remaining, timestamp = GetContainerInfo(dbEntry, itemContainer);
@@ -1175,8 +1191,8 @@ end
 
 local function RemoveBankItems(dbEntry, itemString, count)
     local itemId = Armory:GetUniqueItemId("item:"..itemString);
-    for id = Enum.BagIndex.CharacterBankTab_6, Enum.BagIndex.CharacterBankTab_1, -1 do
-        local itemContainer = InventoryContainerName(id);
+    for i = #CharacterBankContainers, 1, -1 do
+        local itemContainer = InventoryContainerName(CharacterBankContainers[i]);
         local _, numSlots = GetContainerInfo(dbEntry, itemContainer);
         local taken = 0;
         for index = (numSlots or 0), 1, -1 do
@@ -1207,8 +1223,8 @@ local function RemoveBankItems(dbEntry, itemString, count)
     end
 end
 
--- The character bank can only be scanned while its tabs are accessible (e.g. a profession is open),
--- but the client always knows how many of an item it holds. Adjust the stored contents with that
+-- The character bank can only be scanned while it is accessible (in Mainline also while a profession is
+-- open), but the client always knows how many of an item it holds. Adjust the stored contents with that
 -- number, so the counts of this character remain correct for its alts as well, and mark the bank as
 -- out of sync until it has been visited again.
 local function ReconcileBankCount(result, itemString)
@@ -1407,20 +1423,12 @@ end
 function Armory:IsBankOutOfSync()
     local dbEntry = self.selectedDbBaseEntry;
     if ( dbEntry ) then
-        for id = Enum.BagIndex.CharacterBankTab_1, Enum.BagIndex.CharacterBankTab_6 do
+        for _, id in ipairs(CharacterBankContainers) do
             local _, _, _, _, outOfSync = GetContainerInfo(dbEntry, InventoryContainerName(id));
             if ( outOfSync ) then
                 return true;
             end
         end
-    end
-end
-
-if ( not HAS_BANK_TABS ) then
-    -- Classic's bank can only be counted while it is open, so there is nothing to correct
-    ReconcileBankCount = function(result, itemString)
-    end
-    function Armory:IsBankOutOfSync()
     end
 end
 
