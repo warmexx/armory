@@ -108,7 +108,7 @@ function ArmoryFrame_OpenSkillFrame(id)
     if ( Armory:HasTradeSkills() ) then
         local skill = Armory:GetPrimaryTradeSkills()[id];
         local name = skill and skill[1] or nil;
-        if ( name and Armory:HasTradeSkillLines(name) ) then
+        if ( name and Armory:HasTradeSkillLines(name, true) ) then
             Armory:SetSelectedProfession(name);
             ArmoryTradeSkillFrame_Show();
             ArmoryFrame_OpenSideFrame(ArmoryTradeSkillFrame);
@@ -579,7 +579,7 @@ function ArmoryFrame_UpdateLineTabs()
 
     if ( Armory:HasTradeSkills() ) then
         for _, name in ipairs(Armory:GetProfessionNames()) do
-            if ( Armory:HasTradeSkillLines(name) ) then
+            if ( Armory:HasTradeSkillLines(name, true) ) then
                 local lineTab = ArmoryFrame_SetLineTab(tabId, "TradeSkill", name, Armory:GetProfessionTexture(name));
                 if ( lineTab ) then
                     ArmoryTradeSkillFrame.enabled = true;
@@ -745,7 +745,7 @@ function ArmoryCloseChildWindows(reopen)
         if ( currentChild:GetName() == "ArmoryTradeSkillFrame" ) then
             for _, name in ipairs(Armory:GetProfessionNames()) do
                 if ( name == Armory:GetSelectedProfession() ) then
-                    if ( Armory:HasTradeSkillLines(name) ) then
+                    if ( Armory:HasTradeSkillLines(name, true) ) then
                         Armory:SetSelectedProfession(name);
                         ArmoryTradeSkillFrame_Show();
                     end
