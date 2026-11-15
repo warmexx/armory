@@ -1,4 +1,4 @@
-## Interface: 11509
+## Interface: 120105, 11509, 20506
 ## Title: Armory
 ## Title-frFR: Armory [Armurerie]
 ## Title-esES: Armory [Armería]
@@ -16,15 +16,28 @@
 ## SavedVariables: ArmoryDB, ArmorySettings, ArmoryModules, ArmoryCache, ArmoryShared
 ## SavedVariablesPerCharacter: ArmoryLocalSettings
 ## IconTexture: Interface\AddOns\Armory\Artwork\Logo
+## AddonCompartmentFunc: Armory_AddonCompartmentFunc
 ## X-Donate: PayPal:warmexx AT wow-neighbours DOT com
 ## X-Website: http://www.wow-neighbours.com/
 ## X-Category: Inventory
 ## X-Curse-Project-ID: 5195
 
 Embeds.xml
-Libs\LibBase64-1.0\LibBase64-1.0.lua
+Libs\LibBase64-1.0\LibBase64-1.0.lua [AllowLoadGameType classic]
 Locales.xml
-Core_Classic.xml
-Shared_Classic.xml
-Config_Classic.xml
-Frames_Vanilla.xml
+Core.xml
+Core_Mainline.xml [AllowLoadGameType mainline]
+Core_Classic.xml [AllowLoadGameType classic]
+Core\TBC\ArmoryArena.lua [AllowLoadGameType tbc]
+Shared_Mainline.xml [AllowLoadGameType mainline]
+Shared_Classic.xml [AllowLoadGameType classic]
+Shared.xml
+Config.xml
+Frames.xml
+Frames_Mainline.xml [AllowLoadGameType mainline]
+Frames\[Game]\ArmoryPaperDollFrame.xml [AllowLoadGameType classic]
+Frames\[Game]\ArmoryPVPFrame.xml [AllowLoadGameType classic]
+Frames_Classic.xml [AllowLoadGameType classic]
+Tools\ArmoryLookupProtocol.lua [AllowLoadGameType mainline]
+Tools\Classic\ArmoryLookupProtocol.lua [AllowLoadGameType classic]
+Tools.xml

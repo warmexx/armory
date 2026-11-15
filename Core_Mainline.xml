@@ -1,0 +1,18 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+  <Script file="Core\Mainline\ArmoryStubs.lua"/>
+  <Script file="Core\ArmoryFactions.lua"/>
+  <Script file="Core\ArmoryQuests.lua"/>
+  <Script file="Core\ArmoryRaidWorldBosses.lua"/>
+  <Script file="Core\ArmoryRaidFinder.lua"/>
+  <Script file="Core\ArmorySpells.lua"/>
+  <Script file="Core\ArmorySpecializations.lua"/>
+  <Script file="Core\ArmoryArtifacts.lua"/>
+  <Script file="Core\ArmoryTalents.lua"/>
+  <Script file="Core\ArmoryHonorTalents.lua"/>
+  <Script file="Core\ArmoryTradeSkills.lua"/>
+  <Script file="Core\ArmoryCurrency.lua"/>
+  <Script file="Core\ArmoryAchievements.lua"/>
+  <Script file="Core\ArmoryStatistics.lua"/>
+  <Script file="Core\ArmoryGearSets.lua"/>
+</Ui>

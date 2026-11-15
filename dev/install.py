@@ -151,10 +151,13 @@ def sync(client, dry):
             print(f"  {addon}: not installed, copying everything")
         seed(client, addon, released, dry)
         skip_sub = {"ArmoryGuildBank"} if src_sub == "" else set()
-        # A TOC is named after its folder: Armory_Mainline.toc becomes ArmoryOfa_Mainline.toc
+        # A TOC is named after its folder: Armory.toc becomes ArmoryOfa.toc (and a TOC with a
+        # suffix, such as Armory_Camelot.toc, ArmoryOfa_Camelot.toc). An old TOC with a suffix
+        # in the installation is removed below, as for every file no longer in the repo; left
+        # behind, it would win over the TOC without suffix.
         wanted = {}
         for rel in files(src, skip_sub, repo=True):
-            if rel.lower().endswith(".toc") and rel.startswith(released + "_"):
+            if rel.lower().endswith(".toc") and (rel.startswith(released + "_") or rel == released + ".toc"):
                 wanted[addon + rel[len(released):]] = rel
             else:
                 wanted[rel] = rel

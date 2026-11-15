@@ -1,4 +1,4 @@
-## Interface: 120105
+## Interface: 120105, 20506
 ## Title: ArmoryGuildBank
 ## Title-deDE: ArmoryGuildBank [Armory Gildenbank]
 ## Title-esES: ArmoryGuildBank [Banco de Hermandad]
@@ -15,6 +15,7 @@
 ## Author: Warmexx [Neighbours]
 ## Dependencies: Armory
 ## SavedVariables: AgbDB, AgbDBRealms
+## AllowLoadGameType: mainline, tbc
 ## IconTexture: Interface\AddOns\Armory\Artwork\Logo
 ## AddonCompartmentFunc: ArmoryGuildbank_AddonCompartmentFunc
 ## X-Donate: PayPal:warmexx AT wow-neighbours DOT com
@@ -25,4 +26,6 @@
 Locales.xml
 Core.xml
 Config.xml
-Frames.xml
+Frames\ArmoryGuildBank.xml [AllowLoadGameType mainline]
+Frames\TBC\ArmoryGuildBank.xml [AllowLoadGameType tbc]
+Frames\ArmoryInventoryGuildBankFrame.xml

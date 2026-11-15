@@ -196,6 +196,10 @@ for addon, addon_dir in (("Armory", ROOT), ("ArmoryGuildBank", os.path.join(ROOT
         armory_tocs.append(f"{addon}: no TOC for {CLIENT}")
         continue
     loaded, _, toc = result
+    if not loaded:
+        # ## AllowLoadGameType in the TOC excludes this client (the guild bank in Era)
+        armory_tocs.append(f"{os.path.relpath(toc, ROOT)}: not for {CLIENT}")
+        continue
     armory_files |= loaded
     armory_tocs.append(os.path.relpath(toc, ROOT))
     bindings = os.path.join(addon_dir, "Bindings.xml")

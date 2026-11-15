@@ -24,8 +24,8 @@ import sys
 
 WOW = r"D:\Games\World of Warcraft"
 FOLDERS = {"retail": "_retail_", "forever": "_forever_", "era": "_classic_era_", "anniversary": "_anniversary_"}
-TOCS = {"retail": ["Mainline"], "forever": ["Forever", "Camelot", "Mainline"],
-        "era": ["Vanilla", "Classic"], "anniversary": ["TBC", "Classic"]}
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import loadorder  # noqa: E402  (which Armory files a client loads)
 
 if len(sys.argv) < 2 or sys.argv[1].lower() not in FOLDERS:
     sys.exit(__doc__)
@@ -93,33 +93,15 @@ for p in own_files:
     else:
         known |= set(re.findall(r'name="([A-Za-z_]\w*)"', t))
 
-# Armory's files that this client loads, through the TOC it picks (Armory and ArmoryGuildBank)
+# Armory's files that this client loads, through the TOC with its conditions (loadorder.py),
+# plus Bindings.xml of each addon the client loads (no guild bank in Era)
 def toc_files():
-    seen, out = set(), []
-
-    def walk(p):
-        if p in seen or not os.path.exists(p):
-            return
-        seen.add(p)
-        out.append(p)
-        if p.endswith(".xml"):
-            for m in re.finditer(r'<(?:Script|Include)\s+file="([^"]+)"', read(p)):
-                walk(os.path.normpath(os.path.join(os.path.dirname(p), m.group(1).replace("\\", os.sep))))
-
-    for addon, folder in (("Armory", ROOT), ("ArmoryGuildBank", os.path.join(ROOT, "ArmoryGuildBank"))):
-        toc = None
-        for suffix in TOCS[CLIENT]:
-            p = os.path.join(folder, f"{addon}_{suffix}.toc")
-            if os.path.exists(p):
-                toc = p
-                break
-        if not toc:
-            continue  # e.g. no guild bank in Era
-        for line in read(toc).splitlines():
-            line = line.strip()
-            if line and not line.startswith("#") and "Libs" not in line:
-                walk(os.path.normpath(os.path.join(folder, line.replace("\\", os.sep))))
-        walk(os.path.join(folder, "Bindings.xml"))
+    order = loadorder.Order(CLIENT, ROOT).load()
+    out = [os.path.join(ROOT, rel) for _, rel in order.files]
+    for addon, sub in loadorder.ADDONS:
+        bindings = os.path.join(ROOT, sub, "Bindings.xml")
+        if any(a == addon for a, _ in order.files) and os.path.exists(bindings):
+            out.append(bindings)
     return out
 
 

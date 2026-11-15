@@ -21,24 +21,12 @@ def lines(p):
         s="".join(l.split())
         if s and "$Revision" not in l and "$Date" not in l: out.append(s)
     return out
-import re
-def loaded(toc):
-    """Files a TOC loads, through its XML lists (lowercase, relative to root)."""
-    out=set()
-    def walk(q):
-        q=os.path.normpath(q)
-        if q.lower() in out or not os.path.exists(q): return
-        out.add(q.lower())
-        if q.endswith(".xml"):
-            for m in re.finditer(r'<(?:Script|Include)\s+file="([^"]+)"',open(q,encoding="utf-8",errors="replace").read()):
-                walk(os.path.join(os.path.dirname(q),m.group(1).replace("\\",os.sep)))
-    folder=os.path.dirname(toc)
-    if os.path.exists(toc):
-        for l in open(toc,encoding="utf-8",errors="replace"):
-            l=l.strip()
-            if l and not l.startswith("#"): walk(os.path.join(folder,l.replace("\\",os.sep)))
-    return out
-classic_loads=[loaded(os.path.join(root,t)) for t in ("Armory_Vanilla.toc","Armory_TBC.toc",os.path.join("ArmoryGuildBank","ArmoryGuildBank_TBC.toc"))]
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
+import loadorder
+def loaded(client):
+    """Files a client loads, through the TOCs with their conditions (lowercase, full paths)."""
+    return {os.path.join(root,rel).lower() for _,rel in loadorder.Order(client,root).load().files}
+classic_loads=[loaded(c) for c in ("era","anniversary")]
 def supplement(p,s):
     return any(p.lower() in l and s.lower() in l for l in classic_loads)
 supplements=[]

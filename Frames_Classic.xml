@@ -1,0 +1,8 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+  <Include file="Frames\Classic\ArmoryPaperDollFrame.xml"/>
+  <Include file="Frames\Classic\ArmoryTalentFrame.xml"/>
+  <Include file="Frames\Classic\ArmoryPetFrame.xml"/>
+  <Include file="Frames\Classic\ArmoryReputationFrame.xml"/>
+  <Include file="Frames\Classic\ArmorySkillFrame.xml"/>
+</Ui>
