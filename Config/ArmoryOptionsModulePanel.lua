@@ -62,6 +62,10 @@ local function IsMainline()
     return not Armory.isClassic;
 end
 
+local function IsRetail()
+    return Armory.isMainline and not Armory.isForever;
+end
+
 
 ArmoryOptionsInventoryModuleMixin = CreateFromMixins(ArmoryOptionsModuleTemplateMixin);
 
@@ -577,7 +581,7 @@ end
 
 ArmoryOptionsArtifactsModuleMixin = CreateFromMixins(ArmoryOptionsModuleTemplateMixin);
 
-ArmoryOptionsArtifactsModuleMixin.IsAvailable = IsMainline;
+ArmoryOptionsArtifactsModuleMixin.IsAvailable = IsRetail;
 
 function ArmoryOptionsArtifactsModuleMixin:GetValue()
     return Armory:ArtifactsEnabled();

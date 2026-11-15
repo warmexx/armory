@@ -49,7 +49,8 @@ function Armory:SetHonorTalents()
 
     if ( not dbEntry ) then
         return;
-    elseif ( not self:PVPEnabled() or _G.UnitLevel("player") < SHOW_PVP_TALENT_LEVEL ) then
+    -- Forever has no PvP talents ("No PvP talents in Camelot" in Blizzard's talent frame)
+    elseif ( self.isForever or not self:PVPEnabled() or _G.UnitLevel("player") < SHOW_PVP_TALENT_LEVEL ) then
         dbEntry:SetValue(container, nil);
         return;
     end

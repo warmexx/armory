@@ -1111,7 +1111,8 @@ function ArmoryQuestInfo_ShowRewards()
         if ( numQuestCurrencies > 0 ) then
             baseIndex = rewardsCount;
             local foundCurrencies = 0;
-            for i = 1, GetMaxRewardCurrencies(), 1 do
+            -- GetMaxRewardCurrencies is gone (Retail and Forever); the stored currencies have no gaps
+            for i = 1, numQuestCurrencies, 1 do
                 buttonIndex = buttonIndex + 1;
                 index = i + baseIndex;
                 questItem = QuestInfo_GetRewardButton(rewardsFrame, index);

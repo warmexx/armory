@@ -2452,7 +2452,10 @@ function Armory:BuffsEnabled(value)
 end
 
 function Armory:ArtifactsEnabled(value)
-    if ( value ~= nil ) then
+    if ( self.isForever ) then
+        -- Forever has no artifacts
+        return false;
+    elseif ( value ~= nil ) then
         self:SetModule("Artifacts", value);
     end
     return self:GetModule("Artifacts");
