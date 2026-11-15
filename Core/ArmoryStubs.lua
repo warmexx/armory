@@ -606,6 +606,13 @@ function Armory:UnitHasRelicSlot(unit)
     return self:SetGetCharacterValue("HasRelicSlot", _G.UnitHasRelicSlot("player"));
 end
 
+function Armory:UnitHealth(unit)
+    if ( strlower(unit) == "pet" ) then
+        return self:SetGetPetValue("Health", _G.UnitHealth(unit));
+    end
+    return self:SetGetCharacterValue("Health", _G.UnitHealth(unit));
+end
+
 function Armory:UnitHealthMax(unit)
     if ( strlower(unit) == "pet" ) then
         return self:SetGetPetValue("HealthMax", _G.UnitHealthMax(unit));
@@ -630,6 +637,13 @@ function Armory:UnitName(unit)
         return self:GetCharacterValue("Pet");
     end
     return self.character; --:SetGetCharacterValue("Name", _G.UnitName(unit));
+end
+
+function Armory:UnitPower(unit, powerType)
+    if ( strlower(unit) == "pet" ) then
+        return self:SetGetPetValue("Power", _G.UnitPower(unit, powerType));
+    end
+    return self:SetGetCharacterValue("Power", _G.UnitPower(unit, powerType));
 end
 
 function Armory:UnitPowerMax(unit, powerType)

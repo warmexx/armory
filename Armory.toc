@@ -27,6 +27,7 @@ Libs\LibBase64-1.0\LibBase64-1.0.lua [AllowLoadGameType classic]
 Locales.xml
 Core.xml
 Core_Mainline.xml [AllowLoadGameType mainline]
+Core\Forever\ArmoryStubs.lua [AllowLoadGameType mainline] [ExcludeLoadGameType standard]
 Core_Classic.xml [AllowLoadGameType classic]
 Core\TBC\ArmoryArena.lua [AllowLoadGameType tbc]
 Shared_Mainline.xml [AllowLoadGameType mainline]
@@ -34,6 +35,8 @@ Shared_Classic.xml [AllowLoadGameType classic]
 Shared.xml
 Config.xml
 Frames.xml
+Frames\Mainline\ArmoryPaperDollFrame.xml [AllowLoadGameType standard]
+Frames\Forever\ArmoryPaperDollFrame.xml [AllowLoadGameType mainline] [ExcludeLoadGameType standard]
 Frames_Mainline.xml [AllowLoadGameType mainline]
 Frames\[Game]\ArmoryPaperDollFrame.xml [AllowLoadGameType classic]
 Frames\[Game]\ArmoryPVPFrame.xml [AllowLoadGameType classic]

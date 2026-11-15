@@ -219,20 +219,6 @@ function Armory:UnitDefense(unit)
     return self:SetGetCharacterValue("Defense", _G.UnitDefense(unit));
 end
 
-function Armory:UnitHealth(unit)
-    if ( strlower(unit) == "pet" ) then
-        return self:SetGetPetValue("Health", _G.UnitHealth(unit));
-    end
-    return self:SetGetCharacterValue("Health", _G.UnitHealth(unit));
-end
-
-function Armory:UnitPower(unit, powerType)
-    if ( strlower(unit) == "pet" ) then
-        return self:SetGetPetValue("Power", _G.UnitPower(unit, powerType));
-    end
-    return self:SetGetCharacterValue("Power", _G.UnitPower(unit, powerType));
-end
-
 function Armory:UnitPVPRank(unit)
     return self:SetGetCharacterValue("PVPRank", _G.UnitPVPRank("player"));
 end
