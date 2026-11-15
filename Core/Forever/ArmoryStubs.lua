@@ -39,6 +39,26 @@ function Armory:GetPetLoyalty()
     return self:SetGetPetValue("Loyalty", C_PetInfo.GetPetLoyalty());
 end
 
+-- Forever earns the PvP rank as a renown (Camelot\PVPRankFrame.lua); returns rank, points, threshold, maxRank,
+-- the points of the season, the points up to the rank of this week's cap, the increase of the cap this week, the season,
+-- the points up to the highest rank of the season and the name of the points
+local PVP_RANK_FACTION_ID = 2800;
+
+function Armory:GetPVPRankInfo()
+    local info = C_MajorFactions.GetMajorFactionProgressionInfo(PVP_RANK_FACTION_ID);
+    if ( info ) then
+        local function GetTotal(level)
+            return C_MajorFactions.GetTotalReputationForRenownLevel(PVP_RANK_FACTION_ID, level) or 0;
+        end
+        local data = C_MajorFactions.GetMajorFactionData(PVP_RANK_FACTION_ID);
+        local weekMaxPoints = GetTotal(info.currentWeekProgressiveMaxLevel);
+        return self:SetGetCharacterValue("PVPRankRenown", info.renownLevel, info.renownReputationEarned, info.renownLevelThreshold, info.maxLevel,
+            GetTotal(info.renownLevel) + info.renownReputationEarned, weekMaxPoints, weekMaxPoints - GetTotal(info.previousWeekProgressiveMaxLevel),
+            _G.GetCurrentArenaSeason(), GetTotal(info.maxLevel), data and data.name);
+    end
+    return self:GetCharacterValue("PVPRankRenown");
+end
+
 -- Forever returns base, real, effective and bonus (Classic: base, total, bonus and minus)
 function Armory:UnitResistance(unit, index)
     if ( index ) then

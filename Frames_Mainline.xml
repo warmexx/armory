@@ -3,7 +3,6 @@
   <Include file="Frames\ArmoryArtifactFrame.xml"/>
   <Include file="Frames\ArmoryTalentFrame.xml"/>
   <Include file="Frames\ArmoryPetFrame.xml"/>
-  <Include file="Frames\ArmoryPVPFrame.xml"/>
   <Include file="Frames\ArmoryReputationFrame.xml"/>
   <Include file="Frames\ArmoryTokenFrame.xml"/>
   <Include file="Frames\ArmoryInventoryAccountBankFrame.xml"/>
