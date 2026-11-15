@@ -302,7 +302,7 @@ function Armory:CheckAvailableCooldowns()
                 eventTime = GetTimeFromKey(key);
                 title, calendarType = dbEntry:GetValue(container, key);
                 if ( eventTime < now and calendarType == "COOLDOWN" ) then
-                    self:PrintInfo(format(ARMORY_COOLDOWN_AVAILABLE, title, profile.character, profile.realm));
+                    self:PrintInfo(self:StripPlayerRealm(format(ARMORY_COOLDOWN_AVAILABLE, title, profile.character, profile.realm), profile.realm));
                     dbEntry:SetValue(2, container, key, nil);
                 end
             end

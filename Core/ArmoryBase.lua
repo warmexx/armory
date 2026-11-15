@@ -1376,6 +1376,17 @@ function Armory:IsConnectedRealm(value, explicit)
     return false;
 end
 
+-- Leaves out " (realm)" behind the name of a character on the realm of the player (Forever shows no realm names)
+function Armory:StripPlayerRealm(text, realm)
+    if ( realm == self.playerRealm ) then
+        local first, last = strfind(text, " ("..realm..")", 1, true);
+        if ( first ) then
+            text = strsub(text, 1, first - 1)..strsub(text, last + 1);
+        end
+    end
+    return text;
+end
+
 function Armory:ConnectedRealmExists()
     for _, realm in ipairs(self:GetConnectedRealms()) do
         if ( realm ~= self.characterRealm and ArmoryDB[realm] ) then
@@ -1484,7 +1495,7 @@ function Armory:CheckMailItems(mode, days)
                 mailProfiles[profile] = items;
                 for _, item in ipairs(items) do
                     if ( not mode and self:GetConfigMailVerboseCount() ) then
-                        text = format(ARMORY_CHECK_MAIL_MESSAGE, profile.character, profile.realm, item.name, item.left);
+                        text = self:StripPlayerRealm(format(ARMORY_CHECK_MAIL_MESSAGE, profile.character, profile.realm, item.name, item.left), profile.realm);
                         if ( item.ignored ) then
                             text = text..NORMAL_FONT_COLOR_CODE.." ("..IGNORED..")"..FONT_COLOR_CODE_CLOSE;
                         end
@@ -1496,7 +1507,7 @@ function Armory:CheckMailItems(mode, days)
                     total = total + 1;
                 end
                 if ( not mode and not self:GetConfigMailVerboseCount() ) then
-                    self:PrintWarning(format(ARMORY_CHECK_MAIL_SHORT_MESSAGE, profile.character, profile.realm, #items, floor(maxDays)));
+                    self:PrintWarning(self:StripPlayerRealm(format(ARMORY_CHECK_MAIL_SHORT_MESSAGE, profile.character, profile.realm, #items, floor(maxDays)), profile.realm));
                 end
             end
 
@@ -1508,17 +1519,17 @@ function Armory:CheckMailItems(mode, days)
                         local _, _, _, timestamp = self:GetInventoryContainerInfo(ARMORY_MAIL_CONTAINER);
                         days = floor(time() / (24 * 60 * 60)) - floor(timestamp / (24 * 60 * 60));
                         if ( days >= 30 - maxDays and days < 31 ) then
-                            self:PrintWarning(format(ARMORY_MAIL_VISIT_WARNING, profile.character, profile.realm, floor(days)));
+                            self:PrintWarning(self:StripPlayerRealm(format(ARMORY_MAIL_VISIT_WARNING, profile.character, profile.realm, floor(days)), profile.realm));
                         end
                     else
-                        self:PrintWarning(format(ARMORY_MAIL_VISIT_WARNING2, profile.character, profile.realm));
+                        self:PrintWarning(self:StripPlayerRealm(format(ARMORY_MAIL_VISIT_WARNING2, profile.character, profile.realm), profile.realm));
                     end
                 end
 
                 if ( hasContainer and self:GetConfigMailCheckCount() and not (mode == 1 and self:GetConfigMailHideLogonCount()) ) then
                     local remaining = self:GetNumRemainingMailItems();
                     if ( remaining > 0 ) then
-                        self:PrintWarning(format(ARMORY_MAIL_COUNT_WARNING2, profile.character, profile.realm, remaining));
+                        self:PrintWarning(self:StripPlayerRealm(format(ARMORY_MAIL_COUNT_WARNING2, profile.character, profile.realm, remaining), profile.realm));
                     end
                 end
              end
