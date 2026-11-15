@@ -27,13 +27,13 @@
     ArmoryFrame_OpenFrame(4);
   </Binding>
   <Binding name="ARMORY_REPUTATION" category="ADDONS">
-    ArmoryOtherFrame_OpenSubFrame(1);
+    ArmoryOtherFrame_OpenSubFrame("ArmoryReputationFrame");
   </Binding>
   <Binding name="ARMORY_RAID" category="ADDONS">
-    ArmoryOtherFrame_OpenSubFrame(2);
+    ArmoryOtherFrame_OpenSubFrame("ArmoryRaidInfoFrame");
   </Binding>
   <Binding name="ARMORY_CURRENCY" category="ADDONS">
-    if ( not Armory.isClassic ) then ArmoryOtherFrame_OpenSubFrame(3); end
+    ArmoryOtherFrame_OpenSubFrame("ArmoryTokenFrame");
   </Binding>
   <Binding name="ARMORY_INVENTORY" category="ADDONS">
     ArmoryFrame_OpenSideFrame(ArmoryInventoryFrame);

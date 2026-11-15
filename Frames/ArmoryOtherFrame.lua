@@ -51,7 +51,22 @@ function ArmoryOtherFrame_ShowSubFrame()
     end
 end
 
+-- id is the number of the tab or the name of its frame; the key bindings use the name, because the tabs differ per version
 function ArmoryOtherFrame_OpenSubFrame(id)
+    if ( type(id) == "string" ) then
+        local name = id;
+        id = nil;
+        for index, value in ipairs(OTHERFRAME_SUBFRAMES) do
+            if ( value == name ) then
+                id = index;
+                break;
+            end
+        end
+        if ( not id ) then
+            return;
+        end
+    end
+
     local tab = _G["ArmoryOtherFrameTab"..id];
     if ( tab.enabled == nil or tab.enabled ) then
         if ( not tab:IsVisible() ) then
