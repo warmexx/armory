@@ -137,7 +137,13 @@ function Armory:GetPetExperience()
 end
 
 function Armory:GetPetFoodTypes()
-    return self:SetGetPetValue("FoodTypes", _G.GetPetFoodTypes());
+    local getFoodTypes = _G.GetPetFoodTypes or (C_PetInfo and C_PetInfo.GetPetFoodTypes);
+    if ( getFoodTypes ) then
+        return self:SetGetPetValue("FoodTypes", getFoodTypes());
+    elseif ( self:PetExists(self:GetCurrentPet()) ) then
+        -- no live API (Retail): use the value stored from the stable
+        return self:GetPetValue(self:GetCurrentPet(), "FoodTypes");
+    end
 end
 
 function Armory:GetPetIcon()

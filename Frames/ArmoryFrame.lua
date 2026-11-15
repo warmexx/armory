@@ -154,6 +154,12 @@ function ArmoryFrame_OnLoad(self)
     ArmoryPanelTemplates_SetNumTabs(self, #ARMORYFRAME_SUBFRAMES);
     ArmoryPanelTemplates_SetTab(self, 1);
 
+    -- Forever's PVP is the long "Player vs. Player" in most languages, which doesn't fit on the tab
+    -- (the tooltip shows it in full); STAT_CATEGORY_PVP is the short one there in every language
+    if ( Armory.isForever and STAT_CATEGORY_PVP ) then
+        ArmoryFrameTab4:SetText(STAT_CATEGORY_PVP);
+    end
+
     -- Allows Armory to be closed with the Escape key
     table.insert(UISpecialFrames, "ArmoryFrame");
 
