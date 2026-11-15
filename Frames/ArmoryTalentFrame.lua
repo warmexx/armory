@@ -69,6 +69,27 @@ local lines = {};
 local shownNodes = {};
 local shownButtons = {};
 
+-- Forever: the spec tabs are the spec groups (dual spec), as there is one spec per class
+local function GetActiveSpecTab(self)
+    if ( Armory.isForever ) then
+        return Armory:GetActiveSpecGroup();
+    end
+    return Armory:GetSpecialization(false, false, self.talentGroup) or 1;
+end
+
+-- Forever also stores the inactive spec group
+local function IsTalentConfig(configID)
+    if ( Armory.isForever ) then
+        for specGroup = 1, GetNumSpecGroups() do
+            if ( configID == C_SpecializationInfo.GetCombatConfigIDForSpecGroup(specGroup) ) then
+                return true;
+            end
+        end
+        return false;
+    end
+    return configID == C_ClassTalents.GetActiveConfigID();
+end
+
 function ArmoryTalentFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("PLAYER_TALENT_UPDATE");
@@ -76,6 +97,9 @@ function ArmoryTalentFrame_OnLoad(self)
     self:RegisterEvent("TRAIT_CONFIG_UPDATED");
     self:RegisterEvent("PET_SPECIALIZATION_CHANGED");
     self:RegisterEvent("PLAYER_LEVEL_UP");
+    if ( Armory.isForever ) then
+        self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
+    end
 
     self.talentGroup = 1;
     self.selectedSpec = 1;
@@ -90,14 +114,14 @@ function ArmoryTalentFrame_OnEvent(self, event, arg1)
     elseif ( event == "PLAYER_ENTERING_WORLD" ) then
         self:UnregisterEvent("PLAYER_ENTERING_WORLD");
         self.talentGroup = Armory:GetActiveSpecGroup();
-        self.selectedSpec = Armory:GetSpecialization(false, false, self.talentGroup) or 1;
+        self.selectedSpec = GetActiveSpecTab(self);
         Armory:Execute(ArmoryTalentFrame_UpdateSpecs);
         Armory:Execute(ArmoryTalentFrame_UpdateTalents);
-    elseif ( event == "PLAYER_TALENT_UPDATE" or event == "ACTIVE_PLAYER_SPECIALIZATION_CHANGED" or event == "PLAYER_LEVEL_UP" ) then
+    elseif ( event == "PLAYER_TALENT_UPDATE" or event == "ACTIVE_PLAYER_SPECIALIZATION_CHANGED" or event == "PLAYER_LEVEL_UP" or event == "ACTIVE_TALENT_GROUP_CHANGED" ) then
         Armory:Execute(ArmoryTalentFrame_UpdateTalents);
     elseif ( event == "TRAIT_CONFIG_UPDATED" ) then
         -- Also fires for other trait systems
-        if ( arg1 == C_ClassTalents.GetActiveConfigID() ) then
+        if ( IsTalentConfig(arg1) ) then
             Armory:Execute(ArmoryTalentFrame_UpdateTalents);
         end
     elseif ( event == "PET_SPECIALIZATION_CHANGED" ) then
@@ -128,6 +152,9 @@ function ArmoryTalentFrame_OnShow(self)
 end
 
 local function IsActiveSpec(self, spec)
+    if ( Armory.isForever ) then
+        return spec == Armory:GetActiveSpecGroup();
+    end
     return self.talentGroup == Armory:GetActiveSpecGroup() and spec == Armory:GetSpecialization(false, false, self.talentGroup);
 end
 
@@ -362,9 +389,18 @@ end
 
 local function UpdateTabs(self, specName, heroName)
     local tabs = self.Tabs;
-    tabs[TAB_CLASS]:SetText((Armory:UnitClass("player")));
-    tabs[TAB_SPEC]:SetText(specName or "");
-    tabs[TAB_HERO]:SetText(heroName or "");
+    if ( Armory.isForever ) then
+        -- The three groups of the tree
+        for i, tab in ipairs(tabs) do
+            local _, name = Armory:GetTalentGroupInfo(i);
+            tab:SetText(name or "");
+        end
+        heroName = select(2, Armory:GetTalentGroupInfo(TAB_HERO));
+    else
+        tabs[TAB_CLASS]:SetText((Armory:UnitClass("player")));
+        tabs[TAB_SPEC]:SetText(specName or "");
+        tabs[TAB_HERO]:SetText(heroName or "");
+    end
 
     if ( heroName ) then
         tabs[TAB_HERO]:Show();
@@ -410,8 +446,37 @@ local function UpdatePoints(self, specID, currencyID)
     end
 end
 
+-- Forever: the points spent in the group of the tab
+local function UpdateGroupPoints(self, specGroup, tab)
+    if ( Armory:TalentsForSpecExist(specGroup) ) then
+        self.pointsText:SetText(Armory:GetTalentGroupPoints(specGroup, tab));
+    else
+        self.pointsText:SetText("");
+    end
+end
+
+local function UpdateForever(self)
+    local specGroup = self.selectedSpec;
+
+    UpdateTabs(self);
+
+    local tab = ArmoryPanelTemplates_GetSelectedTab(self);
+
+    self.Choice:Hide();
+    UpdateTree(self.Tree, specGroup, tab);
+    UpdateStatus(self, specGroup, IsActiveSpec(self, specGroup));
+    UpdateGroupPoints(self, specGroup, tab);
+    ArmoryTalentFrame_UpdateSpecTabStates(self);
+    self.Tree.heroIcon:Hide();
+end
+
 function ArmoryTalentFrame_Update()
     local self = ArmoryTalentFrame;
+    if ( Armory.isForever ) then
+        UpdateForever(self);
+        return;
+    end
+
     local spec = self.selectedSpec;
     local specID, specName = Armory:GetSpecializationInfo(spec, false, nil, nil, Armory:UnitSex("player"));
     local heroTree, heroName, heroIcon, heroCurrencyID;
@@ -454,8 +519,31 @@ end
 -- SpecTab Button Functions
 ----------------------------------------------------------
 
+-- Forever: a tab per spec group, with the icon of the class's only spec
+local function UpdateSpecGroupTabs(self)
+    local numSpecGroups = Armory:GetNumSpecGroups();
+    local _, _, _, icon = Armory:GetSpecializationInfo(1, false, nil, nil, Armory:UnitSex("player"));
+    local names = { DUAL_SPEC_PRIMARY or TALENT_SPEC_PRIMARY, DUAL_SPEC_SECONDARY or TALENT_SPEC_SECONDARY };
+    for i = 1, MAX_TALENT_SPECTABS do
+        local tab = self["specTab"..i];
+        if ( i <= numSpecGroups ) then
+            tab.tooltip = names[i];
+            tab.description = nil;
+            tab.role = nil;
+            tab:GetNormalTexture():SetTexture(icon);
+            tab:Show();
+        else
+            tab:Hide();
+        end
+    end
+end
+
 function ArmoryTalentFrame_UpdateSpecTabs(self)
-    self.selectedSpec = Armory:GetSpecialization(false, false, self.talentGroup) or 1;
+    self.selectedSpec = GetActiveSpecTab(self);
+    if ( Armory.isForever ) then
+        UpdateSpecGroupTabs(self);
+        return;
+    end
 
     -- demon hunters had 2 specs, druids have 4
     local numSpecs = Armory:GetNumSpecializations();

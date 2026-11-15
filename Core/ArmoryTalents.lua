@@ -46,8 +46,22 @@ local PART_SELECTOR = "selector";
 local function GetTreeKey(treeID)
     local hash = C_Traits.GetTreeHash(treeID);
     if ( hash ) then
-        return STRUCTURE_VERSION..":"..select(2, _G.GetBuildInfo()).."-"..table.concat(hash, ".");
+        -- Forever stores another structure for the same tree than the Retail code did
+        local version = Armory.isForever and "F"..STRUCTURE_VERSION or STRUCTURE_VERSION;
+        return version..":"..select(2, _G.GetBuildInfo()).."-"..table.concat(hash, ".");
     end
+end
+
+-- Forever: the config of a spec group, as Blizzard's talent frame reads it
+local function GetSpecGroupConfigID(specGroup)
+    return specGroup and C_SpecializationInfo.GetCombatConfigIDForSpecGroup(specGroup);
+end
+
+local function GetActiveConfigID()
+    if ( Armory.isForever ) then
+        return GetSpecGroupConfigID(C_SpecializationInfo.GetActiveSpecGroup()) or C_ClassTalents.GetActiveConfigID();
+    end
+    return C_ClassTalents.GetActiveConfigID();
 end
 
 local function GetNodeCostID(configID, nodeID)
@@ -224,6 +238,54 @@ local function StoreStructure(treeID)
     Armory:SetClassValue("player", 2, container, "Key", key);
 end
 
+-- Forever has one tree for all spec groups, split into three groups (the talent trees of old) instead of class, spec and hero;
+-- the part of a node is the index of its group
+local function StoreGroupStructure(configID, treeID)
+    local key = GetTreeKey(treeID);
+    if ( not key or key == Armory:GetClassValue("player", container, "Key") ) then
+        return;
+    end
+
+    Armory:PrintDebug("UPDATE", container, "structure");
+
+    Armory:SetClassValue("player", container, nil);
+
+    local groups = C_Traits.GetGroupDisplayInfoByTreeID(treeID) or {};
+    table.sort(groups, function(a, b) return a.orderIndex < b.orderIndex; end);
+    local partOfGroup = {};
+    for i, info in ipairs(groups) do
+        partOfGroup[info.groupID] = i;
+        Armory:SetClassValue("player", 3, container, "Groups", i, info.groupID, info.displayName, info.icon);
+    end
+
+    local treeNodes = {};
+    for _, nodeID in ipairs(C_Traits.GetTreeNodes(treeID)) do
+        local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID);
+        if ( IsNodeValid(nodeInfo) and nodeInfo.isVisible and #nodeInfo.entryIDs > 0 ) then
+            -- Besides its group a node is in the groups of the rows, which have no display info
+            local part;
+            for _, groupID in ipairs(nodeInfo.groupIDs or {}) do
+                part = part or partOfGroup[groupID];
+            end
+            if ( part ) then
+                table.insert(treeNodes, nodeID);
+                StoreNode(nodeID, nodeInfo, part, configID);
+
+                local targets = {};
+                for _, edge in ipairs(nodeInfo.visibleEdges) do
+                    table.insert(targets, edge.targetNode);
+                end
+                if ( #targets > 0 ) then
+                    Armory:SetClassValue("player", 3, container, "Edges", nodeID, targets);
+                end
+            end
+        end
+    end
+    Armory:SetClassValue("player", 2, container, "TreeNodes", treeNodes);
+
+    Armory:SetClassValue("player", 2, container, "Key", key);
+end
+
 ----------------------------------------------------------
 -- Talents Storage: choices, per character and spec
 ----------------------------------------------------------
@@ -279,14 +341,30 @@ function Armory:SetTalents()
 
         self:PrintDebug("UPDATE", container);
 
-        local specIndex = C_SpecializationInfo.GetSpecialization();
-        local specID = specIndex and C_SpecializationInfo.GetSpecializationInfo(specIndex);
-        local configID = C_ClassTalents.GetActiveConfigID();
-        local treeID = specID and C_ClassTalents.GetTraitTreeForSpec(specID);
+        if ( self.isForever ) then
+            -- Forever: stored per spec group instead of per spec; Blizzard's frame also reads the inactive group
+            local configID = GetActiveConfigID();
+            local configInfo = configID and C_Traits.GetConfigInfo(configID);
+            local treeID = configInfo and configInfo.treeIDs and configInfo.treeIDs[1];
+            if ( treeID ) then
+                StoreGroupStructure(configID, treeID);
+                for specGroup = 1, _G.GetNumSpecGroups() do
+                    local groupConfigID = GetSpecGroupConfigID(specGroup);
+                    if ( groupConfigID ) then
+                        StoreActiveSpec(dbEntry, specGroup, groupConfigID, treeID);
+                    end
+                end
+            end
+        else
+            local specIndex = C_SpecializationInfo.GetSpecialization();
+            local specID = specIndex and C_SpecializationInfo.GetSpecializationInfo(specIndex);
+            local configID = C_ClassTalents.GetActiveConfigID();
+            local treeID = specID and C_ClassTalents.GetTraitTreeForSpec(specID);
 
-        if ( configID and treeID ) then
-            StoreStructure(treeID);
-            StoreActiveSpec(dbEntry, specID, configID, treeID);
+            if ( configID and treeID ) then
+                StoreStructure(treeID);
+                StoreActiveSpec(dbEntry, specID, configID, treeID);
+            end
         end
 
         self:Unlock(container);
@@ -308,9 +386,34 @@ function Armory:GetTalentCurrencies()
     return self:GetClassValue("player", container, "Currencies");
 end
 
--- returns a list of nodeIDs, do not change it
+-- returns a list of nodeIDs, do not change it; Forever has one tree for all spec groups
 function Armory:GetTalentSpecNodes(specID)
+    if ( self.isForever ) then
+        return self:GetClassValue("player", container, "TreeNodes");
+    end
     return self:GetClassValue("player", container, "Specs", specID, "Nodes");
+end
+
+-- Forever: the config of the active spec group, Retail: the active config
+function Armory:GetTalentConfigID()
+    return GetActiveConfigID();
+end
+
+-- Forever: returns groupID, name, icon of a group of the tree
+function Armory:GetTalentGroupInfo(index)
+    return self:GetClassValue("player", container, "Groups", index);
+end
+
+-- Forever: the points spent in a group, each rank costs one point
+function Armory:GetTalentGroupPoints(specGroup, part)
+    local spent = 0;
+    for _, nodeID in ipairs(self:GetTalentSpecNodes() or {}) do
+        local _, _, _, nodePart = self:GetTalentNodeInfo(nodeID);
+        if ( nodePart == part ) then
+            spent = spent + (self:GetTalentNodeState(specGroup, nodeID) or 0);
+        end
+    end
+    return spent;
 end
 
 -- returns posX, posY, type, part, subTreeID, maxRanks
@@ -376,5 +479,9 @@ function Armory:GetTalentPoints(specID, currencyID)
 end
 
 function Armory:GetNumSpecGroups(inspect)
+    -- Forever has dual spec
+    if ( self.isForever ) then
+        return self:SetGetCharacterValue("NumSpecGroups", _G.GetNumSpecGroups()) or 1;
+    end
     return 1;
 end
