@@ -77,6 +77,7 @@ for dp, _, fns in os.walk(BASE):
             blizzard_methods |= set(re.findall(r"[:.]([A-Za-z_]\w*)\s*\(", strip_lua(t)))
         elif fn.endswith(".xml"):
             known |= set(re.findall(r'name="([A-Za-z_]\w*)"', read(p)))
+blizzard_known = set(known)  # without Armory's own names
 
 # Armory's own files (all of them, any client) and its libs
 own_files = []
@@ -154,6 +155,89 @@ for q in loaded:
         if n in other_defs and n not in blizzard_methods:
             method_hits.setdefault(n, set()).add(os.path.relpath(q, ROOT))
 
+# Armory's own globals (constants, functions, frames) that a loaded file uses, defined only in
+# Armory files this client does not load. Example: ARMORY_GEARSLOT_FIRST_EQUIPPED, defined by the
+# Mainline paperdoll and used by the shared inventory code (an error in Era, 2026-11-15).
+GLOBAL_DEF = re.compile(r"^function\s+([A-Za-z_]\w*)\s*\(|^([A-Za-z_]\w*)\s*=(?!=)", re.M)
+
+
+def global_defs(paths):
+    out = set()
+    for q in paths:
+        t = read(q)
+        if q.endswith(".lua"):
+            c = strip_lua(t)
+            out |= {a or b for a, b in GLOBAL_DEF.findall(c)}
+            out |= set(re.findall(r"\b_G\.([A-Za-z_]\w*)\s*=(?!=)", c))
+        else:
+            out |= set(re.findall(r'\bname="([A-Za-z_]\w*)"', t))
+            # functions and assignments in an inline <Script> (Classic's shared templates)
+            for body in re.findall(r"<Script>(.*?)</Script>", t, re.S):
+                c = strip_lua(body)
+                out |= set(re.findall(r"\bfunction\s+([A-Za-z_]\w*)\s*\(", c))
+                out |= set(re.findall(r"^\s*([A-Za-z_]\w*)\s*=(?!=)", c, re.M))
+    return out
+
+
+def parent_suffixes(paths):
+    """The X of every name="$parentX" (in a frame or a template that a frame inherits)."""
+    out = set()
+    for q in paths:
+        if q.endswith(".xml"):
+            out |= set(re.findall(r'\bname="\$parent(\w+)"', read(q)))
+    return out
+
+
+# Names that apicheck finds here and that were checked by hand: the use is behind a flag, an
+# IsAvailable or a Mainline-only tab, so this client never reaches it. Checked 2026-11-15.
+REVIEWED = {
+    "ARMORY_GEARSLOT_FIRST_EQUIPPED": "behind GetNumProfessionGearSlots() > 0",
+    "ARMORY_GEARSLOT_LAST_EQUIPPED": "behind GetNumProfessionGearSlots() > 0",
+    "ARMORY_PERSONAL_GUILDBANK": "behind if ( AGB ): no guild bank in Era",
+    "ArmoryAchievementFrame": "Achievements tab and binding only in Mainline",
+    "ArmoryAchievementFrame_Toggle": "Achievements tab only in Mainline",
+    "ArmoryArtifactFrame": "if ( ArmoryArtifactFrame and ... )",
+    "ArmoryGearSets_Update": "Armory:Execute(nil) does nothing",
+    "ArmoryInventoryAccountBankFrame": "account bank tab hidden in Classic",
+    "ArmoryInventoryAccountBankFrame_Update": "account bank tab hidden in Classic",
+    "ArmoryLookupFrame_DownloadRecipes": "Classic's ARMORY_LOOKUP_TYPE has no LOOKUP_DOWNLOAD",
+    "ArmoryLookupFrame_StartDownload": "command only set in Mainline",
+    "ArmoryMoneyFrame_Update": "Classic uses Blizzard's MoneyFrame_Update (flag)",
+    "ArmoryPaperDollCheckButton_Enable": "option IsAvailable = IsMainline",
+    "ArmoryPaperDollOverlayFrame": "options behind the overlay option, IsAvailable = IsMainline",
+    "ArmoryPaperDollOverlayFrameCheckButton": "option IsAvailable = IsMainline",
+}
+
+
+def global_uses(path):
+    t = read(path)
+    if path.endswith(".xml"):
+        # handler bodies and the frames that inherits, parent and relativeTo point to
+        t = " ".join(re.findall(r">([^<]*)</(?:On\w+|Binding)>", t)
+                     + re.findall(r'\b(?:inherits|parent|relativeTo)="([^"]+)"', t))
+    return set(re.findall(r"(?<![\w.:$])([A-Za-z_]\w*)\b", strip_lua(t)))
+
+
+loaded_all = toc_files()
+repo_all = []
+for d, dn, fn in os.walk(ROOT):
+    dn[:] = [x for x in dn if x.lower() not in ("libs", "dev", "docs", ".git", ".release")]
+    repo_all += [os.path.join(d, f) for f in fn if f.endswith((".lua", ".xml"))]
+not_loaded = [q for q in repo_all if q not in set(loaded_all)]
+loaded_globals = global_defs(loaded_all)
+suffixes = parent_suffixes(loaded_all)
+only_elsewhere = global_defs(not_loaded) - loaded_globals - blizzard_known
+# a name made from a loaded frame plus a $parent child (ArmoryPetFrame + LevelText) exists
+only_elsewhere = {n for n in only_elsewhere
+                  if not any(n.endswith(s) and n[:-len(s)] in loaded_globals for s in suffixes)}
+global_hits, reviewed = {}, set()
+for q in loaded_all:
+    for n in global_uses(q) & only_elsewhere:
+        if n in REVIEWED:
+            reviewed.add(n)
+        else:
+            global_hits.setdefault(n, set()).add(os.path.relpath(q, ROOT))
+
 print(f"Client: {CLIENT}, Armory source: {ROOT}\n")
 print("=== Global functions used by Armory that this client does not define")
 for n in sorted(hits):
@@ -167,3 +251,8 @@ for n in sorted(enum_hits):
 print("\n=== Methods called by Armory, defined only in Armory files this client does not load")
 for n in sorted(method_hits):
     print(f"{n:45s} <- {', '.join(sorted(method_hits[n])[:3])}")
+print("\n=== Armory globals used by Armory, defined only in Armory files this client does not load")
+for n in sorted(global_hits):
+    print(f"{n:45s} <- {', '.join(sorted(global_hits[n])[:3])}")
+if reviewed:
+    print(f"({len(reviewed)} more, checked by hand: see REVIEWED in apicheck.py)")
