@@ -81,12 +81,12 @@ end
 
 function ArmoryGuildBankFrame_Toggle()
     if ( ArmoryListGuildBankFrame:IsShown() or ArmoryIconGuildBankFrame:IsShown() ) then
-        Armory:HideFrame(ArmoryListGuildBankFrame);
-        Armory:HideFrame(ArmoryIconGuildBankFrame);
+        ArmoryListGuildBankFrame:Hide();
+        ArmoryIconGuildBankFrame:Hide();
     elseif ( AGB:GetIconViewMode() ) then
-        Armory:ShowFrame(ArmoryIconGuildBankFrame);
+        ArmoryIconGuildBankFrame:Show();
     else
-        Armory:ShowFrame(ArmoryListGuildBankFrame);
+        ArmoryListGuildBankFrame:Show();
     end
 end
 
@@ -277,11 +277,11 @@ end
 function ArmoryGuildBankFrameEnableIconView(checked)
     AGB:SetIconViewMode(checked);
     if ( checked ) then
-        Armory:HideFrame(ArmoryListGuildBankFrame);
-        Armory:ShowFrame(ArmoryIconGuildBankFrame);
+        ArmoryListGuildBankFrame:Hide();
+        ArmoryIconGuildBankFrame:Show();
     else
-        Armory:HideFrame(ArmoryIconGuildBankFrame);
-        Armory:ShowFrame(ArmoryListGuildBankFrame);
+        ArmoryIconGuildBankFrame:Hide();
+        ArmoryListGuildBankFrame:Show();
     end
 end
 

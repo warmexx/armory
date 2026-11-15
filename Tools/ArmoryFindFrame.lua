@@ -35,9 +35,9 @@ local FIND_RESULTS = {};
 
 function ArmoryFindFrame_Toggle()
     if ( ArmoryFindFrame:IsShown() ) then
-        Armory:HideFrame(ArmoryFindFrame);
+        ArmoryFindFrame:Hide();
     else
-        Armory:ShowFrame(ArmoryFindFrame);
+        ArmoryFindFrame:Show();
     end
 end
 

@@ -4,13 +4,32 @@
     Classic keeps Blizzard's own templates, which look like Classic. Shared XML uses the names
     of Armory's Mainline templates, so here they point to Blizzard's.
   -->
+  <!--
+    Blizzard's close button hides its window with HideUIPanel, which is blocked in combat. Armory's
+    windows are no UI panels, so they hide themselves: Armory's close button does it directly, and
+    the close button of ButtonFrameTemplate does it through onCloseCallback (returning nothing stops
+    Blizzard's HideUIPanel).
+  -->
+  <Script>
+    function ArmoryUIPanelCloseButton_OnClick(self)
+        self:GetParent():Hide();
+    end
+  </Script>
   <Button name="ArmoryUIPanelButtonTemplate" inherits="UIPanelButtonTemplate" virtual="true"/>
-  <Button name="ArmoryUIPanelCloseButton" inherits="UIPanelCloseButton" virtual="true"/>
+  <Button name="ArmoryUIPanelCloseButton" inherits="UIPanelCloseButtonNoScripts" virtual="true">
+    <Scripts>
+      <OnClick function="ArmoryUIPanelCloseButton_OnClick"/>
+    </Scripts>
+  </Button>
   <EditBox name="ArmoryInputBoxTemplate" inherits="InputBoxTemplate" virtual="true"/>
   <Frame name="ArmoryDialogBorderDarkTemplate" inherits="DialogBorderDarkTemplate" virtual="true"/>
-  <Frame name="ArmoryButtonFrameTemplate" inherits="ButtonFrameTemplate" virtual="true"/>
+  <Frame name="ArmoryButtonFrameTemplate" inherits="ButtonFrameTemplate" virtual="true">
+    <KeyValues>
+      <KeyValue key="onCloseCallback" value="ArmoryUIPanelCloseButton_OnClick" type="global"/>
+    </KeyValues>
+  </Frame>
   <Frame name="ArmoryInsetFrameTemplate" inherits="InsetFrameTemplate" useParentLevel="true" virtual="true"/>
-  <Frame name="ArmoryChildFrameTemplate" movable="true" parent="ArmoryFrame" inherits="ButtonFrameTemplate" enableMouse="true" virtual="true">
+  <Frame name="ArmoryChildFrameTemplate" movable="true" parent="ArmoryFrame" inherits="ArmoryButtonFrameTemplate" enableMouse="true" virtual="true">
     <Anchors>
       <Anchor point="TOPLEFT" relativeTo="ArmoryFrame" relativePoint="TOPRIGHT" x="42"/>
     </Anchors>

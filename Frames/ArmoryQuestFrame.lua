@@ -30,10 +30,10 @@ local Armory, _ = Armory, nil;
 
 function ArmoryQuestFrame_Toggle()
     if ( ArmoryQuestFrame:IsShown() ) then
-        Armory:HideFrame(ArmoryQuestFrame);
+        ArmoryQuestFrame:Hide();
     else
         ArmoryCloseChildWindows();
-        Armory:ShowFrame(ArmoryQuestFrame);
+        ArmoryQuestFrame:Show();
     end
 end
 

@@ -33,6 +33,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - The summary has the columns item level, bags (with the free slots per bag) and events, and shows the difficulty and killed bosses of raid locks, as in Retail (Classic Era and Burning Crusade Anniversary)
 - The money tooltips of the summary and the inventory include the money of your personal guild banks, as in Retail (Burning Crusade Anniversary)
 - Corrects the stored bank contents when they no longer match what the game reports, for example after visiting the bank with Armory turned off, and marks those counts with a ~ until the bank is visited again, as in Retail (Classic Era and Burning Crusade Anniversary)
+- Armory's windows open and close in combat and no longer push Blizzard's windows aside, as in Retail (Classic Era and Burning Crusade Anniversary)
 - Fixes the command queue re-processing repeated updates, which could cause frame rate drops (e.g. during crafting) (Classic Era and Burning Crusade Anniversary)
 - The talent window shows your unspent talent points, as in Burning Crusade Anniversary (Classic Era)
 - Shift-click on a recipe in the tradeskill window links the item it makes, as in Retail (Classic Era and Burning Crusade Anniversary)

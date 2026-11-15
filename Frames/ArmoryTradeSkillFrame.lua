@@ -277,7 +277,7 @@ function ArmoryTradeSkillFrameMixin:Refresh()
 
     ArmoryCloseDropDownMenus();
     ArmoryCloseChildWindows();
-    Armory:ShowFrame(self);
+    self:Show();
 
     self:OnDataSourceChanged();
 
@@ -1503,5 +1503,5 @@ function ArmoryTradeSkillFrame_Show()
 end
 
 function ArmoryTradeSkillFrame_Hide()
-    Armory:HideFrame(ArmoryTradeSkillFrame);
+    ArmoryTradeSkillFrame:Hide();
 end

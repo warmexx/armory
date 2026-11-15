@@ -93,15 +93,6 @@ local max = max;
 local issecrettable = issecrettable;
 local hasanysecretvalues = hasanysecretvalues;
 
--- Classic still opens its frames as UI panels, which do not open in combat
-if ( Armory.isClassic ) then
-    function Armory:ShowFrame(frame) ShowUIPanel(frame); end
-    function Armory:HideFrame(frame) HideUIPanel(frame); end
-else
-    function Armory:ShowFrame(frame) frame:Show(); end
-    function Armory:HideFrame(frame) frame:Hide(); end
-end
-
 local iconProvider, cellPrototype, baseCellPrototype = QTip:CreateCellProvider(QTip.LabelProvider)
 
 function cellPrototype:InitializeCell()
@@ -1160,7 +1151,7 @@ function Armory:SelectDefaultProfile()
                 end
             end
         end
-        self:HideFrame(ArmoryFrame);
+        ArmoryFrame:Hide();
     end
 end
 
@@ -1266,9 +1257,9 @@ function Armory:Toggle()
     if ( table.getn(self:SelectableProfiles()) == 0 ) then
         self:PrintRed(ARMORY_NO_DATA);
     elseif ( ArmoryFrame:IsVisible()  ) then
-        self:HideFrame(ArmoryFrame);
+        ArmoryFrame:Hide();
     else
-        self:ShowFrame(ArmoryFrame);
+        ArmoryFrame:Show();
     end
 end
 
@@ -2873,7 +2864,7 @@ function Armory:Find(...)
 
             if ( windowMode ) then
                 ArmoryFindFrame_Initialize(where, numArgs == 1, strtrim(self:ToString(1, unpack(searchArgs, 1, numArgs))));
-                self:ShowFrame(ArmoryFindFrame);
+                ArmoryFindFrame:Show();
             end
 
             if ( flags[ARMORY_CMD_FIND_INVENTORY] and self:HasInventory() ) then
@@ -2972,13 +2963,13 @@ function Armory:Find(...)
             end
         elseif ( windowMode ) then
             ArmoryFindFrame_Initialize(where);
-            self:ShowFrame(ArmoryFindFrame);
+            ArmoryFindFrame:Show();
         else
             invalidCommand = true;
         end
     elseif ( windowMode ) then
          ArmoryFindFrame_Initialize();
-         self:ShowFrame(ArmoryFindFrame);
+         ArmoryFindFrame:Show();
     else
         invalidCommand = true;
     end

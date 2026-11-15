@@ -659,7 +659,7 @@
       </Layer>
     </Layers>
     <Frames>
-      <Button name="ArmoryPVPTeamDetailsCloseButton" inherits="UIPanelCloseButton">
+      <Button name="ArmoryPVPTeamDetailsCloseButton" inherits="ArmoryUIPanelCloseButton">
         <Anchors>
           <Anchor point="TOPRIGHT" relativeTo="ArmoryPVPTeamDetails" relativePoint="TOPRIGHT">
             <Offset>

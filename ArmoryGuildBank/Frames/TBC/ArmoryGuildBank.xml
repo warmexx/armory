@@ -651,7 +651,7 @@
           </Frame>
         </Frames>
       </Frame>
-      <Button name="ArmoryListGuildBankFrameCloseButton" inherits="UIPanelCloseButton">
+      <Button name="ArmoryListGuildBankFrameCloseButton" inherits="ArmoryUIPanelCloseButton">
         <Anchors>
           <Anchor point="TOPRIGHT" relativeTo="ArmoryListGuildBankFrame" relativePoint="TOPRIGHT">
             <Offset>
@@ -1245,7 +1245,7 @@
           </OnLoad>
         </Scripts>
       </Frame>
-      <Button inherits="UIPanelCloseButton">
+      <Button inherits="ArmoryUIPanelCloseButton">
         <Anchors>
           <Anchor point="TOPRIGHT">
             <Offset x="3" y="-8"/>

@@ -596,7 +596,7 @@
         </Layers>
         <Frames>
           <Frame parentKey="Border" inherits="DialogBorderDarkTemplate"/>
-          <Button name="ArmoryReputationDetailCloseButton" inherits="UIPanelCloseButton">
+          <Button name="ArmoryReputationDetailCloseButton" inherits="ArmoryUIPanelCloseButton">
             <Anchors>
               <Anchor point="TOPRIGHT">
                 <Offset>

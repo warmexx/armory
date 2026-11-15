@@ -86,10 +86,10 @@ local MoneyFrame_Update = Armory.isClassic and MoneyFrame_Update or ArmoryMoneyF
 
 function ArmoryInventoryFrame_Toggle()
     if ( ArmoryInventoryFrame:IsShown() ) then
-        Armory:HideFrame(ArmoryInventoryFrame);
+        ArmoryInventoryFrame:Hide();
     else
         ArmoryCloseChildWindows();
-        Armory:ShowFrame(ArmoryInventoryFrame);
+        ArmoryInventoryFrame:Show();
     end
 end
 

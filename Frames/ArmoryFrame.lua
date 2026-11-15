@@ -59,13 +59,13 @@ function ArmoryFrame_ToggleArmory(tab)
         ArmoryPanelTemplates_SetTab(ArmoryFrame, subFrame:GetID());
         if ( ArmoryFrame:IsVisible() ) then
             if ( subFrame:IsVisible() ) then
-                Armory:HideFrame(ArmoryFrame);
+                ArmoryFrame:Hide();
             else
                 PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
                 ArmoryFrame_ShowSubFrame(tab);
             end
         else
-            Armory:ShowFrame(ArmoryFrame);
+            ArmoryFrame:Show();
             ArmoryFrame_ShowSubFrame(tab);
         end
     end
@@ -95,11 +95,11 @@ function ArmoryFrame_OpenSideFrame(frame)
     ArmoryFrame_UpdateLineTabs();
     if ( frame.enabled ) then
         if ( not ArmoryFrame:IsShown() ) then
-            Armory:ShowFrame(ArmoryFrame);
+            ArmoryFrame:Show();
         end
         if ( not frame:IsVisible() ) then
             ArmoryCloseChildWindows();
-            Armory:ShowFrame(frame);
+            frame:Show();
         end
     end
 end

@@ -64,11 +64,11 @@ function ArmoryToggleSpellBook(spellBank)
         ArmorySpellBookFrame.suppressCloseSound = true;
     end
 
-    Armory:HideFrame(ArmorySpellBookFrame);
+    ArmorySpellBookFrame:Hide();
     if ( (not isShown or (ArmorySpellBookFrame.spellBank ~= spellBank)) ) then
         ArmorySpellBookFrame.spellBank = spellBank;
         ArmoryCloseChildWindows();
-        Armory:ShowFrame(ArmorySpellBookFrame);
+        ArmorySpellBookFrame:Show();
     end
     ArmorySpellBookFrame_UpdatePages();
 
@@ -180,7 +180,7 @@ function ArmorySpellBookFrame_Update(showing)
         ArmorySpellBookFrame_SetTabType(ArmorySpellBookFrameTabButton1, BANK_PLAYER);
         if ( ArmorySpellBookFrame.spellBank == BANK_PET ) then
             -- if has no pet spells but trying to show the pet spellbook close the window;
-            Armory:HideFrame(ArmorySpellBookFrame);
+            ArmorySpellBookFrame:Hide();
             ArmorySpellBookFrame.spellBank = BANK_PLAYER;
         end
     end

@@ -59,10 +59,10 @@ end
 
 function ArmorySocialFrame_Toggle()
     if ( ArmorySocialFrame:IsShown() or not Armory:HasSocial() ) then
-        Armory:HideFrame(ArmorySocialFrame);
+        ArmorySocialFrame:Hide();
     else
         ArmoryCloseChildWindows();
-        Armory:ShowFrame(ArmorySocialFrame);
+        ArmorySocialFrame:Show();
     end
 end
 

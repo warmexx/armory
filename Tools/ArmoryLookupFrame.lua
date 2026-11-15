@@ -37,9 +37,9 @@ local LOOKUP_LINES_DISPLAYED = 19;
 
 function ArmoryLookupFrame_Toggle()
     if ( ArmoryLookupFrame:IsShown() ) then
-        Armory:HideFrame(ArmoryLookupFrame);
+        ArmoryLookupFrame:Hide();
     elseif ( Armory:HasDataSharing() ) then
-        Armory:ShowFrame(ArmoryLookupFrame);
+        ArmoryLookupFrame:Show();
     else
         Armory:PrintRed(ARMORY_LOOKUP_DISABLED);
     end
