@@ -143,7 +143,7 @@ function Armory:ClearCurrency()
     dirty = true;
 end
 
-function Armory:UpdateCurrency(retries)
+function Armory:UpdateCurrency()
     local dbEntry = self.playerDbBaseEntry;
     if ( not dbEntry ) then
         return;
@@ -194,12 +194,10 @@ function Armory:UpdateCurrency(retries)
         local funcExpand = function(index) C_CurrencyInfo.ExpandCurrencyList(index, true); end;
         local funcCollapse = function(index) C_CurrencyInfo.ExpandCurrencyList(index, false); end;
 
-        retries = retries or 0;
-
-        if ( retries < 3 and not dbEntry:SetExpandableListValues(container, funcNumLines, funcGetLineState, funcGetLineInfo, funcExpand, funcCollapse) ) then
-            retries = retries + 1;
-            self:PrintDebug("Update failed; executing again...", retries);
-            self:ExecuteDelayed(5 * retries, function() Armory:UpdateCurrency(retries) end);
+        if ( dbEntry:SetExpandableListValues(container, funcNumLines, funcGetLineState, funcGetLineInfo, funcExpand, funcCollapse) ) then
+            self:UpdateSucceeded(container);
+        else
+            self:RetryUpdate(container, function() Armory:UpdateCurrency(); end);
         end
 
         dirty = dirty or self:IsPlayerSelected();

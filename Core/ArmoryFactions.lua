@@ -42,6 +42,109 @@ local factionLines = {};
 local dirty = true;
 local owner = "";
 
+-- How a faction line is read from the game, chosen once per family. Classic has no
+-- C_Reputation.GetFactionDataByIndex, friendships, renown or paragon. Both store the same values:
+-- the line (with Classic's faction description where Mainline stores a friendship or renown
+-- standing) under "Info" and the faction ID under "Data".
+local GetNumFactionLines, GetFactionLineInfo, GetFactionLineState, GetFactionLineID;
+local ExpandFactionLine, CollapseFactionLine, IsFactionParagon;
+
+if ( Armory.isClassic ) then
+    local MAX_REPUTATION_REACTION = MAX_REPUTATION_REACTION or 8;
+
+    GetNumFactionLines = function()
+        return _G.GetNumFactions();
+    end;
+    GetFactionLineInfo = function(index)
+        local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, _, hasBonusRepGain = _G.GetFactionInfo(index);
+        return name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, hasBonusRepGain, standingID == MAX_REPUTATION_REACTION;
+    end;
+    GetFactionLineState = function(index)
+        local _, _, _, _, _, _, _, _, isHeader, isCollapsed = _G.GetFactionInfo(index);
+        return isHeader, not isCollapsed;
+    end;
+    GetFactionLineID = function(index)
+        return (select(14, _G.GetFactionInfo(index)));
+    end;
+    ExpandFactionLine = function(index)
+        _G.ExpandFactionHeader(index);
+    end;
+    CollapseFactionLine = function(index)
+        _G.CollapseFactionHeader(index);
+    end;
+    IsFactionParagon = function(factionID)
+        return false;
+    end;
+else
+    GetNumFactionLines = function()
+        return C_Reputation.GetNumFactions();
+    end;
+    GetFactionLineInfo = function(index)
+        -- description will be used for factionStandingtext ever since the details panel has been removed
+        local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID, hasBonusRepGain, isCapped;
+
+        local factionData = C_Reputation.GetFactionDataByIndex(index);
+        if ( factionData ) then
+            name = factionData.name;
+            description = factionData.description;
+            standingID = factionData.reaction;
+            barMin, barMax, barValue = factionData.currentReactionThreshold, factionData.nextReactionThreshold, factionData.currentStanding;
+            atWarWith, canToggleAtWar = factionData.atWarWith, factionData.canToggleAtWar;
+            isHeader, isCollapsed = factionData.isHeader, factionData.isCollapsed;
+            hasRep, isWatched = factionData.isHeaderWithRep, factionData.isWatched;
+            isChild = factionData.isChild;
+            factionID = factionData.factionID;
+            hasBonusRepGain = factionData.hasBonusRepGain;
+            isCapped = standingID == MAX_REPUTATION_REACTION;
+
+            local isMajorFaction = factionID and C_Reputation.IsMajorFaction(factionID);
+            local repInfo = factionID and C_GossipInfo.GetFriendshipReputation(factionID);
+            if ( repInfo and repInfo.friendshipFactionID > 0 ) then
+                description = repInfo.reaction;
+                if ( repInfo.nextThreshold ) then
+                    barMin, barMax, barValue = repInfo.reactionThreshold, repInfo.nextThreshold, repInfo.standing;
+                else
+                    -- max rank, make it look like a full bar
+                    barMin, barMax, barValue = 0, 1, 1;
+                    isCapped = true;
+                end
+            elseif ( isMajorFaction ) then
+                local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID);
+
+                barMin, barMax = 0, majorFactionData.renownLevelThreshold;
+                isCapped = C_MajorFactions.HasMaximumRenown(factionID);
+                barValue = isCapped and majorFactionData.renownLevelThreshold or majorFactionData.renownReputationEarned or 0;
+
+                description = RENOWN_LEVEL_LABEL:format(majorFactionData.renownLevel);
+            else
+                -- no need to store
+                description = nil;
+            end
+        end
+
+        return name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, hasBonusRepGain, isCapped;
+    end;
+    GetFactionLineState = function(index)
+        local factionData = C_Reputation.GetFactionDataByIndex(index);
+        if ( factionData ) then
+            return factionData.isHeader, not factionData.isCollapsed;
+        end
+    end;
+    GetFactionLineID = function(index)
+        local factionData = C_Reputation.GetFactionDataByIndex(index);
+        return factionData and factionData.factionID;
+    end;
+    ExpandFactionLine = function(index)
+        C_Reputation.ExpandFactionHeader(index);
+    end;
+    CollapseFactionLine = function(index)
+        C_Reputation.CollapseFactionHeader(index);
+    end;
+    IsFactionParagon = function(factionID)
+        return C_Reputation.IsFactionParagon(factionID);
+    end;
+end
+
 local function GetFactionLines()
     local dbEntry = Armory.selectedDbBaseEntry;
 
@@ -128,7 +231,7 @@ function Armory:ClearFactions()
     dirty = true;
 end
 
-function Armory:UpdateFactions(retries)
+function Armory:UpdateFactions()
     local dbEntry = self.playerDbBaseEntry;
     if ( not dbEntry ) then
         return;
@@ -143,70 +246,14 @@ function Armory:UpdateFactions(retries)
         self:PrintDebug("UPDATE", container);
 
         -- store the complete (expanded) list
-        local funcNumLines = C_Reputation.GetNumFactions;
-        local funcGetLineInfo = function(index)
-            -- description will be used for factionStandingtext ever since the details panel has been removed
-            local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID, hasBonusRepGain, isCapped;
-
-            local factionData = C_Reputation.GetFactionDataByIndex(index);
-            if ( factionData ) then
-                name = factionData.name;
-                description = factionData.description;
-                standingID = factionData.reaction;
-                barMin, barMax, barValue = factionData.currentReactionThreshold, factionData.nextReactionThreshold, factionData.currentStanding;
-                atWarWith, canToggleAtWar = factionData.atWarWith, factionData.canToggleAtWar;
-                isHeader, isCollapsed = factionData.isHeader, factionData.isCollapsed;
-                hasRep, isWatched = factionData.isHeaderWithRep, factionData.isWatched;
-                isChild = factionData.isChild;
-                factionID = factionData.factionID;
-                hasBonusRepGain = factionData.hasBonusRepGain;
-                isCapped = standingID == MAX_REPUTATION_REACTION;
-
-                local hasFriendship;
-
-                local isMajorFaction = factionID and C_Reputation.IsMajorFaction(factionID);
-                local repInfo = factionID and C_GossipInfo.GetFriendshipReputation(factionID);
-                if ( repInfo and repInfo.friendshipFactionID > 0 ) then
-                    description = repInfo.reaction;
-                    if ( repInfo.nextThreshold ) then
-                        barMin, barMax, barValue = repInfo.reactionThreshold, repInfo.nextThreshold, repInfo.standing;
-                    else
-                        -- max rank, make it look like a full bar
-                        barMin, barMax, barValue = 0, 1, 1;
-                        isCapped = true;
-                    end
-                elseif ( isMajorFaction ) then
-                    local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID);
-
-                    barMin, barMax = 0, majorFactionData.renownLevelThreshold;
-                    isCapped = C_MajorFactions.HasMaximumRenown(factionID);
-                    barValue = isCapped and majorFactionData.renownLevelThreshold or majorFactionData.renownReputationEarned or 0;
-
-                    description = RENOWN_LEVEL_LABEL:format(majorFactionData.renownLevel);
-                else
-                    -- no need to store
-                    description = nil;
-                end
-            end
-
-            return name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, hasBonusRepGain, isCapped;
-        end;
-        local funcGetLineState = function(index)
-            local factionData = C_Reputation.GetFactionDataByIndex(index);
-            if ( factionData ) then
-                return factionData.isHeader, not factionData.isCollapsed;
-            end
-        end;
-        local funcExpand = C_Reputation.ExpandFactionHeader;
-        local funcCollapse = C_Reputation.CollapseFactionHeader;
         local funcAdditionalInfo = function(index)
-            local factionData = C_Reputation.GetFactionDataByIndex(index);
-            if ( factionData and factionData.factionID ) then
-                local id = tostring(factionData.factionID);
+            local factionID = GetFactionLineID(index);
+            if ( factionID ) then
+                local id = tostring(factionID);
                 local info = dbEntry:SelectContainer(container, id);
 
-                if ( C_Reputation.IsFactionParagon(factionData.factionID) ) then
-                    info.Paragon = dbEntry.Save(C_Reputation.GetFactionParagonInfo(factionData.factionID));
+                if ( IsFactionParagon(factionID) ) then
+                    info.Paragon = dbEntry.Save(C_Reputation.GetFactionParagonInfo(factionID));
                     info.NoData = nil;
                 else
                     info.Paragon = nil;
@@ -217,10 +264,10 @@ function Armory:UpdateFactions(retries)
             end
         end;
 
-        retries = retries or 0;
-
-        if ( not dbEntry:SetExpandableListValues(container, funcNumLines, funcGetLineState, funcGetLineInfo, funcExpand, funcCollapse, funcAdditionalInfo) ) then
-            self:PrintDebug("Update failed", container);
+        if ( dbEntry:SetExpandableListValues(container, GetNumFactionLines, GetFactionLineState, GetFactionLineInfo, ExpandFactionLine, CollapseFactionLine, funcAdditionalInfo) ) then
+            self:UpdateSucceeded(container);
+        else
+            self:RetryUpdate(container, function() Armory:UpdateFactions(); end);
         end
 
         dirty = dirty or self:IsPlayerSelected();
@@ -272,10 +319,11 @@ function Armory:GetFactionStanding(factionName)
     local dbEntry = self.selectedDbBaseEntry;
 
     if ( dbEntry ) then
+        -- all stored lines, also those under a collapsed header
         local count = dbEntry:GetNumValues(container);
         for i = 1, count do
-            local name, _, standingID = GetFactionLineValue(i);
-            if ( name == factionName ) then
+            local name, _, standingID = dbEntry:GetValue(container, i, "Info");
+            if ( name == factionName and standingID ) then
                 return standingID, GetText("FACTION_STANDING_LABEL"..standingID, self:UnitSex("player"));
             end
         end

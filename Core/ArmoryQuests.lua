@@ -271,7 +271,7 @@ function Armory:ClearQuests()
     dirty = true;
 end
 
-function Armory:UpdateQuests(retries)
+function Armory:UpdateQuests()
     local dbEntry = self.playerDbBaseEntry;
     if ( not dbEntry ) then
         return;
@@ -461,16 +461,12 @@ function Armory:UpdateQuests(retries)
 
             dbEntry:ClearContainer(container);
 
-            retries = retries or 0;
-
-            if ( retries < 3 ) then
-                -- if expand/collapse has been called a QUEST_LOG_UPDATE event will be fired immediately after the scan has been completed
-                success, self.ignoreQuestUpdate = dbEntry:SetExpandableListValues(container, funcNumLines, funcGetLineState, funcGetLineInfo, funcExpand, funcCollapse, funcAdditionalInfo, funcSelect);
-                if ( dataMissing or not success ) then
-                    retries = retries + 1;
-                    self:PrintDebug("Update failed; executing again...", retries);
-                    self:ExecuteDelayed(5 * retries, function() Armory:UpdateQuests(retries) end);
-                end
+            -- if expand/collapse has been called a QUEST_LOG_UPDATE event will be fired immediately after the scan has been completed
+            success, self.ignoreQuestUpdate = dbEntry:SetExpandableListValues(container, funcNumLines, funcGetLineState, funcGetLineInfo, funcExpand, funcCollapse, funcAdditionalInfo, funcSelect);
+            if ( dataMissing or not success ) then
+                self:RetryUpdate(container, function() Armory:UpdateQuests(); end);
+            else
+                self:UpdateSucceeded(container);
             end
 
             dbEntry:SetValue(2, container, "NumQuests", numQuests);

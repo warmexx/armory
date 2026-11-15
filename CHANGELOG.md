@@ -27,6 +27,9 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - The colors of the tooltip lines can be set in the Tooltip options, as in Retail (Classic Era and Burning Crusade Anniversary)
 - Hovering over a reputation bar shows the standing of all your characters with that faction, as in Retail (Classic Era and Burning Crusade Anniversary)
 - Fixes the highlight of the selected faction disappearing after hovering over it (Classic Era and Burning Crusade Anniversary)
+- Fixes the reputation required for a recipe, which showed Unknown when the faction was under a collapsed header in the reputation window
+- Fixes the stored quest log becoming empty when the game had not loaded all quests yet, for example right after logging in
+- Saving the reputation, currencies and quest log is retried at most three times in a row when the game has not loaded them completely yet
 - The raid info shows the difficulty, lists expired locks at the bottom and shows the killed bosses when hovering over a lock, as in Retail (Classic Era and Burning Crusade Anniversary)
 - Fixes an error when turning off the Raid module in the options (Classic Era and Burning Crusade Anniversary)
 - The social window has the Events tab, with your calendar events, raid lockouts and tradeskill cooldowns, and warnings before they start, as in Retail (Classic Era and Burning Crusade Anniversary)

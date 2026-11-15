@@ -51,7 +51,7 @@ if ( not Armory ) then
         title = ARMORY_TITLE,
         version = C_AddOns.GetAddOnMetadata("Armory", "Version"),
         -- per family: the SavedVariables of Classic have their own history
-        dbVersion = (isVanilla or isTBC) and 2 or 54,
+        dbVersion = (isVanilla or isTBC) and 3 or 54,
         interface = _G.GetBuildInfo(),
 
         isMainline = isRetail or isForever,
@@ -731,6 +731,33 @@ function Armory:IsDbCompatible()
 
             upgraded = true;
 
+        -- convert from 2 to 3 (Classic)
+        elseif ( dbVersion == 2 ) then
+            -- factions are now stored as in Mainline: the line under "Info", without the faction ID,
+            -- and the faction ID under "Data" (not for headers), with an entry of its own
+            for realm in pairs(ArmoryDB) do
+                for character in pairs(ArmoryDB[realm]) do
+                    entry = ArmoryDB[realm][character];
+                    if ( type(entry.Factions) == "table" ) then
+                        local factions = {};
+                        for index, line in ipairs(entry.Factions) do
+                            local name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID, hasBonusRepGain = ArmoryDbEntry.Load(line);
+                            factions[index] = {
+                                Info = ArmoryDbEntry.Save(name, description, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, hasBonusRepGain, standingID == 8)
+                            };
+                            if ( factionID and not isHeader ) then
+                                local id = tostring(factionID);
+                                factions[index].Data = ArmoryDbEntry.Save(id);
+                                factions[id] = { NoData = true };
+                            end
+                        end
+                        entry.Factions = factions;
+                    end
+                end
+            end
+
+            upgraded = true;
+
         end
 
         if ( upgraded ) then
@@ -1079,6 +1106,33 @@ end
 
 function Armory:Execute(func, ...)
     return self.commandHandler:AddCommand(func, ...);
+end
+
+-- Retrying a failed update of a stored list (the game may not have loaded it completely yet).
+-- At most MAX_UPDATE_RETRIES retries in a row per list, one pending at a time. The count is shared
+-- by all callers and only reset by a successful update: expanding and collapsing headers fires the
+-- event that calls the update again, so a count per call chain started over each time and never ended.
+local MAX_UPDATE_RETRIES = 3;
+local updateFailures = {};
+local updateRetryPending = {};
+
+function Armory:RetryUpdate(container, func)
+    local failures = (updateFailures[container] or 0) + 1;
+    updateFailures[container] = failures;
+    if ( failures <= MAX_UPDATE_RETRIES and not updateRetryPending[container] ) then
+        updateRetryPending[container] = true;
+        self:PrintDebug("Update failed; executing again...", container, failures);
+        self:ExecuteDelayed(5 * failures, function()
+            updateRetryPending[container] = nil;
+            func();
+        end);
+    else
+        self:PrintDebug("Update failed", container);
+    end
+end
+
+function Armory:UpdateSucceeded(container)
+    updateFailures[container] = nil;
 end
 
 function Armory:IsExecuted(command)

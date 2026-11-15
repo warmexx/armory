@@ -1,7 +1,6 @@
 <!-- Revision: @file-revision@ @file-date-iso@ -->
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
   <Script file="Core\Classic\ArmoryStubs.lua"/>
-  <Script file="Core\Classic\ArmoryFactions.lua"/>
   <Script file="Core\Classic\ArmoryQuests.lua"/>
   <Script file="Core\Classic\ArmorySpells.lua"/>
   <Script file="Core\Classic\ArmorySkills.lua"/>
