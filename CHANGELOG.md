@@ -11,6 +11,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - Fixes an error when guild members look up your data, and adds the option to share with your guild (Classic Era and Burning Crusade Anniversary)
 - Fixes an error when the buff frame shows a debuff (Classic Era and Burning Crusade Anniversary)
 - Fixes looking up First Aid recipes, which never found anything (Classic Era and Burning Crusade Anniversary)
+- Jewelcrafting recipes can be looked up, as in Retail (Burning Crusade Anniversary)
 - Fixes the time played message in the chat after logging in, which Armory requests for itself (Classic Era and Burning Crusade Anniversary)
 - Fixes an error when checking the mailboxes for items that are about to expire (Classic Era and Burning Crusade Anniversary)
 - Shift-click instead of Alt-click copies the name of a chat link into the search box of the inventory and the guild bank, as in Retail; Alt-click on a chat link is left for the search (Classic Era and Burning Crusade Anniversary)

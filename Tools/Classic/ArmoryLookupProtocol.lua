@@ -30,6 +30,7 @@
 local Armory, _ = Armory;
 
 -- The lookup protocol of Classic: replies carry names and links, all with version c1
+-- Classic keeps c1: it has no shared recipe store for version 2, and c1 still talks to the old Classic releases
 
 local VERSION = "c1";
 
@@ -43,6 +44,9 @@ ARMORY_LOOKUP_SKILLS = {
     ARMORY_TRADE_LEATHERWORKING = "LW",
     ARMORY_TRADE_TAILORING = "TA",
 };
+if ( Armory.isTBC ) then
+    ARMORY_LOOKUP_SKILLS.ARMORY_TRADE_JEWELCRAFTING = "JC";
+end
 
 ARMORY_LOOKUP_TYPE = { LOOKUP_RECIPE = "R", LOOKUP_QUEST = "Q", LOOKUP_CHARACTER = "C", LOOKUP_ITEM = "I" };
 
