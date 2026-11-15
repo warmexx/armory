@@ -1,0 +1,7 @@
+## Interface: 16001
+## Title: OfaTestOneCamelot
+## Notes: Armory One for All, TOC-test (fase 0)
+## SavedVariables: OfaTestOneCamelotDB
+## X-Ofa-Toc: Camelot
+
+report.lua

@@ -1,0 +1,19 @@
+## Interface: 120105, 16001, 11509, 20506
+## Title: OfaTestOne
+## Notes: Armory One for All, TOC-test (fase 0)
+## SavedVariables: OfaTestOneDB
+## X-Ofa-Toc: base
+
+files\first.lua
+files\mainline.xml [AllowLoadGameType mainline]
+files\classic.xml [AllowLoadGameType classic]
+[Family]\family.lua
+[Game]\game.lua [AllowLoadGameType classic]
+files\onlyforever.lua [AllowLoadGameType mainline] [ExcludeLoadGameType standard]
+files\onlyretail.lua [AllowLoadGameType standard]
+files\vanillatbc.lua [AllowLoadGameType vanilla, tbc]
+files\retailtbc.lua [AllowLoadGameType standard, tbc]
+files\notvanilla.lua [ExcludeLoadGameType vanilla]
+[Game]\gameonly.lua
+files\last.lua
+report.lua
