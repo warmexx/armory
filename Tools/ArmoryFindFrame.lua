@@ -33,6 +33,15 @@ ARMORY_FIND_HEIGHT = 16;
 local FIND_LINES_DISPLAYED = 13;
 local FIND_RESULTS = {};
 
+-- Blizzard's WhoFrameColumn_SetWidth is only in the FriendsFrame of Retail and Classic, not in Forever's
+function ArmoryFindFrameColumn_SetWidth(frame, width)
+    frame:SetWidth(width);
+    local middle = _G[frame:GetName().."Middle"];
+    if ( middle ) then
+        middle:SetWidth(width - 9);
+    end
+end
+
 function ArmoryFindFrame_Toggle()
     if ( ArmoryFindFrame:IsShown() ) then
         ArmoryFindFrame:Hide();
@@ -332,9 +341,9 @@ function ArmoryFindFrame_Update()
     -- If need scrollbar resize columns
     if ( ArmoryFindFrame.simpleView ) then
     elseif ( showScrollBar ) then
-        WhoFrameColumn_SetWidth(ArmoryFindFrameColumnHeader3, 131);
+        ArmoryFindFrameColumn_SetWidth(ArmoryFindFrameColumnHeader3, 131);
     else
-        WhoFrameColumn_SetWidth(ArmoryFindFrameColumnHeader3, 154);
+        ArmoryFindFrameColumn_SetWidth(ArmoryFindFrameColumnHeader3, 154);
     end
 
     C_Timer.After(0, function() ArmoryFindFrameEditBox:SetFocus(); end);

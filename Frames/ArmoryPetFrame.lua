@@ -87,7 +87,10 @@ function ArmoryPetFrame_OnLoad(self)
     self:RegisterEvent("UNIT_RANGED_ATTACK_POWER");
     self:RegisterEvent("UNIT_DEFENSE");
     self:RegisterEvent("UNIT_ATTACK");
-    self:RegisterEvent("PET_SPELL_POWER_UPDATE");
+    -- Forever has no PET_SPELL_POWER_UPDATE
+    if ( C_EventUtils.IsEventValid("PET_SPELL_POWER_UPDATE") ) then
+        self:RegisterEvent("PET_SPELL_POWER_UPDATE");
+    end
 
     ArmoryPetFrame_InitStatCategories();
 

@@ -1,4 +1,4 @@
-## Interface: 120105, 20506
+## Interface: 120105, 16001, 20506
 ## Title: ArmoryGuildBank
 ## Title-deDE: ArmoryGuildBank [Armory Gildenbank]
 ## Title-esES: ArmoryGuildBank [Banco de Hermandad]

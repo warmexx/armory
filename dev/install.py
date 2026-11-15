@@ -17,7 +17,7 @@ the newest version in CHANGELOG.md plus "-dev" (for example v20.0.0-dev), as the
 would fill it in.
 
 Usage: python -I dev/install.py <client> [--dry-run]
-  client: retail, era, anniversary or all (Forever follows in phase 3, see docs/CODEBASIS.md)
+  client: retail, forever, era, anniversary or all
 """
 import filecmp
 import glob
@@ -28,7 +28,7 @@ import sys
 
 WOW = r"D:\Games\World of Warcraft"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CLIENTS = {"retail": "_retail_", "era": "_classic_era_", "anniversary": "_anniversary_"}
+CLIENTS = {"retail": "_retail_", "forever": "_forever_", "era": "_classic_era_", "anniversary": "_anniversary_"}
 # Addon folders: (folder in the repo, folder in Interface\AddOns). Every client gets both, like
 # the package; the guild bank's TOC keeps it out of Era (## AllowLoadGameType).
 ADDONS = [("", "Armory"), ("ArmoryGuildBank", "ArmoryGuildBank")]

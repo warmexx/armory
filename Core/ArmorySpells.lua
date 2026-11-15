@@ -46,8 +46,27 @@ local function GetSubSpellName(id, spellBank)
     end
 end
 
+-- The spells of a pet specialization as a list of spell IDs. Retail still has GetSpecializationSpells
+-- (spell ID and level in turns); Forever does not, and gets the spell IDs from GetSpellsDisplay.
+local GetPetSpecializationSpells;
+if ( _G.GetSpecializationSpells ) then
+    GetPetSpecializationSpells = function(spec)
+        local spells = {};
+        local values = { _G.GetSpecializationSpells(spec, nil, true) };
+        for i = 1, #values, 2 do
+            table.insert(spells, values[i]);
+        end
+        return spells;
+    end;
+else
+    GetPetSpecializationSpells = function(spec)
+        local specID = C_SpecializationInfo.GetSpecializationInfo(spec, false, true);
+        return specID and C_SpecializationInfo.GetSpellsDisplay(specID) or {};
+    end;
+end
+
 local function IsSpecializationSpell(spellID, specSpells)
-    for i = 1, #specSpells, 2 do
+    for i = 1, #specSpells do
         if ( spellID == specSpells[i] ) then
             return true;
         end
@@ -67,7 +86,7 @@ local function SaveSpellBook(dbEntry, oldNum, newNum, spellBank, offSpec)
         _, isHunterPet = _G.HasPetUI();
         if ( isHunterPet ) then
             spec = C_SpecializationInfo.GetSpecialization(false, true) or 1;
-            specSpells = { _G.GetSpecializationSpells(spec, nil, true) };
+            specSpells = GetPetSpecializationSpells(spec);
             if ( spec ) then
                 Armory:SetClassValue("pet", 2, container, spec, nil);
             end

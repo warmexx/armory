@@ -196,7 +196,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            WhoFrameColumn_SetWidth(self, 83);
+            ArmoryFindFrameColumn_SetWidth(self, 83);
             self.sortType = "who";
           </OnLoad>
         </Scripts>
@@ -211,7 +211,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            WhoFrameColumn_SetWidth(self, 86);
+            ArmoryFindFrameColumn_SetWidth(self, 86);
             self.sortType = "where";
           </OnLoad>
         </Scripts>
@@ -226,7 +226,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            WhoFrameColumn_SetWidth(self, 131);
+            ArmoryFindFrameColumn_SetWidth(self, 131);
             self.sortType = "what";
           </OnLoad>
         </Scripts>
