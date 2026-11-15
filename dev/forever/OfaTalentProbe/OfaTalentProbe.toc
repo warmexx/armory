@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: OfaTalentProbe
-## Notes: Armory One for All: measures the talent tree of WoW Forever (/otp), for building Armory's talents
+## Notes: Armory One for All: measures talents, achievements, Legacy and PvP in WoW Forever (/otp), for building Armory's screens
 ## SavedVariables: OfaTalentProbeDB
 
 OfaTalentProbe.lua

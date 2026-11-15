@@ -1,5 +1,5 @@
--- OfaTalentProbe: measures the talent tree and the specializations of WoW Forever for Armory One for All,
--- and checks which functions from the open questions exist.
+-- OfaTalentProbe: measures the talent tree, the specializations, the achievements and Legacy, and the PvP rank
+-- of WoW Forever for Armory One for All, and checks which functions from the open questions exist.
 -- Reads only; changes nothing (no InitializeViewLoadout, no loadouts).
 --
 -- /otp        measure the current character and save it in OfaTalentProbeDB (WTF\...\SavedVariables)
@@ -62,12 +62,30 @@ local GLOBALS = {
     "GetMaxRewardCurrencies", "GetNumUnspentPvpTalents", "SHOW_PVP_TALENT_LEVEL",
     "GetSpecializationSpells", "GetNumSpecializations", "GetSpecializationInfoForClassID",
     "GetNumSpecGroups", "GetActiveSpecGroup", "EJ_GetCreatureInfo", "MAX_PLAYER_LEVEL",
+    -- Reported by dev\apicheck.py for Forever
+    "GetSavedInstanceEncounterInfo", "JoinTemporaryChannel", "GetAuctionItemInfo", "GetNumAuctionItems",
+    "UnitRangedAttack", "UnitBonusArmor", "GetBladedArmorEffect", "GetCraftReagentItemLink",
+    -- PvP and achievements
+    "GetPVPLifetimeStats", "GetPVPSessionStats", "GetPVPYesterdayStats", "GetPersonalRatedInfo",
+    "UnitHonor", "UnitHonorLevel", "UnitHonorMax", "GetCurrentArenaSeason", "GetPvpTalentSlotInfo",
+    "GetTotalAchievementPoints", "GetNumCompletedAchievements", "GetStatisticsCategoryList", "GetStatistic",
+    "GetCategoryList", "GetAchievementInfo", "GetAchievementLink", "GetComparisonStatistic",
 };
 local FUNCTIONS = {
     "C_Bank.FetchPurchasedBankTabData", "C_Bank.CanViewBank", "C_SpecializationInfo.GetSpellsDisplay",
     "C_PetInfo.GetPetHappiness", "C_PetInfo.GetPetLoyalty", "C_PetInfo.GetPetTrainingPoints",
     "C_QuestInfoSystem.GetQuestRewardCurrencies", "C_SkillInfo.GetSkillLineInfo",
+    "C_MajorFactions.GetMajorFactionProgressionInfo", "C_MajorFactions.GetMajorFactionData",
+    "C_SeasonInfo.GetTimeUntilCurrentPVPSeasonEnd", "C_Traits.GetConfigIDByTreeID",
+    "C_Traits.GetTraitCurrencyForAchievement", "C_Traits.GetMaxAvailableTraitCurrency",
 };
+
+-- Blizzard_LegacySystem and PVPRankFrame (Camelot)
+local PVP_RANK_FACTION_ID = 2800;
+local LEGACY_REWARD_TRACK_FACTION_ID = 2802;
+local LEGACY_POINTS_TRAIT_CURRENCY_ID = 4225;
+local LEGACY_TREES = { 1187, 1188, 1189 };
+local ACHIEVEMENT_SAMPLES = 3;
 
 local function MeasureConfig(configID, treeID, withStructure)
     local config = {};
@@ -137,6 +155,92 @@ local function MeasureConfig(configID, treeID, withStructure)
         config.conditions = conditions;
     end
     return config;
+end
+
+local function MeasureCategories(categories, isStatistic)
+    local result = {};
+    for _, categoryID in ipairs(categories or {}) do
+        local category = {
+            id = categoryID,
+            info = { Try("GetCategoryInfo " .. categoryID, GetCategoryInfo, categoryID) },
+            num = { Try("GetCategoryNumAchievements " .. categoryID, GetCategoryNumAchievements, categoryID, true) },
+            samples = {},
+        };
+        for i = 1, min(category.num[1] or 0, ACHIEVEMENT_SAMPLES) do
+            local info = { Try("GetAchievementInfo " .. categoryID .. " " .. i, GetAchievementInfo, categoryID, i) };
+            local sample = { info = Copy(info) };
+            local achievementID = info[1];
+            if ( achievementID ) then
+                if ( isStatistic ) then
+                    sample.statistic = Copy({ Try("GetStatistic " .. achievementID, GetStatistic, achievementID) });
+                else
+                    sample.numCriteria = Try("GetAchievementNumCriteria " .. achievementID, GetAchievementNumCriteria, achievementID);
+                    if ( (sample.numCriteria or 0) > 0 ) then
+                        sample.criteria1 = Copy({ Try("GetAchievementCriteriaInfo " .. achievementID, GetAchievementCriteriaInfo, achievementID, 1) });
+                    end
+                    sample.legacyPoints = Try("GetTraitCurrencyForAchievement " .. achievementID, Api("C_Traits", "GetTraitCurrencyForAchievement"), LEGACY_POINTS_TRAIT_CURRENCY_ID, achievementID);
+                end
+            end
+            table.insert(category.samples, sample);
+        end
+        table.insert(result, Copy(category));
+    end
+    return result;
+end
+
+local function MeasureAchievements(data)
+    local achievements = {};
+    achievements.totalPoints = Try("GetTotalAchievementPoints", GetTotalAchievementPoints);
+    achievements.numCompleted = { Try("GetNumCompletedAchievements", GetNumCompletedAchievements) };
+    achievements.categories = MeasureCategories(Try("GetCategoryList", GetCategoryList), false);
+    achievements.statistics = MeasureCategories(Try("GetStatisticsCategoryList", GetStatisticsCategoryList), true);
+    data.achievements = achievements;
+end
+
+local function MeasureLegacy(data)
+    local legacy = { trees = {} };
+    for _, treeID in ipairs(LEGACY_TREES) do
+        local configID = Try("GetConfigIDByTreeID " .. treeID, Api("C_Traits", "GetConfigIDByTreeID"), treeID);
+        local tree = { configID = configID };
+        if ( configID ) then
+            tree.treeInfo = Copy(Try("GetTreeInfo " .. treeID, Api("C_Traits", "GetTreeInfo"), configID, treeID));
+            tree.config = MeasureConfig(configID, treeID, true);
+        end
+        legacy.trees[treeID] = tree;
+    end
+    legacy.maxAvailablePoints = Try("GetMaxAvailableTraitCurrency", Api("C_Traits", "GetMaxAvailableTraitCurrency"), LEGACY_POINTS_TRAIT_CURRENCY_ID, false);
+    legacy.rewardTrack = Copy(Try("GetMajorFactionData 2802", Api("C_MajorFactions", "GetMajorFactionData"), LEGACY_REWARD_TRACK_FACTION_ID));
+    legacy.rewardTrackLevel = Try("GetCurrentRenownLevel 2802", Api("C_MajorFactions", "GetCurrentRenownLevel"), LEGACY_REWARD_TRACK_FACTION_ID);
+    local levels = Try("GetRenownLevels 2802", Api("C_MajorFactions", "GetRenownLevels"), LEGACY_REWARD_TRACK_FACTION_ID);
+    legacy.numRewardTrackLevels = levels and #levels;
+    legacy.rewardTrackLevel1 = levels and Copy(levels[1]);
+    data.legacy = legacy;
+end
+
+local function MeasurePvP(data)
+    local pvp = {};
+    pvp.rank = Copy(Try("GetMajorFactionProgressionInfo 2800", Api("C_MajorFactions", "GetMajorFactionProgressionInfo"), PVP_RANK_FACTION_ID));
+    pvp.rankFaction = Copy(Try("GetMajorFactionData 2800", Api("C_MajorFactions", "GetMajorFactionData"), PVP_RANK_FACTION_ID));
+    pvp.season = Try("GetCurrentArenaSeason", GetCurrentArenaSeason);
+    pvp.seasonEnd = Try("GetTimeUntilCurrentPVPSeasonEnd", Api("C_SeasonInfo", "GetTimeUntilCurrentPVPSeasonEnd"));
+    pvp.honor = { Try("UnitHonor", UnitHonor, "player"), Try("UnitHonorLevel", UnitHonorLevel, "player"), Try("UnitHonorMax", UnitHonorMax, "player") };
+    pvp.lifetime = { Try("GetPVPLifetimeStats", GetPVPLifetimeStats) };
+    pvp.session = { Try("GetPVPSessionStats", GetPVPSessionStats) };
+    pvp.yesterday = { Try("GetPVPYesterdayStats", GetPVPYesterdayStats) };
+    pvp.pvpName = Try("UnitPVPName", UnitPVPName, "player");
+    pvp.rated = {};
+    for i = 1, 4 do
+        pvp.rated[i] = Copy({ Try("GetPersonalRatedInfo " .. i, GetPersonalRatedInfo, i) });
+    end
+    local currencyConsts = Constants and Constants.CurrencyConsts or {};
+    pvp.honorCurrencyID = currencyConsts.HONOR_CURRENCY_ID;
+    pvp.conquestCurrencyID = currencyConsts.CONQUEST_CURRENCY_ID;
+    for _, key in ipairs({ "honorCurrencyID", "conquestCurrencyID" }) do
+        if ( pvp[key] ) then
+            pvp[key .. "Info"] = Copy(Try("GetCurrencyInfo " .. pvp[key], Api("C_CurrencyInfo", "GetCurrencyInfo"), pvp[key]));
+        end
+    end
+    data.pvp = pvp;
 end
 
 local function Measure()
@@ -214,6 +318,10 @@ local function Measure()
         end
     end
 
+    MeasureAchievements(data);
+    MeasureLegacy(data);
+    MeasurePvP(data);
+
     -- Open questions in docs\FOREVER.md: does the client have these?
     data.exists = {};
     for _, name in ipairs(GLOBALS) do
@@ -236,8 +344,9 @@ local function Measure()
             numNodes = numNodes + 1;
         end
     end
-    print(format("OfaTalentProbe: %s, level %s, tree %s, %d nodes, %d groups, %d errors. /reload to save the file.",
-        key, tostring(data.level), tostring(treeID), numNodes, active and #(active.groups or {}) or 0, #errors));
+    print(format("OfaTalentProbe: %s, level %s, tree %s, %d nodes, %d groups, %d achievement categories, PvP rank %s, %d errors. /reload to save the file.",
+        key, tostring(data.level), tostring(treeID), numNodes, active and #(active.groups or {}) or 0,
+        #data.achievements.categories, tostring(data.pvp.rank and data.pvp.rank.renownLevel), #errors));
 end
 
 SLASH_OFATALENTPROBE1 = "/otp";
