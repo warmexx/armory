@@ -565,7 +565,8 @@ function ArmoryFrame_UpdateLineTabs()
         tabId = tabId + 1;
     end
 
-    if ( Armory.isMainline and Armory:HasAchievements() and _G.GetTotalAchievementPoints() > 0 ) then
+    -- Forever has no achievement points: its achievements give Legacy points instead
+    if ( Armory.isMainline and Armory:HasAchievements() and (Armory.isForever or _G.GetTotalAchievementPoints() > 0) ) then
         ArmoryFrame_SetLineTab(tabId, "Achievements", ACHIEVEMENT_BUTTON, "Interface\\Icons\\Achievement_Level_10");
         ArmoryAchievementFrame.enabled = true;
         tabId = tabId + 1;
