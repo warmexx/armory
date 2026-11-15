@@ -164,11 +164,6 @@ function Armory:CountCurrency(link)
     return 0;
 end
 
--- Classic has no quest history (dailies and weeklies)
-function Armory:GetNumQuestHistoryEntries()
-    return 0, 0;
-end
-
 -- Classic has no Raid Finder, and its world bosses have no lockout (GetNumSavedWorldBosses is always 0)
 function Armory:ClearRaidFinder()
 end

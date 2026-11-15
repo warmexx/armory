@@ -285,10 +285,6 @@ function Armory:GetVersatilityBonus(index)
     end
 end
 
-function Armory:GetWeeklyQuestResetTime()
-    return time() + C_DateAndTime.GetSecondsUntilWeeklyReset();
-end
-
 function Armory:HasAPEffectsSpellPower()
     return self:SetGetCharacterValue("HasAPEffectsSP", _G.HasAPEffectsSpellPower());
 end

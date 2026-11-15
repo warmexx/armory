@@ -496,31 +496,6 @@ end
 -- Quests Interface
 ----------------------------------------------------------
 
-function Armory:GetQuestLogIndexByName(name)
-    local dbEntry = self.playerDbBaseEntry;
-    if ( dbEntry and name ) then
-        local count = dbEntry:GetNumValues(container);
-        for i = 1, count do
-            if ( strtrim(name) == dbEntry:GetValue(container, i, "Info") ) then
-                return i;
-            end
-        end
-    end
-end
-
-function Armory:GetQuestHeader(index)
-    local dbEntry = self.playerDbBaseEntry;
-    if ( dbEntry ) then
-        for i = index, 1, -1 do
-            local title, _, _, isHeader = dbEntry:GetValue(container, i, "Info");
-            if ( isHeader ) then
-                return title;
-            end
-        end
-    end
-    return UNKNOWN;
-end
-
 function Armory:IsOnQuest(id)
     local dbEntry = self.selectedDbBaseEntry;
     return dbEntry and dbEntry:Contains(container, id);

@@ -12,6 +12,7 @@
   <Script file="Core\Classic\ArmoryFactions.lua"/>
   <Script file="Core\ArmoryInventory.lua"/>
   <Script file="Core\Classic\ArmoryQuests.lua"/>
+  <Script file="Core\ArmoryQuestHistory.lua"/>
   <Script file="Core\ArmoryRaid.lua"/>
   <Script file="Core\Classic\ArmorySpells.lua"/>
   <Script file="Core\Classic\ArmorySkills.lua"/>

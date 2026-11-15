@@ -345,6 +345,10 @@ function Armory:GetUnitPowerModifier(unit)
     return self:SetGetCharacterValue("PowerModifier", _G.GetUnitPowerModifier(unit));
 end
 
+function Armory:GetWeeklyQuestResetTime()
+    return time() + C_DateAndTime.GetSecondsUntilWeeklyReset();
+end
+
 function Armory:GetXPExhaustion()
     return self:SetGetCharacterValue("XPExhaustion", _G.GetXPExhaustion(), time());
 end

@@ -99,7 +99,7 @@ local function GetQuestLines()
                     table.insert(groups, key);
                 end
                 if ( isWeekly ) then
-                    isTrivial = time() > Armory:GetWeeklyQuestResetTime();
+                    isTrivial = timestamp < Armory:GetWeeklyQuestResetTime() - 7 * (24*60*60);
                 else
                     isTrivial = days > 0;
                 end
@@ -166,6 +166,29 @@ end
 local randomBG;
 local bosses = {};
 
+-- Classic has no weeklies (QuestIsWeekly came with Wrath)
+local QuestIsWeekly = QuestIsWeekly or function() return false; end;
+
+-- Both families store the quest log lines with the values of GetQuestLogTitle under "Info"
+local function GetQuestLogIndexByName(dbEntry, name)
+    local count = dbEntry:GetNumValues("Quests");
+    for i = 1, count do
+        if ( strtrim(name) == dbEntry:GetValue("Quests", i, "Info") ) then
+            return i;
+        end
+    end
+end
+
+local function GetQuestHeader(dbEntry, index)
+    for i = index, 1, -1 do
+        local title, _, _, isHeader = dbEntry:GetValue("Quests", i, "Info");
+        if ( isHeader ) then
+            return title;
+        end
+    end
+    return UNKNOWN;
+end
+
 local function SaveHistoryEntry(title, header, isWeekly)
     local dbEntry = Armory.playerDbBaseEntry;
     if ( dbEntry and title ) then
@@ -206,9 +229,9 @@ function Armory:UpdateQuestHistory(historyType)
                 return;
             end
             title = GetTitleText();
-            index = self:GetQuestLogIndexByName(title);
-            if ( title and index ) then
-                header = self:GetQuestHeader(index - 1);
+            index = title and GetQuestLogIndexByName(dbEntry, title);
+            if ( index ) then
+                header = GetQuestHeader(dbEntry, index - 1);
                 SaveHistoryEntry(title, header, isWeekly);
             end
 

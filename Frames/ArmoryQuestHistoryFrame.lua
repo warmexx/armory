@@ -33,9 +33,12 @@ ARMORY_QUESTHISTORY_HEIGHT = 16;
 local QUESTHISTORY_DISPLAYED = 22;
 
 function ArmoryQuestHistoryFrame_OnLoad(self)
-    self:RegisterEvent("LFG_COMPLETION_REWARD");
-    self:RegisterEvent("UPDATE_BATTLEFIELD_SCORE");
-    self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS");
+    -- Classic has no random dungeons or battlegrounds, so only dailies (and weeklies) are kept
+    if ( not Armory.isClassic ) then
+        self:RegisterEvent("LFG_COMPLETION_REWARD");
+        self:RegisterEvent("UPDATE_BATTLEFIELD_SCORE");
+        self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS");
+    end
 end
 
 function ArmoryQuestHistoryFrame_OnEvent(self, event, ...)
