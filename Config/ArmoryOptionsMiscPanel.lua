@@ -28,9 +28,6 @@
 
 local Armory, _ = Armory, nil;
 
-local ipairs = ipairs;
-local PlaySound = PlaySound;
-
 ArmoryOptionsMiscPanelMixin = CreateFromMixins(ArmoryOptionsPanelTemplateMixin);
 
 function ArmoryOptionsMiscPanelMixin:OnLoad()

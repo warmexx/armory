@@ -31,8 +31,6 @@ local Armory, _ = Armory, nil;
 ARMORY_INVENTORY_LINES_DISPLAYED = 20;
 ARMORY_INVENTORY_HEIGHT = 16;
 
-local format = format;
-
 -- the first bag of the bank: a bank tab in Mainline, the bag after the bag slots in Classic
 local FIRST_BANK_BAG = Armory.isClassic and NUM_BAG_SLOTS + 1 or Enum.BagIndex.CharacterBankTab_1;
 

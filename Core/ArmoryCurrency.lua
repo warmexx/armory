@@ -29,11 +29,6 @@
 local Armory, _ = Armory, nil;
 local container = "Currency";
 
-local table = table;
-local select = select;
-local type = type;
-local strtrim = strtrim;
-
 ----------------------------------------------------------
 -- Currency Internals
 ----------------------------------------------------------

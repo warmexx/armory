@@ -29,23 +29,6 @@
 local AGB = AGB;
 local Armory, _ = Armory, nil;
 
-local table = table;
-local ipairs = ipairs;
-local pairs = pairs;
-local mod = mod;
-local ceil = ceil;
-local floor = floor;
-local unpack = unpack;
-local type = type;
-local string = string;
-local date = date;
-local tonumber = tonumber;
-local tostring = tostring;
-local strjoin = strjoin;
-local strupper = strupper;
-local strtrim = strtrim;
-local format = format;
-
 local GUILDBANK_LINES_DISPLAYED = 20;
 
 local MAX_GUILDBANK_SLOTS_PER_TAB = 98;

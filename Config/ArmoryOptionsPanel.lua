@@ -28,8 +28,6 @@
 
 local Armory, _ = Armory, nil;
 
-local next = next;
-
 ArmoryOptionsPanelMixin = CreateFromMixins(ArmoryOptionsPanelTemplateMixin);
 
 function ArmoryOptionsPanelMixin:Open()

@@ -31,10 +31,6 @@ local Armory, _ = Armory, nil;
 local NUM_ACHIEVEMENTS_DISPLAYED = 15;
 ARMORY_ACHIEVEMENTFRAME_ACHIEVEMENTHEIGHT = 26;
 
-local floor = floor;
-local select = select;
-local tonumber = tonumber;
-
 function ArmoryAchievementFrame_Toggle()
     if ( ArmoryAchievementFrame:IsShown() ) then
         ArmoryAchievementFrame:Hide();

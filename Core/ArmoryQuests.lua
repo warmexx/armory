@@ -32,16 +32,6 @@ local container = "Quests";
 local selectedQuestLine = 0;
 local questLogFilter = "";
 
-local table = table;
-local select = select;
-local pairs = pairs;
-local ipairs = ipairs;
-local tostring = tostring;
-local string = string;
-local strlower = strlower;
-local strtrim = strtrim;
-local time = time;
-
 ----------------------------------------------------------
 -- Quests Internals
 ----------------------------------------------------------

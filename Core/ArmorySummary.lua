@@ -33,19 +33,6 @@ local summary = {};
 
 local VALOR_TIER1_LFG_ID = 301;
 
-local floor = floor;
-local mod = mod;
-local time = time;
-local date = date;
-local tonumber = tonumber;
-local type = type;
-local unpack = unpack;
-local table = table;
-local pairs = pairs;
-local ipairs = ipairs;
-local select = select;
-local format = format;
-
 local function SummaryAutoHide(parent)
     if ( Armory.summary.locked ) then
         Armory.summary:SetAutoHideDelay(nil);

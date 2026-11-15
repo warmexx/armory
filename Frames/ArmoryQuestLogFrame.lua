@@ -35,12 +35,6 @@ local QUESTS_DISPLAYED = 6;
 local REWARDS_SECTION_OFFSET = 5;       -- vertical distance between sections
 local REWARDS_ROW_OFFSET = 2;            -- vertical distance between rows within a section
 
-local table = table;
-local ipairs = ipairs;
-local select = select;
-local unpack = unpack;
-local type = type;
-
 -- Per family, chosen once
 local MoneyFrame_Update = Armory.isClassic and MoneyFrame_Update or ArmoryMoneyFrame_Update;
 local GetQuestDetailsTheme, QuestHasWarModeBonus, GetMajorFactionReputationRewards, QuestHasQuestSessionBonus, SetQuestLegendToFontString;

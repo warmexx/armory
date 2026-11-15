@@ -315,8 +315,6 @@ local NUM_GEARSETS_PER_ROW = 5;
 
 local STRIPE_COLOR = {r=0.9, g=0.9, b=1};
 
-local BreakUpLargeNumbers = BreakUpLargeNumbers;
-
 function ArmoryPaperDollTalentFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_TALENT_UPDATE");
     self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED");

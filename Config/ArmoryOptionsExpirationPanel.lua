@@ -29,9 +29,6 @@
 
 local Armory, _ = Armory, nil;
 
-local format = format;
-local floor = floor;
-
 ArmoryOptionsExpirationPanelMixin = CreateFromMixins(ArmoryOptionsPanelTemplateMixin);
 
 function ArmoryOptionsExpirationPanelMixin:OnLoad()

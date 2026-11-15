@@ -29,11 +29,6 @@
 local Armory, _ = Armory, nil;
 local container = "Instances";
 
-local format = format;
-local max = max;
-local table = table;
-local time = time;
-
 ----------------------------------------------------------
 -- Raid Info Internals
 ----------------------------------------------------------

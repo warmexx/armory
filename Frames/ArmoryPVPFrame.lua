@@ -35,10 +35,6 @@ local CONQUEST_BRACKET_INDEXES = { 7, 1, 2, 4 }; -- 5v5 was removed
 local RATED_BG_BUTTON_ID = 4;
 local RATED_SOLO_SHUFFLE_BUTTON_ID = 1;
 
-local ipairs = ipairs;
-local math = math;
-local select = select;
-
 function ArmoryPVPFrame_OnLoad(self)
     CONQUEST_BUTTONS = {ArmoryConquestFrame.RatedSoloShuffle, ArmoryConquestFrame.Arena2v2, ArmoryConquestFrame.Arena3v3, ArmoryConquestFrame.RatedBG};
 

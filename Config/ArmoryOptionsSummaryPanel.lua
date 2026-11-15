@@ -29,10 +29,6 @@
 
 local Armory, _ = Armory, nil;
 
-local table = table;
-local pairs = pairs;
-local ipairs = ipairs;
-
 local ARMORY_SUMMARY_CURRENCIES_HEIGHT = 16;
 local SUMMARY_CURRENCIES_DISPLAYED = 8;
 

@@ -28,12 +28,6 @@
 
 local Armory, _ = Armory, nil;
 
-local _G = _G;
-local table, next = table, next;
-local getmetatable = getmetatable;
-local error = error;
-local tostring = tostring;
-
 
 ArmoryOptionControlBaseMixin = {}
 

@@ -52,12 +52,6 @@ end
 local STRIPE_COLOR = {r=0.9, g=0.9, b=1};
 local STATCATEGORY_PADDING = 4;
 
-local unpack = unpack;
-local type = type;
-local ceil = ceil;
-local format = format;
-local next = next;
-
 function ArmoryPetSlot_OnClick(self, button)
     local pets = Armory:GetPets();
     if ( pets[self:GetID()] ) then

@@ -29,16 +29,6 @@
 local Armory, _ = Armory, nil;
 local container = "Buffs";
 
-local table = table;
-local unpack = unpack;
-local max = math.max;
-local strlower = strlower;
-local ceil = ceil;
-local tostring = tostring;
-local time = time;
-local format = format;
-local issecrettable = issecrettable;
-
 local continuousBuffs = {
     ["71041"] = true, -- Dungeon Deserter
     ["24755"] = true, -- Tricked or Treated

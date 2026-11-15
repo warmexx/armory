@@ -33,12 +33,6 @@ ARMORY_REPUTATIONFRAME_FACTIONHEIGHT = 26;
 local NUM_FACTIONS_DISPLAYED = 15;
 local MAX_REPUTATION_REACTION = 8;
 
-local table = table;
-local ipairs = ipairs;
-local next = next;
-local mod = mod;
-local floor = floor;
-
 function ArmoryReputationFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("UPDATE_FACTION");

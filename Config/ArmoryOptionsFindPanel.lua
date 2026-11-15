@@ -29,8 +29,6 @@
 
 local Armory, _ = Armory, nil;
 
-local ipairs = ipairs;
-
 ArmoryOptionsFindPanelMixin = CreateFromMixins(ArmoryOptionsPanelTemplateMixin);
 
 function ArmoryOptionsFindPanelMixin:OnLoad()

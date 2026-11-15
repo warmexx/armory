@@ -61,6 +61,23 @@ tradeIcons[ARMORY_TRADE_POISONS] = "Trade_BrewPoison";
 tradeIcons[ARMORY_TRADE_SKINNING] = "INV_Weapon_ShortBlade_01";
 tradeIcons[ARMORY_TRADE_TAILORING] = "Trade_Tailoring";
 
+local tonumber = tonumber;
+local strlower = strlower;
+local strtrim = strtrim;
+local strmatch = strmatch;
+local strjoin = strjoin;
+local table = table;
+local pairs = pairs;
+local ipairs = ipairs;
+local string = string;
+local tostring = tostring;
+local select = select;
+local time = time;
+local unpack = unpack;
+local max = max;
+local type = type;
+local format = format;
+
 ----------------------------------------------------------
 -- TradeSkills Internals
 ----------------------------------------------------------

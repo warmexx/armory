@@ -29,18 +29,6 @@
 local Armory, _ = Armory, nil;
 local BCT = LibStub("LibBabble-CreatureType-3.0"):GetReverseLookupTable();
 
-local tostring = tostring;
-local tonumber = tonumber;
-local time = time;
-local table = table;
-local ipairs = ipairs;
-local strlower = strlower;
-local strupper = strupper;
-local mod = mod;
-local floor = floor;
-local issecretvalue = issecretvalue;
-local issecrettable = issecrettable;
-
 function Armory:GetAverageItemLevel()
     return self:SetGetCharacterValue("AverageItemLevel", _G.GetAverageItemLevel());
 end

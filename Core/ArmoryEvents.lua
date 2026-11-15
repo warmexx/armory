@@ -31,18 +31,6 @@ ARMORY_MAX_EVENT_DAYS = 31;
 local Armory, _ = Armory, nil;
 local container = "Events";
 
-local date = date;
-local format = format;
-local ipairs = ipairs;
-local pairs = pairs;
-local strsplit = strsplit;
-local table = table;
-local time = time;
-local tonumber = tonumber;
-local pcall = pcall;
-local issecrettable = issecrettable;
-local hasanysecretvalues = hasanysecretvalues;
-
 ----------------------------------------------------------
 -- Events Internals
 ----------------------------------------------------------

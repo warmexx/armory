@@ -28,18 +28,6 @@
 
 local Armory, _ = Armory, nil;
 
-local tostring = tostring;
-local tonumber = tonumber;
-local time = time;
-local table = table;
-local ipairs = ipairs;
-local strlower = strlower;
-local strupper = strupper;
-local mod = mod;
-local floor = floor;
-local issecretvalue = issecretvalue;
-local issecrettable = issecrettable;
-
 -- Stubs that only Mainline has (Retail and Forever); the shared ones are in Core\ArmoryStubs.lua
 
 function Armory:GetActiveSpecGroup(inspect)

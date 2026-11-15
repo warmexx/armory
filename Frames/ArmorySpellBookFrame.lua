@@ -38,9 +38,6 @@ local SPELLFLYOUT_DEFAULT_SPACING = 4;
 local SPELLFLYOUT_INITIAL_SPACING = 7;
 local SPELLFLYOUT_FINAL_SPACING = 9;
 
-local ceil = ceil;
-local strlen = strlen;
-
 -- Per family, chosen once at load: Classic's spellbook API still takes a book type,
 -- and Classic has no pet specializations
 local BANK_PLAYER, BANK_PET, GetPetSpec;

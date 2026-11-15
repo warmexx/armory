@@ -29,9 +29,6 @@
 
 local Armory, _ = Armory, nil;
 
-local table, next, ipairs = table, next, ipairs;
-local error = error;
-
 local category;
 local function Register(panel, name)
     if ( not category ) then

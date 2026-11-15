@@ -28,8 +28,6 @@
 
 local Armory, _ = Armory, nil;
 
-local strlen = strlen;
-
 ArmoryOptionsSharePanelMixin = CreateFromMixins(ArmoryOptionsPanelTemplateMixin);
 
 function ArmoryOptionsSharePanelMixin:OnLoad()

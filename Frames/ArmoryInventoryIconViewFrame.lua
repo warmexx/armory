@@ -36,10 +36,6 @@ local CONTAINER_OFFSET_Y = -5;
 local CONTAINER_ROW_HEIGHT = 37;
 local NUM_CONTAINER_COLUMNS = 4;
 
-local mod = mod;
-local format = format;
-local floor = floor;
-
 -- Classic calls it Standard
 local QUALITY_COMMON = Enum.ItemQuality.Common or Enum.ItemQuality.Standard;
 

@@ -29,11 +29,6 @@
 local Armory, _ = Armory, nil;
 local container = "Spells";
 
-local max = max;
-local tostring = tostring;
-local table = table;
-local pairs = pairs;
-
 ----------------------------------------------------------
 -- Spells Internals
 ----------------------------------------------------------

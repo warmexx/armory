@@ -29,11 +29,6 @@
 local Armory, _ = Armory, nil;
 local container = "Factions";
 
-local table = table;
-local select = select;
-local tostring = tostring;
-local tonumber = tonumber;
-
 ----------------------------------------------------------
 -- Factions Internals
 ----------------------------------------------------------
