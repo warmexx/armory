@@ -147,6 +147,7 @@ function ArmoryPetFrame_OnHide(self)
 end
 
 function ArmoryPetFrame_InitPets()
+    local summonedPet = UnitName("pet");
     for i = 1, C_StableInfo.GetNumStablePets() do
         local petInfo = C_StableInfo.GetStablePetInfo(i);
         if ( petInfo and not Armory:PetExists(petInfo.name) ) then
@@ -155,6 +156,11 @@ function ArmoryPetFrame_InitPets()
             Armory:SetPetValue(petInfo.name, "Level", petInfo.level);
             Armory:SetPetValue(petInfo.name, "Family", petInfo.familyName);
             Armory:SetPetValue(petInfo.name, "FoodTypes", C_StableInfo.GetStablePetFoodTypes(i));
+        end
+        -- Forever: the happiness and loyalty of a stabled pet; the summoned pet stores its own
+        if ( Armory.isForever and petInfo and petInfo.happinessLevel and petInfo.name ~= summonedPet ) then
+            Armory:SetPetValue(petInfo.name, "Happiness", petInfo.happinessLevel);
+            Armory:SetPetValue(petInfo.name, "Loyalty", petInfo.loyaltyName);
         end
     end
 end
@@ -258,13 +264,16 @@ function ArmoryPetFrame_SetHappiness(foodTypes)
     if ( loyalty and loyalty ~= "" ) then
         table.insert(lines, loyalty);
     end
-    if ( damagePercentage ) then
-        table.insert(lines, format(PET_DAMAGE_PERCENTAGE, damagePercentage));
-    end
-    if ( (loyaltyRate or 0) < 0 ) then
-        table.insert(lines, LOSING_LOYALTY);
-    elseif ( (loyaltyRate or 0) > 0 ) then
-        table.insert(lines, GAINING_LOYALTY);
+    -- Damage and loyalty rate only for the summoned pet, as Blizzard's stable leaves them out
+    if ( Armory:IsPlayerSelected() and Armory.selectedPet == UnitName("pet") ) then
+        if ( damagePercentage ) then
+            table.insert(lines, format(PET_DAMAGE_PERCENTAGE, damagePercentage));
+        end
+        if ( (loyaltyRate or 0) < 0 ) then
+            table.insert(lines, LOSING_LOYALTY);
+        elseif ( (loyaltyRate or 0) > 0 ) then
+            table.insert(lines, GAINING_LOYALTY);
+        end
     end
     if ( foodTypes ) then
         table.insert(lines, format(PET_DIET_TEMPLATE, BuildListString(unpack(type(foodTypes) == "table" and foodTypes or {foodTypes}))));
