@@ -478,8 +478,7 @@ function ArmoryInventoryMoneyFrame_OnEnter(self)
             grandTotal = true;
         end
     end
-    -- TODO round 3: the personal guild bank money in Classic (TBC) too
-    if ( AGB and not Armory.isClassic ) then
+    if ( AGB ) then
         local pgbTotal = AGB:GetPGBMoney(currentRealm, currentFaction);
         if ( pgbTotal > 0 ) then
             GameTooltip:AddLine(format(ARMORY_MONEY_TOTAL, ARMORY_PERSONAL_GUILDBANK, currentFaction), "", 1, 1, 1);

@@ -177,6 +177,12 @@ local function IsBankContainer(id)
     return IsCharacterContainer(id) or IsAccountContainer(id);
 end
 
+function Armory:IsBag(id)
+    if ( id ) then
+        return IsBagContainer(id);
+    end
+end
+
 local function InventoryContainerName(id)
     return "Container" .. id;
 end

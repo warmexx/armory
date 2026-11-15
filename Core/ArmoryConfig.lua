@@ -1474,8 +1474,15 @@ function Armory:SetConfigSummaryCurrency(on)
     self:Setting("General", "HideSummaryCurrency", not on);
 end
 
-function Armory:GetConfigSummaryCurrency()
-    return not self:Setting("General", "HideSummaryCurrency");
+-- Classic has no currency module, so no currency columns
+if ( Armory.isClassic ) then
+    function Armory:GetConfigSummaryCurrency()
+        return false;
+    end
+else
+    function Armory:GetConfigSummaryCurrency()
+        return not self:Setting("General", "HideSummaryCurrency");
+    end
 end
 
 local currencyKey = "SummaryCurrency:";

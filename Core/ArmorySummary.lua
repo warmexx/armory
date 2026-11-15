@@ -445,7 +445,7 @@ local function DisplayQuests(tooltip, characterInfo)
         if ( not questHeaderState.Quests ) then
             numEntries = Armory:GetNumQuestLogEntries();
             for i = 1, numEntries do
-                questTitleText, level, _, isHeader, isCollapsed, isComplete, frequency, questID = Armory:GetQuestLogTitle(i);
+                questTitleText, level, questTag, isHeader, isCollapsed, isComplete, frequency, questID = Armory:GetQuestLogTitle(i);
                 index, column = tooltip:AddLine("");
 
                 if ( isHeader ) then
@@ -475,7 +475,7 @@ local function DisplayQuests(tooltip, characterInfo)
                 color = Armory:HexColor(color);
 
                 myColumn = column; index, column = tooltip:SetCell(index, myColumn, color..questTitleText..FONT_COLOR_CODE_CLOSE);
-                myColumn = column; index, column = tooltip:SetCell(index, myColumn, isHeader and "" or color..(ArmoryQuestLog_GetQuestTag(questID, i, isComplete, frequency) or "")..FONT_COLOR_CODE_CLOSE);
+                myColumn = column; index, column = tooltip:SetCell(index, myColumn, isHeader and "" or color..(ArmoryQuestLog_GetQuestTag(questID, i, isComplete, frequency, questTag) or "")..FONT_COLOR_CODE_CLOSE);
             end
         end
     end

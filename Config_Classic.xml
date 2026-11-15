@@ -9,6 +9,6 @@
   <Include file="Config\ArmoryOptionsTooltipPanel.xml"/>
   <Include file="Config\ArmoryOptionsFindPanel.xml"/>
   <Include file="Config\ArmoryOptionsExpirationPanel.xml"/>
-  <Include file="Config\Classic\ArmoryOptionsSummaryPanel.xml"/>
+  <Include file="Config\ArmoryOptionsSummaryPanel.xml"/>
   <Include file="Config\ArmoryOptionsMiscPanel.xml"/>
 </Ui>

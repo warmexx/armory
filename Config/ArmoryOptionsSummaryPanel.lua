@@ -36,10 +36,19 @@ local ipairs = ipairs;
 local ARMORY_SUMMARY_CURRENCIES_HEIGHT = 16;
 local SUMMARY_CURRENCIES_DISPLAYED = 8;
 
+-- Classic has no currency module
+local function HasCurrency()
+    return not Armory.isClassic;
+end
+
 ArmoryOptionsSummaryPanelMixin = CreateFromMixins(ArmoryOptionsPanelTemplateMixin);
 
 function ArmoryOptionsSummaryPanelMixin:OnLoad()
     ArmoryOptionsPanelTemplateMixin.OnLoad(self);
+
+    if ( not HasCurrency() ) then
+        self.CurrencyContainer:Hide();
+    end
 
     self.Title:SetText(ARMORY_SUMMARY_TITLE);
     self.SubText:SetText(ARMORY_SUMMARY_SUBTEXT1);
@@ -246,6 +255,7 @@ end
 
 
 ArmoryOptionsSummaryCurrencyMixin = CreateFromMixins(ArmoryOptionsSummaryColumnTemplateMixin);
+ArmoryOptionsSummaryCurrencyMixin.IsAvailable = HasCurrency;
 
 function ArmoryOptionsSummaryCurrencyMixin:GetValue()
     return Armory:GetConfigSummaryCurrency();
@@ -371,7 +381,9 @@ ArmoryOptionsCurrencyCheckButtonTemplateMixin = CreateFromMixins(ArmoryOptionsCh
 
 function ArmoryOptionsCurrencyCheckButtonTemplateMixin:Register(parent)
     self.panel = parent:GetParent();
-    self.panel:RegisterControl(self);
+    if ( HasCurrency() ) then
+        self.panel:RegisterControl(self);
+    end
 end
 
 function ArmoryOptionsCurrencyCheckButtonTemplateMixin:GetValue()

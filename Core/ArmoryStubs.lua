@@ -41,6 +41,10 @@ local floor = floor;
 local issecretvalue = issecretvalue;
 local issecrettable = issecrettable;
 
+function Armory:GetAverageItemLevel()
+    return self:SetGetCharacterValue("AverageItemLevel", _G.GetAverageItemLevel());
+end
+
 function Armory:GetBlockChance()
     return self:SetGetCharacterValue("BlockChance", _G.GetBlockChance());
 end

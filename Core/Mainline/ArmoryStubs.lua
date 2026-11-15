@@ -50,10 +50,6 @@ function Armory:GetAttackPowerForStat(index, effectiveStat)
     return self:SetGetCharacterValue("AttackPowerForStat"..index, _G.GetAttackPowerForStat(index, effectiveStat));
 end
 
-function Armory:GetAverageItemLevel()
-    return self:SetGetCharacterValue("AverageItemLevel", _G.GetAverageItemLevel());
-end
-
 function Armory:GetAvoidance()
     return self:SetGetCharacterValue("Avoidance", _G.GetAvoidance());
 end
@@ -299,12 +295,6 @@ end
 
 function Armory:HasSPEffectsAttackPower()
     return self:SetGetCharacterValue("HasSPEffectsAP", _G.HasSPEffectsAttackPower());
-end
-
-function Armory:IsBag(id)
-    if ( id ) then
-        return id >= Enum.BagIndex.Backpack and id <= NUM_TOTAL_BAG_FRAMES;
-    end
 end
 
 function Armory:IsCharacterBankSlot(index)
