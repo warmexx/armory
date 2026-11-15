@@ -1,24 +1,20 @@
-"""Brings the ArmoryOfa installation in a client up to date with this repo.
+"""Brings the Armory installation in a client up to date with this repo.
 
-The repo is installed as ArmoryOfa and ArmoryGuildBankOfa, next to the released Armory, so
-both can be in a client and you switch between them in the addon list. Never enable both:
-they share their global names (Armory, ArmoryFrame, ArmoryDB and so on). Each folder has its
-own SavedVariables file, so their data stays apart. On install, paths to the addon folder,
-the Dependencies and the titles in the TOCs and GetAddOnMetadata("Armory") are rewritten to
-the Ofa names.
+Since 2026-11-15 the repo is installed as Armory and ArmoryGuildBank themselves, over the
+released addon (before that as ArmoryOfa next to it). Libs and the translations stay as the
+release put them there: Libs come from the packager (externals) and are never touched. A file in
+Locales without an @localization template, such as Localization.lua, is source code and is
+installed like any other file; the released one of Era or BCC lacks globals that the shared code
+uses. The translations (the files with a template) come in every client from the released
+Armory and ArmoryGuildBank in Retail, since v20 takes all of them from the Retail project on
+CurseForge. Do not update Armory with the CurseForge app: that puts the old release back.
 
-The first install takes Libs and Locales from the released Armory and ArmoryGuildBank in that
-client, and copies their SavedVariables (ArmoryOfa.lua and so on), each only when it is missing.
 Copies every file that is new or changed, and removes Lua, XML and TOC files that are
-no longer in the repo, so a stale file can never be loaded. Libs are left alone: they come
-from the packager (externals). A file in Locales without an @localization template, such as
-Localization.lua, is source code and is installed like any other file; the released one of
-Era or BCC lacks globals that the shared code uses. The translations (the files with a
-template) come in every client from the released Armory and ArmoryGuildBank in Retail, since
-v20 takes all of them from the Retail project on CurseForge.
-Revision lines are ignored when comparing, so a packaged file with an expanded
-revision counts as unchanged. In TOCs, @project-version@ becomes the newest version in
-CHANGELOG.md plus "-dev" (for example v20.0.0-dev), as the packager would fill it in.
+no longer in the repo, so a stale file can never be loaded (also the TOCs with a suffix of the
+release, which would win over Armory.toc). Revision lines are ignored when comparing, so a
+packaged file with an expanded revision counts as unchanged. In TOCs, @project-version@ becomes
+the newest version in CHANGELOG.md plus "-dev" (for example v20.0.0-dev), as the packager
+would fill it in.
 
 Usage: python -I dev/install.py <client> [--dry-run]
   client: retail, era, anniversary or all (Forever follows in phase 3, see docs/CODEBASIS.md)
@@ -34,10 +30,8 @@ WOW = r"D:\Games\World of Warcraft"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CLIENTS = {"retail": "_retail_", "era": "_classic_era_", "anniversary": "_anniversary_"}
 # Addon folders: (folder in the repo, folder in Interface\AddOns). Every client gets both, like
-# the package; a client without a TOC for the guild bank (Era) does not load it.
-# The third name is the released addon that the first install takes Libs, Locales and data from.
-ADDONS = [("", "ArmoryOfa", "Armory"), ("ArmoryGuildBank", "ArmoryGuildBankOfa", "ArmoryGuildBank")]
-SEED_DIRS = ("Libs", "Locales")
+# the package; the guild bank's TOC keeps it out of Era (## AllowLoadGameType).
+ADDONS = [("", "Armory"), ("ArmoryGuildBank", "ArmoryGuildBank")]
 SKIP_DIRS = {".git", ".release", ".vscode", ".tokensave", ".claude", "dev", "docs", "Libs", "Locales"}
 SKIP_FILES = {".gitignore", ".pkgmeta", ".gitattributes"}
 CODE = (".lua", ".xml", ".toc")
@@ -54,24 +48,12 @@ def dev_version():
 VERSION = dev_version()
 
 
-RENAMES = [
-    # Interface\AddOns\Armory\... in Lua (double backslash), TOC and XML (single)
-    (re.compile(rb"(?i)(AddOns[\x5c]+)(Armory(?:GuildBank)?)(?=[\x5c])"), rb"\1\2Ofa"),
-    (re.compile(rb'GetAddOnMetadata\("Armory"'), rb'GetAddOnMetadata("ArmoryOfa"'),
-    (re.compile(rb"(?m)^(## Dependencies: )Armory\b"), rb"\1ArmoryOfa"),
-    (re.compile(rb"(?m)^(## Title(?:-\w+)?: )(Armory(?:GuildBank)?)\b"), rb"\1\2Ofa"),
-]
-
-
 def content(path):
     """The bytes as they should be installed."""
     with open(path, "rb") as f:
         data = f.read()
     if path.lower().endswith(".toc"):
         data = data.replace(b"@project-version@", VERSION.encode())
-    if path.lower().endswith(CODE):
-        for rx, to in RENAMES:
-            data = rx.sub(to, data)
     return data
 
 
@@ -81,13 +63,13 @@ def is_source_locale(path):
         return b"@localization(" not in f.read()
 
 
-def translations(src, released):
+def translations(src, addon):
     """(installed path, Retail file) for each translation that the repo has as a template."""
     out = []
     for p in glob.glob(os.path.join(src, "Locales", "*.lua")):
         if not is_source_locale(p):
             name = os.path.basename(p)
-            t = os.path.join(TRANSLATIONS, released, "Locales", name)
+            t = os.path.join(TRANSLATIONS, addon, "Locales", name)
             if os.path.exists(t):
                 out.append((os.path.join("Locales", name), t))
     return out
@@ -123,48 +105,21 @@ def same(a, b):
     return norm(data) == norm(installed)
 
 
-def seed(client, addon, released, dry):
-    """Takes Libs, Locales and SavedVariables from the released addon, where missing."""
-    base = os.path.join(WOW, CLIENTS[client])
-    for sub in SEED_DIRS:
-        s = os.path.join(base, "Interface", "AddOns", released, sub)
-        d = os.path.join(base, "Interface", "AddOns", addon, sub)
-        if os.path.isdir(s) and not os.path.exists(d):
-            print(f"  seed   {os.path.join(addon, sub)} from {released}")
-            if not dry:
-                shutil.copytree(s, d)
-    for pattern in ("*", os.path.join("*", "*", "*")):
-        for s in glob.glob(os.path.join(base, "WTF", "Account", pattern, "SavedVariables", released + ".lua")):
-            d = os.path.join(os.path.dirname(s), addon + ".lua")
-            if not os.path.exists(d):
-                print(f"  seed   {os.path.relpath(d, base)}")
-                if not dry:
-                    shutil.copy2(s, d)
-
-
 def sync(client, dry):
     print(f"== {client}")
-    for src_sub, addon, released in ADDONS:
+    for src_sub, addon in ADDONS:
         src = os.path.join(ROOT, src_sub)
         dst = os.path.join(WOW, CLIENTS[client], "Interface", "AddOns", addon)
         if not os.path.isdir(dst):
             print(f"  {addon}: not installed, copying everything")
-        seed(client, addon, released, dry)
+        if src_sub == "" and not os.path.isdir(os.path.join(dst, "Libs")):
+            print(f"  WARNING {addon} has no Libs: install the release once first")
         skip_sub = {"ArmoryGuildBank"} if src_sub == "" else set()
-        # A TOC is named after its folder: Armory.toc becomes ArmoryOfa.toc (and a TOC with a
-        # suffix, such as Armory_Camelot.toc, ArmoryOfa_Camelot.toc). An old TOC with a suffix
-        # in the installation is removed below, as for every file no longer in the repo; left
-        # behind, it would win over the TOC without suffix.
-        wanted = {}
-        for rel in files(src, skip_sub, repo=True):
-            if rel.lower().endswith(".toc") and (rel.startswith(released + "_") or rel == released + ".toc"):
-                wanted[addon + rel[len(released):]] = rel
-            else:
-                wanted[rel] = rel
+        wanted = {rel: rel for rel in files(src, skip_sub, repo=True)}
         present = files(dst) if os.path.isdir(dst) else set()
         copied = removed = 0
         for rel in sorted(wanted):
-            s, d = os.path.join(src, wanted[rel]), os.path.join(dst, rel)
+            s, d = os.path.join(src, rel), os.path.join(dst, rel)
             if os.path.exists(d) and same(s, d):
                 continue
             print(f"  copy   {addon}\\{rel}")
@@ -173,7 +128,7 @@ def sync(client, dry):
                 os.makedirs(os.path.dirname(d), exist_ok=True)
                 with open(d, "wb") as f:
                     f.write(content(s))
-        for rel, t in translations(src, released):
+        for rel, t in translations(src, addon):
             d = os.path.join(dst, rel)
             if os.path.exists(d) and filecmp.cmp(t, d, shallow=False):
                 continue
