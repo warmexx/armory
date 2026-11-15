@@ -984,7 +984,8 @@ function Armory:GetInventoryContainerValue(id, index, unit)
                 texture = dbEntry:GetValue("InventoryItemTexture"..index);
                 quality = dbEntry:GetValue("InventoryItemQuality"..index);
                 link = dbEntry:GetValue("InventoryItemLink"..index);
-            elseif ( index >= ARMORY_GEARSLOT_FIRST_EQUIPPED and index <= ARMORY_GEARSLOT_LAST_EQUIPPED ) then
+            -- Classic has no profession gear slots (and no ARMORY_GEARSLOT_*); an empty slot has index 0
+            elseif ( GetNumProfessionGearSlots() > 0 and index >= ARMORY_GEARSLOT_FIRST_EQUIPPED and index <= ARMORY_GEARSLOT_LAST_EQUIPPED ) then
                 link, texture, quality = self:GetProfessionItems(index);
             end
             return texture, 1, quality, link;
