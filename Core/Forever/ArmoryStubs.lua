@@ -30,6 +30,15 @@ local Armory, _ = Armory, nil;
 
 -- Stubs that only Forever has, in addition to Core\Mainline\ArmoryStubs.lua; mostly for the paper doll
 
+-- Forever has the pet happiness and loyalty of Classic, in C_PetInfo
+function Armory:GetPetHappiness()
+    return self:SetGetPetValue("Happiness", C_PetInfo.GetPetHappiness());
+end
+
+function Armory:GetPetLoyalty()
+    return self:SetGetPetValue("Loyalty", C_PetInfo.GetPetLoyalty());
+end
+
 -- Forever returns base, real, effective and bonus (Classic: base, total, bonus and minus)
 function Armory:UnitResistance(unit, index)
     if ( index ) then

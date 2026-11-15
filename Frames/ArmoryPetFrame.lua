@@ -91,6 +91,10 @@ function ArmoryPetFrame_OnLoad(self)
     if ( C_EventUtils.IsEventValid("PET_SPELL_POWER_UPDATE") ) then
         self:RegisterEvent("PET_SPELL_POWER_UPDATE");
     end
+    -- Forever has the happiness of Classic
+    if ( Armory.isForever ) then
+        self:RegisterUnitEvent("UNIT_HAPPINESS", "pet");
+    end
 
     ArmoryPetFrame_InitStatCategories();
 
@@ -116,6 +120,8 @@ function ArmoryPetFrame_OnEvent(self, event, ...)
         Armory:ExecuteConditional(ArmoryPetFrame_HasPetData, ArmoryPetFrame_Update);
     elseif ( event == "PET_UI_CLOSE" ) then
         ArmoryFrameTab_Update();
+    elseif ( event == "UNIT_HAPPINESS" ) then
+        Armory:Execute(ArmoryPetFrame_Update);
     elseif( event == "PET_SPELL_POWER_UPDATE" ) then
         Armory:Execute(ArmoryPetFrame_UpdateStats);
     elseif ( arg1 == "pet" ) then
@@ -204,7 +210,12 @@ function ArmoryPetFrame_Update(petChanged)
 
     local _, canGainXP = Armory:HasPetUI();
     local foodTypes = Armory:GetPetFoodTypes();
-    if ( canGainXP and Armory:GetPetFoodTypes() ) then
+    if ( Armory.isForever and canGainXP and ArmoryPetFrame_SetHappiness(foodTypes) ) then
+        ArmoryPetFrameDiet:Show();
+    elseif ( canGainXP and Armory:GetPetFoodTypes() ) then
+        if ( Armory.isForever ) then
+            ArmoryPetFrame_SetDietIcon();
+        end
         ArmoryPetFrameDiet.tooltip = format(PET_DIET_TEMPLATE, BuildListString(unpack(type(foodTypes) == "table" and foodTypes or {foodTypes})));
         ArmoryPetFrameDiet:Show();
     else
@@ -227,6 +238,59 @@ function ArmoryPetFrame_Update(petChanged)
         ArmoryPetFrameNextPageButton:Enable();
     end
     ArmoryPetFrameCurrentPage:SetFormattedText(MERCHANT_PAGE_NUMBER, ArmoryPetFrame.page, ArmoryPetFrame.maxPages);
+end
+
+-- Forever: the diet icon shows the happiness instead, with the loyalty and the diet in its tooltip,
+-- as Blizzard's PetHappinessIndicatorMixin (PetHappiness.lua) does
+local PET_HAPPINESS_ATLAS = { "UI-PetMad", "UI-PetNeutral", "UI-PetHappiness" };
+
+function ArmoryPetFrame_SetHappiness(foodTypes)
+    local happiness, damagePercentage, loyaltyRate = Armory:GetPetHappiness();
+    local atlas = happiness and PET_HAPPINESS_ATLAS[happiness];
+    if ( not atlas ) then
+        return false;
+    end
+
+    ArmoryPetFrameDietTexture:SetAtlas(atlas);
+
+    local lines = {};
+    local loyalty = Armory:GetPetLoyalty();
+    if ( loyalty and loyalty ~= "" ) then
+        table.insert(lines, loyalty);
+    end
+    if ( damagePercentage ) then
+        table.insert(lines, format(PET_DAMAGE_PERCENTAGE, damagePercentage));
+    end
+    if ( (loyaltyRate or 0) < 0 ) then
+        table.insert(lines, LOSING_LOYALTY);
+    elseif ( (loyaltyRate or 0) > 0 ) then
+        table.insert(lines, GAINING_LOYALTY);
+    end
+    if ( foodTypes ) then
+        table.insert(lines, format(PET_DIET_TEMPLATE, BuildListString(unpack(type(foodTypes) == "table" and foodTypes or {foodTypes}))));
+    end
+
+    ArmoryPetFrameDiet.tooltip = _G["PET_HAPPINESS"..happiness] or NONE;
+    ArmoryPetFrameDiet.tooltipLines = lines;
+    return true;
+end
+
+-- Forever: back to the diet icon of the XML when the happiness is not known
+function ArmoryPetFrame_SetDietIcon()
+    ArmoryPetFrameDietTexture:SetTexture("Interface\\PetStableFrame\\PetStable-Parts");
+    ArmoryPetFrameDietTexture:SetTexCoord(0.08593750, 0.13476563, 0.73437500, 0.77929688);
+    ArmoryPetFrameDiet.tooltipLines = nil;
+end
+
+function ArmoryPetFrameDiet_OnEnter(self)
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+    GameTooltip:SetText(self.tooltip);
+    if ( self.tooltipLines ) then
+        for _, line in ipairs(self.tooltipLines) do
+            GameTooltip:AddLine(line, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true);
+        end
+        GameTooltip:Show();
+    end
 end
 
 function ArmoryPetFrame_SetSelectedPetInfo()

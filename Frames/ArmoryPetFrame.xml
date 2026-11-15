@@ -244,10 +244,7 @@
               </Layer>
             </Layers>
             <Scripts>
-              <OnEnter>
-                GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-                GameTooltip:SetText(self.tooltip);
-              </OnEnter>
+              <OnEnter function="ArmoryPetFrameDiet_OnEnter"/>
               <OnLeave function="GameTooltip_Hide"/>
             </Scripts>
           </Frame>
