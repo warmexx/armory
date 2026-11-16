@@ -29,6 +29,12 @@
 local Armory, _ = Armory, nil;
 local gearSetItems = {};
 
+-- Forever lacks some of Retail's tooltip strings (DEFAULT_STAT1_TOOLTIP), and its strings are not in the Lua export.
+-- The Retail stats below still run on a hidden frame to store every value; a missing string must not stop that.
+local function format(fmt, ...)
+    return string.format(fmt or "", ...);
+end
+
 ARMORY_SLOTINFO = {
     INVTYPE_2HWEAPON = "MainHandSlot",
     INVTYPE_BODY = "ShirtSlot",
