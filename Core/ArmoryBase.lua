@@ -494,6 +494,14 @@ function Armory:Init()
     self.selectedDbBaseEntry = nil;
     self.playerRealm = _G.GetRealmName();
     self.player = _G.UnitName("player");
+    if ( self.isForever ) then
+        -- Forever: a character is identified by name and surname (regional unique names)
+        local name, surname = _G.UnitNameUnmodified("player");
+        if ( name and surname and surname ~= "" ) then
+            local separator = Constants.CharacterNameSeparatorConsts and Constants.CharacterNameSeparatorConsts.CHARACTERNAME_SURNAME_SEPARATOR or " ";
+            self.player = name..separator..surname;
+        end
+    end
     self.playerDbBaseEntry = nil;
     self.characterRealm = _G.GetRealmName();
     self.character = nil;
