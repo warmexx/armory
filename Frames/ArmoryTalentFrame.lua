@@ -63,11 +63,20 @@ local STATE_MAXED = "yellow";
 local STATE_PARTIAL = "green";
 local STATE_EMPTY = "gray";
 
-local buttons = {};
 local choiceButtons = {};
-local lines = {};
 local shownNodes = {};
 local shownButtons = {};
+
+-- Where a tree gets its nodes; Forever's Legacy trees (Frames\Forever\ArmoryLegacyFrame.lua) store theirs the same way.
+-- squareNodes draws every node square and showAllRanks always shows rank/max, as Blizzard's Legacy tree does.
+local TALENT_SOURCE = {
+    GetNodes = function(specID) return specID and Armory:GetTalentSpecNodes(specID); end,
+    GetNodeInfo = function(nodeID) return Armory:GetTalentNodeInfo(nodeID); end,
+    GetNumEntries = function(nodeID) return Armory:GetNumTalentNodeEntries(nodeID); end,
+    GetEntryInfo = function(nodeID, index) return Armory:GetTalentNodeEntryInfo(nodeID, index); end,
+    GetEdges = function(nodeID) return Armory:GetTalentNodeEdges(nodeID); end,
+    GetNodeState = function(specID, nodeID) return Armory:GetTalentNodeState(specID, nodeID); end,
+};
 
 -- Forever: the spec tabs are the spec groups (dual spec), as there is one spec per class
 local function GetActiveSpecTab(self)
@@ -196,18 +205,20 @@ local function GetEntryIcon(spellID, overrideIcon)
     return spellID and select(2, C_Spell.GetSpellTexture(spellID));
 end
 
-local function GetEntryIndex(nodeID, entryID)
-    for i = 1, Armory:GetNumTalentNodeEntries(nodeID) or 0 do
-        if ( Armory:GetTalentNodeEntryInfo(nodeID, i) == entryID ) then
+local function GetEntryIndex(source, nodeID, entryID)
+    for i = 1, source.GetNumEntries(nodeID) or 0 do
+        if ( source.GetEntryInfo(nodeID, i) == entryID ) then
             return i;
         end
     end
     return 1;
 end
 
-local function GetButtonArt(nodeType, entryType)
+local function GetButtonArt(source, nodeType, entryType)
     if ( nodeType == Enum.TraitNodeType.Selection ) then
         return ART_CHOICE;
+    elseif ( source.squareNodes ) then
+        return ART_SQUARE;
     elseif ( entryType == Enum.TraitNodeEntryType.SpendCapstoneCircle ) then
         return ART_CAPSTONE_CIRCLE;
     elseif ( entryType == Enum.TraitNodeEntryType.SpendCapstoneSquare ) then
@@ -245,9 +256,10 @@ local function SetButtonArt(button, art, state, size)
     end
 end
 
-local function SetButtonEntry(button, nodeID, index, rank, maxRanks, art, size)
-    local _, spellID, _, _, _, overrideIcon = Armory:GetTalentNodeEntryInfo(nodeID, index);
+local function SetButtonEntry(button, source, nodeID, index, rank, maxRanks, art, size)
+    local _, spellID, _, _, _, overrideIcon = source.GetEntryInfo(nodeID, index);
 
+    button.source = source;
     button.nodeID = nodeID;
     button.entryIndex = index;
     button.spellID = spellID;
@@ -266,7 +278,10 @@ local function SetButtonEntry(button, nodeID, index, rank, maxRanks, art, size)
     button.icon:SetDesaturated(rank == 0);
     button.icon:SetAlpha((rank == 0) and 0.7 or 1);
 
-    if ( rank > 0 and maxRanks > 1 ) then
+    if ( source.showAllRanks ) then
+        button.rankText:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+        button.rankText:SetFormattedText("%d/%d", rank, maxRanks);
+    elseif ( rank > 0 and maxRanks > 1 ) then
         local color = (state == STATE_MAXED) and NORMAL_FONT_COLOR or GREEN_FONT_COLOR;
         button.rankText:SetTextColor(color.r, color.g, color.b);
         button.rankText:SetText(rank);
@@ -275,15 +290,16 @@ local function SetButtonEntry(button, nodeID, index, rank, maxRanks, art, size)
     end
 end
 
-local function UpdateButton(button, specID, nodeID, nodeType, nodeMaxRanks, size)
-    local rank, entryID = Armory:GetTalentNodeState(specID, nodeID);
+local function UpdateButton(button, source, specID, nodeID, nodeType, nodeMaxRanks, size)
+    local rank, entryID = source.GetNodeState(specID, nodeID);
 
-    -- A capstone always shows its first tier, the other tiers only add to it
-    local isTiered = (nodeType == Enum.TraitNodeType.Tiered);
-    local index = isTiered and 1 or GetEntryIndex(nodeID, entryID);
-    local _, _, _, _, _, _, _, entryType = Armory:GetTalentNodeEntryInfo(nodeID, index);
+    -- A capstone always shows its first tier, the other tiers only add to it;
+    -- Blizzard's Legacy tree shows a tiered node as a plain node with the entry of its rank (TalentButtonLegacyMixin)
+    local isTiered = (nodeType == Enum.TraitNodeType.Tiered) and not source.showAllRanks;
+    local index = isTiered and 1 or GetEntryIndex(source, nodeID, entryID);
+    local _, _, _, _, _, _, _, entryType = source.GetEntryInfo(nodeID, index);
 
-    SetButtonEntry(button, nodeID, index, rank or 0, nodeMaxRanks or 1, GetButtonArt(nodeType, entryType), size);
+    SetButtonEntry(button, source, nodeID, index, rank or 0, nodeMaxRanks or 1, GetButtonArt(source, nodeType, entryType), size);
     button.isTiered = isTiered;
     button.hasChoices = (nodeType == Enum.TraitNodeType.Selection);
 
@@ -293,18 +309,21 @@ local function UpdateButton(button, specID, nodeID, nodeType, nodeMaxRanks, size
     end
 end
 
+-- Each tree frame has its own buttons and lines
 local function GetButton(tree, index)
-    if ( not buttons[index] ) then
-        buttons[index] = CreateFrame("Button", nil, tree, "ArmoryTalentButtonTemplate");
+    tree.buttons = tree.buttons or {};
+    if ( not tree.buttons[index] ) then
+        tree.buttons[index] = CreateFrame("Button", nil, tree, "ArmoryTalentButtonTemplate");
     end
-    return buttons[index];
+    return tree.buttons[index];
 end
 
 local function ShowLine(tree, index, startButton, endButton, ratio)
-    local line = lines[index];
+    tree.lines = tree.lines or {};
+    local line = tree.lines[index];
     if ( not line ) then
         line = tree:CreateLine(nil, "ARTWORK");
-        lines[index] = line;
+        tree.lines[index] = line;
     end
 
     local isActive = (startButton.rank > 0 and endButton.rank > 0);
@@ -330,13 +349,13 @@ local function GetTreeScale(tree, width, height)
     return scale;
 end
 
-local function UpdateTree(tree, specID, part, heroTree)
+local function UpdateTree(tree, source, specID, part, heroTree)
     table.wipe(shownNodes);
     table.wipe(shownButtons);
 
     local minX, maxX, minY, maxY;
-    for _, nodeID in ipairs(specID and Armory:GetTalentSpecNodes(specID) or {}) do
-        local posX, posY, _, nodePart, subTreeID = Armory:GetTalentNodeInfo(nodeID);
+    for _, nodeID in ipairs(source.GetNodes(specID) or {}) do
+        local posX, posY, _, nodePart, subTreeID = source.GetNodeInfo(nodeID);
         if ( nodePart == part and (not subTreeID or subTreeID == heroTree) ) then
             table.insert(shownNodes, nodeID);
             minX = min(minX or posX, posX);
@@ -355,9 +374,9 @@ local function UpdateTree(tree, specID, part, heroTree)
         local offsetY = treeHeight / 2 - (minY + maxY) / 2 * scale;
 
         for i, nodeID in ipairs(shownNodes) do
-            local posX, posY, nodeType, _, _, nodeMaxRanks = Armory:GetTalentNodeInfo(nodeID);
+            local posX, posY, nodeType, _, _, nodeMaxRanks = source.GetNodeInfo(nodeID);
             local button = GetButton(tree, i);
-            UpdateButton(button, specID, nodeID, nodeType, nodeMaxRanks, size);
+            UpdateButton(button, source, specID, nodeID, nodeType, nodeMaxRanks, size);
             button.x = offsetX + posX * scale;
             button.y = offsetY + posY * scale;
             button:ClearAllPoints();
@@ -367,14 +386,14 @@ local function UpdateTree(tree, specID, part, heroTree)
         end
     end
 
-    for i = #shownNodes + 1, #buttons do
-        buttons[i]:Hide();
+    for i = #shownNodes + 1, #(tree.buttons or {}) do
+        tree.buttons[i]:Hide();
     end
 
     -- The stored edges are those of all specs
     local numLines = 0;
     for _, nodeID in ipairs(shownNodes) do
-        for _, target in ipairs(Armory:GetTalentNodeEdges(nodeID) or {}) do
+        for _, target in ipairs(source.GetEdges(nodeID) or {}) do
             if ( shownButtons[target] ) then
                 numLines = numLines + 1;
                 ShowLine(tree, numLines, shownButtons[nodeID], shownButtons[target], size / BLIZZARD_BUTTON_SIZE);
@@ -382,9 +401,14 @@ local function UpdateTree(tree, specID, part, heroTree)
         end
     end
 
-    for i = numLines + 1, #lines do
-        lines[i]:Hide();
+    for i = numLines + 1, #(tree.lines or {}) do
+        tree.lines[i]:Hide();
     end
+end
+
+-- Draws the nodes of one part of another tree than the talents in a frame, see TALENT_SOURCE
+function ArmoryTalentFrame_UpdateTree(tree, source, specID, part)
+    UpdateTree(tree, source, specID, part);
 end
 
 local function UpdateTabs(self, specName, heroName)
@@ -463,7 +487,7 @@ local function UpdateForever(self)
     local tab = ArmoryPanelTemplates_GetSelectedTab(self);
 
     self.Choice:Hide();
-    UpdateTree(self.Tree, specGroup, tab);
+    UpdateTree(self.Tree, TALENT_SOURCE, specGroup, tab);
     UpdateStatus(self, specGroup, IsActiveSpec(self, specGroup));
     UpdateGroupPoints(self, specGroup, tab);
     ArmoryTalentFrame_UpdateSpecTabStates(self);
@@ -496,7 +520,7 @@ function ArmoryTalentFrame_Update()
     end
 
     self.Choice:Hide();
-    UpdateTree(self.Tree, specID, TAB_PARTS[tab], heroTree);
+    UpdateTree(self.Tree, TALENT_SOURCE, specID, TAB_PARTS[tab], heroTree);
     UpdateStatus(self, specID, IsActiveSpec(self, spec));
     UpdatePoints(self, specID, currencyID);
     ArmoryTalentFrame_UpdateSpecTabStates(self);
@@ -603,17 +627,18 @@ end
 
 -- The ranks of a capstone are spent on its tiers in order, see TalentButtonCapstoneWithTrackMixin
 local function SetCapstoneTooltip(self)
-    local _, spellID, _, _, overrideName = Armory:GetTalentNodeEntryInfo(self.nodeID, 1);
+    local source = self.source;
+    local _, spellID, _, _, overrideName = source.GetEntryInfo(self.nodeID, 1);
     GameTooltip_SetTitle(GameTooltip, TALENT_BUTTON_TOOLTIP_CAPSTONE_TRACK_TITLE_FORMAT:format(GetEntryName(spellID, overrideName), self.rank, self.maxRanks));
 
     local remainingRanks = self.rank;
-    for i = 1, Armory:GetNumTalentNodeEntries(self.nodeID) or 0 do
-        local entryID, _, maxRanks = Armory:GetTalentNodeEntryInfo(self.nodeID, i);
+    for i = 1, source.GetNumEntries(self.nodeID) or 0 do
+        local entryID, _, maxRanks = source.GetEntryInfo(self.nodeID, i);
         local spentInTier = min(remainingRanks, maxRanks or 0);
         remainingRanks = remainingRanks - spentInTier;
 
         GameTooltip_AddBlankLineToTooltip(GameTooltip);
-        GameTooltip_AddHighlightLine(GameTooltip, TOOLTIP_TALENT_RANK_CAPSTONE:format(i));
+        GameTooltip_AddHighlightLine(GameTooltip, (TOOLTIP_TALENT_RANK_CAPSTONE or "Rank %d"):format(i));
 
         local tooltipInfo = CreateBaseTooltipInfo("GetTraitEntry", entryID, max(spentInTier, 1));
         tooltipInfo.append = true;
@@ -627,16 +652,22 @@ local function SetCapstoneTooltip(self)
 end
 
 local function SetEntryTooltip(self)
-    local entryID, spellID, _, _, overrideName = Armory:GetTalentNodeEntryInfo(self.nodeID, self.entryIndex);
+    local entryID, spellID, entryMaxRanks, _, overrideName = self.source.GetEntryInfo(self.nodeID, self.entryIndex);
     GameTooltip_SetTitle(GameTooltip, GetEntryName(spellID, overrideName));
     GameTooltip_AddHighlightLine(GameTooltip, TALENT_BUTTON_TOOLTIP_RANK_FORMAT:format(self.rank, self.maxRanks));
     GameTooltip_AddBlankLineToTooltip(GameTooltip);
-    GameTooltip:AppendInfo("GetTraitEntry", entryID, max(self.rank, 1));
+    -- A Legacy node of several entries has the ranks of all of them, an entry only its own
+    local rank = self.rank;
+    if ( self.source.showAllRanks and entryMaxRanks ) then
+        rank = min(rank, entryMaxRanks);
+    end
+    GameTooltip:AppendInfo("GetTraitEntry", entryID, max(rank, 1));
 end
 
 local function ShowChoices(owner)
     local frame = ArmoryTalentFrame.Choice;
-    local numChoices = Armory:GetNumTalentNodeEntries(owner.nodeID) or 0;
+    local source = owner.source;
+    local numChoices = source.GetNumEntries(owner.nodeID) or 0;
 
     for i = 1, numChoices do
         local button = choiceButtons[i];
@@ -645,9 +676,9 @@ local function ShowChoices(owner)
             button:SetPoint("LEFT", CHOICE_PADDING + (i - 1) * (CHOICE_BUTTON_SIZE + CHOICE_SPACING), 0);
             choiceButtons[i] = button;
         end
-        local _, _, _, _, _, _, _, entryType = Armory:GetTalentNodeEntryInfo(owner.nodeID, i);
+        local _, _, _, _, _, _, _, entryType = source.GetEntryInfo(owner.nodeID, i);
         local rank = (i == owner.entryIndex) and owner.rank or 0;
-        SetButtonEntry(button, owner.nodeID, i, rank, owner.maxRanks, GetButtonArt(nil, entryType), CHOICE_BUTTON_SIZE);
+        SetButtonEntry(button, source, owner.nodeID, i, rank, owner.maxRanks, GetButtonArt(source, nil, entryType), CHOICE_BUTTON_SIZE);
         button.icon:SetAlpha(1);
         button:Show();
     end

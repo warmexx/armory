@@ -76,13 +76,19 @@ function ArmoryAchievementFrame_UpdateAchievements(force)
 end
 
 function ArmoryAchievementFrame_OnShow(self)
-    if ( Armory:HasStatistics() ) then
+    -- Forever: a third tab with the Legacy trees (Frames\Forever\ArmoryLegacyFrame.lua)
+    local hasStatistics = Armory:HasStatistics();
+    local hasLegacy = Armory.isForever and Armory:HasLegacy();
+    if ( hasStatistics or hasLegacy ) then
         ArmoryAchievementFrameTab1:Show();
-        ArmoryAchievementFrameTab2:Show();
+        ArmoryAchievementFrameTab2:SetShown(hasStatistics);
     else
         ArmoryAchievementFrameTab1:Hide();
         ArmoryAchievementFrameTab2:Hide();
         ArmoryAchievementFrame_SelectSource(1);
+    end
+    if ( Armory.isForever ) then
+        ArmoryLegacyFrame_UpdateTab(hasStatistics);
     end
     ArmoryAchievementFrameEditBox:SetText(Armory:GetAchievementFilter());
     ArmoryAchievementFrame_Update();
@@ -154,6 +160,10 @@ function ArmoryAchievementFrame_Update()
     local achievementIndex, achievementRow, achievementTitle, achievementQuantity, achievementBar, achievementButton, achievementBackground;
     local id, name, isHeader, isChild, collapsed, quantity;
     local rightBarTexture, hasQuantity;
+
+    if ( Armory.isForever and ArmoryLegacyFrame_Update(ArmoryAchievementFrame.selected == "legacy") ) then
+        return;
+    end
 
     if ( ArmoryAchievementFrame.selected == "achievements" ) then
         numAchievements = Armory:GetNumAchievements();
@@ -335,6 +345,9 @@ function ArmoryAchievementFrame_SelectSource(id)
     if ( id == 1 ) then
         ArmoryAchievementFrame.selected = "achievements";
         ArmoryAchievementFrame:SetTitle(ACHIEVEMENTS);
+    elseif ( id == 3 ) then
+        ArmoryAchievementFrame.selected = "legacy";
+        ArmoryAchievementFrame:SetTitle(LEGACY_BUTTON or "Legacy");
     else
         ArmoryAchievementFrame.selected = "statistics";
         ArmoryAchievementFrame:SetTitle(STATISTICS);

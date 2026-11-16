@@ -1,0 +1,94 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\FrameXML\UI.xsd">
+  <Script file="ArmoryLegacyFrame.lua"/>
+
+  <!-- Forever: the Legacy trees as the third tab of the achievements frame, after Achievements and Statistics -->
+  <Button name="ArmoryAchievementFrameTab3" parent="ArmoryAchievementFrame" inherits="ArmoryPanelTabButtonTemplate" id="3" hidden="true">
+    <Anchors>
+      <Anchor point="LEFT" relativeTo="ArmoryAchievementFrameTab2" relativePoint="RIGHT" x="-16" y="0"/>
+    </Anchors>
+    <Scripts>
+      <OnClick>
+        ArmoryAchievementFrameTab_OnClick(self);
+        PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
+      </OnClick>
+    </Scripts>
+  </Button>
+
+  <!-- A button per tree, as Blizzard's LegacyTreeSelectionPanel -->
+  <Button name="ArmoryLegacyTreeButtonTemplate" inherits="ArmoryPlayerSpecTabTemplate" virtual="true" hidden="false">
+    <Scripts>
+      <OnClick function="ArmoryLegacyTreeButton_OnClick" />
+      <OnEnter function="ArmoryLegacyTreeButton_OnEnter" />
+    </Scripts>
+  </Button>
+
+  <Frame name="ArmoryLegacyFrame" parent="ArmoryAchievementFrame" setAllPoints="true" hidden="true">
+    <Layers>
+      <Layer level="ARTWORK">
+        <FontString inherits="GameFontNormalLarge" justifyH="LEFT" parentKey="treeName">
+          <Anchors>
+            <Anchor point="TOPLEFT" x="62" y="-38"/>
+          </Anchors>
+        </FontString>
+        <FontString inherits="GameFontNormalSmall" justifyH="LEFT" parentKey="availableText">
+          <Anchors>
+            <Anchor point="BOTTOMLEFT" relativeTo="ArmoryAchievementFrameInset" relativePoint="BOTTOMLEFT" x="10" y="9"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Button parentKey="treeButton3" inherits="ArmoryLegacyTreeButtonTemplate" id="3">
+        <Anchors>
+          <Anchor point="TOPRIGHT" x="-14" y="-34"/>
+        </Anchors>
+      </Button>
+      <Button parentKey="treeButton2" inherits="ArmoryLegacyTreeButtonTemplate" id="2">
+        <Anchors>
+          <Anchor point="RIGHT" relativeKey="$parent.treeButton3" relativePoint="LEFT" x="-6" y="0"/>
+        </Anchors>
+      </Button>
+      <Button parentKey="treeButton1" inherits="ArmoryLegacyTreeButtonTemplate" id="1">
+        <Anchors>
+          <Anchor point="RIGHT" relativeKey="$parent.treeButton2" relativePoint="LEFT" x="-6" y="0"/>
+        </Anchors>
+      </Button>
+
+      <!-- The buttons and lines of the tree are created by ArmoryTalentFrame_UpdateTree -->
+      <Frame parentKey="Tree">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryAchievementFrameInset" relativePoint="TOPLEFT" x="4" y="-4"/>
+          <Anchor point="BOTTOMRIGHT" relativeTo="ArmoryAchievementFrameInset" relativePoint="BOTTOMRIGHT" x="-4" y="26"/>
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture parentKey="treeIcon">
+              <Size x="48" y="48"/>
+              <Anchors>
+                <Anchor point="TOPLEFT" x="4" y="-4"/>
+              </Anchors>
+            </Texture>
+          </Layer>
+        </Layers>
+      </Frame>
+
+      <!-- The tooltip of the points: earned of the maximum and the seasonal cap -->
+      <Button parentKey="pointsButton">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.availableText" x="-2" y="2"/>
+          <Anchor point="BOTTOMRIGHT" relativeKey="$parent.availableText" x="2" y="-2"/>
+        </Anchors>
+        <Scripts>
+          <OnEnter function="ArmoryLegacyPoints_OnEnter" />
+          <OnLeave function="GameTooltip_Hide" />
+        </Scripts>
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnLoad function="ArmoryLegacyFrame_OnLoad" />
+      <OnEvent function="ArmoryLegacyFrame_OnEvent" />
+    </Scripts>
+  </Frame>
+</Ui>
