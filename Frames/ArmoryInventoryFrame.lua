@@ -370,7 +370,16 @@ function ArmoryInventoryFrame_OnShow(self)
         ArmoryPanelTemplates_SetTab(self, 1);
     end
 
-    -- only the visible tabs: no account bank in Classic, and the guild bank tab only with a guild
+    if ( not Armory.isClassic ) then
+        -- no account bank in Forever; C_Bank.CanViewBank is only true at the bank
+        ArmoryInventoryFrameTab3:SetShown(C_Bank.FetchNumPurchasedBankTabs(Enum.BankType.Account) > 0);
+    end
+    if ( ArmoryInventoryFrameTab4 ) then
+        local previousTab = ArmoryInventoryFrameTab3:IsShown() and ArmoryInventoryFrameTab3 or ArmoryInventoryFrameTab2;
+        ArmoryInventoryFrameTab4:SetPoint("LEFT", previousTab, "RIGHT", -16, 0);
+    end
+
+    -- only the visible tabs: no account bank in Classic and Forever, and the guild bank tab only with a guild
     local tabs = {};
     local totalTabWidth = 0;
     local tabWidthCache = {};
