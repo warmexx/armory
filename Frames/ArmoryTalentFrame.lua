@@ -30,10 +30,14 @@ local Armory, _ = Armory, nil;
 
 local MAX_TALENT_SPECTABS = 4;
 
+-- In the order of Blizzard's frame and its art: class left, hero in the middle, spec right
 local TAB_CLASS = 1;
-local TAB_SPEC = 2;
-local TAB_HERO = 3;
-local TAB_PARTS = { "class", "spec", "hero" };
+local TAB_HERO = 2;
+local TAB_SPEC = 3;
+local TAB_PARTS = { "class", "hero", "spec" };
+local TAB_OFFSET_X = 56;
+local TAB_OFFSET_Y = -37;
+local TAB_OVERLAP = -7;
 local TABS_MAX_WIDTH = 274;
 
 -- The sizes in Blizzard's talent frame, in which a row is 600 units of a tenth of a pixel
@@ -58,6 +62,28 @@ local ART_CIRCLE = { atlas = "talents-node-circle-%s", mask = "talents-node-circ
 local ART_CHOICE = { atlas = "talents-node-choice-%s", mask = "talents-node-choice-mask", baseSize = BLIZZARD_BUTTON_SIZE, scale = 1 };
 local ART_CAPSTONE_SQUARE = { atlas = "talents-node-apex-active-large-%s", baseSize = BLIZZARD_CAPSTONE_SIZE, scale = 1.4 };
 local ART_CAPSTONE_CIRCLE = { atlas = "talents-node-apex-large-%s", mask = "talents-node-circle-mask", baseSize = BLIZZARD_CAPSTONE_SIZE, scale = 1.4 };
+
+-- Blizzard's art behind the talent tree, from SpecializationVisuals in Blizzard_PlayerSpells\ClassTalents\Blizzard_ClassTalentUtil.lua.
+-- That addon is load on demand, hence the copy. Forever has one per class: "talent-background-<class>".
+local SPEC_BACKGROUNDS = {
+    [250] = "deathknight-blood", [251] = "deathknight-frost", [252] = "deathknight-unholy",
+    [577] = "demonhunter-havoc", [581] = "demonhunter-vengeance", [1480] = "demonhunter-devourer",
+    [102] = "druid-balance", [103] = "druid-feral", [104] = "druid-guardian", [105] = "druid-restoration",
+    [1467] = "evoker-devastation", [1468] = "evoker-preservation", [1473] = "evoker-augmentation",
+    [253] = "hunter-beastmastery", [254] = "hunter-marksmanship", [255] = "hunter-survival",
+    [62] = "mage-arcane", [63] = "mage-fire", [64] = "mage-frost",
+    [268] = "monk-brewmaster", [269] = "monk-windwalker", [270] = "monk-mistweaver",
+    [65] = "paladin-holy", [66] = "paladin-protection", [70] = "paladin-retribution",
+    [256] = "priest-discipline", [257] = "priest-holy", [258] = "priest-shadow",
+    [259] = "rogue-assassination", [260] = "rogue-outlaw", [261] = "rogue-subtlety",
+    [262] = "shaman-elemental", [263] = "shaman-enhancement", [264] = "shaman-restoration",
+    [265] = "warlock-affliction", [266] = "warlock-demonology", [267] = "warlock-destruction",
+    [71] = "warrior-arms", [72] = "warrior-fury", [73] = "warrior-protection",
+};
+-- Forever: Blizzard stretches the art of the class over its talent frame (1212 by 595, Camelot\ClassTalents\Blizzard_ClassTalentsFrame.xml)
+-- and puts the trees of the groups next to each other, each in a column of 400: a third of the art per group
+local FOREVER_ART_ASPECT = 1212 / 595;
+local FOREVER_NUM_GROUPS = 3;
 
 local STATE_MAXED = "yellow";
 local STATE_PARTIAL = "green";
@@ -414,24 +440,34 @@ end
 local function UpdateTabs(self, specName, heroName)
     local tabs = self.Tabs;
     if ( Armory.isForever ) then
-        -- The three groups of the tree
+        -- The three groups of the tree, a tab without a group is hidden
         for i, tab in ipairs(tabs) do
             local _, name = Armory:GetTalentGroupInfo(i);
             tab:SetText(name or "");
+            tab:SetShown(name ~= nil);
         end
-        heroName = select(2, Armory:GetTalentGroupInfo(TAB_HERO));
     else
         tabs[TAB_CLASS]:SetText((Armory:UnitClass("player")));
         tabs[TAB_SPEC]:SetText(specName or "");
         tabs[TAB_HERO]:SetText(heroName or "");
+        tabs[TAB_HERO]:SetShown(heroName ~= nil);
     end
 
-    if ( heroName ) then
-        tabs[TAB_HERO]:Show();
-    else
-        tabs[TAB_HERO]:Hide();
-        if ( ArmoryPanelTemplates_GetSelectedTab(self) == TAB_HERO ) then
-            ArmoryPanelTemplates_SetTab(self, TAB_CLASS);
+    if ( not tabs[ArmoryPanelTemplates_GetSelectedTab(self)]:IsShown() ) then
+        ArmoryPanelTemplates_SetTab(self, TAB_CLASS);
+    end
+
+    -- The shown tabs follow each other, also without the hero tab in the middle
+    local previous;
+    for _, tab in ipairs(tabs) do
+        if ( tab:IsShown() ) then
+            tab:ClearAllPoints();
+            if ( previous ) then
+                tab:SetPoint("LEFT", previous, "RIGHT", TAB_OVERLAP, 0);
+            else
+                tab:SetPoint("TOPLEFT", self, "TOPLEFT", TAB_OFFSET_X, TAB_OFFSET_Y);
+            end
+            previous = tab;
         end
     end
 
@@ -479,16 +515,52 @@ local function UpdateGroupPoints(self, specGroup, tab)
     end
 end
 
+-- Blizzard's art lies behind all parts of the tree at once. This fills the frame with the part of the tab, at the aspect ratio
+-- of the frame: center and partWidth are fractions of the art's width, artAspect is its width / height as Blizzard shows it.
+-- A part narrower than the frame loses some of its top and bottom, a wider one some of its sides.
+local function UpdateBackground(self, atlas, center, partWidth, artAspect, desaturate)
+    local background = self.background;
+    local atlasInfo = atlas and C_Texture.GetAtlasInfo(atlas);
+    if ( not atlasInfo or atlasInfo.width == 0 or atlasInfo.height == 0 ) then
+        background:Hide();
+        return;
+    end
+
+    local frameWidth, frameHeight = background:GetSize();
+    local frameAspect = frameWidth / frameHeight;
+    artAspect = artAspect or atlasInfo.width / atlasInfo.height;
+
+    local sliceWidth, sliceHeight = min(1, frameAspect / artAspect), 1;
+    if ( partWidth < sliceWidth ) then
+        sliceWidth = partWidth;
+        sliceHeight = partWidth * artAspect / frameAspect;
+    end
+    local left = max(0, min(1 - sliceWidth, center - sliceWidth / 2));
+    local top = (1 - sliceHeight) / 2;
+
+    local texWidth = atlasInfo.rightTexCoord - atlasInfo.leftTexCoord;
+    local texHeight = atlasInfo.bottomTexCoord - atlasInfo.topTexCoord;
+    background:SetTexture(atlasInfo.file or atlasInfo.filename);
+    background:SetTexCoord(
+        atlasInfo.leftTexCoord + texWidth * left, atlasInfo.leftTexCoord + texWidth * (left + sliceWidth),
+        atlasInfo.topTexCoord + texHeight * top, atlasInfo.topTexCoord + texHeight * (top + sliceHeight));
+    background:SetDesaturated(desaturate);
+    background:Show();
+end
+
 local function UpdateForever(self)
     local specGroup = self.selectedSpec;
 
     UpdateTabs(self);
 
     local tab = ArmoryPanelTemplates_GetSelectedTab(self);
+    local isActive = IsActiveSpec(self, specGroup);
+    local _, classFile = Armory:UnitClass("player");
 
     self.Choice:Hide();
+    UpdateBackground(self, classFile and "talent-background-"..strlower(classFile), (tab - 0.5) / FOREVER_NUM_GROUPS, 1 / FOREVER_NUM_GROUPS, FOREVER_ART_ASPECT, not isActive);
     UpdateTree(self.Tree, TALENT_SOURCE, specGroup, tab);
-    UpdateStatus(self, specGroup, IsActiveSpec(self, specGroup));
+    UpdateStatus(self, specGroup, isActive);
     UpdateGroupPoints(self, specGroup, tab);
     ArmoryTalentFrame_UpdateSpecTabStates(self);
     self.Tree.heroIcon:Hide();
@@ -519,9 +591,13 @@ function ArmoryTalentFrame_Update()
         currencyID = heroCurrencyID;
     end
 
+    local isActive = IsActiveSpec(self, spec);
+    local background = specID and SPEC_BACKGROUNDS[specID];
+
     self.Choice:Hide();
+    UpdateBackground(self, background and "talents-background-"..background, (tab - 1) / (#self.Tabs - 1), 1, nil, not isActive);
     UpdateTree(self.Tree, TALENT_SOURCE, specID, TAB_PARTS[tab], heroTree);
-    UpdateStatus(self, specID, IsActiveSpec(self, spec));
+    UpdateStatus(self, specID, isActive);
     UpdatePoints(self, specID, currencyID);
     ArmoryTalentFrame_UpdateSpecTabStates(self);
 

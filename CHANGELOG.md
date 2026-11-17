@@ -19,6 +19,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - Fixes an error when checking the mailboxes for items that are about to expire (Classic Era and Burning Crusade Anniversary)
 - Shift-click instead of Alt-click copies the name of a chat link into the search box of the inventory and the guild bank, as in Retail; Alt-click on a chat link is left for the search (Classic Era and Burning Crusade Anniversary)
 - Alt-click copies the name of an item in your bags into the search box of the guild bank too, as in the inventory (Retail)
+- The talent window shows the background of the spec behind the talent tree, and the class, hero and spec tabs in the order of Blizzard's talent window (Retail)
 - Searching with /find runs in the background and stops when you close the window, as in Retail, and in Burning Crusade Anniversary it also searches the guild bank (Classic Era and Burning Crusade Anniversary)
 - Mail warnings as in Retail: one message per mailbox, or one per item with the new option Detailed mail warnings, and a warning when a character has never opened the mailbox (Classic Era and Burning Crusade Anniversary)
 - The total line of the item count in tooltips also shows how many are in the guild bank, as in Retail (Burning Crusade Anniversary)

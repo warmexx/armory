@@ -1,0 +1,7 @@
+## Interface: 16001
+## Title: OfaTalentMock
+## Notes: Armory One for All: mock talents in WoW Forever (/otm), to look at Armory's talent frame below level 10
+## Dependencies: Armory
+## SavedVariables: OfaTalentMockDB
+
+OfaTalentMock.lua
