@@ -5,6 +5,9 @@ Thanks for using Armory. You can show your appreciation and support future devel
 
 ## v20.0.0
 - One Armory for all versions of World of Warcraft: Retail, WoW Forever, Classic Era and Burning Crusade Anniversary now share one addon and one project page
+- Shows the paper doll in the Classic Era layout with Forever's stats, the talents with both specs of dual spec, the skills, the happiness and loyalty of your pets (also in the stable), the PvP frame with the PvP rank and honor, the achievements and statistics, and the Legacy trees as a third tab of the achievements frame (WoW Forever)
+- Characters are stored under their name and surname, so two of your characters with the same first name are kept apart (WoW Forever)
+- Leaves your own realm out of the names in the mail and cooldown messages in the chat
 - Fixes Alt-click search on chat links, the spellbook update, the server time and the guild roster request after Blizzard's API changes (Classic Era)
 - Fixes the missing close function of the options panel, the UI scale reset, the color picker and an error in the tradeskill price source check (Burning Crusade Anniversary)
 - Fixes an error when opening the options and the Defaults button of the options panel (Classic Era and Burning Crusade Anniversary)
