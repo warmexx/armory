@@ -1208,6 +1208,10 @@ local setPattern = EQUIPMENT_SETS:gsub("%%s", ".+");
 local madeByPattern = ITEM_CREATED_BY:gsub("%%s", ".+");
 local cdPattern = ITEM_COOLDOWN_TIME:gsub("%%s", ".+");
 
+local function IsTinkerIgnorable(line)
+    return line and (line:find(setPattern) or line:find(madeByPattern) or line:find(cdPattern) or line == ITEM_SOCKETABLE);
+end
+
 function Armory:GetTinkerFromTooltip(tooltip1, tooltip2)
     if ( (self:GetItemFromTooltip(tooltip1)) ~= (self:GetItemFromTooltip(tooltip2)) ) then
         return;
@@ -1221,10 +1225,13 @@ function Armory:GetTinkerFromTooltip(tooltip1, tooltip2)
     local tooltip2Line = self:GetTooltipText(tooltip2, tooltip2Index);
 
     while ( tooltip1Index > 1 ) do
-        if ( tooltip1Line == RETRIEVING_ITEM_INFO or tooltip2Line == RETRIEVING_ITEM_INFO ) then
+        if ( not tooltip1Line or tooltip1Line == RETRIEVING_ITEM_INFO or tooltip2Line == RETRIEVING_ITEM_INFO ) then
             return;
-        elseif ( tooltip1Line:find(setPattern) or tooltip1Line:find(madeByPattern) or tooltip1Line:find(cdPattern) or tooltip1Line == ITEM_SOCKETABLE ) then
+        elseif ( IsTinkerIgnorable(tooltip1Line) ) then
             tooltip1Index = tooltip1Index - 1;
+        elseif ( IsTinkerIgnorable(tooltip2Line) ) then
+            -- the line may be in both tooltips (equipment sets): skip it on both sides to keep them aligned
+            tooltip2Index = tooltip2Index - 1;
         elseif ( tooltip1Line:find(ITEM_LEVEL) or tooltip1Line:find(ITEM_MIN_LEVEL) ) then
             break;
         elseif ( tooltip1Line == tooltip2Line ) then

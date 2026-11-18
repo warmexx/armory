@@ -348,7 +348,11 @@ function Armory:SetInventoryItemInfo(index)
             local tooltip2 = self:AllocateTooltip();
             tooltip2:SetHyperlink(link);
             if ( self:IsValidTooltip(tooltip2) ) then
-                tinker, anchor = self:GetTinkerFromTooltip(tooltip1, tooltip2);
+                -- Tinkers (engineering) only go on gloves, belt and cloak; elsewhere a difference is
+                -- something else (e.g. the stats of a scaling item) that doesn't belong in the stored tooltip
+                if ( index == ARMORY_SLOTID.HandsSlot or index == ARMORY_SLOTID.WaistSlot or index == ARMORY_SLOTID.BackSlot ) then
+                    tinker, anchor = self:GetTinkerFromTooltip(tooltip1, tooltip2);
+                end
                 emptySockets, activeMeta = self:GetInventoryItemSocketInfo(tooltip1);
             else
                 invalid = true;
