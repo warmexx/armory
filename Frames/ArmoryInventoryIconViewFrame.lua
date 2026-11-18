@@ -151,6 +151,9 @@ function ArmoryInventoryIconViewFrame_ShowContainer(containerFrame)
     end
 
     local index, template;
+    -- An empty slot never matches, so it is darkened while a filter is active, as in the guild bank;
+    -- slots with an item get their own state below
+    local filterActive = Armory:InventoryFilterActive();
     for i = 1, numSlots do
         index = offset + i;
         buttonName = buttonBaseName..index;
@@ -183,6 +186,7 @@ function ArmoryInventoryIconViewFrame_ShowContainer(containerFrame)
             Armory:SetItemLink(itemButton, nil);
             itemButton.hasItem = nil;
             itemButton.IconBorder:Hide();
+            itemButton.searchOverlay:SetShown(filterActive);
 
             itemButton:Show();
         else

@@ -319,7 +319,10 @@
       </EditBox>
       <Frame name="ArmoryInventoryFilterDropDown" inherits="ArmoryFilterDropDownTemplate">
         <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryFrameEditBox" relativePoint="BOTTOMLEFT" x="-21"/>
+          <!-- Right aligned (text RIGHT, see ArmoryInventoryFilterDropDown_OnLoad): the arrow ends 8 pixels inside
+               the search box, as the text of Options starts 8 pixels inside the money box. The arrow button ends at
+               x=148 in the dropdown; its texture has about 3 transparent pixels at the edge. -->
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryFrameEditBox" relativePoint="BOTTOMRIGHT" x="-153"/>
         </Anchors>
         <Scripts>
           <OnLoad>

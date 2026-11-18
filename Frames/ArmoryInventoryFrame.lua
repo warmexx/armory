@@ -530,6 +530,8 @@ end
 
 function ArmoryInventoryFilterDropDown_OnLoad(self)
     ArmoryItemFilter_InitializeDropDown(self);
+    -- The text ends at a fixed spot, so the arrow does not move when the text changes
+    ArmoryDropDownMenu_JustifyText(self, "RIGHT");
 end
 
 function ArmoryInventoryFilterDropDown_OnShow(self)

@@ -178,7 +178,7 @@ function ArmoryGuildBankFrame_OnTextChanged(self)
 end
 
 function ArmoryGuildBankFilterDropDown_OnLoad(self)
-    ArmoryDropDownMenu_SetWidth(self, 116);
+    -- No fixed width, as in the inventory: the text then ends at the arrow
     ArmoryItemFilter_InitializeDropDown(self);
 end
 
@@ -578,11 +578,14 @@ function ArmoryListGuildBankFrame_AllignCommonControls(self)
 
     ArmoryGuildBankFilterDropDown:SetParent(self);
     ArmoryGuildBankFilterDropDown:ClearAllPoints();
-    ArmoryGuildBankFilterDropDown:SetPoint("TOPRIGHT", "ArmoryGuildBankFrameEditBox", "BOTTOMRIGHT", 16, 0);
+    -- Two columns, as in the inventory: the filter right aligned below the search box (see ArmoryInventoryFrame.xml),
+    -- the guild below the money
+    ArmoryDropDownMenu_JustifyText(ArmoryGuildBankFilterDropDown, "RIGHT");
+    ArmoryGuildBankFilterDropDown:SetPoint("TOPLEFT", "ArmoryGuildBankFrameEditBox", "BOTTOMRIGHT", -153, 0);
 
     ArmoryGuildBankNameDropDown:SetParent(self);
     ArmoryGuildBankNameDropDown:ClearAllPoints();
-    ArmoryGuildBankNameDropDown:SetPoint("RIGHT", "ArmoryGuildBankFilterDropDown", "LEFT", 30, 0);
+    ArmoryGuildBankNameDropDown:SetPoint("TOPLEFT", "ArmoryListGuildBankFrameMoneyBackgroundFrame", "BOTTOMLEFT", -19, 0);
 end
 
 function ArmoryIconGuildBankFrame_OnLoad(self)
@@ -619,7 +622,8 @@ function ArmoryIconGuildBankFrame_AllignCommonControls(self)
 
     ArmoryGuildBankFilterDropDown:SetParent(self);
     ArmoryGuildBankFilterDropDown:ClearAllPoints();
-    ArmoryGuildBankFilterDropDown:SetPoint("TOPRIGHT", self, "TOPRIGHT", 16, -39);
+    ArmoryDropDownMenu_JustifyText(ArmoryGuildBankFilterDropDown, "LEFT");
+    ArmoryGuildBankFilterDropDown:SetPoint("TOPRIGHT", self, "TOPRIGHT", 10, -39);
 
     ArmoryGuildBankNameDropDown:SetParent(self);
     ArmoryGuildBankNameDropDown:ClearAllPoints();
