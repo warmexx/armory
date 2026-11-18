@@ -26,6 +26,5 @@
 Locales.xml
 Core.xml
 Config.xml
-Frames\ArmoryGuildBank.xml [AllowLoadGameType mainline]
-Frames\TBC\ArmoryGuildBank.xml [AllowLoadGameType tbc]
+Frames\ArmoryGuildBank.xml
 Frames\ArmoryInventoryGuildBankFrame.xml

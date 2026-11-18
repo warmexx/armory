@@ -38,6 +38,7 @@
     </HitRectInsets>
   </Frame>
   <EditBox name="ArmorySearchBoxTemplate" inherits="SearchBoxTemplate" virtual="true"/>
+  <Frame name="ArmorySmallMoneyFrameTemplate" inherits="SmallMoneyFrameTemplate" virtual="true"/>
   <CheckButton name="ArmoryUICheckButtonTemplate" inherits="UICheckButtonTemplate" virtual="true"/>
   <ScrollFrame name="ArmoryUIPanelScrollFrameTemplate" inherits="UIPanelScrollFrameTemplate" virtual="true"/>
   <ScrollFrame name="ArmoryFauxScrollFrameTemplate" inherits="FauxScrollFrameTemplate" virtual="true"/>

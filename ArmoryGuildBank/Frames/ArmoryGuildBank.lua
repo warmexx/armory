@@ -38,6 +38,7 @@ local NUM_GUILDBANK_COLUMNS = 7;
 -- Classic calls it Standard
 local QUALITY_COMMON = Enum.ItemQuality.Common or Enum.ItemQuality.Standard;
 local MoneyFrame_Update = Armory.isClassic and MoneyFrame_Update or ArmoryMoneyFrame_Update;
+local NUM_TAB_FRAMES = 8;
 
 ArmoryStaticPopupDialogs["ARMORY_DELETE_GUILDBANK"] = {
     text = ARMORY_DELETE_UNIT,
@@ -295,7 +296,7 @@ local function UpdateGuildEmblem(dbEntry, frameName)
     end
 end
 
--- The tabard on the portrait of the list view (Mainline)
+-- The tabard on the portrait of the list view
 local function UpdateGuildTabard(dbEntry)
     local emblemTexture = ArmoryListGuildBankFrame.PortraitOverlay.TabardEmblem;
     local backgroundTexture = ArmoryListGuildBankFrame.PortraitOverlay.TabardBackground;
@@ -364,12 +365,7 @@ local function UpdateGuildTabard(dbEntry)
     emblemTexture:SetWidth(hasEmblem and (emblemTexture:GetHeight() * (7 / 8)) or emblemTexture:GetHeight());
 end
 
-local UpdateGuildListViewInfo;
-if ( Armory.isClassic ) then
-    UpdateGuildListViewInfo = function(dbEntry) UpdateGuildEmblem(dbEntry, "ArmoryListGuildBankFrame"); end;
-else
-    UpdateGuildListViewInfo = UpdateGuildTabard;
-end
+local UpdateGuildListViewInfo = UpdateGuildTabard;
 
 local function UpdateGuildIconViewInfo(dbEntry)
     UpdateGuildEmblem(dbEntry, "ArmoryIconGuildBankFrame");
@@ -557,11 +553,6 @@ end
 
 function ArmoryListGuildBankFrame_OnLoad(self)
     InitGuildBankFrame(self);
-
-    if ( Armory.isClassic ) then
-        Armory:SetPortraitToTexture(ArmoryListGuildBankFramePortrait, "Interface\\LFGFrame\\BattlenetWorking4");
-    end
-
     ArmoryListGuildBankFrame_ResetScrollBar();
 end
 
@@ -579,19 +570,11 @@ function ArmoryListGuildBankFrame_AllignCommonControls(self)
 
     ArmoryGuildBankFactionFrame:SetParent(self);
     ArmoryGuildBankFactionFrame:ClearAllPoints();
-    if ( Armory.isClassic ) then
-        ArmoryGuildBankFactionFrame:SetPoint("TOPLEFT", self, "TOPLEFT", 28, -74);
-    else
-        ArmoryGuildBankFactionFrame:SetPoint("TOPLEFT", self, "TOPLEFT", 16, -64);
-    end
+    ArmoryGuildBankFactionFrame:SetPoint("TOPLEFT", self, "TOPLEFT", 16, -64);
 
     ArmoryGuildBankFrameEditBox:SetParent(self);
     ArmoryGuildBankFrameEditBox:ClearAllPoints();
-    if ( Armory.isClassic ) then
-        ArmoryGuildBankFrameEditBox:SetPoint("TOPRIGHT", self, "TOPRIGHT", -45, -45);
-    else
-        ArmoryGuildBankFrameEditBox:SetPoint("TOPRIGHT", self, "TOPRIGHT", -10, -36);
-    end
+    ArmoryGuildBankFrameEditBox:SetPoint("TOPRIGHT", self, "TOPRIGHT", -10, -36);
 
     ArmoryGuildBankFilterDropDown:SetParent(self);
     ArmoryGuildBankFilterDropDown:ClearAllPoints();
@@ -668,7 +651,8 @@ function ArmoryIconGuildBankFrame_UpdateTabs()
         local tab, tabButton, iconTexture;
         local name, count, link, texture, timestamp;
         local icon;
-        for i = 1, MAX_GUILDBANK_TABS do
+        -- All tab frames: TBC has 6 tabs (MAX_GUILDBANK_TABS), the XML 8; a tab without data is hidden
+        for i = 1, NUM_TAB_FRAMES do
             tab = _G["ArmoryIconGuildBankTab"..i];
             tabButton = _G["ArmoryIconGuildBankTab"..i.."Button"];
             iconTexture = _G["ArmoryIconGuildBankTab"..i.."ButtonIconTexture"];
