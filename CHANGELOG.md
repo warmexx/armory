@@ -7,6 +7,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - The realm and faction filter are now two separate options, so you can show both factions on your realm or one faction on all realms
 - The item counts in tooltips list your characters first, then your guild banks and then the Warband bank, and can be sorted by name or by count in the Tooltip options
 - The Warband bank has its own color in the item counts, which can be set in the Tooltip options (Retail)
+- The options of the inventory (bag layout, search all) are now in an Options menu next to the filter, with a new option to show your backpack and bags as one combined bag
 - Fixes a stat of a scaling item showing up among the item counts in the tooltip of an equipment slot, mistaken for an engineering tinker (Retail)
 - Fixes an error when logging in or reloading during a keystone, a PvP match or a boss encounter, when Armory joins its share channel (Retail)
 

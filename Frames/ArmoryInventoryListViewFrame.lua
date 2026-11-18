@@ -39,7 +39,6 @@ function ArmoryInventoryListViewFrame_OnShow(self)
     ArmoryInventoryListViewScrollFrameScrollBar:SetMinMaxValues(0, 0);
     ArmoryInventoryListViewScrollFrameScrollBar:SetValue(0);
     Armory:SetInventorySearchAllFilter(Armory:GetInventorySearchAll());
-    ArmoryInventoryListViewFrameSearchAllCheckButton:SetChecked(Armory:GetInventorySearchAllFilter());
     ArmoryInventoryListViewFrame_Update();
 end
 

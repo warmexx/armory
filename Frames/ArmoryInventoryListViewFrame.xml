@@ -29,35 +29,16 @@
       </OnShow>
     </Scripts>
     <Frames>
-      <CheckButton name="ArmoryInventoryListViewFrameSearchAllCheckButton" inherits="ArmoryUICheckButtonTemplate">
-        <Size>
-          <AbsDimension x="24" y="24"/>
-        </Size>
+      <Frame name="ArmoryInventoryListViewFrameOptionsDropDown" inherits="ArmoryFilterDropDownTemplate">
         <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryMoneyBackgroundFrame" relativePoint="BOTTOMLEFT">
-            <Offset>
-              <AbsDimension x="10" y="-2"/>
-            </Offset>
-          </Anchor>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryMoneyBackgroundFrame" relativePoint="BOTTOMLEFT" x="-19"/>
         </Anchors>
         <Scripts>
           <OnLoad>
-            ArmoryInventoryListViewFrameSearchAllCheckButtonText:SetText(ARMORY_INVENTORY_SEARCH_ALL);
+            ArmoryInventoryOptionsDropDown_OnLoad(self, true);
           </OnLoad>
-          <OnClick>
-            ArmoryInventoryListViewSearchAll(self:GetChecked());
-          </OnClick>
-          <OnEnter>
-            Armory:AddEnhancedTip(self, ARMORY_INVENTORY_SEARCH_ALL, 1.0, 1.0, 1.0, ARMORY_INVENTORY_SEARCH_ALL_TOOLTIP, 1);
-          </OnEnter>
-          <OnLeave>
-            GameTooltip:Hide();
-          </OnLeave>
         </Scripts>
-        <HitRectInsets>
-          <AbsInset left="0" right="-75" top="0" bottom="0"/>
-        </HitRectInsets>
-      </CheckButton>
+      </Frame>
       <Button name="ArmoryInventoryLine1" inherits="ArmoryInventoryListItemTemplate">
         <Anchors>
           <Anchor point="TOPLEFT" x="-2"/>

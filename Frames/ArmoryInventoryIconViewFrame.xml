@@ -82,35 +82,16 @@
       </OnShow>
     </Scripts>
     <Frames>
-      <CheckButton name="ArmoryInventoryIconViewFrameLayoutCheckButton" inherits="ArmoryUICheckButtonTemplate">
-        <Size>
-          <AbsDimension x="24" y="24"/>
-        </Size>
+      <Frame name="ArmoryInventoryIconViewFrameOptionsDropDown" inherits="ArmoryFilterDropDownTemplate">
         <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryMoneyBackgroundFrame" relativePoint="BOTTOMLEFT">
-            <Offset>
-              <AbsDimension x="10" y="-2"/>
-            </Offset>
-          </Anchor>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryInventoryMoneyBackgroundFrame" relativePoint="BOTTOMLEFT" x="-19"/>
         </Anchors>
         <Scripts>
           <OnLoad>
-            ArmoryInventoryIconViewFrameLayoutCheckButtonText:SetText(ARMORY_INVENTORY_BAGLAYOUT);
+            ArmoryInventoryOptionsDropDown_OnLoad(self);
           </OnLoad>
-          <OnClick>
-            ArmoryInventoryIconViewBagLayout(self:GetChecked());
-          </OnClick>
-          <OnEnter>
-            Armory:AddEnhancedTip(self, ARMORY_INVENTORY_BAGLAYOUT, 1.0, 1.0, 1.0, ARMORY_INVENTORY_BAGLAYOUT_TOOLTIP, 1);
-          </OnEnter>
-          <OnLeave>
-            GameTooltip:Hide();
-          </OnLeave>
         </Scripts>
-        <HitRectInsets>
-          <AbsInset left="0" right="-75" top="0" bottom="0"/>
-        </HitRectInsets>
-      </CheckButton>
+      </Frame>
     </Frames>
     <ScrollChild>
       <Frame name="ArmoryInventoryIconViewChildFrame">

@@ -18,3 +18,5 @@ L["ARMORY_ITEMCOUNT_SORT_TYPE"] = "Characters first"
 L["ARMORY_ITEMCOUNT_SORT_NAME"] = "By name"
 L["ARMORY_ITEMCOUNT_SORT_COUNT"] = "Most first"
 L["ARMORY_ITEMCOUNT_SORT_COUNTASC"] = "Fewest first"
+-- Only used in Classic; Retail and Forever use Blizzard's COMBINED_BAG_TITLE
+L["ARMORY_INVENTORY_COMBINEDBAG"] = "Combined Backpack"

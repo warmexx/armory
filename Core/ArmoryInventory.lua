@@ -196,6 +196,30 @@ function Armory:IsBag(id)
     end
 end
 
+-- With "Combine bags" the backpack shows the backpack and the bags; the reagent bag stays apart
+local BACKPACK = Armory.isClassic and BACKPACK_CONTAINER or Enum.BagIndex.Backpack;
+local combinedBags = {};
+
+-- The containers that the container shows: the backpack and the bags, or the container itself
+function Armory:GetCombinedContainers(id)
+    table.wipe(combinedBags);
+    if ( id == BACKPACK and self:GetInventoryCombineBags() ) then
+        for _, bagId in ipairs(ArmoryInventoryPlayerContainers) do
+            if ( IsGenericBagContainer(bagId) ) then
+                table.insert(combinedBags, bagId);
+            end
+        end
+    else
+        table.insert(combinedBags, id);
+    end
+    return combinedBags;
+end
+
+-- A bag that the backpack shows, so it has no place of its own
+function Armory:IsCombinedBag(id)
+    return id ~= BACKPACK and IsGenericBagContainer(id) and self:GetInventoryCombineBags();
+end
+
 local function InventoryContainerName(id)
     return "Container" .. id;
 end
@@ -248,17 +272,34 @@ local function GetInventoryLines(unit)
             id = containers[i];
             name, numSlots, isCollapsed, containerName = Armory:GetInventoryContainerInfoEx(id);
             header = {name, id, numSlots, isCollapsed, true, nil, nil, profile.realm, profile.character, 0, containerName};
+            if ( Armory:IsCombinedBag(id) ) then
+                -- shown by the backpack
+                numSlots = nil;
+            elseif ( unit == "player" ) then
+                -- the backpack with the bags when they are combined; the lines keep their own bag
+                local bags = Armory:GetCombinedContainers(id);
+                if ( #bags > 1 ) then
+                    numSlots = 0;
+                    for _, bagId in ipairs(bags) do
+                        numSlots = numSlots + (select(2, Armory:GetInventoryContainerInfoEx(bagId)) or 0);
+                    end
+                    header[3] = numSlots;
+                    header[11] = ARMORY_INVENTORY_COMBINEDBAG;
+                end
+            end
             if ( numSlots and numSlots > 0 ) then
                 table.wipe(itemLines[unit]);
-                for index = 1, numSlots do
-                    link = Armory:GetContainerItemLink(id, index);
-                    name = Armory:GetNameFromLink(link);
-                    if ( name and Armory:MatchInventoryItem(inventoryFilter, name, link, true) ) then
-                        _, itemCount = Armory:GetContainerItemInfo(id, index);
-                        table.insert(itemLines[unit], {name, id, itemCount, nil, nil, index, link, profile.realm, profile.character});
-                    else
-                        -- free slot
-                        header[10] = header[10] + 1;
+                for _, bagId in ipairs(unit == "player" and Armory:GetCombinedContainers(id) or {id}) do
+                    for index = 1, select(2, Armory:GetInventoryContainerInfoEx(bagId)) or 0 do
+                        link = Armory:GetContainerItemLink(bagId, index);
+                        name = Armory:GetNameFromLink(link);
+                        if ( name and Armory:MatchInventoryItem(inventoryFilter, name, link, true) ) then
+                            _, itemCount = Armory:GetContainerItemInfo(bagId, index);
+                            table.insert(itemLines[unit], {name, bagId, itemCount, nil, nil, index, link, profile.realm, profile.character});
+                        else
+                            -- free slot
+                            header[10] = header[10] + 1;
+                        end
                     end
                 end
                 if ( #itemLines[unit] == 0 and not Armory:InventoryFilterActive() ) then
@@ -1074,6 +1115,16 @@ function Armory:GetInventoryLineState(id, unit)
         _, _, _, isCollapsed = Armory:GetInventoryLineInfo(id, unit);
     end
     return isCollapsed;
+end
+
+-- The backpack and the bags as one container in the inventory, as Blizzard's combined bag
+function Armory:SetInventoryCombineBags(checked)
+    self:Setting("Inventory", "CombineBags", checked);
+    dirty.player = true;
+end
+
+function Armory:GetInventoryCombineBags()
+    return self:Setting("Inventory", "CombineBags") or nil;
 end
 
 function Armory:ExpandContainer(id)

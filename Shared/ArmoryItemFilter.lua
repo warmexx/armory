@@ -213,6 +213,7 @@ function ArmoryItemFilter_InitializeDropDown(dropdown)
 
     ArmoryDropDownMenu_Initialize(dropdown, ArmoryItemFilterDropDown_Initialize, "MENU");
     ArmoryDropDownMenu_JustifyText(dropdown, "LEFT");
+    ArmoryDropDownMenu_ShowMenuArrow(dropdown);
     ArmoryItemFilterDropDown_SetText();
 
     local filterText = _G[dropdown:GetName().."Button"];

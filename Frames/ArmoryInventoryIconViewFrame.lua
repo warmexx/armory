@@ -63,7 +63,6 @@ function ArmoryInventoryIconViewFrame_OnLoad(self)
 end
 
 function ArmoryInventoryIconViewFrame_OnShow(self)
-    ArmoryInventoryIconViewFrameLayoutCheckButton:SetChecked(Armory:GetInventoryBagLayout());
     ArmoryInventoryIconViewFrame_Update();
 end
 
@@ -75,9 +74,22 @@ end
 function ArmoryInventoryContainerItemButton_OnEnter(self)
     local containerName = self:GetParent():GetName();
     local containerButton = _G[containerName.."Label"];
-    local containerId = containerButton:GetID();
+    -- with combined bags a button can show an item of another bag than its container
+    local containerId = self.bagId or containerButton:GetID();
     local itemIndex = self:GetID();
     Armory:SetBagItem(containerId, itemIndex);
+end
+
+-- The slots of the container, as {bag, slot}: of all bags when they are combined in the backpack
+local containerSlots = {};
+local function GetContainerSlots(id)
+    table.wipe(containerSlots);
+    for _, bagId in ipairs(Armory:GetCombinedContainers(id)) do
+        for slot = 1, select(2, Armory:GetInventoryContainerInfoEx(bagId)) or 0 do
+            table.insert(containerSlots, {bagId, slot});
+        end
+    end
+    return containerSlots;
 end
 
 function ArmoryInventoryIconViewFrame_ShowContainer(containerFrame)
@@ -89,8 +101,14 @@ function ArmoryInventoryIconViewFrame_ShowContainer(containerFrame)
     local buttonBaseName = containerName.."Item";
     local buttonTemplate = "ArmoryInventoryFrameItemButtonTemplate";
     local rowHeight = CONTAINER_ROW_HEIGHT;
+    local slots = GetContainerSlots(id);
+    local combined = #Armory:GetCombinedContainers(id) > 1;
+    numSlots = #slots;
+    if ( combined ) then
+        containerTitle = ARMORY_INVENTORY_COMBINEDBAG;
+    end
 
-    if ( Armory:GetInventoryBagLayout() and HasBagLayout(id) ) then
+    if ( Armory:GetInventoryBagLayout() and HasBagLayout(id) and not combined ) then
         columns = NUM_CONTAINER_COLUMNS;
         isPlusTwoBag = (mod(numSlots, columns) == 2);
     else
@@ -141,6 +159,7 @@ function ArmoryInventoryIconViewFrame_ShowContainer(containerFrame)
             itemButton = CreateFrame("CheckButton", buttonName, containerFrame, buttonTemplate);
         end
         itemButton:SetID(0);
+        itemButton.bagId = nil;
         if ( not isCollapsed ) then
             -- Set first button
             if ( index == 1 ) then
@@ -181,11 +200,12 @@ function ArmoryInventoryIconViewFrame_ShowContainer(containerFrame)
 
     if ( not isCollapsed ) then
         local texture, itemCount, quality, slotId;
-        local name, link;
+        local name, link, bagId, slot;
         for i = 1, numSlots do
-            texture, itemCount, quality, _, _, _, slotId = Armory:GetInventoryContainerValue(id, i);
+            bagId, slot = slots[i][1], slots[i][2];
+            texture, itemCount, quality, _, _, _, slotId = Armory:GetInventoryContainerValue(bagId, slot);
             if ( texture ) then
-                if ( Armory:GetInventoryBagLayout() ) then
+                if ( Armory:GetInventoryBagLayout() and not combined ) then
                     index = offset + (slotId or i);
                 else
                     index = offset + i;
@@ -200,7 +220,7 @@ function ArmoryInventoryIconViewFrame_ShowContainer(containerFrame)
                         SetItemButtonCount(itemButton, itemCount);
                     end
 
-                    link = Armory:GetContainerItemLink(id, i);
+                    link = Armory:GetContainerItemLink(bagId, slot);
                     name = Armory:GetNameFromLink(link);
                     if ( not Armory:InventoryFilterActive() or (name and Armory:MatchInventoryItem(Armory:GetInventoryItemNameFilter(), name, link)) ) then
                         itemButton.searchOverlay:Hide();
@@ -217,7 +237,8 @@ function ArmoryInventoryIconViewFrame_ShowContainer(containerFrame)
 
                     Armory:SetItemLink(itemButton, link);
                     itemButton.hasItem = 1;
-                    itemButton:SetID(i);
+                    itemButton:SetID(slot);
+                    itemButton.bagId = combined and bagId or nil;
                 end
             end
         end
@@ -248,7 +269,8 @@ function ArmoryInventoryIconViewFrame_Update()
         if ( containerFrame ) then
             _, size, isCollapsed = Armory:GetInventoryContainerInfo(ArmoryInventoryPlayerContainers[i]);
 
-            if ( size and size > 0 ) then
+            -- a bag combined in the backpack has no place of its own
+            if ( size and size > 0 and not Armory:IsCombinedBag(ArmoryInventoryPlayerContainers[i]) ) then
                 if ( not isCollapsed and ArmoryInventoryCollapseAllButton.isCollapsed ) then
                     ArmoryInventoryCollapseAllButton.isCollapsed = nil;
                     ArmoryInventoryCollapseAllButton:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up");
@@ -292,4 +314,49 @@ end
 function ArmoryInventoryIconViewBagLayout(checked)
     Armory:SetInventoryBagLayout(checked);
     ArmoryInventoryIconViewFrame_OnShow(ArmoryInventoryIconViewFrame);
+end
+
+-- Shared by the icon and the list view
+function ArmoryInventoryCombineBags(checked)
+    Armory:SetInventoryCombineBags(checked);
+    ArmoryInventoryFrame_Update();
+end
+
+-- The options of the icon and the list view, as checks in a dropdown next to the item filter
+local function AddOption(text, tooltip, checked, setter)
+    local info = ArmoryDropDownMenu_CreateInfo();
+    info.text = text;
+    info.tooltipTitle = text;
+    info.tooltipText = tooltip;
+    info.checked = checked;
+    info.isNotRadio = true;
+    info.keepShownOnClick = 1;
+    info.func = function(_, _, _, isChecked) setter(isChecked); end;
+    ArmoryDropDownMenu_AddButton(info);
+end
+
+local function InitializeOptions(self, level)
+    -- Also called on load, before the settings are there; level is set when the menu opens
+    if ( not level ) then
+        return;
+    elseif ( self.isListView ) then
+        AddOption(ARMORY_INVENTORY_SEARCH_ALL, ARMORY_INVENTORY_SEARCH_ALL_TOOLTIP, Armory:GetInventorySearchAllFilter(), ArmoryInventoryListViewSearchAll);
+    else
+        AddOption(ARMORY_INVENTORY_BAGLAYOUT, ARMORY_INVENTORY_BAGLAYOUT_TOOLTIP, Armory:GetInventoryBagLayout(), ArmoryInventoryIconViewBagLayout);
+    end
+    AddOption(ARMORY_INVENTORY_COMBINEBAGS, ARMORY_INVENTORY_COMBINEBAGS_TOOLTIP, Armory:GetInventoryCombineBags(), ArmoryInventoryCombineBags);
+
+    local info = ArmoryDropDownMenu_CreateInfo();
+    info.text = CLOSE;
+    info.notCheckable = 1;
+    info.func = function() ArmoryHideDropDownMenu(1); end;
+    ArmoryDropDownMenu_AddButton(info);
+end
+
+function ArmoryInventoryOptionsDropDown_OnLoad(self, isListView)
+    self.isListView = isListView;
+    ArmoryDropDownMenu_Initialize(self, InitializeOptions, "MENU");
+    ArmoryDropDownMenu_JustifyText(self, "LEFT");
+    ArmoryDropDownMenu_ShowMenuArrow(self);
+    ArmoryDropDownMenu_SetText(self, OPTIONS);
 end

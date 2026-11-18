@@ -946,6 +946,19 @@ function ArmoryDropDownMenu_JustifyText(frame, justification)
     end
 end
 
+-- A dropdown in MENU mode shows only its text; this brings back the arrow button right after
+-- the text, so it shows that a click opens a menu. Call it after ArmoryDropDownMenu_JustifyText.
+function ArmoryDropDownMenu_ShowMenuArrow(frame)
+    local name = frame:GetName();
+    local button = _G[name.."Button"];
+    _G[name.."ButtonNormalTexture"]:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up");
+    _G[name.."ButtonPushedTexture"]:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Down");
+    _G[name.."ButtonDisabledTexture"]:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Disabled");
+    _G[name.."ButtonHighlightTexture"]:SetTexture("Interface\\Buttons\\UI-Common-MouseHilight");
+    -- the textures sit at the right of the button, which covers the text
+    button:SetPoint("RIGHT", name.."Text", "RIGHT", 26, 0);
+end
+
 function ArmoryDropDownMenu_SetAnchor(dropdown, xOffset, yOffset, point, relativeTo, relativePoint)
     dropdown.xOffset = xOffset;
     dropdown.yOffset = yOffset;
