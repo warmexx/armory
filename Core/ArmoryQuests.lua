@@ -775,3 +775,252 @@ function Armory:FindQuestSpell(spellList, ...)
 
     return list;
 end
+
+----------------------------------------------------------
+-- Classic: the quest log of Era and TBC, chosen once at load
+-- Era and TBC have the old quest log API, store the quest tag instead of the suggested group
+-- and keep the number of quests and the dailies (TBC) in the database
+----------------------------------------------------------
+
+if ( Armory.isClassic ) then
+    GetQuestLines = function()
+        local dbEntry = Armory.selectedDbBaseEntry;
+
+        table.wipe(questLines);
+
+        if ( dbEntry ) then
+            local count = dbEntry:GetNumValues(container);
+            local collapsed = false;
+            local hasItems = (questLogFilter == "");
+            local include, text, numItems;
+
+            for i = 1, count do
+                local name, _, _, isHeader, _, _, _, questID = dbEntry:GetValue(container, i, "Info");
+
+                local isCollapsed = Armory:GetHeaderLineState(container, name);
+                if ( isHeader ) then
+                    table.insert(questLines, i);
+                    collapsed = isCollapsed;
+                elseif ( not collapsed ) then
+                    if ( questLogFilter == "" ) then
+                        include = true;
+                    else
+                        local id = tostring(questID);
+                        text = name.."\t"..dbEntry:GetValue(container, id, "Text");
+                        numItems = dbEntry:GetNumValues(container, id, "LeaderBoards");
+                        for index = 1, numItems do
+                            text = text.."\t"..(dbEntry:GetValue(container, id, "LeaderBoards", index) or "");
+                        end
+                        numItems = dbEntry:GetNumValues(container, id, "Rewards");
+                        for index = 1, numItems do
+                            text = text.."\t"..(dbEntry:GetValue(container, id, "Rewards", index) or "");
+                        end
+                        _, name = dbEntry:GetValue(container, id, "RewardSpell");
+                        if ( name ) then
+                            text = text.."\t"..name;
+                        end
+                        include = string.find(strlower(text), strlower(questLogFilter), 1, true);
+                    end
+                    if ( include ) then
+                        hasItems = true;
+                        table.insert(questLines, i);
+                    end
+                end
+            end
+
+            if ( not hasItems ) then
+                table.wipe(questLines);
+            end
+        end
+
+        dirty = false;
+        owner = Armory:SelectedCharacter();
+
+        return questLines;
+    end
+
+    function Armory:UpdateQuests()
+        local dbEntry = self.playerDbBaseEntry;
+        if ( not dbEntry ) then
+            return;
+        end
+
+        if ( not self:IsLocked(container) ) then
+            if ( self.ignoreQuestUpdate ) then
+                self.ignoreQuestUpdate = false;
+                return;
+            end
+
+            self:Lock(container);
+
+            self:PrintDebug("UPDATE", container);
+
+            if ( self:HasQuestLog() ) then
+                local success, dataMissing;
+
+                local numQuests = 0;
+                local currentQuest = _G.GetQuestLogSelection();
+
+                -- store the complete (expanded) list
+                local funcNumLines = _G.GetNumQuestLogEntries;
+                local funcGetLineInfo = _G.GetQuestLogTitle;
+                local funcGetLineState = function(index)
+                    local _, _, _, isHeader, isCollapsed = _G.GetQuestLogTitle(index);
+                    return isHeader, not isCollapsed;
+                end;
+                local funcExpand = _G.ExpandQuestHeader;
+                local funcCollapse = _G.CollapseQuestHeader;
+                local funcSelect = _G.SelectQuestLogEntry;
+                local funcAdditionalInfo = function(index)
+                    numQuests = numQuests + 1;
+
+                    local questID = select(8, _G.GetQuestLogTitle(index));
+                    local id = tostring(questID);
+                    local info = dbEntry:SelectContainer(container, id);
+                    info.Text = dbEntry.Save(_G.GetQuestLogQuestText());
+                    info.GroupNum = _G.GetQuestLogGroupNum and _G.GetQuestLogGroupNum() or nil;
+                    info.RewardTitle = _G.GetQuestLogRewardTitle and _G.GetQuestLogRewardTitle() or nil;
+                    if ( _G.IsCurrentQuestFailed() ) then
+                        info.Failed = _G.IsCurrentQuestFailed();
+                    end
+                    if ( _G.GetQuestLogTimeLeft() ) then
+                        info.TimeLeft = dbEntry.Save(_G.GetQuestLogTimeLeft(), time());
+                    end
+                    if ( _G.GetQuestLogRequiredMoney() > 0 ) then
+                        info.RequiredMoney = _G.GetQuestLogRequiredMoney();
+                    end
+                    if ( _G.GetQuestLogRewardMoney() > 0 ) then
+                        info.RewardMoney = _G.GetQuestLogRewardMoney();
+                    end
+                    if ( _G.GetQuestLogRewardHonor and _G.GetQuestLogRewardHonor() > 0 ) then
+                        info.RewardHonor = _G.GetQuestLogRewardHonor();
+                    end
+                    local spellRewards = C_QuestInfoSystem.GetQuestRewardSpells(questID) or {};
+                    local numQuestSpellRewards = #spellRewards;
+                    if ( numQuestSpellRewards > 0 ) then
+                        info.RewardSpells = {};
+                        for i = 1, numQuestSpellRewards do
+                            local spellID = spellRewards[i];
+                            local spellInfo = C_QuestInfoSystem.GetQuestRewardSpellInfo(questID, spellID);
+                            local knownSpell = C_SpellBook.IsSpellInSpellBook(spellID, Enum.SpellBookSpellBank.Player, true);
+                            local isFollowerCollected = spellInfo.garrFollowerID and C_Garrison.IsFollowerCollected(spellInfo.garrFollowerID);
+                            local link = _G.GetSpellLink(spellID);
+                            info.RewardSpells[i] = dbEntry.Save(
+                                spellInfo.texture,
+                                spellInfo.name,
+                                spellInfo.isTradeskill,
+                                spellInfo.isSpellLearned,
+                                spellInfo.hideSpellLearnText,
+                                spellInfo.isBoostSpell,
+                                spellInfo.garrFollowerID,
+                                spellInfo.genericUnlock,
+                                spellID, knownSpell, isFollowerCollected, link
+                            );
+                            if ( not link ) then
+                                dataMissing = true;
+                            end
+                        end
+                    end
+                    if ( _G.GetNumQuestLeaderBoards() > 0 ) then
+                        info.LeaderBoards = {};
+                        for i = 1, _G.GetNumQuestLeaderBoards() do
+                            info.LeaderBoards[i] = dbEntry.Save(_G.GetQuestLogLeaderBoard(i));
+                        end
+                    end
+                    if ( _G.GetNumQuestLogRewards() > 0 ) then
+                        info.Rewards = {};
+                        for i = 1, _G.GetNumQuestLogRewards() do
+                            local name, texture, numItems, quality, isUsable = _G.GetQuestLogRewardInfo(i);
+                            link = _G.GetQuestLogItemLink("reward", i);
+                            info.Rewards[i] = dbEntry.Save(name, texture, numItems, quality, isUsable, link);
+                            if ( not link ) then
+                                dataMissing = true;
+                            end
+                        end
+                    end
+                    if ( _G.GetNumQuestLogChoices() > 0 ) then
+                        info.Choices = {};
+                        for i = 1, _G.GetNumQuestLogChoices() do
+                            local name, texture, numItems, quality, isUsable = _G.GetQuestLogChoiceInfo(i);
+                            link = _G.GetQuestLogItemLink("choice", i);
+                            info.Choices[i] = dbEntry.Save(name, texture, numItems, quality, isUsable, link);
+                            if ( not link ) then
+                                dataMissing = true;
+                            end
+                        end
+                    end
+                    return id;
+                end;
+
+                -- LightHeaded hooks SelectQuestLogEntry
+                local stubbed;
+                if ( LightHeaded ) then
+                    stubbed = LightHeaded.GetCurrentQID;
+                    LightHeaded.GetCurrentQID = function() return nil; end;
+                end
+
+                dbEntry:ClearContainer(container);
+
+                -- if expand/collapse has been called a QUEST_LOG_UPDATE event will be fired immediately after the scan has been completed
+                success, self.ignoreQuestUpdate = dbEntry:SetExpandableListValues(container, funcNumLines, funcGetLineState, funcGetLineInfo, funcExpand, funcCollapse, funcAdditionalInfo, funcSelect);
+                if ( dataMissing or not success ) then
+                    self:RetryUpdate(container, function() Armory:UpdateQuests(); end);
+                else
+                    self:UpdateSucceeded(container);
+                end
+
+                dbEntry:SetValue(2, container, "NumQuests", numQuests);
+                if ( _G.GetMaxDailyQuests ) then
+                    dbEntry:SetValue(2, container, "MaxDailyQuests", _G.GetMaxDailyQuests());
+                end
+                if ( _G.GetDailyQuestsCompleted ) then
+                    dbEntry:SetValue(2, container, "DailyQuestsCompleted", _G.GetDailyQuestsCompleted());
+                end
+
+                _G.SelectQuestLogEntry(currentQuest);
+
+                if ( stubbed ) then
+                    LightHeaded.GetCurrentQID = stubbed;
+                end
+            else
+                dbEntry:SetValue(container, nil);
+            end
+
+            dirty = dirty or self:IsPlayerSelected();
+
+            self:Unlock(container);
+        else
+            self:PrintDebug("LOCKED", container);
+        end
+    end
+
+    function Armory:GetNumQuestLogEntries()
+        if ( dirty or not self:IsSelectedCharacter(owner) ) then
+            GetQuestLines();
+        end
+        local dbEntry = self.selectedDbBaseEntry;
+        local numQuests = (dbEntry and dbEntry:GetValue(container, "NumQuests")) or 0;
+        return #questLines, numQuests;
+    end
+
+    function Armory:GetQuestLogTitle(index)
+        local title, level, questTag, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling = GetQuestLineValue(index);
+        isCollapsed = self:GetHeaderLineState(container, title);
+        return title, level, questTag, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory, isHidden, isScaling;
+    end
+
+    function Armory:GetQuestLogSpellLink(id)
+        local link = select(12, self:GetQuestLogRewardSpell(id));
+        return link;
+    end
+
+    function Armory:GetDailyQuestsCompleted()
+        local dbEntry = self.selectedDbBaseEntry;
+        return dbEntry and dbEntry:GetValue(container, "DailyQuestsCompleted") or 0;
+    end
+
+    function Armory:GetMaxDailyQuests()
+        local dbEntry = self.selectedDbBaseEntry;
+        return dbEntry and dbEntry:GetValue(container, "MaxDailyQuests") or 0;
+    end
+end
