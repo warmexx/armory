@@ -272,9 +272,7 @@ function Armory:SetCommand(label, func, afterLabel)
     local help = _G[label.."_TEXT"];
     local params, options, usage, disabled, index;
 
-    if ( label == "ARMORY_CMD_SET_NOVALUE" ) then
-        params = "xxx";
-    elseif ( label == "ARMORY_CMD_FIND" ) then
+    if ( label == "ARMORY_CMD_FIND" ) then
         local cat = {ARMORY_CMD_FIND_ALL};
         if ( self:HasInventory() ) then
             table.insert(cat, ARMORY_CMD_FIND_ITEM);
@@ -303,12 +301,8 @@ function Armory:SetCommand(label, func, afterLabel)
         params = _G[label] or "";
     end
 
-    if ( self.options[label] ) then
-        if ( self.options[label].disabled and self.options[label].disabled() ) then
-            return;
-        elseif ( self.options[label].type == "toggle" ) then
-            options = ARMORY_CMD_SET_ON.."|"..ARMORY_CMD_SET_OFF;
-        end
+    if ( self.options[label] and self.options[label].disabled and self.options[label].disabled() ) then
+        return;
     end
     if ( _G[label.."_PARAMS_TEXT"] ) then
         options = _G[label.."_PARAMS_TEXT"];
@@ -534,16 +528,6 @@ function Armory:Init()
         self:SetCommand("ARMORY_CMD_DELETE_ALL", function(...) return Armory:ClearDb(...) end);
         self:SetCommand("ARMORY_CMD_DELETE_REALM", function(...) return Armory:ClearDb(...) end);
         self:SetCommand("ARMORY_CMD_DELETE_CHAR", function(...) return Armory:ClearDb(...) end);
-        --self:SetCommand("ARMORY_CMD_SET_NOVALUE");
-        --self:SetCommand("ARMORY_CMD_SET_EXPDAYS", function(...) return Armory:SetConfig(...) end);
-        --self:SetCommand("ARMORY_CMD_SET_SEARCHALL", function(...) return Armory:SetConfig(...) end);
-        --self:SetCommand("ARMORY_CMD_SET_LASTVIEWED", function(...) return Armory:SetConfig(...) end);
-        --self:SetCommand("ARMORY_CMD_SET_PERCHARACTER", function(...) return Armory:SetConfig(...) end);
-        --self:SetCommand("ARMORY_CMD_SET_SHOWALTEQUIP", function(...) return Armory:SetConfig(...) end);
-        --self:SetCommand("ARMORY_CMD_SET_SHOWUNEQUIP", function(...) return Armory:SetConfig(...) end);
-        --self:SetCommand("ARMORY_CMD_SET_SHOWEQCTOOLTIPS", function(...) return Armory:SetConfig(...) end);
-        --self:SetCommand("ARMORY_CMD_SET_SHOWITEMCOUNT", function(...) return Armory:SetConfig(...) end);
-        --self:SetCommand("ARMORY_CMD_SET_SHOWQUESTALTS", function(...) return Armory:SetConfig(...) end);
         self:SetCommand("ARMORY_CMD_RESET_FRAME", function(...) return Armory:Reset(...) end);
         self:SetCommand("ARMORY_CMD_RESET_SETTINGS", function(...) return Armory:Reset(...) end);
         self:SetCommand("ARMORY_CMD_CHECK", function(...) Armory:CheckMailItems(nil, ...) end);
@@ -807,87 +791,6 @@ function Armory:ConvertDb()
     if ( Armory:GetConfigUseEncoding() ) then
         ArmoryCache = nil;
     end
-end
-
-function Armory:SetConfig(what, arg1, arg2)
-    local invalidCommand = false;
-    local entry;
-
-    if ( what ) then
-        what = strlower(what);
-
-        if ( what == strlower(ARMORY_CMD_SET_EXPDAYS) ) then
-            entry = self.options.ARMORY_CMD_SET_EXPDAYS;
-            if ( tonumber(arg1) ) then
-                arg1 = tonumber(arg1);
-                if ( arg1 >= entry.minValue and arg1 <= entry.maxValue ) then
-                    entry.set(tonumber(arg1));
-                    if ( arg1 == 0 ) then
-                        arg1 = arg1.." ("..OFF..")";
-                    end
-                    self:Print(format(ARMORY_CMD_SET_SUCCESS, ARMORY_CMD_SET_EXPDAYS, arg1));
-                else
-                    self:Print(format(ARMORY_CMD_SET_EXPDAYS_INVALID, ARMORY_CMD_SET_EXPDAYS_PARAMS_TEXT, entry.maxValue));
-                end
-            elseif ( entry.get() == 0 ) then
-                self:Print(format(ARMORY_CMD_SET_NOVALUE, "0 ("..OFF..")"));
-            else
-                self:Print(format(ARMORY_CMD_SET_NOVALUE, entry.get()));
-            end
-
-        else
-            if ( what == strlower(ARMORY_CMD_SET_SEARCHALL) ) then
-                entry = self.options.ARMORY_CMD_SET_SEARCHALL;
-            elseif ( what == strlower(ARMORY_CMD_SET_LASTVIEWED) ) then
-                entry = self.options.ARMORY_CMD_SET_LASTVIEWED;
-            elseif ( what == strlower(ARMORY_CMD_SET_SHOWALTEQUIP) ) then
-                entry = self.options.ARMORY_CMD_SET_SHOWALTEQUIP;
-            elseif ( what == strlower(ARMORY_CMD_SET_SHOWUNEQUIP) ) then
-                entry = self.options.ARMORY_CMD_SET_SHOWUNEQUIP;
-            elseif ( what == strlower(ARMORY_CMD_SET_SHOWEQCTOOLTIPS) ) then
-                entry = self.options.ARMORY_CMD_SET_SHOWEQCTOOLTIPS;
-            elseif ( what == strlower(ARMORY_CMD_SET_SHOWITEMCOUNT) ) then
-                entry = self.options.ARMORY_CMD_SET_SHOWITEMCOUNT;
-            elseif ( what == strlower(ARMORY_CMD_SET_SHOWQUESTALTS) ) then
-                entry = self.options.ARMORY_CMD_SET_SHOWQUESTALTS;
-            elseif ( what == strlower(ARMORY_CMD_SET_PERCHARACTER) ) then
-                entry = self.options.ARMORY_CMD_SET_PERCHARACTER;
-            end
-
-            if ( entry ) then
-                invalidCommand = self:SwitchSetting(what, arg1, entry.set, entry.get);
-            else
-                invalidCommand = true;
-            end
-        end
-    else
-        invalidCommand = true;
-    end
-
-    return invalidCommand;
-end
-
-function Armory:SwitchSetting(what, arg1, onoffSet, onoffGet)
-    local on = strlower(ARMORY_CMD_SET_ON);
-    local off = strlower(ARMORY_CMD_SET_OFF);
-
-    if ( arg1 ) then
-        arg1 = strlower(arg1);
-        if ( arg1 == on ) then
-            onoffSet(self, true);
-            self:Print(format(ARMORY_CMD_SET_SUCCESS, strlower(what), on));
-        elseif ( arg1 == off ) then
-            onoffSet(self, false);
-            self:Print(format(ARMORY_CMD_SET_SUCCESS, strlower(what), off));
-        else
-            return true;
-        end
-    elseif ( onoffGet(self) ) then
-        self:Print(format(ARMORY_CMD_SET_NOVALUE, on));
-    else
-        self:Print(format(ARMORY_CMD_SET_NOVALUE, off));
-    end
-    return false;
 end
 
 function Armory:ClearDb(what, arg1, arg2)
