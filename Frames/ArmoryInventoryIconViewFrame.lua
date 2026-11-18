@@ -344,7 +344,7 @@ local function InitializeOptions(self, level)
     else
         AddOption(ARMORY_INVENTORY_BAGLAYOUT, ARMORY_INVENTORY_BAGLAYOUT_TOOLTIP, Armory:GetInventoryBagLayout(), ArmoryInventoryIconViewBagLayout);
     end
-    AddOption(ARMORY_INVENTORY_COMBINEBAGS, ARMORY_INVENTORY_COMBINEBAGS_TOOLTIP, Armory:GetInventoryCombineBags(), ArmoryInventoryCombineBags);
+    AddOption(USE_COMBINED_BAGS_TEXT, OPTION_TOOLTIP_USE_COMBINED_BAGS, Armory:GetInventoryCombineBags(), ArmoryInventoryCombineBags);
 
     local info = ArmoryDropDownMenu_CreateInfo();
     info.text = CLOSE;
