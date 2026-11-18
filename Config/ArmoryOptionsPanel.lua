@@ -165,6 +165,13 @@ function ArmoryOptionsPanelSetScanOnEnterMixin:GetKey()
 end
 
 
+ArmoryOptionsPanelSetRealmFilterMixin = CreateFromMixins(ArmoryOptionsCheckButtonTemplateMixin);
+
+function ArmoryOptionsPanelSetRealmFilterMixin:GetKey()
+    return "ARMORY_CMD_SET_USEREALMFILTER";
+end
+
+
 ArmoryOptionsPanelSetFactionFilterMixin = CreateFromMixins(ArmoryOptionsCheckButtonTemplateMixin);
 
 function ArmoryOptionsPanelSetFactionFilterMixin:GetKey()

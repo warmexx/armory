@@ -565,6 +565,12 @@ Armory.options = {
         disabled = function() return not (Armory:HasSocial() and Armory:GetConfigEnableCooldownEvents()); end,
         default = true
     },
+    ARMORY_CMD_SET_USEREALMFILTER = {
+        type = "toggle",
+        set = function(value) Armory:SetConfigUseRealmFilter(value and value ~= "0"); end,
+        get = function() return Armory:GetConfigUseRealmFilter(); end,
+        default = false
+    },
     ARMORY_CMD_SET_USEFACTIONFILTER = {
         type = "toggle",
         set = function(value) Armory:SetConfigUseFactionFilter(value and value ~= "0"); end,
@@ -1636,14 +1642,38 @@ function Armory:GetConfigFrameScaleOnMouseWheel()
     return not self:Setting("General", "DisableScaleOnMouseWheel");
 end
 
+local function ResetFilteredProfiles(self)
+    self:ResetSelectableCharacters();
+    self:ResetProfile();
+    self:SetPaperDollLastViewed(self.playerRealm, self.player);
+    self:SelectDefaultProfile();
+end
+
+function Armory:SetConfigUseRealmFilter(on)
+    local current = self:GetConfigUseRealmFilter();
+    self:Setting("General", "UseRealmFilter", on);
+    if ( current ~= on ) then
+        ResetFilteredProfiles(self);
+    end
+end
+
+-- The realm filter used to be part of the faction filter; until it is set, it follows that setting
+function Armory:GetConfigUseRealmFilter()
+    local on = self:Setting("General", "UseRealmFilter");
+    if ( on == nil ) then
+        return self:GetConfigUseFactionFilter();
+    end
+    return on;
+end
+
 function Armory:SetConfigUseFactionFilter(on)
+    -- Keep the realm filter as it is
+    local realmFilter = self:GetConfigUseRealmFilter();
     local current = self:GetConfigUseFactionFilter();
     self:Setting("General", "UseFactionFilter", on);
+    self:Setting("General", "UseRealmFilter", realmFilter);
     if ( current ~= on ) then
-        self:ResetSelectableCharacters();
-        self:ResetProfile();
-        self:SetPaperDollLastViewed(self.playerRealm, self.player);
-        self:SelectDefaultProfile();
+        ResetFilteredProfiles(self);
     end
 end
 

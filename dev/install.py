@@ -7,7 +7,9 @@ Locales without an @localization template, such as Localization.lua, is source c
 installed like any other file; the released one of Era or BCC lacks globals that the shared code
 uses. The translations (the files with a template) come in every client from the released
 Armory and ArmoryGuildBank in Retail, since v20 takes all of them from the Retail project on
-CurseForge. Do not update Armory with the CurseForge app: that puts the old release back.
+CurseForge. New English strings that are not on CurseForge yet (dev/strings/<addon>_enUS.lua)
+are added to the installed enUS.lua, so they can be tested before the import.
+Do not update Armory with the CurseForge app: that puts the old release back.
 
 Copies every file that is new or changed, and removes Lua, XML and TOC files that are
 no longer in the repo, so a stale file can never be loaded (also the TOCs with a suffix of the
@@ -75,6 +77,37 @@ def translations(src, addon):
     return out
 
 
+STRINGS = os.path.join(ROOT, "dev", "strings")
+KEY = re.compile(rb'^L\["([^"]+)"\]', re.M)
+
+
+def translation(path, addon, rel):
+    """The Retail translation, plus the new English strings in dev/strings that it lacks.
+
+    dev/strings/<addon>_enUS.lua holds the strings that are not on CurseForge yet; adding them
+    here lets them be tested before the import. Only for enUS.lua."""
+    with open(path, "rb") as f:
+        data = f.read()
+    pending = os.path.join(STRINGS, f"{addon}_enUS.lua")
+    if os.path.basename(rel).lower() != "enus.lua" or not os.path.exists(pending):
+        return data
+    have = set(KEY.findall(data))
+    with open(pending, "rb") as f:
+        text = f.read()
+    # a statement runs from its key to the next key or comment line (long strings span lines)
+    starts = [m.start() for m in KEY.finditer(text)]
+    extra = []
+    for i, start in enumerate(starts):
+        end = starts[i + 1] if i + 1 < len(starts) else len(text)
+        stmt = re.split(rb"\r?\n--", text[start:end])[0].rstrip()
+        if KEY.match(stmt).group(1) not in have:
+            extra.append(stmt)
+    if not extra:
+        return data
+    nl = b"\r\n" if b"\r\n" in data else b"\n"
+    return data.rstrip() + nl + nl + b"-- dev/strings: not on CurseForge yet" + nl + nl.join(s.replace(b"\r\n", b"\n").replace(b"\n", nl) for s in extra) + nl
+
+
 def files(base, skip_sub=(), repo=False):
     out = set()
     if repo:
@@ -130,13 +163,17 @@ def sync(client, dry):
                     f.write(content(s))
         for rel, t in translations(src, addon):
             d = os.path.join(dst, rel)
-            if os.path.exists(d) and filecmp.cmp(t, d, shallow=False):
-                continue
-            print(f"  copy   {addon}\{rel} (Retail translation)")
+            data = translation(t, addon, rel)
+            if os.path.exists(d):
+                with open(d, "rb") as f:
+                    if f.read() == data:
+                        continue
+            print(f"  copy   {addon}\\{rel} (Retail translation)")
             copied += 1
             if not dry:
                 os.makedirs(os.path.dirname(d), exist_ok=True)
-                shutil.copyfile(t, d)
+                with open(d, "wb") as f:
+                    f.write(data)
         for rel in sorted(present - set(wanted)):
             if rel.lower().endswith(CODE):
                 print(f"  remove {addon}\\{rel}")

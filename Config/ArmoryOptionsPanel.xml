@@ -62,9 +62,14 @@
           <Anchor point="TOPLEFT" relativeKey="$parent.PauseInInstance" relativePoint="BOTTOMLEFT" x="-16" y="-8" />
         </Anchors>
       </CheckButton>
-      <CheckButton parentKey="FactionFilter" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsPanelSetFactionFilterMixin">
+      <CheckButton parentKey="RealmFilter" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsPanelSetRealmFilterMixin">
         <Anchors>
           <Anchor point="TOPLEFT" relativeKey="$parent.ScanOnEnter" relativePoint="BOTTOMLEFT" y="-8" />
+        </Anchors>
+      </CheckButton>
+      <CheckButton parentKey="FactionFilter" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsPanelSetFactionFilterMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.RealmFilter" relativePoint="BOTTOMLEFT" y="-8" />
         </Anchors>
       </CheckButton>
       <CheckButton parentKey="ClassColors" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsPanelSetClassColorsMixin">

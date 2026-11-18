@@ -1163,7 +1163,7 @@ function Armory:Profiles(reload)
 end
 
 function Armory:SelectableProfiles()
-    if ( not self:GetConfigUseFactionFilter() ) then
+    if ( not (self:GetConfigUseRealmFilter() or self:GetConfigUseFactionFilter()) ) then
         return self:Profiles();
     end
 
@@ -1432,8 +1432,9 @@ end
 
 function Armory:RealmList()
     if ( ArmoryDB and table.getn(self.realms) == 0 ) then
+        local realmFilter, factionFilter = self:GetConfigUseRealmFilter(), self:GetConfigUseFactionFilter();
         for realm in pairs(ArmoryDB) do
-            if ( not self:GetConfigUseFactionFilter() or (self:IsConnectedRealm(realm) and table.getn(self:CharacterList(realm)) > 0) ) then
+            if ( not (realmFilter or factionFilter) or ((not realmFilter or self:IsConnectedRealm(realm)) and table.getn(self:CharacterList(realm)) > 0) ) then
                 table.insert(self.realms, realm);
             end
         end
