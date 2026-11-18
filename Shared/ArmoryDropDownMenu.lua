@@ -472,12 +472,22 @@ function ArmoryDropDownMenu_AddButton(info, level)
     button:Show();
 end
 
+-- All Armory dropdowns share the same lists. While a list shows the menu of another dropdown, its
+-- buttons are not ours to redraw: doing so wipes the checks of that menu (e.g. the minimap menu
+-- when a paperdoll or options dropdown updates its selection in the background).
+local function ArmoryDropDownMenu_ListBelongsTo(frame, level)
+    return not _G["ArmoryDropDownList"..level]:IsShown() or ARMORY_DROPDOWNMENU_OPEN_MENU == frame:GetName();
+end
+
 function ArmoryDropDownMenu_Refresh(frame, useValue, dropdownLevel)
     local button, checked, checkImage, normalText, width;
     local maxWidth = 0;
     assert(frame);
     if ( not dropdownLevel ) then
         dropdownLevel = ARMORY_DROPDOWNMENU_MENU_LEVEL;
+    end
+    if ( not ArmoryDropDownMenu_ListBelongsTo(frame, dropdownLevel) ) then
+        return;
     end
 
     -- Just redraws the existing menu
@@ -920,6 +930,10 @@ function ArmoryDropDownMenu_ClearAll(frame)
     frame.selectedName = nil;
     frame.selectedValue = nil;
     ArmoryDropDownMenu_SetText(frame, "");
+
+    if ( not ArmoryDropDownMenu_ListBelongsTo(frame, ARMORY_DROPDOWNMENU_MENU_LEVEL) ) then
+        return;
+    end
 
     local button, checkImage;
     for i=1, ARMORY_DROPDOWNMENU_MAXBUTTONS do
