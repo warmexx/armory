@@ -380,6 +380,13 @@ function ArmoryOptionsTooltipShowGearSetsMixin:GetKey()
     return "ARMORY_CMD_SET_SHOWGEARSETS";
 end
 
+ArmoryOptionsTooltipShowSlotItemLevelsMixin = CreateFromMixins(ArmoryOptionsCheckButtonTemplateMixin);
+
+function ArmoryOptionsTooltipShowSlotItemLevelsMixin:GetKey()
+    return "ARMORY_CMD_SET_SHOWSLOTITEMLEVELS";
+end
+
+
 ArmoryOptionsTooltipShowGemsMixin = CreateFromMixins(ArmoryOptionsCheckButtonTemplateMixin);
 
 function ArmoryOptionsTooltipShowGemsMixin:GetKey()

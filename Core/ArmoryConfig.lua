@@ -110,6 +110,12 @@ Armory.options = {
         get = function() return Armory:GetConfigShowEqcTooltips(); end,
         default = true
     },
+    ARMORY_CMD_SET_SHOWSLOTITEMLEVELS = {
+        type = "toggle",
+        set = function(value) Armory:SetConfigShowSlotItemLevels(value and value ~= "0"); end,
+        get = function() return Armory:GetConfigShowSlotItemLevels(); end,
+        default = true
+    },
     ARMORY_CMD_SET_SHOWITEMCOUNT = {
         type = "toggle",
         set = function(value) Armory:SetConfigShowItemCount(value and value ~= "0"); end,
@@ -787,6 +793,15 @@ end
 
 function Armory:GetConfigShowEqcTooltips()
     return not self:Setting("General", "HideEqcTooltips");
+end
+
+-- The item level of your other characters in the tooltip of an equipment slot
+function Armory:SetConfigShowSlotItemLevels(on)
+    self:Setting("General", "HideSlotItemLevels", not on);
+end
+
+function Armory:GetConfigShowSlotItemLevels()
+    return not self:Setting("General", "HideSlotItemLevels");
 end
 
 function Armory:SetConfigShowItemCount(on)

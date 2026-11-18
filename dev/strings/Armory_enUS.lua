@@ -20,3 +20,7 @@ L["ARMORY_ITEMCOUNT_SORT_COUNT"] = "Most first"
 L["ARMORY_ITEMCOUNT_SORT_COUNTASC"] = "Fewest first"
 -- Only used in Classic; Retail and Forever use Blizzard's COMBINED_BAG_TITLE
 L["ARMORY_INVENTORY_COMBINEDBAG"] = "Combined Backpack"
+L["ARMORY_CMD_SET_SHOWSLOTITEMLEVELS_TEXT"] = "show item level of other characters in slot tooltips"
+L["ARMORY_CMD_SET_SHOWSLOTITEMLEVELS_MENUTEXT"] = "Show item level of other characters"
+L["ARMORY_CMD_SET_SHOWSLOTITEMLEVELS_TOOLTIP"] = "If enabled, the tooltip of an equipment slot in the paper doll lists the item level of your other characters in that slot. Armor slots only list characters that wear the same armor type."
+L["ARMORY_SLOT_ITEMLEVELS"] = "Item level of your other characters"

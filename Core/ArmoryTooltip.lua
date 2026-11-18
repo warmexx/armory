@@ -253,6 +253,117 @@ local function UpdateItemCandidates(candidates)
     return result;
 end
 
+----------------------------------------------------------
+-- Item level of your other characters per equipment slot
+----------------------------------------------------------
+
+-- The best armor type a class can wear; in Classic plate and mail come at level 40
+local CLASS_ARMOR = {
+    WARRIOR = 4, PALADIN = 4, DEATHKNIGHT = 4,
+    HUNTER = 3, SHAMAN = 3, EVOKER = 3,
+    ROGUE = 2, DRUID = 2, MONK = 2, DEMONHUNTER = 2,
+    PRIEST = 1, MAGE = 1, WARLOCK = 1,
+};
+-- Slots with an armor type: head, shoulder, chest, waist, legs, feet, wrist and hands (not the back)
+local ARMOR_SLOTS = { [1] = true, [3] = true, [5] = true, [6] = true, [7] = true, [8] = true, [9] = true, [10] = true };
+-- Rings and trinkets come in pairs; the lower of the two is the one to replace
+local PAIRED_SLOTS = { [11] = 12, [12] = 11, [13] = 14, [14] = 13 };
+-- Ammo, shirt and tabard have no item level that matters
+local NO_ITEMLEVEL_SLOTS = { [0] = true, [4] = true, [19] = true };
+
+local function GetArmorType()
+    local _, class = Armory:UnitClass("player");
+    local armorType = CLASS_ARMOR[class or ""];
+    if ( armorType and armorType > 2 and Armory.isClassic and (Armory:UnitLevel("player") or 0) < 40 ) then
+        armorType = armorType - 1;
+    end
+    return armorType;
+end
+
+-- Per character: name, armor type and the item level per slot. Reading them means loading the
+-- profile and every item link, so other characters are read once; they don't change while you
+-- play. The character you play is read every time. Names follow "Use class colors".
+local slotCache = {};
+local slotCacheClassColors;
+
+local function ReadCharacterSlots()
+    local entry = { name = Armory:GetQualifiedCharacterName(), armorType = GetArmorType(), levels = {} };
+    local complete = true;
+    for slotId = 1, 19 do
+        local link = Armory:GetInventoryItemLink("player", slotId);
+        if ( link ) then
+            entry.levels[slotId] = C_Item.GetDetailedItemLevelInfo(link);
+            -- not there until the item is in the client's cache
+            complete = complete and entry.levels[slotId] ~= nil;
+        end
+    end
+    return entry, complete;
+end
+
+local function GetCharacterSlots(profile)
+    local key = profile.realm.."|"..profile.character;
+    local entry = slotCache[key];
+    if ( not entry ) then
+        Armory:SelectProfile(profile);
+        local complete;
+        entry, complete = ReadCharacterSlots();
+        if ( complete and not (profile.realm == Armory.playerRealm and profile.character == Armory.player) ) then
+            slotCache[key] = entry;
+        end
+    end
+    return entry;
+end
+
+local function GetSlotItemLevel(entry, slotId)
+    local itemLevel = entry.levels[slotId];
+    local otherLevel = PAIRED_SLOTS[slotId] and entry.levels[PAIRED_SLOTS[slotId]];
+    if ( itemLevel and otherLevel ) then
+        itemLevel = min(itemLevel, otherLevel);
+    end
+    return itemLevel;
+end
+
+local slotItemLevels = {};
+function Armory:AddSlotItemLevels(tooltip, slotId)
+    if ( not slotId or NO_ITEMLEVEL_SLOTS[slotId] or not self:GetConfigShowSlotItemLevels() ) then
+        return;
+    end
+
+    local classColors = self:GetConfigUseClassColors() and true or false;
+    if ( classColors ~= slotCacheClassColors ) then
+        table.wipe(slotCache);
+        slotCacheClassColors = classColors;
+    end
+
+    local currentProfile = self:CurrentProfile();
+    local armorType = ARMOR_SLOTS[slotId] and GetArmorType();
+
+    table.wipe(slotItemLevels);
+    for _, profile in ipairs(self:SelectableProfiles()) do
+        if ( profile.realm ~= currentProfile.realm or profile.character ~= currentProfile.character ) then
+            local entry = GetCharacterSlots(profile);
+            if ( not armorType or entry.armorType == armorType ) then
+                local itemLevel = GetSlotItemLevel(entry, slotId);
+                if ( itemLevel ) then
+                    table.insert(slotItemLevels, {name=entry.name, itemLevel=itemLevel});
+                end
+            end
+        end
+    end
+    self:SelectProfile(currentProfile);
+
+    if ( #slotItemLevels > 0 ) then
+        table.sort(slotItemLevels, function(a, b) return a.itemLevel > b.itemLevel; end);
+        AddSpacer(tooltip);
+        tooltip:AddLine(ARMORY_SLOT_ITEMLEVELS);
+        local r, g, b = HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b;
+        for _, entry in ipairs(slotItemLevels) do
+            tooltip:AddDoubleLine(entry.name, entry.itemLevel, r, g, b, r, g, b);
+        end
+        tooltip:Show();
+    end
+end
+
 -- Classic has no gems option
 local SHOW_GEMS = Armory.isMainline;
 

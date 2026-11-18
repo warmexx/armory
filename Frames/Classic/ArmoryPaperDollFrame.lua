@@ -261,6 +261,9 @@ function ArmoryPaperDollItemSlotButton_OnEnter(self)
         end
         GameTooltip:SetText(text);
     end
+    if ( self.itemId == nil ) then
+        Armory:AddSlotItemLevels(GameTooltip, self:GetID());
+    end
 end
 
 function ArmoryPaperDollItemSlotButton_OnClick(self, button)

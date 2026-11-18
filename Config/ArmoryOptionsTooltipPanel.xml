@@ -167,9 +167,15 @@
         </Anchors>
       </CheckButton>
 
-      <CheckButton parentKey="ShowGems" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowGemsMixin">
+      <CheckButton parentKey="ShowSlotItemLevels" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowSlotItemLevelsMixin">
         <Anchors>
           <Anchor point="TOPLEFT" relativeKey="$parent.ShowGearSets" relativePoint="BOTTOMLEFT" />
+        </Anchors>
+      </CheckButton>
+
+      <CheckButton parentKey="ShowGems" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowGemsMixin">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowSlotItemLevels" relativePoint="BOTTOMLEFT" />
         </Anchors>
       </CheckButton>
     </Frames>
