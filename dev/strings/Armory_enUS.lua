@@ -12,3 +12,9 @@ L["ARMORY_CMD_SET_FACTIONFILTER_TEXT"] = "enable faction filter"
 L["ARMORY_CMD_SET_FACTIONFILTER_MENUTEXT"] = "Faction filter"
 L["ARMORY_CMD_SET_FACTIONFILTER_TOOLTIP"] = [=[If enabled, only characters belonging to the current faction will be shown. This will also affect tooltip information.
 Note that for item counts there is a separate faction setting.]=]
+L["ARMORY_CMD_SET_COUNTSORT_TEXT"] = "sort item counts"
+L["ARMORY_CMD_SET_COUNTSORT_TOOLTIP"] = "Sets the order of the item counts in tooltips. Characters first lists your characters, then your guild banks and then the Warband bank."
+L["ARMORY_ITEMCOUNT_SORT_TYPE"] = "Characters first"
+L["ARMORY_ITEMCOUNT_SORT_NAME"] = "By name"
+L["ARMORY_ITEMCOUNT_SORT_COUNT"] = "Most first"
+L["ARMORY_ITEMCOUNT_SORT_COUNTASC"] = "Fewest first"

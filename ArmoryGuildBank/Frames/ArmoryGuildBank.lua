@@ -906,7 +906,7 @@ local function AddGuildBankCount(item, itemCounts)
                                 end
                             end
                             if ( count > 0 ) then
-                                info = { name=guild, count=count, details="("..table.concat(detailCounts, ", ")..")" };
+                                info = { name=guild, count=count, details="("..table.concat(detailCounts, ", ")..")", guild=true };
                                 if ( AGB:GetConfigCrossFactionItemCount() ) then
                                     info.name = info.name .. "-" .. realmName;
                                 end

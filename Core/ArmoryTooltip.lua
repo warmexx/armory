@@ -56,6 +56,58 @@ local hasanysecretvalues = hasanysecretvalues;
 -- Tooltip Enhancement
 ----------------------------------------------------------
 
+-- Characters first, then guild banks, then the account bank
+local function ItemCountRank(v)
+    if ( v.account ) then
+        return 3;
+    elseif ( v.guild ) then
+        return 2;
+    end
+    return 1;
+end
+
+-- The name without color codes and textures (class colors, the connected realm icon)
+local function ItemCountName(v)
+    if ( not v.sortName ) then
+        local name = v.account and ACCOUNT_BANK_PANEL_TITLE or v.name or "";
+        name = name:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("|T.-|t", "");
+        v.sortName = strlower(name);
+    end
+    return v.sortName;
+end
+
+local sortMode;
+local function CompareItemCounts(a, b)
+    if ( sortMode == "name" ) then
+        local nameA, nameB = ItemCountName(a), ItemCountName(b);
+        if ( nameA ~= nameB ) then
+            return nameA < nameB;
+        end
+    elseif ( sortMode == "count" or sortMode == "countasc" ) then
+        if ( a.count ~= b.count ) then
+            if ( sortMode == "count" ) then
+                return a.count > b.count;
+            end
+            return a.count < b.count;
+        end
+    else
+        local rankA, rankB = ItemCountRank(a), ItemCountRank(b);
+        if ( rankA ~= rankB ) then
+            return rankA < rankB;
+        end
+    end
+    return a.order < b.order;
+end
+
+local function SortItemCounts(itemCount)
+    for i, v in ipairs(itemCount) do
+        -- the order they were added in, which decides between equal entries
+        v.order = v.order or i;
+    end
+    sortMode = Armory:GetConfigItemCountSort();
+    table.sort(itemCount, CompareItemCounts);
+end
+
 local function AddSpacer(tooltip)
     local lastLine = _G[tooltip:GetName().."TextLeft"..tooltip:NumLines()];
     if ( lastLine ) then
@@ -282,8 +334,12 @@ local function EnhanceItemTooltip(tooltip, id, link)
                 table.insert(reagents, reagentLink);
             end
             itemCount = Armory:GetMultipleItemCount(reagents)
+            for _, reagentCount in ipairs(itemCount) do
+                SortItemCounts(reagentCount);
+            end
         else
             itemCount = Armory:GetItemCount(link);
+            SortItemCounts(itemCount);
         end
 
         fetched = key;
@@ -327,7 +383,11 @@ local function EnhanceItemTooltip(tooltip, id, link)
 
                 local r, g, b = GetTableColor(v);
                 if ( not r ) then
-                    r, g, b = Armory:GetConfigItemCountColor();
+                    if ( v.account ) then
+                        r, g, b = Armory:GetConfigAccountItemCountColor();
+                    else
+                        r, g, b = Armory:GetConfigItemCountColor();
+                    end
                 end
                 local label = format(Armory:FormatCount("%s [%d]", v.numColor or numColor), v.account and ACCOUNT_BANK_PANEL_TITLE or v.name, v.count);
                 if ( v.tier ) then

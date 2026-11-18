@@ -118,6 +118,71 @@ function ArmoryOptionsTooltipItemCountPerSlotMixin:OnLoad()
 end
 
 
+-- Only with an account bank, so not in Classic and Forever
+local function HasAccountBank()
+    return not Armory.isClassic and C_Bank and C_Bank.FetchNumPurchasedBankTabs(Enum.BankType.Account) > 0;
+end
+
+ArmoryOptionsTooltipAccountItemCountColorMixin = CreateFromMixins(ArmoryOptionsColorTemplateMixin);
+
+function ArmoryOptionsTooltipAccountItemCountColorMixin:OnLoad()
+    self:SetLabel(ACCOUNT_BANK_PANEL_TITLE or "");
+
+    self:ColorSetter(function(r, g, b) Armory:SetConfigAccountItemCountColor(r, g, b); end);
+    self:ColorGetter(function(default) return Armory:GetConfigAccountItemCountColor(default); end);
+
+    ArmoryOptionsColorTemplateMixin.OnLoad(self);
+    self:SetupDependency(self:GetPanel().ShowItemCount);
+
+    -- Swatch in the column of the swatch above it (rows are 26 apart), label to its left
+    self.Swatch:ClearAllPoints();
+    self.Swatch:SetPoint("TOP", self:GetPanel().ShowItemCountTotalsColor.Swatch, "BOTTOM", 0, -10);
+    self.Text:ClearAllPoints();
+    self.Text:SetPoint("RIGHT", self.Swatch, "LEFT", -5, 0);
+
+    self:GetPanel():HookScript("OnShow", function() self:SetShown(HasAccountBank()); end);
+end
+
+
+ArmoryOptionsTooltipItemCountSortMixin = CreateFromMixins(ArmoryOptionsDropDownTemplateMixin);
+
+local ITEMCOUNT_SORT_TEXT = {
+    type = ARMORY_ITEMCOUNT_SORT_TYPE,
+    name = ARMORY_ITEMCOUNT_SORT_NAME,
+    count = ARMORY_ITEMCOUNT_SORT_COUNT,
+    countasc = ARMORY_ITEMCOUNT_SORT_COUNTASC,
+};
+
+function ArmoryOptionsTooltipItemCountSortMixin:SetValue(value)
+    ArmoryOptionsDropDownTemplateMixin.SetValue(self, value);
+    Armory:SetConfigItemCountSort(value);
+end
+
+function ArmoryOptionsTooltipItemCountSortMixin:OnLoad()
+    ArmoryOptionsDropDownTemplateMixin.OnLoad(self);
+    self:SetLabel(Armory:Proper(ARMORY_CMD_SET_COUNTSORT_TEXT));
+    self:SetTooltipText(ARMORY_CMD_SET_COUNTSORT_TOOLTIP);
+    self:SetDefaultValue("type");
+
+    -- Label above the box, in the color of the labels of the color swatches
+    self.Label:SetFontObject(GameFontNormal);
+end
+
+function ArmoryOptionsTooltipItemCountSortMixin:Initialize()
+    ArmoryOptionsDropDownTemplateMixin.Initialize(self);
+    self:SetValue(Armory:GetConfigItemCountSort());
+end
+
+function ArmoryOptionsTooltipItemCountSortMixin:AddButtons(info)
+    for _, value in ipairs(ARMORY_ITEMCOUNT_SORTS) do
+        info.text = ITEMCOUNT_SORT_TEXT[value];
+        info.value = value;
+        info.checked = nil;
+        ArmoryDropDownMenu_AddButton(info);
+    end
+end
+
+
 ArmoryOptionsTooltipGlobalItemCountMixin = CreateFromMixins(ArmoryOptionsCheckButtonTemplateMixin);
 
 function ArmoryOptionsTooltipGlobalItemCountMixin:GetKey()

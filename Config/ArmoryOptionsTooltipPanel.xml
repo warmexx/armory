@@ -42,6 +42,11 @@
           <Anchor point="TOPLEFT" relativeKey="$parent.ShowItemCountTotals" relativePoint="BOTTOMLEFT" />
         </Anchors>
       </CheckButton>
+      <Frame parentKey="AccountItemCountColor" inherits="ArmoryOptionsColorTemplate" mixin="ArmoryOptionsTooltipAccountItemCountColorMixin">
+        <Anchors>
+          <Anchor point="LEFT" relativeKey="$parent.ItemCountPerSlot" x="360"/>
+        </Anchors>
+      </Frame>
 
       <CheckButton parentKey="GlobalItemCount" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipGlobalItemCountMixin">
         <Anchors>
@@ -54,6 +59,12 @@
           <Anchor point="TOPLEFT" relativeKey="$parent.GlobalItemCount" relativePoint="BOTTOMLEFT" />
         </Anchors>
       </CheckButton>
+      <Frame name="$parentItemCountSort" parentKey="ItemCountSort" inherits="ArmoryOptionsDropDownTemplate" mixin="ArmoryOptionsTooltipItemCountSortMixin">
+        <Anchors>
+          <!-- its own column, under "Numeric Value": the label on the row of GlobalItemCount, the box below it -->
+          <Anchor point="TOPLEFT" relativeKey="$parent.ShowItemCountTotalsNumberColor" relativePoint="BOTTOMLEFT" x="-16" y="-48" />
+        </Anchors>
+      </Frame>
 
 
       <CheckButton parentKey="ShowKnownBy" inherits="ArmoryOptionsCheckButtonTemplate" mixin="ArmoryOptionsTooltipShowKnownByMixin">

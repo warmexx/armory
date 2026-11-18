@@ -1125,6 +1125,30 @@ function Armory:GetConfigItemCountColor(default)
     return r, g, b;
 end
 
+-- The account bank (Warband bank) in the item counts; until set, it has the color of the other item counts
+function Armory:SetConfigAccountItemCountColor(r, g, b)
+    self:Setting("General", "AccountItemCountColor", r, g, b);
+end
+
+function Armory:GetConfigAccountItemCountColor(default)
+    local r, g, b = self:Setting("General", "AccountItemCountColor");
+    if ( default or not r ) then
+        r, g, b = self:GetConfigItemCountColor(default);
+    end
+    return r, g, b;
+end
+
+-- Order of the item counts in tooltips: "type" (characters, guild banks, account bank), "name", "count" (most first) or "countasc"
+ARMORY_ITEMCOUNT_SORTS = {"type", "name", "count", "countasc"};
+
+function Armory:SetConfigItemCountSort(value)
+    self:Setting("General", "ItemCountSort", value ~= "type" and value or nil);
+end
+
+function Armory:GetConfigItemCountSort()
+    return self:Setting("General", "ItemCountSort") or "type";
+end
+
 function Armory:SetConfigItemCountNumberColor(r, g, b)
     self:Setting("General", "ItemCountNumberColor", r, g, b);
 end
