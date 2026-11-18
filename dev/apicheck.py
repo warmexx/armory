@@ -208,6 +208,11 @@ REVIEWED = {
     "ArmoryPaperDollCheckButton_Enable": "option IsAvailable = IsMainline",
     "ArmoryPaperDollOverlayFrame": "options behind the overlay option, IsAvailable = IsMainline",
     "ArmoryPaperDollOverlayFrameCheckButton": "option IsAvailable = IsMainline",
+    "ArmoryHealth": "if ( ArmoryHealth ): health and mana bars only in Forever's paperdoll",
+    "ArmoryPaperDollFrame_UpdateHealthBar": "behind if ( ArmoryHealth ): only in Forever",
+    "ArmoryPaperDollFrame_UpdateManaBar": "behind if ( ArmoryHealth ): only in Forever",
+    "ArmoryRangedSlot": "if ( ArmoryRangedSlot ): ranged slot only in Forever's paperdoll",
+    "ArmorySocketsFrame": "if ( ArmorySocketsFrame ): sockets only in Retail's paperdoll",
 }
 
 

@@ -37,8 +37,10 @@ Shared_Classic.xml [AllowLoadGameType classic]
 Shared.xml
 Config.xml
 Frames.xml
+Frames\Mainline\ArmoryPaperDollTemplates.xml [AllowLoadGameType mainline]
 Frames\Mainline\ArmoryPaperDollFrame.xml [AllowLoadGameType standard]
 Frames\Forever\ArmoryPaperDollFrame.xml [AllowLoadGameType mainline] [ExcludeLoadGameType standard]
+Frames\Mainline\ArmoryGearSetFrame.xml [AllowLoadGameType mainline]
 Frames\ArmoryPaperDollOverlayFrame.xml [AllowLoadGameType mainline]
 Frames_Mainline.xml [AllowLoadGameType mainline]
 Frames\Mainline\ArmoryPVPFrame.xml [AllowLoadGameType standard]

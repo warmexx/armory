@@ -29,6 +29,15 @@
 local Armory, _ = Armory, nil;
 local gearSetItems = {};
 
+-- Shared by Retail and Forever. Forever adds its own stats, health and mana bars and the ranged slot in
+-- Frames\Forever\ArmoryPaperDollFrame.lua; the frames of that layout are checked by name below.
+
+-- Forever lacks some of Retail's tooltip strings (DEFAULT_STAT1_TOOLTIP), and its strings are not in the Lua export.
+-- The Retail stats below still run on a hidden frame to store every value; a missing string must not stop that.
+local function format(fmt, ...)
+    return string.format(fmt or "", ...);
+end
+
 ARMORY_SLOTINFO = {
     INVTYPE_2HWEAPON = "MainHandSlot",
     INVTYPE_BODY = "ShirtSlot",
@@ -1898,8 +1907,13 @@ function ArmoryPaperDollFrame_UpdateInventory()
     ArmoryPaperDollFrame_UpdateSlot(ArmoryTrinket1Slot);
     ArmoryPaperDollFrame_UpdateSlot(ArmoryMainHandSlot);
     ArmoryPaperDollFrame_UpdateSlot(ArmorySecondaryHandSlot);
+    if ( ArmoryRangedSlot ) then
+        ArmoryPaperDollFrame_UpdateSlot(ArmoryRangedSlot);
+    end
 
-    ArmoryPaperDoll_UpdateSockets();
+    if ( ArmorySocketsFrame ) then
+        ArmoryPaperDoll_UpdateSockets();
+    end
     if ( Armory:GetConfigUseOverlay() ) then
         ArmoryPaperDoll_UpdateSockets(1);
     end
@@ -1995,6 +2009,10 @@ function ArmoryPaperDollFrame_Update()
     ArmoryPaperDollFrame_SetZone();
     ArmoryPaperDollFrame_SetLevel();
     ArmoryPaperDollFrame_UpdateStats();
+    if ( ArmoryHealth ) then
+        ArmoryPaperDollFrame_UpdateHealthBar();
+        ArmoryPaperDollFrame_UpdateManaBar();
+    end
     ArmoryPaperDollFrame_UpdateTalent();
     ArmoryPaperDollFrame_UpdateSkills();
     ArmoryPaperDollFrame_UpdateInventory();
@@ -2282,8 +2300,13 @@ function ArmoryGearSetFrameEquipSet_OnClick(self)
             ArmoryPaperDollItemSlotButton_Update(ArmoryTrinket1Slot, items[14]);
             ArmoryPaperDollItemSlotButton_Update(ArmoryMainHandSlot, items[16]);
             ArmoryPaperDollItemSlotButton_Update(ArmorySecondaryHandSlot, items[17]);
+            if ( ArmoryRangedSlot ) then
+                ArmoryPaperDollItemSlotButton_Update(ArmoryRangedSlot, items[18]);
+            end
 
-            ArmoryPaperDoll_UpdateSockets();
+            if ( ArmorySocketsFrame ) then
+                ArmoryPaperDoll_UpdateSockets();
+            end
         end
     end
 end
