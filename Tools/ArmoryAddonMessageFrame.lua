@@ -364,9 +364,23 @@ function ArmoryAddonMessageFrame_HasChannels()
     return (firstChannelId ~= nil);
 end
 
+-- Joining and leaving a channel is blocked in combat and, since Midnight, in chat messaging lockdown
+-- (a running keystone, a PvP match or a boss encounter)
+local function CanChangeChannel()
+    if ( InCombatLockdown() ) then
+        return false;
+    elseif ( C_ChatInfo.InChatMessagingLockdown and C_ChatInfo.InChatMessagingLockdown() ) then
+        return false;
+    end
+    return true;
+end
+
 function ArmoryAddonMessageFrame_UpdateChannel(leave)
     local channelName, name = Armory:GetConfigChannelName();
     if ( (name or "") == "" ) then
+        return;
+    elseif ( not CanChangeChannel() ) then
+        Armory:ExecuteConditional(CanChangeChannel, ArmoryAddonMessageFrame_UpdateChannel, leave);
         return;
     end
 

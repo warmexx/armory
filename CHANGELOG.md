@@ -5,6 +5,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 
 ## v20.0.0
 - Fixes a stat of a scaling item showing up among the item counts in the tooltip of an equipment slot, mistaken for an engineering tinker (Retail)
+- Fixes an error when logging in or reloading during a keystone, a PvP match or a boss encounter, when Armory joins its share channel (Retail)
 - One Armory for all versions of World of Warcraft: Retail, WoW Forever, Classic Era and Burning Crusade Anniversary now share one addon and one project page
 - Shows the paper doll in the Classic Era layout with Forever's stats, the talents with both specs of dual spec, the skills, the happiness and loyalty of your pets (also in the stable), the PvP frame with the PvP rank and honor, the achievements and statistics, and the Legacy trees as a third tab of the achievements frame (WoW Forever)
 - Characters are stored under their name and surname, so two of your characters with the same first name are kept apart (WoW Forever)
