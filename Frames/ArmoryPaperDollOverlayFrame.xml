@@ -1,0 +1,117 @@
+<!-- Revision: @file-revision@ @file-date-iso@ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+  <Script file="ArmoryPaperDollOverlayFrame.lua"/>
+  <CheckButton name="ArmoryPaperDollOverlayFrameCheckButton" inherits="ArmoryUICheckButtonTemplate" parent="PaperDollFrame">
+    <Size>
+      <AbsDimension x="24" y="24"/>
+    </Size>
+    <Anchors>
+      <Anchor point="BOTTOMLEFT">
+        <Offset>
+          <AbsDimension x="10" y="7"/>
+        </Offset>
+      </Anchor>
+    </Anchors>
+    <Scripts>
+      <OnLoad>
+        ArmoryPaperDollOverlayFrameCheckButtonText:SetFontObject(GameFontHighlightSmall);
+        ArmoryPaperDollOverlayFrameCheckButtonText:SetText(ARMORY_TITLE);
+      </OnLoad>
+      <OnShow>
+        self:SetChecked(Armory:GetConfigUseOverlay());
+      </OnShow>
+      <OnClick>
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+        Armory:SetConfigUseOverlay(self:GetChecked());
+        if ( self:GetChecked() ) then
+          ArmoryPaperDollOverlayFrame:Show();
+        else
+          ArmoryPaperDollOverlayFrame:Hide();
+        end
+      </OnClick>
+      <OnEnter>
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT");
+        GameTooltip:SetText(ARMORY_CMD_SET_USEOVERLAY_MENUTEXT, nil, nil, nil, nil, true);
+      </OnEnter>
+      <OnLeave function="GameTooltip_Hide"/>
+    </Scripts>
+  </CheckButton>
+
+  <Frame name="ArmoryPaperDollOverlayFrame" setAllPoints="true" enableMouse="true" parent="PaperDollFrame" hidden="true" useParentLevel="true">
+    <Frames>
+      <Frame name="ArmoryPaperDollTalentOverlay" inherits="ArmoryPaperDollTalentFrameTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" x="51" y="-64"/>
+        </Anchors>
+      </Frame>
+      <Frame name="ArmoryPaperDollTradeSkillOverlay" inherits="ArmoryPaperDollTradeSkillFrameTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryPaperDollTalentOverlay" relativePoint="BOTTOMLEFT">
+            <Offset x="0" y="0" />
+          </Anchor>
+        </Anchors>
+      </Frame>
+      <Frame name="ArmorySocketsOverlayFrame" inherits="ArmorySocketsFrameTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryPaperDollTalentOverlay" relativePoint="TOPRIGHT">
+            <Offset x="0" y="0"/>
+          </Anchor>
+        </Anchors>
+      </Frame>
+      <Frame name="ArmoryAttributesOverlayTopFrame" inherits="ArmoryAttributesFrameTemplate" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" x="52" y="-87"/>
+        </Anchors>
+        <Frames>
+          <Frame name="ArmoryAttributesOverlayTopFramePlayerStatDropDown" inherits="ArmoryDropDownMenuTemplate" enableMouse="true">
+            <Anchors>
+              <Anchor point="BOTTOMLEFT" relativeTo="ArmoryAttributesOverlayTopFrameTop" relativePoint="TOPLEFT">
+                <Offset>
+                  <AbsDimension x="-17" y="-8"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+            <Scripts>
+              <OnLoad function="ArmoryAttributesOverlayTopFramePlayerStatDropDown_OnLoad" />
+              <OnShow function="ArmoryAttributesOverlayTopFramePlayerStatDropDown_OnShow" />
+            </Scripts>
+          </Frame>
+        </Frames>
+      </Frame>
+      <Frame name="ArmoryAttributesOverlayBottomFrame" inherits="ArmoryAttributesFrameTemplate">
+        <Size>
+          <AbsDimension x="228" y="125"/>
+        </Size>
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="ArmoryPaperDollTradeSkillOverlay" relativePoint="BOTTOMLEFT">
+            <Offset>
+              <AbsDimension x="1" y="-25"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Frames>
+          <Frame name="ArmoryAttributesOverlayBottomFramePlayerStatDropDown" inherits="ArmoryDropDownMenuTemplate" enableMouse="true">
+            <Anchors>
+              <Anchor point="BOTTOMLEFT" relativeTo="ArmoryAttributesOverlayBottomFrameTop" relativePoint="TOPLEFT">
+                <Offset>
+                  <AbsDimension x="-17" y="-8"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+            <Scripts>
+              <OnLoad function="ArmoryAttributesOverlayBottomFramePlayerStatDropDown_OnLoad" />
+              <OnShow function="ArmoryAttributesOverlayBottomFramePlayerStatDropDown_OnShow" />
+            </Scripts>
+          </Frame>
+        </Frames>
+      </Frame>
+    </Frames>
+    <Scripts>
+      <OnLoad function="ArmoryPaperDollOverlayFrame_OnLoad" />
+      <OnEvent function="ArmoryPaperDollOverlayFrame_OnEvent" />
+      <OnShow function="ArmoryPaperDollOverlayFrame_OnShow" />
+      <OnHide function="ArmoryPaperDollOverlayFrame_OnHide" />
+    </Scripts>
+  </Frame>
+
+</Ui>

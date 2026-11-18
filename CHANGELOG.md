@@ -11,6 +11,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - The tooltip of an equipment slot in the paper doll lists the item level of your other characters in that slot, for armor only those with the same armor type
 - Fixes a stat of a scaling item showing up among the item counts in the tooltip of an equipment slot, mistaken for an engineering tinker (Retail)
 - Fixes an error when logging in or reloading during a keystone, a PvP match or a boss encounter, when Armory joins its share channel (Retail)
+- Fixes an error when logging in for the first time on a character that Armory doesn't know yet (Retail and WoW Forever)
 
 ## v20.0.0-beta1
 - One Armory for all versions of World of Warcraft: Retail, WoW Forever, Classic Era and Burning Crusade Anniversary now share one addon and one project page

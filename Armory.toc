@@ -39,6 +39,7 @@ Config.xml
 Frames.xml
 Frames\Mainline\ArmoryPaperDollFrame.xml [AllowLoadGameType standard]
 Frames\Forever\ArmoryPaperDollFrame.xml [AllowLoadGameType mainline] [ExcludeLoadGameType standard]
+Frames\ArmoryPaperDollOverlayFrame.xml [AllowLoadGameType mainline]
 Frames_Mainline.xml [AllowLoadGameType mainline]
 Frames\Mainline\ArmoryPVPFrame.xml [AllowLoadGameType standard]
 Frames\Forever\ArmoryPVPFrame.xml [AllowLoadGameType mainline] [ExcludeLoadGameType standard]
