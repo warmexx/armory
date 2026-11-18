@@ -1,9 +1,10 @@
--- New English strings for the CurseForge localization of Armory (project 5195, namespace Armory),
--- not yet imported there. Import them as enUS phrases before building a release; remove a line
--- here once CurseForge has it.
+-- New English strings for the CurseForge localization of Armory (project 5195, namespace Armory).
+-- Import them as enUS phrases before building a release.
 -- dev/install.py adds the lines whose key is missing to the installed Locales\enUS.lua, so they
--- can be tested before the import.
+-- can be tested before the import. It takes the translations from the release installed in
+-- Retail, so keep an imported line until a release that has it is installed there.
 
+-- Imported on CurseForge on 2026-11-18; remove once beta2 is installed in Retail.
 L["ARMORY_CMD_SET_USEREALMFILTER_TEXT"] = "enable realm filter"
 L["ARMORY_CMD_SET_USEREALMFILTER_MENUTEXT"] = "Realm filter"
 L["ARMORY_CMD_SET_USEREALMFILTER_TOOLTIP"] = [=[If enabled, only characters on the current and connected realms will be shown. This will also affect tooltip information.
