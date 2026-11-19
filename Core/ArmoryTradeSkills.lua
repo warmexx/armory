@@ -530,16 +530,14 @@ local function FormatRequirements(requirements)
     return formattedRequirements;
 end
 
-local function StoreTradeSkillInfo(dbEntry, recipeID, index)
-    local skillLineID, skillLineName = C_TradeSkillUI.GetTradeSkillLineForRecipe(recipeID);
-    if ( skillLineName ) then
-        dbEntry:SetValue(2, rankContainer, skillLineName, C_TradeSkillUI.GetProfessionInfoBySkillLineID(skillLineID).skillLevel);
-    end
+-- The recipes are shared by all characters and don't change during a session, so each is stored once.
+-- The game updates the list often, e.g. on the crafting orders pages, and storing all of them again
+-- each time took too long.
+local storedRecipes = {};
 
-    local recipe = Armory.sharedDbEntry:SelectContainer(container, recipeContainer, tostring(recipeID));
+local function StoreRecipe(dbEntry, recipe, recipeID)
     local reagents = Armory.sharedDbEntry:SelectContainer(container, reagentContainer);
 
-    local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID);
     local recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipeID, false);
     local quantityMin, quantityMax = 1, 1;
 
@@ -600,12 +598,30 @@ local function StoreTradeSkillInfo(dbEntry, recipeID, index)
     recipe.Description = C_TradeSkillUI.GetRecipeDescription(recipeID, {});
     recipe.NumMade = dbEntry.Save(quantityMin, quantityMax);
     recipe.ItemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID);
+end
 
-    if ( #C_TradeSkillUI.GetRecipeRequirements(recipeID) > 0 ) then
-        local requirements = C_TradeSkillUI.GetRecipeRequirements(recipeID);
+local function StoreTradeSkillInfo(dbEntry, recipeID, index)
+    local skillLineID, skillLineName = C_TradeSkillUI.GetTradeSkillLineForRecipe(recipeID);
+    if ( skillLineName ) then
+        dbEntry:SetValue(2, rankContainer, skillLineName, C_TradeSkillUI.GetProfessionInfoBySkillLineID(skillLineID).skillLevel);
+    end
+
+    local recipe = Armory.sharedDbEntry:SelectContainer(container, recipeContainer, tostring(recipeID));
+    -- the data can have been deleted since
+    if ( not (storedRecipes[recipeID] and recipe.RecipeLink) ) then
+        StoreRecipe(dbEntry, recipe, recipeID);
+        storedRecipes[recipeID] = true;
+    end
+
+    local requirements = C_TradeSkillUI.GetRecipeRequirements(recipeID);
+    if ( #requirements > 0 ) then
         recipe.Tools = Armory:BuildColoredListString(unpack(FormatRequirements(requirements)));
     end
 
+    SetItemCache(dbEntry, nil, recipe.ItemLink);
+end
+
+local function StoreCooldown(dbEntry, recipeID, index)
     local cooldown, isDayCooldown, charges, maxCharges = C_TradeSkillUI.GetRecipeCooldown(recipeID);
 
     -- HACK: when a cd is activated it will return 00:00, but after a relog it suddenly becomes 03:00
@@ -618,10 +634,64 @@ local function StoreTradeSkillInfo(dbEntry, recipeID, index)
     else
         dbEntry:SetValue(3, itemContainer, index, "Cooldown", nil);
     end
+end
 
-    SetItemCache(dbEntry, nil, recipe.ItemLink);
+-- Storing all recipes at once can take longer than the game allows, so it is spread over frames:
+-- one queue per profession, replaced when the profession is read again. The game only has the data
+-- while the profession window shows that profession; a queue stops when it is closed or switched.
+-- The list of recipes and their cooldowns are stored right away.
+local MAX_STORE_TIME_PER_FRAME = 10;
+local pendingRecipes = {};
 
-    return recipe;
+local function IsOwnProfessionOpen(name)
+    if ( not C_TradeSkillUI.IsTradeSkillReady() ) then
+        return false, "not ready";
+    elseif ( C_TradeSkillUI.IsTradeSkillLinked() or C_TradeSkillUI.IsTradeSkillGuild() or C_TradeSkillUI.IsNPCCrafting() or C_TradeSkillUI.IsRuneforging() ) then
+        return false, "not own";
+    end
+    local professionInfo = Armory:GetCurrentProfessionInfo();
+    if ( not professionInfo ) then
+        return false, "no profession";
+    elseif ( professionInfo.displayName ~= name ) then
+        return false, professionInfo.displayName;
+    end
+    return true;
+end
+
+local storeFrame = CreateFrame("Frame");
+storeFrame:Hide();
+storeFrame:SetScript("OnUpdate", function(self)
+    local start = debugprofilestop();
+    for key, queue in pairs(pendingRecipes) do
+        local isOpen, reason = IsOwnProfessionOpen(queue.name);
+        if ( not isOpen ) then
+            Armory:PrintDebug("STOPPED", queue.name, #queue - queue.next + 1, reason, ProfessionsFrame and ProfessionsFrame:IsShown());
+            queue.next = #queue + 1;
+            -- an incomplete cache would hide crafters; without one it is rebuilt from the list when needed
+            ClearItemCache(queue.dbEntry);
+        end
+        while ( queue.next <= #queue ) do
+            local recipeID, index = unpack(queue[queue.next]);
+            queue.next = queue.next + 1;
+            StoreTradeSkillInfo(queue.dbEntry, recipeID, index);
+            if ( debugprofilestop() - start > MAX_STORE_TIME_PER_FRAME ) then
+                return;
+            end
+        end
+        pendingRecipes[key] = nil;
+    end
+    self:Hide();
+end);
+
+local function NewRecipeQueue(dbEntry, name)
+    local queue = { dbEntry = dbEntry, name = name, next = 1 };
+    pendingRecipes[dbEntry.db] = queue;
+    return queue;
+end
+
+local function QueueRecipe(queue, recipeID, index)
+    table.insert(queue, {recipeID, index});
+    storeFrame:Show();
 end
 
 local function CreateSkillList()
@@ -824,6 +894,7 @@ function Armory:UpdateTradeSkill()
             ClearItemCache(dbEntry);
 
             local nodeInfoList, categoryNodes = CreateSkillList();
+            local queue = NewRecipeQueue(dbEntry, name);
 
             for i, node in ipairs(categoryNodes) do
                 local categoryInfo = node.categoryInfo;
@@ -838,10 +909,11 @@ function Armory:UpdateTradeSkill()
                 dbEntry:SetValue(3, itemContainer, i, "Info", GetTradeSkillLineInfo(info));
                 if ( info.recipeID ) then
                     dbEntry:SetValue(3, itemContainer, i, "Data", tostring(info.recipeID));
+                    StoreCooldown(dbEntry, info.recipeID, i);
 
                     local spell = Spell:CreateFromSpellID(info.recipeID);
                     spell:ContinueOnSpellLoad(function()
-                        StoreTradeSkillInfo(dbEntry, info.recipeID, i);
+                        QueueRecipe(queue, info.recipeID, i);
                     end);
                 end
             end
