@@ -116,6 +116,7 @@ function ArmoryInventoryFrame_OnLoad(self)
         self:RegisterEvent("TRADE_SKILL_CLOSE");
         self:RegisterEvent("AUCTION_HOUSE_AUCTION_CREATED");
         self:RegisterEvent("COMMODITY_SEARCH_RESULTS_UPDATED");
+        self:RegisterEvent("ITEM_SEARCH_RESULTS_UPDATED");
         self:RegisterEvent("OWNED_AUCTIONS_UPDATED");
 
         self:SetPortraitToAsset("Interface\\Buttons\\Button-Backpack-Up");
@@ -257,10 +258,11 @@ else
             return false;
         elseif ( event == "AUCTION_HOUSE_AUCTION_CREATED" ) then
             self.queryOwnedAuctions = true;
-        elseif ( event == "COMMODITY_SEARCH_RESULTS_UPDATED" ) then
+        elseif ( event == "COMMODITY_SEARCH_RESULTS_UPDATED" or event == "ITEM_SEARCH_RESULTS_UPDATED" ) then
             if ( self.queryOwnedAuctions ) then
                 Armory:ExecuteConditional(C_AuctionHouse.IsThrottledMessageSystemReady, QueryOwnedAuctions);
             end
+            return false;
         elseif ( event == "OWNED_AUCTIONS_UPDATED" ) then
             self.queryOwnedAuctions = false;
             -- Must execute immediately
@@ -290,7 +292,7 @@ function ArmoryInventoryFrame_OnEvent(self, event, ...)
     local update = true;
 
     -- make sure no Blizz id will match (e.g. -4 was introduced for tokens bag)
-    if ( arg1 and arg1 <= ARMORY_MAIL_CONTAINER ) then
+    if ( type(arg1) == "number" and arg1 <= ARMORY_MAIL_CONTAINER ) then
         arg1 = arg1 * 100;
     end
 

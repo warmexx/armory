@@ -559,9 +559,13 @@ else
     GetOwnedAuction = function(index)
         local info = C_AuctionHouse.GetOwnedAuctionInfo(index);
         if ( info and info.itemKey and info.status ~= Enum.AuctionStatus.Sold ) then
-            local link, timeLeft, count = info.itemLink, info.timeLeftSeconds, info.quantity;
-            info = C_AuctionHouse.GetItemKeyInfo(info.itemKey);
+            local itemKey, link, timeLeft, count = info.itemKey, info.itemLink, info.timeLeftSeconds, info.quantity;
+            info = C_AuctionHouse.GetItemKeyInfo(itemKey);
             if ( info and info.iconFileID ) then
+                -- commodities have no link of their own
+                if ( not link ) then
+                    link = info.battlePetLink or select(2, C_Item.GetItemInfo(itemKey.itemID)) or Armory:GetLink("item", itemKey.itemID, info.itemName, info.quality);
+                end
                 return info.iconFileID, count, info.quality, link, timeLeft;
             end
         end
