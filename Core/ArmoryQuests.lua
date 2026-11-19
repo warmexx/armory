@@ -242,6 +242,15 @@ local function UpdateQuestHeaderState(index, isCollapsed)
     dirty = true;
 end
 
+-- The quest log doesn't load its reward items, so their link stays missing until the item is loaded
+-- elsewhere; the retry of the update finds it loaded
+local function RequestRewardItem(questID, itemID)
+    Armory:PrintDebug("No link", questID, itemID);
+    if ( itemID and itemID > 0 ) then
+        C_Item.RequestLoadItemDataByID(itemID);
+    end
+end
+
 local function IsSpellKnownOrOverridesKnown(spellID, isPet)
     local spellBank = isPet and Enum.SpellBookSpellBank.Pet or Enum.SpellBookSpellBank.Player;
     return C_SpellBook.IsSpellInSpellBook(spellID, spellBank, true);
@@ -413,10 +422,11 @@ function Armory:UpdateQuests()
                 if ( _G.GetNumQuestLogRewards(questID) > 0 ) then
                     info.Rewards = {};
                     for i = 1, _G.GetNumQuestLogRewards(questID) do
-                        local name, texture, numItems, quality, isUsable = _G.GetQuestLogRewardInfo(i, questID);
+                        local name, texture, numItems, quality, isUsable, itemID = _G.GetQuestLogRewardInfo(i, questID);
                         link = _G.GetQuestLogItemLink("reward", i, questID);
                         info.Rewards[i] = dbEntry.Save(name, texture, numItems, quality, isUsable, link);
                         if ( not link ) then
+                            RequestRewardItem(questID, itemID);
                             dataMissing = true;
                         end
                     end
@@ -424,10 +434,11 @@ function Armory:UpdateQuests()
                 if ( _G.GetNumQuestLogChoices(questID) > 0 ) then
                     info.Choices = {};
                     for i = 1, _G.GetNumQuestLogChoices(questID) do
-                        local name, texture, numItems, quality, isUsable = _G.GetQuestLogChoiceInfo(i, questID);
+                        local name, texture, numItems, quality, isUsable, itemID = _G.GetQuestLogChoiceInfo(i, questID);
                         link = _G.GetQuestLogItemLink("choice", i, questID);
                         info.Choices[i] = dbEntry.Save(name, texture, numItems, quality, isUsable, link);
                         if ( not link ) then
+                            RequestRewardItem(questID, itemID);
                             dataMissing = true;
                         end
                     end

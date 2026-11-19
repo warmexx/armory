@@ -238,11 +238,13 @@ function ArmoryDbEntry:SetExpandableListValues(key, funcNumLines, funcGetLineSta
                     values.Data = self.Save(funcAdditionalInfo(i));
                 end
             else
+                Armory:PrintDebug("No line info", key, i, newNumLines);
                 failed = true;
             end
         elseif ( select("#", funcGetLineInfo(i)) > 1 ) then
             container[i] = self.Save(funcGetLineInfo(i));
         else
+            Armory:PrintDebug("No line info", key, i, newNumLines);
             failed = true;
         end
     end

@@ -8,6 +8,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - The guild bank is stored while you use it instead of when you close it, so Armory no longer interferes with closing the game's guild bank
 - Armory no longer interferes with closing a profession window when it stores the complete professions (Classic Era and Burning Crusade Anniversary)
 - The column names of the summary stay in place when you scroll through your characters
+- Fixes the quest log of a character with many quest rewards that weren't loaded yet failing to update: Armory now asks the game to load the reward items (Retail and WoW Forever)
 - Fixes a lag spike and a "script ran too long" error in the profession window, for example on the Patron Orders page: Armory stores each recipe once per session and spreads the work over several frames (Retail and WoW Forever)
 
 ## v20.0.0-beta2
