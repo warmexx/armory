@@ -3,6 +3,9 @@ The project page can be found on https://www.curseforge.com/wow/addons/armory.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+## v20.0.0-beta3
+- Fixes Armory being blamed for blocking the use of a bag item, which happened while item comparison was on. Armory's comparison with Alt now shows up next to the game's comparison instead of replacing it
+
 ## v20.0.0-beta2
 - The realm and faction filter are now two separate options, so you can show both factions on your realm or one faction on all realms
 - The item counts in tooltips list your characters first, then your guild banks and then the Warband bank, and can be sorted by name or by count in the Tooltip options

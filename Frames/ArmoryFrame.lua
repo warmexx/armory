@@ -773,12 +773,24 @@ function ArmoryFrame_OnMouseDown(self, button)
     end
 end
 
-local Orig_GameTooltip_ShowCompareItem = GameTooltip_ShowCompareItem;
-function GameTooltip_ShowCompareItem(...)
-    if ( ArmoryComparisonTooltip1:IsVisible() or ArmoryComparisonTooltip2:IsVisible() ) then
-        return;
+-- Blizzard's comparison tooltips stay as they are: replacing GameTooltip_ShowCompareItem or hiding
+-- them from here taints Blizzard's tooltip code, up to protected calls such as using a bag item.
+-- Armory's own comparison goes next to them instead.
+local function HasShoppingTooltips(tooltip)
+    for _, shoppingTooltip in ipairs(tooltip.shoppingTooltips or {}) do
+        if ( shoppingTooltip:IsVisible() ) then
+            return true;
+        end
     end
-    return Orig_GameTooltip_ShowCompareItem(...);
+    return false;
+end
+
+local function GetTooltipEdge(frame, getEdge)
+    local value = getEdge(frame);
+    if ( not value or issecretvalue(value) ) then
+        return nil;
+    end
+    return value;
 end
 
 local function TooltipGetEquipmentSlot(tooltip)
@@ -865,15 +877,13 @@ function ArmoryComparisonFrame_OnUpdate(self, elapsed)
         if ( not link or buyable or learnable ) then
             link = TooltipGetEquipmentSlot(tooltip);
         end
-        if ( self.link ~= link ) then
+        -- Blizzard's comparison coming or going moves Armory's next to it
+        local hasShoppingTooltips = HasShoppingTooltips(tooltip);
+        if ( self.link ~= link or self.hasShoppingTooltips ~= hasShoppingTooltips ) then
             self.link = link;
-            self.hasShoppingTooltips = ShoppingTooltip1:IsVisible() or ShoppingTooltip2:IsVisible();
+            self.hasShoppingTooltips = hasShoppingTooltips;
             if ( link ) then
                 self.hasComparison = true;
-
-                ShoppingTooltip1:Hide();
-                ShoppingTooltip2:Hide();
-
                 ArmoryShowCompareItem(tooltip, link);
             else
                 ArmoryComparisonTooltip1:Hide();
@@ -884,22 +894,10 @@ function ArmoryComparisonFrame_OnUpdate(self, elapsed)
     elseif ( self.hasComparison ) then
         self.hasComparison = false;
         self.link = nil;
+        self.hasShoppingTooltips = nil;
 
         ArmoryComparisonTooltip1:Hide();
         ArmoryComparisonTooltip2:Hide();
-
-        if ( self.hasShoppingTooltips ) then
-            if ( GameTooltip:IsVisible() ) then
-                GameTooltip_ShowCompareItem();
-            elseif ( AtlasLootTooltip and AtlasLootTooltip:IsVisible() ) then
-                if ( AtlasLootItem_ShowCompareItem ) then
-                    AtlasLootItem_ShowCompareItem();
-                elseif ( AtlasLoot.ItemShowCompareItem ) then
-                    AtlasLoot:ItemShowCompareItem();
-                end
-            end
-        end
-
     end
 end
 
@@ -980,19 +978,26 @@ function ArmoryShowCompareItem(tooltip, link)
         return;
     end
 
-    -- find correct side
-    local side = "left";
-    local rightDist = 0;
-    local leftPos = tooltip:GetLeft();
-    local rightPos = tooltip:GetRight();
-    if ( not rightPos or issecretvalue(rightPos) ) then
-        rightPos = 0;
-    end
-    if ( not leftPos or issecretvalue(leftPos) ) then
-        leftPos = 0;
+    -- the outer edges of the tooltip together with Blizzard's comparison tooltips
+    local leftPos = GetTooltipEdge(tooltip, tooltip.GetLeft) or 0;
+    local rightPos = GetTooltipEdge(tooltip, tooltip.GetRight) or 0;
+    local leftFrame, rightFrame = tooltip, tooltip;
+    for _, shoppingTooltip in ipairs(tooltip.shoppingTooltips or {}) do
+        if ( shoppingTooltip:IsVisible() ) then
+            local left = GetTooltipEdge(shoppingTooltip, shoppingTooltip.GetLeft);
+            local right = GetTooltipEdge(shoppingTooltip, shoppingTooltip.GetRight);
+            if ( left and left < leftPos ) then
+                leftPos, leftFrame = left, shoppingTooltip;
+            end
+            if ( right and right > rightPos ) then
+                rightPos, rightFrame = right, shoppingTooltip;
+            end
+        end
     end
 
-    rightDist = GetScreenWidth() - rightPos;
+    -- find correct side
+    local side;
+    local rightDist = GetScreenWidth() - rightPos;
 
     if (leftPos and (rightDist < leftPos)) then
         side = "left";
@@ -1031,10 +1036,11 @@ function ArmoryShowCompareItem(tooltip, link)
         ArmoryComparisonTooltip1:SetOwner(tooltip, "ANCHOR_NONE");
         ArmoryComparisonTooltip1:SetScale(GameTooltip:GetScale());
         ArmoryComparisonTooltip1:ClearAllPoints();
-        if ( side and side == "left" ) then
-            ArmoryComparisonTooltip1:SetPoint("TOPRIGHT", tooltip:GetName(), "TOPLEFT", 0, -10);
+        -- Blizzard's comparison tooltips already sit lower than the tooltip
+        if ( side == "left" ) then
+            ArmoryComparisonTooltip1:SetPoint("TOPRIGHT", leftFrame, "TOPLEFT", 0, leftFrame == tooltip and -10 or 0);
         else
-            ArmoryComparisonTooltip1:SetPoint("TOPLEFT", tooltip:GetName(), "TOPRIGHT", 0, -10);
+            ArmoryComparisonTooltip1:SetPoint("TOPLEFT", rightFrame, "TOPRIGHT", 0, rightFrame == tooltip and -10 or 0);
         end
         setCompareItem(1);
 
