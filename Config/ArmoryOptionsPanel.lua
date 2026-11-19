@@ -31,7 +31,27 @@ local Armory, _ = Armory, nil;
 ArmoryOptionsPanelMixin = CreateFromMixins(ArmoryOptionsPanelTemplateMixin);
 
 function ArmoryOptionsPanelMixin:Open()
+    if ( not SettingsPanel:IsShown() ) then
+        self:SuppressGameMenuOnClose();
+    end
     Settings.OpenToCategory(self:GetCategoryID());
+end
+
+-- Blizzard returns to the game menu on close, which only makes sense when the settings were opened from there
+function ArmoryOptionsPanelMixin:SuppressGameMenuOnClose()
+    if ( not self.settingsPanelHooked ) then
+        self.settingsPanelHooked = true;
+        SettingsPanel:HookScript("OnHide", function()
+            C_Timer.After(0, function() self.suppressGameMenu = nil; end);
+        end);
+        hooksecurefunc(SettingsPanel, "TransitionBackOpeningPanel", function()
+            if ( self.suppressGameMenu and GameMenuFrame:IsShown() and not InCombatLockdown() ) then
+                HideUIPanel(GameMenuFrame);
+            end
+            self.suppressGameMenu = nil;
+        end);
+    end
+    self.suppressGameMenu = true;
 end
 
 function ArmoryOptionsPanelMixin:OnLoad()

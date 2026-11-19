@@ -10,6 +10,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - The column names of the summary stay in place when you scroll through your characters
 - Fixes the quest log of a character with many quest rewards that weren't loaded yet failing to update: Armory now asks the game to load the reward items (Retail and WoW Forever)
 - Fixes a lag spike and a "script ran too long" error in the profession window, for example on the Patron Orders page: Armory stores each recipe once per session and spreads the work over several frames (Retail and WoW Forever)
+- Closing the options opened with /ar config no longer opens the game menu
 
 ## v20.0.0-beta2
 - The realm and faction filter are now two separate options, so you can show both factions on your realm or one faction on all realms
