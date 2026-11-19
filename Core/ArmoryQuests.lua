@@ -931,7 +931,7 @@ if ( Armory.isClassic ) then
                         info.Rewards = {};
                         for i = 1, _G.GetNumQuestLogRewards() do
                             local name, texture, numItems, quality, isUsable = _G.GetQuestLogRewardInfo(i);
-                            link = _G.GetQuestLogItemLink("reward", i);
+                            local link = _G.GetQuestLogItemLink("reward", i);
                             info.Rewards[i] = dbEntry.Save(name, texture, numItems, quality, isUsable, link);
                             if ( not link ) then
                                 dataMissing = true;
@@ -942,7 +942,7 @@ if ( Armory.isClassic ) then
                         info.Choices = {};
                         for i = 1, _G.GetNumQuestLogChoices() do
                             local name, texture, numItems, quality, isUsable = _G.GetQuestLogChoiceInfo(i);
-                            link = _G.GetQuestLogItemLink("choice", i);
+                            local link = _G.GetQuestLogItemLink("choice", i);
                             info.Choices[i] = dbEntry.Save(name, texture, numItems, quality, isUsable, link);
                             if ( not link ) then
                                 dataMissing = true;

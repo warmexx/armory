@@ -384,7 +384,7 @@ end
 function AGB:ProcessResponse()
     local module = ArmoryAddonMessageFrame_GetModule(ARMORY_GUILDBANK_MESSAGE_TYPE.BANK_SYNC_REQUEST);
     local dbEntry = self:Db();
-    local tabs, timestamp, checksum, values, itemId, info, count, slotInfo, slot, total;
+    local tabs, tab, timestamp, checksum, values, itemId, info, count, slotInfo, slot, total;
     local remoteTime, offset;
     local updated;
 
