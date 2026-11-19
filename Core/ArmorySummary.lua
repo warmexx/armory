@@ -33,6 +33,53 @@ local summary = {};
 
 local VALOR_TIER1_LFG_ID = 301;
 
+-- LibQTip's layout constants
+local TOOLTIP_PADDING = 10;
+local CELL_MARGIN_V = 3;
+
+-- the column names and the separator below them
+local NUM_HEADER_LINES = 2;
+
+local function UnfreezeSummaryHeader(tooltip)
+    if ( tooltip.armoryFrozenHeader ) then
+        tooltip.scrollFrame:SetPoint("TOP", tooltip, "TOP", 0, -TOOLTIP_PADDING);
+        tooltip.slider:SetPoint("TOPRIGHT", tooltip, "TOPRIGHT", -TOOLTIP_PADDING, -TOOLTIP_PADDING);
+        tooltip.armoryFrozenHeader = nil;
+    end
+end
+
+-- Moves the header lines out of the scroll frame, so only the characters scroll
+local function FreezeSummaryHeader(tooltip)
+    local firstLine = tooltip.lines[NUM_HEADER_LINES + 1];
+    if ( not (firstLine and tooltip.slider and tooltip.slider:IsShown()) ) then
+        return;
+    end
+
+    local scrollChild = tooltip.scrollChild;
+    local frameLevel = scrollChild:GetFrameLevel();
+    local margin = tooltip.cell_margin_v or CELL_MARGIN_V;
+    local height = 0;
+    for i = 1, NUM_HEADER_LINES do
+        local line = tooltip.lines[i];
+        height = height + line.height + margin;
+        line:SetParent(tooltip);
+        line:SetFrameLevel(frameLevel + 2);
+        for _, cell in pairs(line.cells) do
+            if ( cell ) then
+                cell:SetParent(tooltip);
+                cell:SetFrameLevel(frameLevel + 3);
+            end
+        end
+    end
+
+    tooltip.lines[1]:SetPoint("TOP", tooltip, "TOP", 0, -TOOLTIP_PADDING);
+    firstLine:SetPoint("TOP", scrollChild);
+    scrollChild:SetHeight(tooltip.height - height);
+    tooltip.scrollFrame:SetPoint("TOP", tooltip, "TOP", 0, -(TOOLTIP_PADDING + height));
+    tooltip.slider:SetPoint("TOPRIGHT", tooltip, "TOPRIGHT", -TOOLTIP_PADDING, -(TOOLTIP_PADDING + height));
+    tooltip.armoryFrozenHeader = true;
+end
+
 local function SummaryAutoHide(parent)
     if ( Armory.summary.locked ) then
         Armory.summary:SetAutoHideDelay(nil);
@@ -1100,6 +1147,7 @@ function Armory:DisplaySummary()
 
     local iconProvider = self.qtipIconProvider;
     GameTooltip:Hide();
+    UnfreezeSummaryHeader(self.summary);
     self.summary:Clear();
 
     local headerFont = self.summary:GetHeaderFont();
@@ -1317,6 +1365,7 @@ function Armory:DisplaySummary()
     end
 
     self.summary:UpdateScrolling(512);
+    FreezeSummaryHeader(self.summary);
     self.summary:Show();
 
     SummaryAutoHide();
@@ -1336,6 +1385,7 @@ function Armory:HideSummary(force)
     end
     if ( not self.summary.locked ) then
         self.summary:SetScale(1);
+        UnfreezeSummaryHeader(self.summary);
         self.qtip:Release(self.summary);
         table.wipe(summary);
         self.summary = nil;
