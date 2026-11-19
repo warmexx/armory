@@ -133,8 +133,10 @@ function ArmoryTradeSkillFrameMixin:OnLoad()
         Armory:SetPortraitToTexture(ArmoryTradeSkillFramePortrait, "Interface\\Spellbook\\Spellbook-Icon");
 
         self:RegisterEvent("TRADE_SKILL_SHOW");
+        self:RegisterEvent("TRADE_SKILL_UPDATE");
         self:RegisterEvent("TRADE_SKILL_CLOSE");
         self:RegisterEvent("CRAFT_SHOW");
+        self:RegisterEvent("CRAFT_UPDATE");
         self:RegisterEvent("CRAFT_CLOSE");
     else
         self:SetPortraitToAsset("Interface\\Spellbook\\Spellbook-Icon");
@@ -153,15 +155,37 @@ function ArmoryTradeSkillFrameMixin:OnLoad()
 end
 
 if ( Armory.isClassic ) then
+    -- The skill line (name, rank) of the open window, remembered on the events on which Blizzard's frame
+    -- redraws it: after closing the game returns UNKNOWN, while the recipes can still be read
+    local openSkillLines = {};
+
+    local function RememberSkillLine(isCraft)
+        local name, rank, maxRank;
+        if ( isCraft ) then
+            name, rank, maxRank = GetCraftDisplaySkillLine();
+        else
+            name, rank, maxRank = GetTradeSkillLine();
+        end
+        if ( name and name ~= "UNKNOWN" ) then
+            openSkillLines[isCraft] = { name, rank, maxRank };
+        end
+    end
+
     function ArmoryTradeSkillFrameMixin:OnEvent(event, ...)
         local isCraft = event:sub(1, 5) == "CRAFT";
+        if ( event == "TRADE_SKILL_SHOW" or event == "CRAFT_SHOW" ) then
+            -- another profession may have opened without closing the previous one
+            openSkillLines[isCraft] = nil;
+            RememberSkillLine(isCraft);
+        elseif ( event == "TRADE_SKILL_UPDATE" or event == "CRAFT_UPDATE" ) then
+            RememberSkillLine(isCraft);
+            return;
+        end
+
         if ( not Armory:CanHandleEvents() ) then
             return;
         elseif ( event == "TRADE_SKILL_SHOW" or event == "CRAFT_SHOW" ) then
-            self.isOpen = true;
             Armory:PullTradeSkillItems(isCraft);
-        elseif ( event == "TRADE_SKILL_CLOSE" or event == "CRAFT_CLOSE" ) then
-            self.isOpen = false;
         end
 
         if ( not Armory:GetConfigExtendedTradeSkills() ) then
@@ -169,11 +193,26 @@ if ( Armory.isClassic ) then
         end
     end
 
-    function ArmoryTradeSkillFrameMixin:Update(isCraft)
+    -- With extended tradeskills Classic reads the window when it closes: right after the close function,
+    -- in a secure hook (replacing CloseTradeSkill and CloseCraft tainted Blizzard's closing of the window)
+    local function UpdateWhenClosed(isCraft)
+        local skillLine = openSkillLines[isCraft];
+        openSkillLines[isCraft] = nil;
+        if ( skillLine and Armory:GetConfigExtendedTradeSkills() ) then
+            ArmoryTradeSkillFrame:Update(isCraft, skillLine);
+        end
+    end
+
+    if ( CloseCraft ) then
+        hooksecurefunc("CloseCraft", function() UpdateWhenClosed(true); end);
+    end
+    hooksecurefunc("CloseTradeSkill", function() UpdateWhenClosed(false); end);
+
+    function ArmoryTradeSkillFrameMixin:Update(isCraft, skillLine)
         local currentSkill, modeChanged;
 
         Armory:UnregisterTradeSkillUpdateEvents();
-        currentSkill, modeChanged = Armory:UpdateTradeSkill(isCraft);
+        currentSkill, modeChanged = Armory:UpdateTradeSkill(isCraft, skillLine);
         Armory:RegisterTradeSkillUpdateEvents();
 
         if ( Armory.character == Armory.player ) then
@@ -1467,36 +1506,6 @@ function ArmoryOptionalReagentButtonMixin:GetOptions(options)
 end
 
 ----------------------------------------------------------
-
-if ( Armory.isClassic ) then
-    -- With extended tradeskills Classic reads the window when it closes
-    local function UpdateWhenClosing(closeFunc, isCraft)
-        if ( not ArmoryTradeSkillFrame.isOpen or ArmoryTradeSkillFrame.closing ) then
-            return;
-        end
-
-        ArmoryTradeSkillFrame.closing = true;
-
-        if ( Armory:GetConfigExtendedTradeSkills() ) then
-            ArmoryTradeSkillFrame:Update(isCraft);
-        end
-
-        closeFunc();
-
-        ArmoryTradeSkillFrame.closing = false;
-        ArmoryTradeSkillFrame.isOpen = false;
-    end
-
-    local Orig_CloseCraft = CloseCraft;
-    function CloseCraft()
-        UpdateWhenClosing(Orig_CloseCraft, true);
-    end
-
-    local Orig_CloseTradeSkill = CloseTradeSkill;
-    function CloseTradeSkill()
-        UpdateWhenClosing(Orig_CloseTradeSkill, false);
-    end
-end
 
 function ArmoryTradeSkillFrame_Show()
     ArmoryTradeSkillFrame:Refresh();

@@ -6,6 +6,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 ## v20.0.0-beta3
 - Fixes Armory being blamed for blocking the use of a bag item, which happened while item comparison was on. Armory's comparison with Alt now shows up next to the game's comparison instead of replacing it
 - The guild bank is stored while you use it instead of when you close it, so Armory no longer interferes with closing the game's guild bank
+- Armory no longer interferes with closing a profession window when it stores the complete professions (Classic Era and Burning Crusade Anniversary)
 
 ## v20.0.0-beta2
 - The realm and faction filter are now two separate options, so you can show both factions on your realm or one faction on all realms

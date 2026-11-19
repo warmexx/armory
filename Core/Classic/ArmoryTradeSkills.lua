@@ -694,7 +694,8 @@ function Armory:PullTradeSkillItems(isCraft)
     end
 end
 
-function Armory:UpdateTradeSkill(isCraft)
+-- skillLine: { name, rank, maxRank } of the window that just closed; the game no longer gives it after closing
+function Armory:UpdateTradeSkill(isCraft, skillLine)
     local name, rank, maxRank;
     local modeChanged;
     local warned;
@@ -706,7 +707,9 @@ function Armory:UpdateTradeSkill(isCraft)
         return;
     end
 
-    if ( isCraft ) then
+    if ( skillLine ) then
+        name, rank, maxRank = unpack(skillLine);
+    elseif ( isCraft ) then
         name, rank, maxRank = _G.GetCraftDisplaySkillLine();
     else
         name, rank, maxRank = _G.GetTradeSkillLine();
