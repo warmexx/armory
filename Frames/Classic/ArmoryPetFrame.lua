@@ -70,7 +70,6 @@ function ArmoryPetFrame_OnLoad(self)
     self:RegisterEvent("UNIT_HAPPINESS");
 
     if ( Armory.isTBC ) then
-        -- Spell damage instead of attack and defense
         ArmoryPetAttackFrame:Hide();
         ArmoryPetDefenseFrame:Hide();
         ArmoryPetSpellDamageFrame:Show();

@@ -30,9 +30,8 @@ local Armory, _ = Armory, nil;
 
 ArmoryPanelTabButtonMixin = {};
 
--- Classic's UI-Character-ActiveTab is 128x32 instead of 128x64: show the selected tab
--- like Blizzard's CharacterFrameTabButtonTemplate in Classic does, which also has the
--- unselected tab 1 pixel higher than in Mainline
+-- Classic's UI-Character-ActiveTab is 128x32 instead of 128x64, and the unselected tab sits
+-- 1 pixel higher, as in Blizzard's CharacterFrameTabButtonTemplate
 local function SetClassicTabs(tab)
     local name = tab:GetName();
     _G[name.."Left"]:SetPoint("TOPLEFT", 0, 0);

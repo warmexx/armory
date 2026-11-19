@@ -109,7 +109,6 @@ function ArmoryInventoryFrame_OnLoad(self)
         -- Blizzard's frame template in Classic has a button bar
         ButtonFrameTemplate_HideButtonBar(self);
         Armory:SetPortraitToTexture(ArmoryInventoryFramePortrait, "Interface\\Buttons\\Button-Backpack-Up");
-        -- Classic has no account bank
         ArmoryInventoryFrameTab3:Hide();
     else
         self:RegisterEvent("BANK_TAB_SETTINGS_UPDATED");
@@ -379,7 +378,6 @@ function ArmoryInventoryFrame_OnShow(self)
         ArmoryInventoryFrameTab4:SetPoint("LEFT", previousTab, "RIGHT", -16, 0);
     end
 
-    -- only the visible tabs: no account bank in Classic and Forever, and the guild bank tab only with a guild
     local tabs = {};
     local totalTabWidth = 0;
     local tabWidthCache = {};
@@ -398,7 +396,6 @@ function ArmoryInventoryFrame_OnShow(self)
 end
 
 function ArmoryInventoryFrame_Update()
-    -- Classic has no account bank
     local accountBankFrame = ArmoryInventoryAccountBankFrame;
 
     if ( accountBankFrame and ArmoryPanelTemplates_GetSelectedTab(ArmoryInventoryFrame) == 3 ) then

@@ -52,7 +52,6 @@ local function GetTreeKey(treeID)
     end
 end
 
--- Forever: the config of a spec group, as Blizzard's talent frame reads it
 local function GetSpecGroupConfigID(specGroup)
     return specGroup and C_SpecializationInfo.GetCombatConfigIDForSpecGroup(specGroup);
 end
@@ -394,7 +393,6 @@ function Armory:GetTalentSpecNodes(specID)
     return self:GetClassValue("player", container, "Specs", specID, "Nodes");
 end
 
--- Forever: the config of the active spec group, Retail: the active config
 function Armory:GetTalentConfigID()
     return GetActiveConfigID();
 end
@@ -479,7 +477,6 @@ function Armory:GetTalentPoints(specID, currencyID)
 end
 
 function Armory:GetNumSpecGroups(inspect)
-    -- Forever has dual spec
     if ( self.isForever ) then
         return self:SetGetCharacterValue("NumSpecGroups", _G.GetNumSpecGroups()) or 1;
     end

@@ -191,7 +191,7 @@ function ArmoryGuildBankFrame_OnTextChanged(self)
 end
 
 function ArmoryGuildBankFilterDropDown_OnLoad(self)
-    -- No fixed width, as in the inventory: the text then ends at the arrow
+    -- no fixed width: the text then ends at the arrow
     ArmoryItemFilter_InitializeDropDown(self);
 end
 
@@ -282,7 +282,6 @@ function ArmoryGuildBankFrameEnableIconView(checked)
     end
 end
 
--- The emblem textures of the icon view, and in Classic of the list view too
 local function UpdateGuildEmblem(dbEntry, frameName)
     local tabardBackgroundUpper, tabardBackgroundLower, tabardEmblemUpper, tabardEmblemLower, tabardBorderUpper, tabardBorderLower = AGB:GetTabardFiles(dbEntry);
 
@@ -309,7 +308,6 @@ local function UpdateGuildEmblem(dbEntry, frameName)
     end
 end
 
--- The tabard on the portrait of the list view
 local function UpdateGuildTabard(dbEntry)
     local emblemTexture = ArmoryListGuildBankFrame.PortraitOverlay.TabardEmblem;
     local backgroundTexture = ArmoryListGuildBankFrame.PortraitOverlay.TabardBackground;
@@ -591,8 +589,6 @@ function ArmoryListGuildBankFrame_AllignCommonControls(self)
 
     ArmoryGuildBankFilterDropDown:SetParent(self);
     ArmoryGuildBankFilterDropDown:ClearAllPoints();
-    -- Two columns, as in the inventory: the filter right aligned below the search box (see ArmoryInventoryFrame.xml),
-    -- the guild below the money
     ArmoryDropDownMenu_JustifyText(ArmoryGuildBankFilterDropDown, "RIGHT");
     ArmoryGuildBankFilterDropDown:SetPoint("TOPLEFT", "ArmoryGuildBankFrameEditBox", "BOTTOMRIGHT", -153, 0);
 
@@ -668,7 +664,7 @@ function ArmoryIconGuildBankFrame_UpdateTabs()
         local tab, tabButton, iconTexture;
         local name, count, link, texture, timestamp;
         local icon;
-        -- All tab frames: TBC has 6 tabs (MAX_GUILDBANK_TABS), the XML 8; a tab without data is hidden
+        -- TBC has 6 tabs (MAX_GUILDBANK_TABS), the XML 8
         for i = 1, NUM_TAB_FRAMES do
             tab = _G["ArmoryIconGuildBankTab"..i];
             tabButton = _G["ArmoryIconGuildBankTab"..i.."Button"];
@@ -748,13 +744,11 @@ DEFAULT_CHAT_FRAME:HookScript("OnHyperlinkClick",
     end
 );
 
--- Only a tab whose info has arrived (it has a name) and that the player cannot view
 local function IsTabHidden(tab)
     local name, _, isViewable = GetGuildBankTabInfo(tab);
     return name ~= nil and not isViewable;
 end
 
--- Caged pet? Classic has no battle pets
 local GetCagedPet;
 if ( Armory.isClassic ) then
     GetCagedPet = function() end;
@@ -776,9 +770,7 @@ end
 -- Guild bank scanning
 ----------------------------------------------------------
 
--- Armory stores the guild bank on the events on which Blizzard's frame redraws it, so what is stored is
--- always what the player saw last. Reading it in a replaced CloseGuildBankFrame tainted the closing of
--- Blizzard's frame. Only while the bank is open: outside a visit the tab data may be missing.
+-- Stored on the update events, not in a replaced CloseGuildBankFrame: that tainted Blizzard's closing.
 local bankOpen = false;
 local seenTabs = {};
 local tabSignatures = {};
@@ -852,8 +844,6 @@ function AGB:OnGuildBankClosed()
     table.wipe(tabSignatures);
 end
 
--- slotsChanged: the contents of the current tab arrived or changed (GUILDBANKBAGSLOTS_CHANGED);
--- otherwise only the tab info did (GUILDBANK_UPDATE_TABS)
 function AGB:OnGuildBankChanged(slotsChanged)
     if ( not bankOpen or not self:Db() ) then
         return;
@@ -861,12 +851,10 @@ function AGB:OnGuildBankChanged(slotsChanged)
 
     if ( slotsChanged ) then
         seenTabs[GetCurrentGuildBankTab()] = true;
-        -- Blizzard's money frame also reads the money when the bank shows, not only on GUILDBANK_UPDATE_MONEY
+        -- GUILDBANK_UPDATE_MONEY does not fire when the bank opens
         self:UpdateMoney();
     end
 
-    -- every tab the player saw during this visit, as the old reading at closing did;
-    -- the signature keeps the full read (with a tooltip per caged pet) to tabs that changed
     for tab in pairs(seenTabs) do
         local name, icon = GetGuildBankTabInfo(tab);
         if ( name ) then

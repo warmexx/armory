@@ -86,10 +86,8 @@ local function UpdateSkillHeaderState(index, isCollapsed)
     dirty = true;
 end
 
--- Forever has the skills in C_SkillInfo, with a table per line. Like Blizzard's skills frame
--- (Camelot\SkillsFrame.lua) only the top-level lines and no Class Skills, with the defense
--- modifier from UnitDefenseSkill. The list skips the hidden lines, so its index is not the
--- index of C_SkillInfo; GetNumSkillLinesForever builds the mapping.
+-- Like Blizzard's skills frame only the top-level lines and no Class Skills. The list skips the
+-- hidden lines, so its index is not the index of C_SkillInfo; GetNumSkillLinesForever builds the mapping.
 local HIDDEN_SKILL_LINE_CATEGORIES = {
     [7] = true, -- Class Skills
 };

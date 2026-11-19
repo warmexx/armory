@@ -472,9 +472,8 @@ function ArmoryDropDownMenu_AddButton(info, level)
     button:Show();
 end
 
--- All Armory dropdowns share the same lists. While a list shows the menu of another dropdown, its
--- buttons are not ours to redraw: doing so wipes the checks of that menu (e.g. the minimap menu
--- when a paperdoll or options dropdown updates its selection in the background).
+-- All Armory dropdowns share the same lists: redrawing a list that shows the menu of another dropdown
+-- wipes the checks of that menu.
 local function ArmoryDropDownMenu_ListBelongsTo(frame, level)
     return not _G["ArmoryDropDownList"..level]:IsShown() or ARMORY_DROPDOWNMENU_OPEN_MENU == frame:GetName();
 end
@@ -960,8 +959,7 @@ function ArmoryDropDownMenu_JustifyText(frame, justification)
     end
 end
 
--- A dropdown in MENU mode shows only its text; this brings back the arrow button right after
--- the text, so it shows that a click opens a menu. Call it after ArmoryDropDownMenu_JustifyText.
+-- A dropdown in MENU mode shows only its text. Call after ArmoryDropDownMenu_JustifyText.
 function ArmoryDropDownMenu_ShowMenuArrow(frame)
     local name = frame:GetName();
     local button = _G[name.."Button"];

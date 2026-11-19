@@ -49,7 +49,6 @@ function ArmoryRaidInfoFrame_OnEvent(self, event, ...)
         return;
 
     elseif ( event == "PLAYER_ENTERING_WORLD" and Armory.isClassic ) then
-        -- Classic has no Raid Finder
         self:UnregisterEvent("PLAYER_ENTERING_WORLD");
         RequestRaidInfo();
 

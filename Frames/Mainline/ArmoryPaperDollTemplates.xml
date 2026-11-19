@@ -1,6 +1,6 @@
 <!-- Revision: @file-revision@ @file-date-iso@ -->
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\..\FrameXML\UI.xsd">
-  <!-- The paperdoll of Retail and Forever: the code and the templates. Armory.toc loads this file, then the frame of the game (Mainline or Forever\ArmoryPaperDollFrame.xml), then ArmoryGearSetFrame.xml -->
+  <!-- Armory.toc loads this file, then the frame of the game (Mainline or Forever), then ArmoryGearSetFrame.xml -->
   <Script file="ArmoryPaperDollFrame.lua"/>
   <Font name="ArmoryFontHighlightExtraSmall" inherits="GameFontHighlightExtraSmall" virtual="true">
     <FontHeight>

@@ -42,7 +42,6 @@ end
 ARMORYFRAME_SUBFRAME = "ArmoryPaperDollFrame";
 
 local SPELLBOOK_PLAYER = Armory.isClassic and BOOKTYPE_SPELL or Enum.SpellBookSpellBank.Player;
--- Classic has no artifact relics
 local ARTIFACT_RELIC = Enum.ItemGemSubclass.Artifactrelic or false;
 local GetInventorySlotInfo = C_PaperDollInfo.GetInventorySlotInfo or GetInventorySlotInfo;
 
@@ -221,7 +220,6 @@ function ArmoryFrame_OnEvent(self, event, ...)
 end
 
 function ArmoryFrame_UpdateName()
-    -- a name with a long title gets a smaller font, so it is not cut off as soon
     local titleText = ArmoryFrame:GetTitleText();
     titleText:SetFontObject(GameFontHighlight);
     ArmoryFrame:SetTitle(Armory:UnitPVPName("player"));
@@ -773,9 +771,8 @@ function ArmoryFrame_OnMouseDown(self, button)
     end
 end
 
--- Blizzard's comparison tooltips stay as they are: replacing GameTooltip_ShowCompareItem or hiding
--- them from here taints Blizzard's tooltip code, up to protected calls such as using a bag item.
--- Armory's own comparison goes next to them instead.
+-- Don't replace GameTooltip_ShowCompareItem or hide Blizzard's comparison tooltips: that taints
+-- protected calls such as using a bag item.
 local function HasShoppingTooltips(tooltip)
     for _, shoppingTooltip in ipairs(tooltip.shoppingTooltips or {}) do
         if ( shoppingTooltip:IsVisible() ) then
@@ -877,7 +874,6 @@ function ArmoryComparisonFrame_OnUpdate(self, elapsed)
         if ( not link or buyable or learnable ) then
             link = TooltipGetEquipmentSlot(tooltip);
         end
-        -- Blizzard's comparison coming or going moves Armory's next to it
         local hasShoppingTooltips = HasShoppingTooltips(tooltip);
         if ( self.link ~= link or self.hasShoppingTooltips ~= hasShoppingTooltips ) then
             self.link = link;
@@ -978,7 +974,6 @@ function ArmoryShowCompareItem(tooltip, link)
         return;
     end
 
-    -- the outer edges of the tooltip together with Blizzard's comparison tooltips
     local leftPos = GetTooltipEdge(tooltip, tooltip.GetLeft) or 0;
     local rightPos = GetTooltipEdge(tooltip, tooltip.GetRight) or 0;
     local leftFrame, rightFrame = tooltip, tooltip;

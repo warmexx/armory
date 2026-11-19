@@ -29,7 +29,7 @@
 local AGB = AGB;
 local Armory, _ = Armory, nil;
 
--- the guild bank is the last tab of the inventory, after the account bank (hidden in Classic and Forever; ArmoryInventoryFrame_OnShow anchors the tab)
+-- ArmoryInventoryFrame_OnShow anchors the tab
 local GUILDBANK_TAB = 4;
 local MoneyFrame_Update = Armory.isClassic and MoneyFrame_Update or ArmoryMoneyFrame_Update;
 

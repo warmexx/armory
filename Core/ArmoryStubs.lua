@@ -390,7 +390,6 @@ end
 
 ----------------------------------------------------------
 
--- Classic has no gear sets
 local HAS_GEAR_SETS = Armory.isMainline;
 
 -- Time left of an owned auction: Mainline knows the duration, Classic only a category (short, medium, long, very long)

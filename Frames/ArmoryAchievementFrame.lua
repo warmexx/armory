@@ -76,7 +76,6 @@ function ArmoryAchievementFrame_UpdateAchievements(force)
 end
 
 function ArmoryAchievementFrame_OnShow(self)
-    -- Forever: a third tab with the Legacy trees (Frames\Forever\ArmoryLegacyFrame.lua)
     local hasStatistics = Armory:HasStatistics();
     local hasLegacy = Armory.isForever and Armory:HasLegacy();
     if ( hasStatistics or hasLegacy ) then

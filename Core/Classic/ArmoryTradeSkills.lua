@@ -694,7 +694,7 @@ function Armory:PullTradeSkillItems(isCraft)
     end
 end
 
--- skillLine: { name, rank, maxRank } of the window that just closed; the game no longer gives it after closing
+-- skillLine: { name, rank, maxRank }, which the game no longer returns after closing
 function Armory:UpdateTradeSkill(isCraft, skillLine)
     local name, rank, maxRank;
     local modeChanged;
@@ -1022,7 +1022,6 @@ end
 
 function Armory:GetTradeSkillCooldown(index)
     local info = GetProfessionLineValue(index);
-    -- Classic has no day cooldowns and no charges
     return info.cooldown, nil, 0, 0;
 end
 
@@ -1053,7 +1052,6 @@ function Armory:GetTradeSkillSpellFocus(index)
 end
 
 function Armory:GetOptionalReagentSlots(index)
-    -- Classic has no optional reagents
     return {};
 end
 

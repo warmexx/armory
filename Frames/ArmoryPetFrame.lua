@@ -91,7 +91,6 @@ function ArmoryPetFrame_OnLoad(self)
     if ( C_EventUtils.IsEventValid("PET_SPELL_POWER_UPDATE") ) then
         self:RegisterEvent("PET_SPELL_POWER_UPDATE");
     end
-    -- Forever has the happiness of Classic
     if ( Armory.isForever ) then
         self:RegisterUnitEvent("UNIT_HAPPINESS", "pet");
     end
@@ -246,8 +245,7 @@ function ArmoryPetFrame_Update(petChanged)
     ArmoryPetFrameCurrentPage:SetFormattedText(MERCHANT_PAGE_NUMBER, ArmoryPetFrame.page, ArmoryPetFrame.maxPages);
 end
 
--- Forever: the diet icon shows the happiness instead, with the loyalty and the diet in its tooltip,
--- as Blizzard's PetHappinessIndicatorMixin (PetHappiness.lua) does
+-- Forever: the diet icon shows the happiness, as Blizzard's PetHappinessIndicatorMixin
 local PET_HAPPINESS_ATLAS = { "UI-PetMad", "UI-PetNeutral", "UI-PetHappiness" };
 
 function ArmoryPetFrame_SetHappiness(foodTypes)

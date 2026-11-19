@@ -181,7 +181,6 @@ end
 
 function Armory:ClearAchievements()
     self:ClearModuleData(container);
-    -- Forever: the Legacy trees are part of the achievements
     if ( self.isForever ) then
         self:ClearLegacy();
     end

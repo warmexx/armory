@@ -859,8 +859,8 @@ end
 -- TradeSkills Interface
 ----------------------------------------------------------
 
--- A gathering profession without recipes, like Skinning in Forever, stores an empty list; withRecipes leaves it out
--- (the frame has nothing to show), the summary still lists its rank. Classic stores no empty list
+-- A gathering profession without recipes, like Skinning in Forever, stores an empty list; withRecipes
+-- leaves it out, the summary still lists its rank
 function Armory:HasTradeSkillLines(name, withRecipes)
     local dbEntry = self.selectedDbBaseEntry;
     if ( withRecipes ) then

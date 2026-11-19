@@ -73,7 +73,6 @@
   <Frame name="ArmoryTalentFrame" setAllPoints="true" useParentLevel="true" enableMouse="true" movable="true" parent="ArmoryFrame" hidden="true" id="3">
     <Layers>
       <Layer level="BACKGROUND" textureSubLevel="-1">
-        <!-- A slice of Blizzard's art of the spec (Retail) or class (Forever) over the whole inset, set in ArmoryTalentFrame.lua -->
         <Texture parentKey="background" hidden="true">
           <Anchors>
             <Anchor point="TOPLEFT" relativeTo="ArmoryFrameInset" x="2" y="-2"/>

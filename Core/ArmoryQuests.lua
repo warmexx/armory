@@ -777,11 +777,11 @@ function Armory:FindQuestSpell(spellList, ...)
 end
 
 ----------------------------------------------------------
--- Classic: the quest log of Era and TBC, chosen once at load
--- Era and TBC have the old quest log API, store the quest tag instead of the suggested group
--- and keep the number of quests and the dailies (TBC) in the database
+-- Classic quest log
 ----------------------------------------------------------
 
+-- Classic stores the quest tag instead of the suggested group, and keeps the number of quests
+-- and the dailies (TBC) in the database
 if ( Armory.isClassic ) then
     GetQuestLines = function()
         local dbEntry = Armory.selectedDbBaseEntry;

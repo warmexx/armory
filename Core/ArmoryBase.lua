@@ -447,7 +447,6 @@ end
 function Armory:MenuAddButton(label, closeMenu)
     local entry = self.options[label];
     if ( not entry ) then
-        -- an option this version doesn't have
         return;
     end
     local info = {};
@@ -1016,10 +1015,8 @@ function Armory:Execute(func, ...)
     return self.commandHandler:AddCommand(func, ...);
 end
 
--- Retrying a failed update of a stored list (the game may not have loaded it completely yet).
--- At most MAX_UPDATE_RETRIES retries in a row per list, one pending at a time. The count is shared
--- by all callers and only reset by a successful update: expanding and collapsing headers fires the
--- event that calls the update again, so a count per call chain started over each time and never ended.
+-- The retry count is shared by all callers and only reset by a successful update: expanding headers
+-- fires the event that calls the update again, so a count per call chain never ended.
 local MAX_UPDATE_RETRIES = 3;
 local updateFailures = {};
 local updateRetryPending = {};
@@ -1284,7 +1281,6 @@ function Armory:IsConnectedRealm(value, explicit)
     return false;
 end
 
--- Leaves out " (realm)" behind the name of a character on the realm of the player (Forever shows no realm names)
 function Armory:StripPlayerRealm(text, realm)
     if ( realm == self.playerRealm ) then
         local first, last = strfind(text, " ("..realm..")", 1, true);
@@ -2373,7 +2369,6 @@ end
 
 function Armory:ArtifactsEnabled(value)
     if ( self.isForever ) then
-        -- Forever has no artifacts
         return false;
     elseif ( value ~= nil ) then
         self:SetModule("Artifacts", value);

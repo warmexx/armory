@@ -29,9 +29,8 @@
 local Armory, _ = Armory, nil;
 local container = "Legacy";
 
--- Forever: the Legacy trees, bought with the Legacy points of the Legacy Challenges (Blizzard_LegacySystem).
--- They are part of the Achievements module, as the Legacy Challenges are achievements. The points are earned by the account,
--- each character spends them in its own way; the structure is the same for all characters and is shared.
+-- The Legacy points are earned by the account, each character spends them in its own way;
+-- the structure of the trees is shared by all characters.
 
 -- Raise it when the stored structure changes, so the structure is stored again
 local STRUCTURE_VERSION = 2;
@@ -39,7 +38,6 @@ local STRUCTURE_VERSION = 2;
 local REWARD_TRACK_FACTION_ID = 2802;
 local POINTS_CURRENCY_ID = 4225;
 
--- The order and the art of Blizzard's LegacyTreeData
 local TREES = {
     { id = 1187, name = "LEGACY_TREE_PROFESSIONS", fallback = "Professions", atlas = "UI-Legacy-Tree-Professions" },
     { id = 1188, name = "LEGACY_TREE_ADVENTURE", fallback = "Adventure", atlas = "UI-Legacy-Tree-Adventure" },
@@ -89,7 +87,7 @@ local function IsNodeValid(nodeInfo)
     return nodeInfo and nodeInfo.ID and nodeInfo.ID ~= 0 and nodeInfo.isVisible and #nodeInfo.entryIDs > 0 and not IsNeverPurchasable(nodeInfo);
 end
 
--- Blizzard's LegacyMicroButtonMixin:IsLegacySystemUnlocked: the account has earned a Legacy point
+-- as Blizzard's LegacyMicroButtonMixin:IsLegacySystemUnlocked
 local function GetEarnedPoints()
     return C_MajorFactions.GetCurrentRenownLevel(GetConstant("LEGACY_REWARD_TRACK_FACTION_ID", REWARD_TRACK_FACTION_ID)) or 0;
 end
@@ -98,7 +96,7 @@ end
 -- Legacy Storage: structure, shared by all characters
 ----------------------------------------------------------
 
--- The same values as the talent nodes (ArmoryTalents.lua), so the talent frame can draw them; the part of a node is the index of its tree
+-- The same values as the talent nodes, so the talent frame can draw them; the part of a node is the index of its tree
 local function StoreNode(nodeID, nodeInfo, part, configID)
     local maxRanks = nodeInfo.maxRanks;
     local isTiered = (nodeInfo.type == Enum.TraitNodeType.Tiered);
@@ -176,7 +174,7 @@ local function StoreRanks(dbEntry, configID)
         end
     end
 
-    -- Blizzard's point summary (LegacySystem.GetCurrencyInfo): the unspent points, the points earned (the level of the reward track) and the seasonal cap
+    -- as LegacySystem.GetCurrencyInfo; earned is the level of the reward track
     local currencies = C_Traits.GetTreeCurrencyInfo(configID, GetTreeID(1), false);
     local currency = currencies and currencies[1];
     if ( currency ) then
@@ -219,7 +217,6 @@ function Armory:SetLegacy()
     end
 end
 
--- The trait configs of the Legacy trees, for TRAIT_CONFIG_UPDATED
 function Armory:IsLegacyConfig(configID)
     return configID ~= nil and configID == GetConfigID();
 end

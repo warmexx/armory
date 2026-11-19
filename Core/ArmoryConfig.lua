@@ -591,7 +591,7 @@ Armory.options = {
     },
 };
 
--- Options a family does not have; an options panel hides the control of a missing key
+-- an options panel hides the control of a missing key
 local unavailableOptions;
 if ( Armory.isClassic ) then
     unavailableOptions = {
@@ -795,7 +795,6 @@ function Armory:GetConfigShowEqcTooltips()
     return not self:Setting("General", "HideEqcTooltips");
 end
 
--- The item level of your other characters in the tooltip of an equipment slot
 function Armory:SetConfigShowSlotItemLevels(on)
     self:Setting("General", "HideSlotItemLevels", not on);
 end
@@ -1140,7 +1139,7 @@ function Armory:GetConfigItemCountColor(default)
     return r, g, b;
 end
 
--- The account bank (Warband bank) in the item counts; until set, it has the color of the other item counts
+-- until set, it has the color of the other item counts
 function Armory:SetConfigAccountItemCountColor(r, g, b)
     self:Setting("General", "AccountItemCountColor", r, g, b);
 end
@@ -1153,7 +1152,7 @@ function Armory:GetConfigAccountItemCountColor(default)
     return r, g, b;
 end
 
--- Order of the item counts in tooltips: "type" (characters, guild banks, account bank), "name", "count" (most first) or "countasc"
+-- "type" (characters, guild banks, account bank), "name", "count" (most first) or "countasc"
 ARMORY_ITEMCOUNT_SORTS = {"type", "name", "count", "countasc"};
 
 function Armory:SetConfigItemCountSort(value)
@@ -1519,7 +1518,6 @@ function Armory:SetConfigSummaryCurrency(on)
     self:Setting("General", "HideSummaryCurrency", not on);
 end
 
--- Classic has no currency module, so no currency columns
 if ( Armory.isClassic ) then
     function Armory:GetConfigSummaryCurrency()
         return false;

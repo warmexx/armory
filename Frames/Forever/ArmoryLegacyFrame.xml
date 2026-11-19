@@ -3,7 +3,6 @@
 ..\..\..\FrameXML\UI.xsd">
   <Script file="ArmoryLegacyFrame.lua"/>
 
-  <!-- Forever: the Legacy trees as the third tab of the achievements frame, after Achievements and Statistics -->
   <Button name="ArmoryAchievementFrameTab3" parent="ArmoryAchievementFrame" inherits="ArmoryPanelTabButtonTemplate" id="3" hidden="true">
     <Anchors>
       <Anchor point="LEFT" relativeTo="ArmoryAchievementFrameTab2" relativePoint="RIGHT" x="-16" y="0"/>
@@ -74,7 +73,6 @@
         </Layers>
       </Frame>
 
-      <!-- The tooltip of the points: earned of the maximum and the seasonal cap -->
       <Button parentKey="pointsButton">
         <Anchors>
           <Anchor point="TOPLEFT" relativeKey="$parent.availableText" x="-2" y="2"/>

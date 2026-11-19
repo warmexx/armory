@@ -37,10 +37,8 @@ local factionLines = {};
 local dirty = true;
 local owner = "";
 
--- How a faction line is read from the game, chosen once per family. Classic has no
--- C_Reputation.GetFactionDataByIndex, friendships, renown or paragon. Both store the same values:
--- the line (with Classic's faction description where Mainline stores a friendship or renown
--- standing) under "Info" and the faction ID under "Data".
+-- Classic has no C_Reputation.GetFactionDataByIndex, friendships, renown or paragon; it stores the
+-- faction description where Mainline stores a friendship or renown standing.
 local GetNumFactionLines, GetFactionLineInfo, GetFactionLineState, GetFactionLineID;
 local ExpandFactionLine, CollapseFactionLine, IsFactionParagon;
 

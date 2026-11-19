@@ -61,7 +61,6 @@
       </CheckButton>
       <Frame name="$parentItemCountSort" parentKey="ItemCountSort" inherits="ArmoryOptionsDropDownTemplate" mixin="ArmoryOptionsTooltipItemCountSortMixin">
         <Anchors>
-          <!-- its own column, under "Numeric Value": the label on the row of GlobalItemCount, the box below it -->
           <Anchor point="TOPLEFT" relativeKey="$parent.ShowItemCountTotalsNumberColor" relativePoint="BOTTOMLEFT" x="-16" y="-48" />
         </Anchors>
       </Frame>

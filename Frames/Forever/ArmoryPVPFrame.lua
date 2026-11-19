@@ -26,8 +26,7 @@
         http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
--- Forever's PvP frame in the layout of Classic Era (Frames\Vanilla\ArmoryPVPFrame); the rank is a renown
--- (Armory:GetPVPRankInfo), the weeks of Era make way for the season and the honor points
+-- The layout of Classic Era; the rank is a renown (Armory:GetPVPRankInfo)
 
 local Armory, _ = Armory;
 
@@ -58,7 +57,6 @@ local function GetRankName(rank)
     end
 end
 
--- The lines that are missing in the client are left out
 local function SetTooltip(frame, title, ...)
     local lines = {};
     for i = 1, select("#", ...) do

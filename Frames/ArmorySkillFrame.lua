@@ -39,7 +39,6 @@ function ArmorySkillFrame_OnLoad(self)
     self:RegisterEvent("SPELLS_CHANGED");
 
     if ( Armory.isForever ) then
-        -- the rows within the inset of the main window and the scroll frame as in the reputation frame
         ArmorySkillTypeLabel1:SetPoint("LEFT", self, "TOPLEFT", 8, -75);
         ArmorySkillRankFrame1:SetPoint("TOPLEFT", self, "TOPLEFT", 24, -68);
         ArmorySkillListScrollFrame:ClearAllPoints();

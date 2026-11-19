@@ -53,7 +53,6 @@ function ArmoryOptionControlBaseMixin:Register(panel)
     self.panel:RegisterControl(self);
 end
 
--- Not every version has every option or module (Classic lacks some)
 function ArmoryOptionControlBaseMixin:IsAvailable()
     local key = self:GetKey();
     return not key or Armory.options[key] ~= nil;

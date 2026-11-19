@@ -38,8 +38,7 @@ local SPELLFLYOUT_DEFAULT_SPACING = 4;
 local SPELLFLYOUT_INITIAL_SPACING = 7;
 local SPELLFLYOUT_FINAL_SPACING = 9;
 
--- Per family, chosen once at load: Classic's spellbook API still takes a book type,
--- and Classic has no pet specializations
+-- Classic's spellbook API still takes a book type
 local BANK_PLAYER, BANK_PET, GetPetSpec;
 if ( Armory.isClassic ) then
     BANK_PLAYER = BOOKTYPE_SPELL;

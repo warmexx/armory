@@ -39,7 +39,6 @@ local NUM_CONTAINER_COLUMNS = 4;
 -- Classic calls it Standard
 local QUALITY_COMMON = Enum.ItemQuality.Common or Enum.ItemQuality.Standard;
 
--- Containers shown in the bag layout: the bags, and in Classic the bank bags too
 local HasBagLayout;
 if ( Armory.isClassic ) then
     HasBagLayout = function(id) return id >= BACKPACK_CONTAINER and id <= NUM_BAG_SLOTS + NUM_BANKBAGSLOTS; end;
@@ -80,7 +79,6 @@ function ArmoryInventoryContainerItemButton_OnEnter(self)
     Armory:SetBagItem(containerId, itemIndex);
 end
 
--- The slots of the container, as {bag, slot}: of all bags when they are combined in the backpack
 local containerSlots = {};
 local function GetContainerSlots(id)
     table.wipe(containerSlots);
@@ -151,8 +149,7 @@ function ArmoryInventoryIconViewFrame_ShowContainer(containerFrame)
     end
 
     local index, template;
-    -- An empty slot never matches, so it is darkened while a filter is active, as in the guild bank;
-    -- slots with an item get their own state below
+    -- an empty slot never matches, so it is darkened while filtering
     local filterActive = Armory:InventoryFilterActive();
     for i = 1, numSlots do
         index = offset + i;
@@ -273,7 +270,6 @@ function ArmoryInventoryIconViewFrame_Update()
         if ( containerFrame ) then
             _, size, isCollapsed = Armory:GetInventoryContainerInfo(ArmoryInventoryPlayerContainers[i]);
 
-            -- a bag combined in the backpack has no place of its own
             if ( size and size > 0 and not Armory:IsCombinedBag(ArmoryInventoryPlayerContainers[i]) ) then
                 if ( not isCollapsed and ArmoryInventoryCollapseAllButton.isCollapsed ) then
                     ArmoryInventoryCollapseAllButton.isCollapsed = nil;
@@ -320,13 +316,11 @@ function ArmoryInventoryIconViewBagLayout(checked)
     ArmoryInventoryIconViewFrame_OnShow(ArmoryInventoryIconViewFrame);
 end
 
--- Shared by the icon and the list view
 function ArmoryInventoryCombineBags(checked)
     Armory:SetInventoryCombineBags(checked);
     ArmoryInventoryFrame_Update();
 end
 
--- The options of the icon and the list view, as checks in a dropdown next to the item filter
 local function AddOption(text, tooltip, checked, setter)
     local info = ArmoryDropDownMenu_CreateInfo();
     info.text = text;

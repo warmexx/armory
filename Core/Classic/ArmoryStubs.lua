@@ -28,8 +28,6 @@
 
 local Armory, _ = Armory;
 
--- Stubs that only Classic has (Era and TBC); the shared ones are in Core\ArmoryStubs.lua
-
 function Armory:GetArenaCurrency()
 	local arenaCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo(Constants.CurrencyConsts.CLASSIC_ARENA_POINTS_CURRENCY_ID);
     return self:SetGetCharacterValue("ArenaCurrency", arenaCurrencyInfo.quantity);
@@ -159,7 +157,6 @@ function Armory:HasWandEquipped()
     return self:SetGetCharacterValue("HasWandEquipped", _G.HasWandEquipped());
 end
 
--- Classic has no currency module
 function Armory:CountCurrency(link)
     return 0;
 end

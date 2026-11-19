@@ -118,7 +118,6 @@ function ArmoryOptionsTooltipItemCountPerSlotMixin:OnLoad()
 end
 
 
--- Only with an account bank, so not in Classic and Forever
 local function HasAccountBank()
     return not Armory.isClassic and C_Bank and C_Bank.FetchNumPurchasedBankTabs(Enum.BankType.Account) > 0;
 end
@@ -134,7 +133,6 @@ function ArmoryOptionsTooltipAccountItemCountColorMixin:OnLoad()
     ArmoryOptionsColorTemplateMixin.OnLoad(self);
     self:SetupDependency(self:GetPanel().ShowItemCount);
 
-    -- Swatch in the column of the swatch above it (rows are 26 apart), label to its left
     self.Swatch:ClearAllPoints();
     self.Swatch:SetPoint("TOP", self:GetPanel().ShowItemCountTotalsColor.Swatch, "BOTTOM", 0, -10);
     self.Text:ClearAllPoints();
@@ -164,7 +162,6 @@ function ArmoryOptionsTooltipItemCountSortMixin:OnLoad()
     self:SetTooltipText(ARMORY_CMD_SET_COUNTSORT_TOOLTIP);
     self:SetDefaultValue("type");
 
-    -- Label above the box, in the color of the labels of the color swatches
     self.Label:SetFontObject(GameFontNormal);
 end
 
@@ -302,8 +299,7 @@ function ArmoryOptionsTooltipShowSecondarySkillRankMixin:OnLoad()
 end
 
 
--- A color has no option of its own; it goes with the option it depends on, which Classic
--- does not have for quests and achievements
+-- a color goes with the option it depends on, which Classic lacks for quests and achievements
 local function OptionAvailable(key)
     return function()
         return Armory.options[key] ~= nil;

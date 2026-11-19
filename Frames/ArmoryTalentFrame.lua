@@ -63,8 +63,8 @@ local ART_CHOICE = { atlas = "talents-node-choice-%s", mask = "talents-node-choi
 local ART_CAPSTONE_SQUARE = { atlas = "talents-node-apex-active-large-%s", baseSize = BLIZZARD_CAPSTONE_SIZE, scale = 1.4 };
 local ART_CAPSTONE_CIRCLE = { atlas = "talents-node-apex-large-%s", mask = "talents-node-circle-mask", baseSize = BLIZZARD_CAPSTONE_SIZE, scale = 1.4 };
 
--- Blizzard's art behind the talent tree, from SpecializationVisuals in Blizzard_PlayerSpells\ClassTalents\Blizzard_ClassTalentUtil.lua.
--- That addon is load on demand, hence the copy. Forever has one per class: "talent-background-<class>".
+-- A copy of SpecializationVisuals (Blizzard_ClassTalentUtil.lua), which is load on demand.
+-- Forever has one per class: "talent-background-<class>".
 local SPEC_BACKGROUNDS = {
     [250] = "deathknight-blood", [251] = "deathknight-frost", [252] = "deathknight-unholy",
     [577] = "demonhunter-havoc", [581] = "demonhunter-vengeance", [1480] = "demonhunter-devourer",
@@ -93,8 +93,7 @@ local choiceButtons = {};
 local shownNodes = {};
 local shownButtons = {};
 
--- Where a tree gets its nodes; Forever's Legacy trees (Frames\Forever\ArmoryLegacyFrame.lua) store theirs the same way.
--- squareNodes draws every node square and showAllRanks always shows rank/max, as Blizzard's Legacy tree does.
+-- squareNodes and showAllRanks: as Blizzard's Legacy tree
 local TALENT_SOURCE = {
     GetNodes = function(specID) return specID and Armory:GetTalentSpecNodes(specID); end,
     GetNodeInfo = function(nodeID) return Armory:GetTalentNodeInfo(nodeID); end,
@@ -112,7 +111,6 @@ local function GetActiveSpecTab(self)
     return Armory:GetSpecialization(false, false, self.talentGroup) or 1;
 end
 
--- Forever also stores the inactive spec group
 local function IsTalentConfig(configID)
     if ( Armory.isForever ) then
         for specGroup = 1, GetNumSpecGroups() do
@@ -335,7 +333,6 @@ local function UpdateButton(button, source, specID, nodeID, nodeType, nodeMaxRan
     end
 end
 
--- Each tree frame has its own buttons and lines
 local function GetButton(tree, index)
     tree.buttons = tree.buttons or {};
     if ( not tree.buttons[index] ) then
@@ -440,7 +437,6 @@ end
 local function UpdateTabs(self, specName, heroName)
     local tabs = self.Tabs;
     if ( Armory.isForever ) then
-        -- The three groups of the tree, a tab without a group is hidden
         for i, tab in ipairs(tabs) do
             local _, name = Armory:GetTalentGroupInfo(i);
             tab:SetText(name or "");
@@ -457,7 +453,6 @@ local function UpdateTabs(self, specName, heroName)
         ArmoryPanelTemplates_SetTab(self, TAB_CLASS);
     end
 
-    -- The shown tabs follow each other, also without the hero tab in the middle
     local previous;
     for _, tab in ipairs(tabs) do
         if ( tab:IsShown() ) then
@@ -506,7 +501,6 @@ local function UpdatePoints(self, specID, currencyID)
     end
 end
 
--- Forever: the points spent in the group of the tab
 local function UpdateGroupPoints(self, specGroup, tab)
     if ( Armory:TalentsForSpecExist(specGroup) ) then
         self.pointsText:SetText(Armory:GetTalentGroupPoints(specGroup, tab));
@@ -619,7 +613,6 @@ end
 -- SpecTab Button Functions
 ----------------------------------------------------------
 
--- Forever: a tab per spec group, with the icon of the class's only spec
 local function UpdateSpecGroupTabs(self)
     local numSpecGroups = Armory:GetNumSpecGroups();
     local _, _, _, icon = Armory:GetSpecializationInfo(1, false, nil, nil, Armory:UnitSex("player"));

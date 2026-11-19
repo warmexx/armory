@@ -254,7 +254,7 @@ local function UpdateItemCandidates(candidates)
 end
 
 ----------------------------------------------------------
--- Item level of your other characters per equipment slot
+-- Item levels per equipment slot
 ----------------------------------------------------------
 
 -- The best armor type a class can wear; in Classic plate and mail come at level 40
@@ -264,11 +264,9 @@ local CLASS_ARMOR = {
     ROGUE = 2, DRUID = 2, MONK = 2, DEMONHUNTER = 2,
     PRIEST = 1, MAGE = 1, WARLOCK = 1,
 };
--- Slots with an armor type: head, shoulder, chest, waist, legs, feet, wrist and hands (not the back)
 local ARMOR_SLOTS = { [1] = true, [3] = true, [5] = true, [6] = true, [7] = true, [8] = true, [9] = true, [10] = true };
 -- Rings and trinkets come in pairs; the lower of the two is the one to replace
 local PAIRED_SLOTS = { [11] = 12, [12] = 11, [13] = 14, [14] = 13 };
--- Ammo, shirt and tabard have no item level that matters
 local NO_ITEMLEVEL_SLOTS = { [0] = true, [4] = true, [19] = true };
 
 local function GetArmorType()
@@ -280,9 +278,8 @@ local function GetArmorType()
     return armorType;
 end
 
--- Per character: name, armor type and the item level per slot. Reading them means loading the
--- profile and every item link, so other characters are read once; they don't change while you
--- play. The character you play is read every time. Names follow "Use class colors".
+-- Reading a character loads its profile and every item link, so other characters are read once;
+-- they don't change while you play.
 local slotCache = {};
 local slotCacheClassColors;
 
@@ -364,7 +361,6 @@ function Armory:AddSlotItemLevels(tooltip, slotId)
     end
 end
 
--- Classic has no gems option
 local SHOW_GEMS = Armory.isMainline;
 
 local gemInfo, crafters, itemCount, hasSkill, canLearn, candidates;
@@ -1096,8 +1092,7 @@ else
     end
 end
 
--- The standing a character has at a faction. Classic stores the faction's description where
--- Mainline stores the standing text, and has no paragon.
+-- Classic stores the faction's description where Mainline stores the standing text, and has no paragon.
 local GetStanding;
 if ( Armory.isClassic ) then
     GetStanding = function(description, standingID, barMin, barMax, barValue, factionID)
@@ -1127,7 +1122,6 @@ else
     end;
 end
 
--- Shows the standing of all characters at a faction next to its reputation bar
 local standings = {};
 function Armory:ShowFactionStandings(owner, factionName)
     local currentProfile = self:CurrentProfile();

@@ -28,15 +28,10 @@
 
 local Armory, _ = Armory, nil;
 
--- Forever: the paperdoll of Retail (Frames\Mainline\ArmoryPaperDollFrame.lua) with the stats, the health and mana bars
--- and the ranged slot of Classic. Retail's stats still run on a hidden frame to store every value.
-
--- Forever lacks some of Retail's tooltip strings (DEFAULT_STAT1_TOOLTIP), and its strings are not in the Lua export.
 local function format(fmt, ...)
     return string.format(fmt or "", ...);
 end
 
--- The ranged slot
 for _, invType in ipairs({ "INVTYPE_CROSSBOW", "INVTYPE_GUN", "INVTYPE_RANGED", "INVTYPE_RANGEDRIGHT", "INVTYPE_RELIC", "INVTYPE_THROWN", "INVTYPE_WAND" }) do
     ARMORY_SLOTINFO[invType] = "RangedSlot";
 end
@@ -761,7 +756,6 @@ function ArmoryUpdatePaperDollStats(prefix, index)
         SetDodge(stats[3]);
         SetParry(stats[4]);
         SetBlock(stats[5]);
-        -- Forever has no resilience
         stats[6]:Hide();
     end
 
@@ -854,7 +848,7 @@ function ArmoryPaperDollFrame_UpdateManaBar()
 end
 
 function ArmoryPaperDollFrame_UpdateStats()
-    -- Keeps storing every stat of the character, as the Live paperdoll did
+    -- keeps storing every stat of the character
     ArmoryInitializePaperDollStats();
 
     if ( not ARMORY_PLAYERSTAT_LEFTDROPDOWN_SELECTION or not ARMORY_PLAYERSTAT_RIGHTDROPDOWN_SELECTION ) then

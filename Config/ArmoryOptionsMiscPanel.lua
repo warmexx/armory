@@ -146,8 +146,7 @@ function ArmoryOptionsMiscMazielMixin:OnCommit()
 end
 
 
--- Classic's config has the keys of these two as well, but not the character frame
--- collapse or the paper doll check button they set
+-- Classic has these keys, but not the frames they set
 local function IsMainline()
     return not Armory.isClassic;
 end

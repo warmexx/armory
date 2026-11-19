@@ -61,8 +61,8 @@ ArmoryTradeSkillTypeColor = {
 -- Per family, chosen once at load
 ----------------------------------------------------------
 
--- The quality and link of the product: Mainline stores the quality, Classic only the link
--- The requirements: Mainline stores them as one list, Classic stores a tool or a spell focus
+-- Mainline stores the quality of the product and its requirements as one list; Classic only the link,
+-- and a tool or a spell focus
 local GetProductQualityAndLink, GetRequirements;
 if ( Armory.isClassic ) then
     GetProductQualityAndLink = function(index, recipeInfo)
@@ -155,8 +155,7 @@ function ArmoryTradeSkillFrameMixin:OnLoad()
 end
 
 if ( Armory.isClassic ) then
-    -- The skill line (name, rank) of the open window, remembered on the events on which Blizzard's frame
-    -- redraws it: after closing the game returns UNKNOWN, while the recipes can still be read
+    -- after closing the game returns UNKNOWN as skill line, while the recipes can still be read
     local openSkillLines = {};
 
     local function RememberSkillLine(isCraft)
@@ -193,8 +192,7 @@ if ( Armory.isClassic ) then
         end
     end
 
-    -- With extended tradeskills Classic reads the window when it closes: right after the close function,
-    -- in a secure hook (replacing CloseTradeSkill and CloseCraft tainted Blizzard's closing of the window)
+    -- a secure hook: replacing CloseTradeSkill and CloseCraft tainted Blizzard's closing of the window
     local function UpdateWhenClosed(isCraft)
         local skillLine = openSkillLines[isCraft];
         openSkillLines[isCraft] = nil;
@@ -487,7 +485,6 @@ local function AddCheckFilters(self, info, level)
 end
 
 if ( Armory.isClassic ) then
-    -- Classic filters on a subclass or an inventory slot, in a submenu
     function ArmoryTradeSkillFrameMixin:InitFilterMenu(dropdown, level)
         local info = ArmoryDropDownMenu_CreateInfo();
         if ( level == 1 ) then

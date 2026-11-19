@@ -169,7 +169,6 @@ local bosses = {};
 -- Classic has no weeklies (QuestIsWeekly came with Wrath)
 local QuestIsWeekly = QuestIsWeekly or function() return false; end;
 
--- Both families store the quest log lines with the values of GetQuestLogTitle under "Info"
 local function GetQuestLogIndexByName(dbEntry, name)
     local count = dbEntry:GetNumValues("Quests");
     for i = 1, count do

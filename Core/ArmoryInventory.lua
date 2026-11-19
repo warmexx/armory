@@ -74,8 +74,6 @@ local function GetAccountBankTabData(id)
     return {};
 end
 
--- Containers per family: Classic has the bank itself (BANK_CONTAINER) with bank bags,
--- Mainline has bank tabs and an account bank
 local HAS_BANK_TABS = not Armory.isClassic;
 local IsBagContainer, IsGenericBagContainer, IsCharacterContainer, IsAccountContainer, IsReagentContainer;
 local HasBagSlot, GetBagItemLink, GetContainerName, GetNumProfessionGearSlots, CountProfessionGear;
@@ -93,12 +91,11 @@ if ( Armory.isClassic ) then
     -- reagents only count in the bags
     IsReagentContainer = IsBagContainer;
 
-    -- a container that is a bag in an inventory slot, including the bank bags
     HasBagSlot = function(id)
         return id > BACKPACK_CONTAINER and id <= NUM_BAG_SLOTS + NUM_BANKBAGSLOTS;
     end
 
-    -- the item of a bag itself; the bank bags are in the bank's own slots
+    -- the bank bags are in the bank's own slots
     GetBagItemLink = function(id)
         if ( id > BACKPACK_CONTAINER and id <= NUM_BAG_SLOTS ) then
             return Armory:GetInventoryItemLink("player", C_Container.ContainerIDToInventoryID(id));
@@ -110,7 +107,6 @@ if ( Armory.isClassic ) then
         return C_Container.GetBagName(id) or name;
     end
 
-    -- no profession gear
     GetNumProfessionGearSlots = function()
         return 0;
     end
@@ -177,7 +173,6 @@ local function IsBankContainer(id)
     return IsCharacterContainer(id) or IsAccountContainer(id);
 end
 
--- The containers of the character bank: the bank itself and the bank bags in Classic, the bank tabs in Mainline
 local CharacterBankContainers = {};
 if ( Armory.isClassic ) then
     table.insert(CharacterBankContainers, BANK_CONTAINER);
@@ -200,7 +195,6 @@ end
 local BACKPACK = Armory.isClassic and BACKPACK_CONTAINER or Enum.BagIndex.Backpack;
 local combinedBags = {};
 
--- The containers that the container shows: the backpack and the bags, or the container itself
 function Armory:GetCombinedContainers(id)
     table.wipe(combinedBags);
     if ( id == BACKPACK and self:GetInventoryCombineBags() ) then
@@ -215,7 +209,6 @@ function Armory:GetCombinedContainers(id)
     return combinedBags;
 end
 
--- A bag that the backpack shows, so it has no place of its own
 function Armory:IsCombinedBag(id)
     return id ~= BACKPACK and IsGenericBagContainer(id) and self:GetInventoryCombineBags();
 end
@@ -273,10 +266,9 @@ local function GetInventoryLines(unit)
             name, numSlots, isCollapsed, containerName = Armory:GetInventoryContainerInfoEx(id);
             header = {name, id, numSlots, isCollapsed, true, nil, nil, profile.realm, profile.character, 0, containerName};
             if ( Armory:IsCombinedBag(id) ) then
-                -- shown by the backpack
                 numSlots = nil;
             elseif ( unit == "player" ) then
-                -- the backpack with the bags when they are combined; the lines keep their own bag
+                -- the lines keep their own bag
                 local bags = Armory:GetCombinedContainers(id);
                 if ( #bags > 1 ) then
                     numSlots = 0;
@@ -484,7 +476,6 @@ local function UpdateContainerName(dbEntry, id, containerName)
     SetContainerInfo(dbEntry, itemContainer, containerName or name, numSlots, remaining, timestamp);
 end
 
--- Tinkers (engineering on gloves, belt and cloak) only exist in Mainline
 local GetTinker;
 if ( Armory.isClassic ) then
     GetTinker = function(id, slotId, link)
@@ -550,7 +541,6 @@ function Armory:ClearInventory()
     dirty.account = true;
 end
 
--- Owned auctions per family: Classic still has the old auction house API
 local GetNumOwnedAuctions, GetOwnedAuction;
 if ( Armory.isClassic ) then
     GetNumOwnedAuctions = function()
@@ -698,7 +688,6 @@ function Armory:SetContainer(id)
         end
 
         if ( id == BANK_CONTAINER ) then
-            -- Classic: the bank itself
             numSlots = NUM_BANKGENERIC_SLOTS;
         elseif ( id > ARMORY_MAIL_CONTAINER ) then
             numSlots = C_Container.GetContainerNumSlots(id);
@@ -975,7 +964,6 @@ function Armory:GetInventoryContainerInfoEx(id, unit)
     local name;
 
     if ( id == BANK_CONTAINER ) then
-        -- Classic: the bank itself
         name = ARMORY_BANK_CONTAINER_NAME;
         if ( outOfSync ) then
             name = "~"..name;
@@ -1117,7 +1105,6 @@ function Armory:GetInventoryLineState(id, unit)
     return isCollapsed;
 end
 
--- The backpack and the bags as one container in the inventory, as Blizzard's combined bag
 function Armory:SetInventoryCombineBags(checked)
     self:Setting("Inventory", "CombineBags", checked);
     dirty.player = true;

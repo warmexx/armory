@@ -46,8 +46,8 @@ local function GetSubSpellName(id, spellBank)
     end
 end
 
--- The spells of a pet specialization as a list of spell IDs. Retail still has GetSpecializationSpells
--- (spell ID and level in turns); Forever does not, and gets the spell IDs from GetSpellsDisplay.
+-- Retail still has GetSpecializationSpells (spell ID and level in turns); Forever gets the spell IDs
+-- from GetSpellsDisplay
 local GetPetSpecializationSpells;
 if ( _G.GetSpecializationSpells ) then
     GetPetSpecializationSpells = function(spec)

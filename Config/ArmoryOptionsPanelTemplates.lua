@@ -39,8 +39,7 @@ local function Register(panel, name)
     Settings.RegisterCanvasLayoutSubcategory(category, panel, name);
 end
 
--- Moves the frames anchored to a removed control into its place, keeping their own
--- vertical offset. The indent of the removed control carries over to them.
+-- the frames below keep their own vertical offset and take over the indent of the removed control
 local function CloseGap(control)
     local _, relativeTo, relativePoint, indent = control:GetPoint(1);
     for _, frame in ipairs({control:GetParent():GetChildren()}) do

@@ -28,13 +28,11 @@
 
 local Armory, _ = Armory, nil;
 
--- Forever: the Legacy trees, as the third tab of the achievements frame (the Legacy Challenges are achievements).
 -- The tree is drawn by the talent frame, the page follows Blizzard's tree page (Blizzard_LegacyTree.lua).
 
 local TAB_LEGACY = 3;
 
--- The nodes of the Legacy trees for ArmoryTalentFrame_UpdateTree, the part of a node is the index of its tree.
--- Blizzard's Legacy tree draws its nodes square and always shows the ranks, see TalentButtonLegacyMixin.
+-- the part of a node is the index of its tree
 local LEGACY_SOURCE = {
     GetNodes = function() return Armory:GetLegacyNodes(); end,
     GetNodeInfo = function(nodeID) return Armory:GetLegacyNodeInfo(nodeID); end,
@@ -99,7 +97,6 @@ function ArmoryLegacyFrame_OnEvent(self, event, arg1)
             Armory:Execute(ArmoryLegacyFrame_UpdateLegacy);
         end
     elseif ( event == "TRAIT_TREE_CURRENCY_INFO_UPDATED" ) then
-        -- A Legacy point earned with a Legacy Challenge
         if ( IsLegacyTree(arg1) ) then
             Armory:Execute(ArmoryLegacyFrame_UpdateLegacy);
         end

@@ -28,8 +28,6 @@
 
 local Armory, _ = Armory, nil;
 
--- Stubs that only Forever has, in addition to Core\Mainline\ArmoryStubs.lua; mostly for the paper doll
-
 -- Forever has the pet happiness and loyalty of Classic, in C_PetInfo
 function Armory:GetPetHappiness()
     return self:SetGetPetValue("Happiness", C_PetInfo.GetPetHappiness());
@@ -70,7 +68,7 @@ function Armory:UnitResistance(unit, index)
 end
 
 ----------------------------------------------------------
--- Forever: weapon skills and wands
+-- Weapon skills
 ----------------------------------------------------------
 
 -- Same mapping as Blizzard's damage tooltip (Blizzard_UIPanels_Game\Camelot\PaperDollFrameStats.lua)
@@ -135,7 +133,7 @@ function Armory:HasWandEquipped()
 end
 
 ----------------------------------------------------------
--- Forever: stats of the paperdoll
+-- Paperdoll stats
 ----------------------------------------------------------
 
 -- The "ForStat" functions are computed with the player's own stat, never with the stat of a character that is being viewed

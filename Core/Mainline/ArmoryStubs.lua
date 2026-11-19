@@ -28,8 +28,6 @@
 
 local Armory, _ = Armory, nil;
 
--- Stubs that only Mainline has (Retail and Forever); the shared ones are in Core\ArmoryStubs.lua
-
 function Armory:GetActiveSpecGroup(inspect)
     return self:SetGetCharacterValue("ActiveSpecGroup", C_SpecializationInfo.GetActiveSpecGroup()) or 1;
 end

@@ -1,21 +1,8 @@
--- OfaCloseProbe: measures for Armory One for All whether the data of a profession window (TradeSkill and
--- Craft) and of the guild bank can still be read right after the window closes. Armory replaced
--- CloseTradeSkill, CloseCraft and CloseGuildBankFrame to read just before closing, which taints Blizzard's
--- closing code; a hooksecurefunc runs just after closing and taints nothing, if the data is still there.
---
--- Measures at: opening (baseline), the secure hook right after the close function, the close event, and
--- one frame later. The "extended" measurement compares every line Armory's extended reading reads with
--- the same lines at opening. Reads only, except that after closing it collapses one expanded header and
--- expands it again, to see whether the list still reacts (Armory's extended reading expands all headers).
--- Leave the window alone between opening and closing (no crafting, no filter): the lines should match.
---
--- Open and close a profession (and in Classic Era Enchanting/Beast Training, which use the Craft window),
--- and the guild bank. Close in different ways: the X button, Escape, walking away.
+-- OfaCloseProbe: can a profession window and the guild bank still be read right after closing?
+-- Open and close them without touching the window in between, then /reload to write OfaCloseProbeDB.
 --
 -- /ocp        print the measurements of this session
 -- /ocp clear  remove all measurements
---
--- After testing: /reload or log out, so the game writes OfaCloseProbeDB (WTF\...\SavedVariables).
 
 OfaCloseProbeDB = OfaCloseProbeDB or {};
 
@@ -69,7 +56,6 @@ local function MeasureCraft()
     };
 end
 
--- Everything Armory's extended reading reads, line by line: compared between opening and after closing
 local function Join(...)
     local values = { ... };
     for i = 1, select("#", ...) do
@@ -111,7 +97,6 @@ local function CraftLines()
     return lines;
 end
 
--- Collapses the first expanded header and expands it again: does the list still react after closing?
 local function TryCollapse(getNum, getState, collapse, expand)
     local before = getNum();
     for id = 1, before do

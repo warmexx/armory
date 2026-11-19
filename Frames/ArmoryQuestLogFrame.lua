@@ -35,7 +35,6 @@ local QUESTS_DISPLAYED = 6;
 local REWARDS_SECTION_OFFSET = 5;       -- vertical distance between sections
 local REWARDS_ROW_OFFSET = 2;            -- vertical distance between rows within a section
 
--- Per family, chosen once
 local MoneyFrame_Update = Armory.isClassic and MoneyFrame_Update or ArmoryMoneyFrame_Update;
 local GetQuestDetailsTheme, QuestHasWarModeBonus, GetMajorFactionReputationRewards, QuestHasQuestSessionBonus, SetQuestLegendToFontString;
 local OBJECTIVE_FINISHED_COLOR; -- Mainline: QUEST_OBJECTIVE_DISABLED_FONT_COLOR
@@ -93,8 +92,7 @@ function ArmoryQuestLogTitleButton_OnLeave(self)
     GameTooltip:Hide();
 end
 
--- Classic has no atlas for the empty quest log: the empty book of Blizzard's Classic quest log, 320x384 in four files.
--- The cobwebs go into the upper inset and the book into the lower one, each filling its own inset.
+-- Classic has no atlas for the empty quest log: the empty book of Blizzard's Classic quest log, 320x384 in four files
 local CLASSIC_EMPTY_BOOK_FILES = {
     -- file, left, top, width and height in the image
     { "TopLeft", 0, 0, 256, 256 },
@@ -109,7 +107,6 @@ local CLASSIC_EMPTY_BOOK_REGIONS = {
 };
 local CLASSIC_EMPTY_BOOK_EDGE = 3;  -- inside the border of the insets
 
--- In the empty frame itself, below the text: one texture per part of a file in a region
 local function CreateClassicEmptyBook(emptyFrame)
     emptyFrame.Bg:Hide();
     emptyFrame.book = {};
@@ -144,8 +141,7 @@ local function LayoutClassicEmptyBook()
     ArmoryQuestLogNoQuestsText:SetPoint("CENTER", insets[1]);
 end
 
--- Without the button bar the lower inset runs further down in Classic than the details:
--- it ends just below them, as in Retail, with the quest count below it
+-- without the button bar the lower inset runs further down in Classic than the details
 local CLASSIC_DETAIL_BOTTOM = 4;
 local function LayoutClassicDetails()
     local frame = ArmoryQuestFrame;
@@ -162,7 +158,6 @@ function ArmoryQuestLogFrame_OnLoad(self)
     if ( Armory.isClassic ) then
         self:RegisterEvent("UPDATE_FACTION");
         CreateClassicEmptyBook(ArmoryEmptyQuestLogFrame);
-        -- below the lower inset, which runs further down in Classic
         ArmoryQuestLogCount:ClearAllPoints();
         ArmoryQuestLogCount:SetPoint("TOPLEFT", ArmoryQuestFrame.bottomInset, "BOTTOMLEFT", 11, -4);
     else
@@ -1107,7 +1102,6 @@ function ArmoryQuestInfo_ShowRewards()
             rewardsCount = rewardsCount + 1;
         end
 
-        -- currency (none in Classic)
         if ( numQuestCurrencies > 0 ) then
             baseIndex = rewardsCount;
             local foundCurrencies = 0;

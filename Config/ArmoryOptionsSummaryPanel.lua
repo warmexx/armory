@@ -32,7 +32,6 @@ local Armory, _ = Armory, nil;
 local ARMORY_SUMMARY_CURRENCIES_HEIGHT = 16;
 local SUMMARY_CURRENCIES_DISPLAYED = 8;
 
--- Classic has no currency module
 local function HasCurrency()
     return not Armory.isClassic;
 end
