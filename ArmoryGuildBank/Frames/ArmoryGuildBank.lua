@@ -99,6 +99,10 @@ function ArmoryGuildBankFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_GUILD_UPDATE");
     self:RegisterEvent("GUILDTABARD_UPDATE");
     self:RegisterEvent("GUILDBANKBAGSLOTS_CHANGED");
+    self:RegisterEvent("GUILDBANK_UPDATE_TABS");
+    self:RegisterEvent("GUILDBANK_UPDATE_MONEY");
+    self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW");
+    self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE");
     self:RegisterEvent("VARIABLES_LOADED");
 
     ArmoryGuildBankFrameEditBox:SetText("");
@@ -129,11 +133,20 @@ function ArmoryGuildBankFrame_OnEvent(self, event, ...)
         end
     elseif ( event == "GUILDTABARD_UPDATE" ) then
         AGB:UpdateGuildInfo();
-    elseif ( event == "GUILDBANKBAGSLOTS_CHANGED" ) then
-        if ( not AGB.tabs ) then
-            AGB.tabs = {};
+    elseif ( event == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" ) then
+        if ( ... == Enum.PlayerInteractionType.GuildBanker ) then
+            AGB:OnGuildBankOpened();
         end
-        AGB.tabs[GetCurrentGuildBankTab()] = 1;
+    elseif ( event == "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" ) then
+        if ( ... == Enum.PlayerInteractionType.GuildBanker ) then
+            AGB:OnGuildBankClosed();
+        end
+    elseif ( event == "GUILDBANKBAGSLOTS_CHANGED" ) then
+        AGB:OnGuildBankChanged(true);
+    elseif ( event == "GUILDBANK_UPDATE_TABS" ) then
+        AGB:OnGuildBankChanged(false);
+    elseif ( event == "GUILDBANK_UPDATE_MONEY" ) then
+        AGB:OnGuildBankMoneyChanged();
     end
 end
 
@@ -735,17 +748,10 @@ DEFAULT_CHAT_FRAME:HookScript("OnHyperlinkClick",
     end
 );
 
-local function IsTabViewable(tab)
-    local view = false;
-    for i = 1, MAX_GUILDBANK_TABS do
-    local _, _, isViewable = GetGuildBankTabInfo(i);
-        if ( isViewable ) then
-            if ( i == tab ) then
-                view = true;
-            end
-        end
-    end
-    return view;
+-- Only a tab whose info has arrived (it has a name) and that the player cannot view
+local function IsTabHidden(tab)
+    local name, _, isViewable = GetGuildBankTabInfo(tab);
+    return name ~= nil and not isViewable;
 end
 
 -- Caged pet? Classic has no battle pets
@@ -766,66 +772,133 @@ else
     end;
 end
 
-local Orig_CloseGuildBankFrame = CloseGuildBankFrame;
-function CloseGuildBankFrame(...)
-    if ( AGB.tabs ) then
-        for tab in pairs(AGB.tabs) do
-            AGB:RemoveFromQueue(tab);
+----------------------------------------------------------
+-- Guild bank scanning
+----------------------------------------------------------
 
-            local name, icon = GetGuildBankTabInfo(tab);
-            local items = {};
-            local slots = {};
-            local itemString, link, texture, count;
-            for i = 1, MAX_GUILDBANK_SLOTS_PER_TAB do
-                link = GetGuildBankItemLink(tab, i);
-                if ( link ) then
-                    texture, count = GetGuildBankItemInfo(tab, i);
+-- Armory stores the guild bank on the events on which Blizzard's frame redraws it, so what is stored is
+-- always what the player saw last. Reading it in a replaced CloseGuildBankFrame tainted the closing of
+-- Blizzard's frame. Only while the bank is open: outside a visit the tab data may be missing.
+local bankOpen = false;
+local seenTabs = {};
+local tabSignatures = {};
 
-                    local speciesID, level, breedQuality, maxHealth, power, speed, petName = GetCagedPet(tab, i);
-                    if ( speciesID and tonumber(speciesID) > 0 ) then
-                        if ( type(texture) == "string" ) then
-                            texture = strupper(texture):match("^INTERFACE\\ICONS\\(.+)") or "";
-                        end
-                        itemString = strjoin(":", speciesID, level, breedQuality, maxHealth, power, speed);
-                        itemString = strjoin("|", itemString, texture, petName);
-                    else
-                        itemString = Armory:GetItemString(link);
-                    end
-                    items[itemString] = (items[itemString] or 0) + count;
-                    slots[tostring(i)] = itemString..";"..count;
+local function GetTabSignature(tab)
+    local signature = {};
+    for i = 1, MAX_GUILDBANK_SLOTS_PER_TAB do
+        local link = GetGuildBankItemLink(tab, i);
+        if ( link ) then
+            local _, count = GetGuildBankItemInfo(tab, i);
+            signature[#signature + 1] = i.."="..link.."x"..tostring(count);
+        end
+    end
+    return table.concat(signature, ";");
+end
+
+local function StoreTabItems(tab)
+    AGB:RemoveFromQueue(tab);
+
+    local items = {};
+    local slots = {};
+    local itemString, link, texture, count;
+    for i = 1, MAX_GUILDBANK_SLOTS_PER_TAB do
+        link = GetGuildBankItemLink(tab, i);
+        if ( link ) then
+            texture, count = GetGuildBankItemInfo(tab, i);
+
+            local speciesID, level, breedQuality, maxHealth, power, speed, petName = GetCagedPet(tab, i);
+            if ( speciesID and tonumber(speciesID) > 0 ) then
+                if ( type(texture) == "string" ) then
+                    texture = strupper(texture):match("^INTERFACE\\ICONS\\(.+)") or "";
                 end
+                itemString = strjoin(":", speciesID, level, breedQuality, maxHealth, power, speed);
+                itemString = strjoin("|", itemString, texture, petName);
+            else
+                itemString = Armory:GetItemString(link);
             end
-
-            local ids = {};
-            for itemString, count in pairs(items) do
-                table.insert(ids, itemString..count);
-            end
-            table.sort(ids);
-
-            AGB:UpdateTabName(tab, name);
-            AGB:UpdateTabIcon(tab, icon);
-            AGB:UpdateTabItems(tab, items, slots, AGB:Checksum(table.concat(ids)));
+            items[itemString] = (items[itemString] or 0) + count;
+            slots[tostring(i)] = itemString..";"..count;
         end
     end
 
-    AGB.tabs = nil;
-
-    for tab = 1, GetNumGuildBankTabs() do
-        if ( not IsTabViewable(tab) ) then
-            AGB:DeleteTab(tab);
-        end
+    local ids = {};
+    for itemString, count in pairs(items) do
+        table.insert(ids, itemString..count);
     end
+    table.sort(ids);
 
+    AGB:UpdateTabItems(tab, items, slots, AGB:Checksum(table.concat(ids)));
+end
+
+local function GuildBankStored()
     AGB:UpdateGuildInfo();
-    AGB:UpdateMoney();
     AGB:UpdateTimestamp();
 
     ArmoryGuildBankFrame_Refresh();
     ArmoryInventoryGuildBankFrame_Refresh();
 
     AGB:Push();
+end
 
-    return Orig_CloseGuildBankFrame(...);
+function AGB:OnGuildBankOpened()
+    bankOpen = true;
+    table.wipe(seenTabs);
+    table.wipe(tabSignatures);
+end
+
+function AGB:OnGuildBankClosed()
+    bankOpen = false;
+    table.wipe(seenTabs);
+    table.wipe(tabSignatures);
+end
+
+-- slotsChanged: the contents of the current tab arrived or changed (GUILDBANKBAGSLOTS_CHANGED);
+-- otherwise only the tab info did (GUILDBANK_UPDATE_TABS)
+function AGB:OnGuildBankChanged(slotsChanged)
+    if ( not bankOpen or not self:Db() ) then
+        return;
+    end
+
+    if ( slotsChanged ) then
+        seenTabs[GetCurrentGuildBankTab()] = true;
+        -- Blizzard's money frame also reads the money when the bank shows, not only on GUILDBANK_UPDATE_MONEY
+        self:UpdateMoney();
+    end
+
+    -- every tab the player saw during this visit, as the old reading at closing did;
+    -- the signature keeps the full read (with a tooltip per caged pet) to tabs that changed
+    for tab in pairs(seenTabs) do
+        local name, icon = GetGuildBankTabInfo(tab);
+        if ( name ) then
+            self:UpdateTabName(tab, name);
+            self:UpdateTabIcon(tab, icon);
+        end
+
+        local signature = GetTabSignature(tab);
+        if ( signature ~= tabSignatures[tab] ) then
+            tabSignatures[tab] = signature;
+            StoreTabItems(tab);
+        end
+    end
+
+    for tab = 1, GetNumGuildBankTabs() do
+        if ( IsTabHidden(tab) ) then
+            self:DeleteTab(tab);
+            seenTabs[tab] = nil;
+            tabSignatures[tab] = nil;
+        end
+    end
+
+    GuildBankStored();
+end
+
+function AGB:OnGuildBankMoneyChanged()
+    if ( not bankOpen or not self:Db() ) then
+        return;
+    end
+
+    self:UpdateMoney();
+    GuildBankStored();
 end
 
 local Orig_Armory_InitializeMenu = Armory.InitializeMenu;
