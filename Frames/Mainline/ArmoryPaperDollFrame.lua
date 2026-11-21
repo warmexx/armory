@@ -2359,23 +2359,9 @@ end
 -- gems; other gems and empty prismatic sockets aren't shown
 local SOCKET_FRAMES = { "Meta", "Red", "Purple", "Blue", "Green" };
 local COLOR_FRAMES = { META = "Meta", RED = "Red", PURPLE = "Purple", BLUE = "Blue", GREEN = "Green" };
-
-local colorIcons;
-local function GetColorIcons()
-    if ( not colorIcons ) then
-        colorIcons = {};
-        local ids = {};
-        for itemId, color in pairs(Armory.gemColors) do
-            if ( not ids[color] or itemId < ids[color] ) then
-                ids[color] = itemId;
-            end
-        end
-        for color, itemId in pairs(ids) do
-            colorIcons[COLOR_FRAMES[color]] = C_Item.GetItemIconByID(itemId);
-        end
-    end
-    return colorIcons;
-end
+-- there are no sockets in these colors, so they are a desaturated yellow socket
+local SOCKET_TINTS = { Purple = { 0.75, 0.35, 1.0 }, Green = { 0.35, 1.0, 0.35 } };
+local NO_TINT = { 1.0, 1.0, 1.0 };
 
 local function AddEmptySockets(frameName, slot, ...)
     local frame;
@@ -2393,18 +2379,11 @@ end
 function ArmoryPaperDoll_UpdateSockets(overlay)
     local suffix = overlay and "Overlay" or "";
     local frameName = "ArmorySockets"..suffix.."Frame";
-    local icons = GetColorIcons();
     local frame;
 
     for _, name in ipairs(SOCKET_FRAMES) do
         frame = _G[frameName..name];
-        if ( icons[name] ) then
-            frame.Icon:SetTexture(icons[name]);
-            frame.Icon:ClearAllPoints();
-            frame.Icon:SetPoint("CENTER");
-            frame.Icon:SetSize(24, 24);
-        end
-        frame.Icon:SetVertexColor(1.0, 1.0, 1.0);
+        frame.Icon:SetVertexColor(unpack(SOCKET_TINTS[name] or NO_TINT));
         frame.count = 0;
         frame.empty = 0;
         frame.tooltip = nil;
@@ -2470,12 +2449,7 @@ function ArmoryPaperDoll_UpdateSockets(overlay)
     for _, name in ipairs(SOCKET_FRAMES) do
         frame = _G[frameName..name];
         frame.Value:SetText(frame.count);
-        if ( name == "Meta" ) then
-            frame.tooltip = EMPTY_SOCKET_META;
-        else
-            frame.tooltip = _G["ARMORY_GEM_COLOR_"..strupper(name)];
-        end
-        frame.tooltip = frame.tooltip.." "..frame.count;
+        frame.tooltip = _G["ARMORY_GEM_COLOR_"..strupper(name)].." "..frame.count;
     end
 end
 

@@ -434,7 +434,7 @@
         </Anchors>
         <Layers>
           <Layer level="BACKGROUND">
-            <Texture file="Interface\ItemSocketingFrame\UI-EmptySocket" parentKey="Icon" />
+            <Texture file="Interface\ItemSocketingFrame\UI-EmptySocket-Yellow" parentKey="Icon" desaturated="true" />
           </Layer>
         </Layers>
       </Frame>
@@ -454,7 +454,7 @@
         </Anchors>
         <Layers>
           <Layer level="BACKGROUND">
-            <Texture file="Interface\ItemSocketingFrame\UI-EmptySocket" parentKey="Icon" />
+            <Texture file="Interface\ItemSocketingFrame\UI-EmptySocket-Yellow" parentKey="Icon" desaturated="true" />
           </Layer>
         </Layers>
       </Frame>
