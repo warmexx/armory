@@ -7,11 +7,15 @@
 ## Version: @project-version@
 ## Notes: Provides an overview of equipment, stats, inventory, professions, quests, spells and more for all your characters
 ## Notes-deDE: Ermöglicht einen Überblick über Ausrüstung, Werte, Inventar, Berufe, Quests, Zauber und viel mehr für alle deine Charaktere
-## Notes-frFR: Donne un aperçu de l'équipement, stats, sacs, métiers, quêtes, sorts et plus encore pour tous vos personnages
 ## Notes-esES: Proporciona un compendio del equipamiento, estadísticas, inventario, profesiones, misiones, hechizos y demás cosas de todos tus personajes
-## Notes-koKR: 계정내 모든 케릭터들의 퀘스트, 스킬, 기술, 상태, 장비, 업적, 가방 및 은행, 우편함 등의 모든 정보를 살펴볼 수 있는 기능을 제공합니다.
-## Notes-ruRU: Предоставляет сведения об одежде, статах, состоянии сумок и банковских ячеек, профессиях, квестах, заклинаниях и многом другом для всех ваших персонажей
-## Notes-zhCN: 为您的所有角色提供装备，属性，背包，职业，任务，法术等的信息
+## Notes-esMX: Muestra un resumen del equipo, estadísticas, inventario, profesiones, misiones, hechizos y más de todos tus personajes
+## Notes-frFR: Donne un aperçu de l'équipement, stats, sacs, métiers, quêtes, sorts et plus encore pour tous vos personnages
+## Notes-itIT: Offre una panoramica di equipaggiamento, statistiche, inventario, professioni, missioni, incantesimi e altro per tutti i tuoi personaggi
+## Notes-koKR: 모든 캐릭터의 장비, 능력치, 소지품, 전문 기술, 퀘스트, 주문 등을 한눈에 보여줍니다
+## Notes-ptBR: Mostra um resumo de equipamento, atributos, inventário, profissões, missões, feitiços e muito mais de todos os seus personagens
+## Notes-ruRU: Показывает экипировку, характеристики, инвентарь, профессии, задания, заклинания и многое другое для всех ваших персонажей
+## Notes-zhCN: 为你所有的角色提供装备、属性、背包、专业、任务、法术等信息的概览
+## Notes-zhTW: 為你所有的角色提供裝備、屬性、背包、專業技能、任務、法術等資訊的概覽
 ## Author: Warmexx [Neighbours]
 ## SavedVariables: ArmoryDB, ArmorySettings, ArmoryModules, ArmoryCache, ArmoryShared
 ## SavedVariablesPerCharacter: ArmoryLocalSettings

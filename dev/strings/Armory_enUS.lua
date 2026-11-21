@@ -30,7 +30,7 @@ L["ARMORY_GEM_COLOR_BLUE"] = "Blue"
 L["ARMORY_GEM_COLOR_GREEN"] = "Green"
 L["ARMORY_GEM_COLOR_META"] = "Meta"
 
--- Not imported yet.
+-- Imported on CurseForge on 2026-11-21; remove once a release that has them is installed in Retail.
 L["ARMORY_GEM_COLOR_YELLOW"] = "Yellow"
 L["ARMORY_PAPERDOLL_SHOW_GEMS"] = "Click to show the gems"
 L["ARMORY_PAPERDOLL_SHOW_RESISTANCES"] = "Click to show the resistances"

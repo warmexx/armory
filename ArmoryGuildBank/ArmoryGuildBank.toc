@@ -8,10 +8,14 @@
 ## Notes: Provides guild bank information to Armory users
 ## Notes-deDE: Ermöglicht Gildenbankinformationen für Armorynutzer
 ## Notes-esES: Da información del banco de la hermandad a los usuarios de Armory
+## Notes-esMX: Proporciona información del banco de hermandad a los usuarios de Armory
 ## Notes-frFR: Fournit des renseignements de la banque de guilde aux utilisateurs de l'Armurerie
+## Notes-itIT: Fornisce agli utenti di Armory le informazioni sulla banca di gilda
 ## Notes-koKR: Armory사용자에게 길드은행의 정보를 추가로 제공합니다.
+## Notes-ptBR: Fornece informações do banco da guilda aos usuários do Armory
 ## Notes-ruRU: Предоставляет доступ к информации о гильдейском банке пользователям Armory
 ## Notes-zhCN: 向Armory用户提供公会银行信息
+## Notes-zhTW: 向 Armory 使用者提供公會銀行資訊
 ## Author: Warmexx [Neighbours]
 ## Dependencies: Armory
 ## SavedVariables: AgbDB, AgbDBRealms

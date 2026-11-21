@@ -1,0 +1,100 @@
+-- zhCN translations for the CurseForge localization of Armory (project 5195, namespace Armory).
+-- Only the phrases that were missing or still English. Import as lua_additive_table.
+
+L["ARMORY_CHECK_MAIL_SHORT_MESSAGE"] = "%1$s (%2$s) 的收件箱中有 %3$d |4件:件;物品将在 %4$d |4天:天;内过期！"
+L["ARMORY_CMD_FIND_PARAMS_TEXT"] = "[名称片段]"
+L["ARMORY_CMD_SET_COUNTSORT_TEXT"] = "物品数量排序"
+L["ARMORY_CMD_SET_COUNTSORT_TOOLTIP"] = "设置鼠标提示中物品数量的顺序。“角色优先”会先列出你的角色，然后是公会银行，最后是战团银行。"
+L["ARMORY_CMD_SET_EXPDAYS_PARAMS_TEXT"] = "天数"
+L["ARMORY_CMD_SET_EXTENDEDTRADE_MENUTEXT"] = "启用专业过滤"
+L["ARMORY_CMD_SET_EXTENDEDTRADE_TEXT"] = "启用子类别和部位过滤"
+L["ARMORY_CMD_SET_EXTENDEDTRADE_TOOLTIP"] = [=[启用后，专业可按子类别和/或物品部位过滤。
+如果与其他插件发生冲突，可以禁用此功能，以获得一个不触发任何事件的简单列表（按住 Shift 点击链接按钮可获得分类列表）。]=]
+L["ARMORY_CMD_SET_FACTIONFILTER_MENUTEXT"] = "阵营过滤"
+L["ARMORY_CMD_SET_FACTIONFILTER_TEXT"] = "启用阵营过滤"
+L["ARMORY_CMD_SET_FACTIONFILTER_TOOLTIP"] = [=[启用后，只显示属于当前阵营的角色。这也会影响鼠标提示信息。
+注意：物品数量有单独的阵营设置。]=]
+L["ARMORY_CMD_SET_IGNOREALTS_MENUTEXT"] = "忽略小号的邮件"
+L["ARMORY_CMD_SET_IGNOREALTS_TEXT"] = "忽略小号邮件的警告"
+L["ARMORY_CMD_SET_LDBLABEL_MENUTEXT"] = "启用 LDB 标签"
+L["ARMORY_CMD_SET_LDBLABEL_TEXT"] = "启用 LibDataBroker 标签显示"
+L["ARMORY_CMD_SET_LDBLABEL_TOOLTIP"] = "启用后，在 LibDataBroker 显示插件中显示文字标签。"
+L["ARMORY_CMD_SET_MAILCHECKVERBOSE_MENUTEXT"] = "详细邮件警告"
+L["ARMORY_CMD_SET_MAILCHECKVERBOSE_TEXT"] = "为每件物品单独显示警告"
+L["ARMORY_CMD_SET_MAILCHECKVERBOSE_TOOLTIP"] = "启用后，邮件过期警告将为每件物品单独显示；否则每个邮箱只显示一条汇总信息。"
+L["ARMORY_CMD_SET_MAILCHECKVISIT_MENUTEXT"] = "警告未注意到的邮件"
+L["ARMORY_CMD_SET_MAILCHECKVISIT_TEXT"] = "检查邮箱上次打开的时间"
+L["ARMORY_CMD_SET_MAILCHECKVISIT_TOOLTIP"] = "启用后，如果某个角色的邮箱至少有 30 天减去过期阈值天数没有打开过，因而可能有未注意到的邮件，将显示警告。"
+L["ARMORY_CMD_SET_SCALEONMOUSEWHEEL_TEXT"] = "启用鼠标滚轮"
+L["ARMORY_CMD_SET_SCALEONMOUSEWHEEL_TOOLTIP"] = "启用后，在 Armory 主窗口背景上滚动鼠标滚轮可调整界面缩放。"
+L["ARMORY_CMD_SET_SHAREITEMS_MENUTEXT"] = "共享物品"
+L["ARMORY_CMD_SET_SHAREITEMS_TEXT"] = "共享你的背包物品"
+L["ARMORY_CMD_SET_SHAREITEMS_TOOLTIP"] = "启用后，使用相同自定义频道的其他 Armory 用户可以搜索你背包中的物品。"
+L["ARMORY_CMD_SET_SHOW2NDSKILLRANK_MENUTEXT"] = "包括副业技能"
+L["ARMORY_CMD_SET_SHOW2NDSKILLRANK_TEXT"] = "包括副业技能等级"
+L["ARMORY_CMD_SET_SHOW2NDSKILLRANK_TOOLTIP"] = "启用后，副业技能也会添加技能等级；否则只为主要技能添加。"
+L["ARMORY_CMD_SET_SHOWSKILLRANK_MENUTEXT"] = "在鼠标提示中显示技能等级"
+L["ARMORY_CMD_SET_SHOWSKILLRANK_TEXT"] = "在鼠标提示中显示技能等级"
+L["ARMORY_CMD_SET_SHOWSKILLRANK_TOOLTIP"] = "启用后，技能按钮的鼠标提示中会添加技能等级。"
+L["ARMORY_CMD_SET_SHOWSLOTITEMLEVELS_MENUTEXT"] = "显示其他角色的物品等级"
+L["ARMORY_CMD_SET_SHOWSLOTITEMLEVELS_TEXT"] = "在栏位鼠标提示中显示其他角色的物品等级"
+L["ARMORY_CMD_SET_SHOWSLOTITEMLEVELS_TOOLTIP"] = "启用后，角色界面中装备栏位的鼠标提示会列出你其他角色在该栏位的物品等级。护甲栏位只列出穿戴相同护甲类型的角色。"
+L["ARMORY_CMD_SET_SYSTEMWARNINGS_MENUTEXT"] = "启用系统警告"
+L["ARMORY_CMD_SET_SYSTEMWARNINGS_TEXT"] = "启用系统警告信息"
+L["ARMORY_CMD_SET_SYSTEMWARNINGS_TOOLTIP"] = [=[启用后，出现问题时（例如服务器没有返回任何数据）会显示警告信息。
+
+强烈建议保持此设置启用。通常最好找出信息的原因并解决问题。例如，禁用子类别和部位过滤可以避免大多数专业更新警告，但代价是会失去部分功能。]=]
+L["ARMORY_CMD_SET_USEMAZIEL_MENUTEXT"] = "使用两个属性面板"
+L["ARMORY_CMD_SET_USEMAZIEL_TEXT"] = "隐藏天赋配置和专业"
+L["ARMORY_CMD_SET_USEMAZIEL_TOOLTIP"] = "启用后，天赋和专业框体将被第二个属性面板替代。"
+L["ARMORY_CMD_SET_USEOVERLAY_MENUTEXT"] = "启用角色模型覆盖"
+L["ARMORY_CMD_SET_USEOVERLAY_TEXT"] = "用 Armory 布局替代角色模型"
+L["ARMORY_CMD_SET_USEOVERLAY_TOOLTIP"] = "启用后，角色窗口折叠时，Armory 的布局将替代角色模型。"
+L["ARMORY_CMD_SET_USEREALMFILTER_MENUTEXT"] = "服务器过滤"
+L["ARMORY_CMD_SET_USEREALMFILTER_TEXT"] = "启用服务器过滤"
+L["ARMORY_CMD_SET_USEREALMFILTER_TOOLTIP"] = [=[启用后，只显示当前服务器及已互联服务器上的角色。这也会影响鼠标提示信息。
+注意：物品数量有单独的服务器设置。]=]
+L["ARMORY_CMD_SET_WARNINGSOUND_TEXT"] = "警告信息音效"
+L["ARMORY_CMD_SET_WARNINGSOUND_TOOLTIP"] = "选择在聊天窗口显示自动警告或错误信息时播放的音效。"
+L["ARMORY_CMD_SET_WEEKLYRESET_MENUTEXT"] = "每周重置"
+L["ARMORY_CMD_SET_WEEKLYRESET_TEXT"] = "服务器每周重置"
+L["ARMORY_CMD_SET_WEEKLYRESET_TOOLTIP"] = "选择服务器每周重置的日子（美服为星期二，欧服为星期三）。"
+L["ARMORY_CMD_SET_WINDOWSEARCH_MENUTEXT"] = "在窗口中显示搜索结果"
+L["ARMORY_CMD_SET_WINDOWSEARCH_TEXT"] = "在专用窗口中显示搜索命令结果"
+L["ARMORY_CMD_SET_WINDOWSEARCH_TOOLTIP"] = "启用后，搜索命令的结果将显示在单独的窗口中；否则显示在聊天窗口中。"
+L["ARMORY_COOLDOWN_AVAILABLE"] = "%2$s (%3$s) 的“%1$s”冷却已结束，可以再次使用。"
+L["ARMORY_COOLDOWN_WARNING"] = "%s 将在 %d |4分钟:分钟;后"
+L["ARMORY_EVENT_WARNING"] = "%s 将在 %d |4分钟:分钟;后开始"
+L["ARMORY_FULLY_RESTED"] = "完全休息于：%s"
+L["ARMORY_GEM_COLOR_BLUE"] = "蓝色"
+L["ARMORY_GEM_COLOR_GREEN"] = "绿色"
+L["ARMORY_GEM_COLOR_META"] = "多彩"
+L["ARMORY_GEM_COLOR_PURPLE"] = "紫色"
+L["ARMORY_GEM_COLOR_RED"] = "红色"
+L["ARMORY_GEM_COLOR_YELLOW"] = "黄色"
+L["ARMORY_INVENTORY_COMBINEDBAG"] = "合并背包"
+L["ARMORY_ITEMCOUNT_SORT_COUNT"] = "最多的优先"
+L["ARMORY_ITEMCOUNT_SORT_COUNTASC"] = "最少的优先"
+L["ARMORY_ITEMCOUNT_SORT_NAME"] = "按名称"
+L["ARMORY_ITEMCOUNT_SORT_TYPE"] = "角色优先"
+L["ARMORY_KNOWN_BY"] = "已学会"
+L["ARMORY_LINK_HINT"] = "Shift-点击以链接"
+L["ARMORY_LINK_TRADESKILL_TOOLTIP"] = "Shift-点击打开你的专业。"
+L["ARMORY_LOOKUP_CHARACTER_SEARCH_TOOLTIP"] = [=[输入过滤条件。
+
+也可以是某人小号的名字。]=]
+L["ARMORY_LOOKUP_DETAIL"] = "点击查看详情"
+L["ARMORY_LOOKUP_PLAYER_HINT"] = [=[Shift-点击查看玩家信息
+右键点击以密语]=]
+L["ARMORY_MAIL_COUNT_WARNING2"] = "%1$s (%2$s) 有 %d |4封:封;邮件无法扫描。"
+L["ARMORY_MAIL_VISIT_WARNING"] = "%1$s (%2$s) 已有 %3$s |4天:天;没有查看邮箱。请登录检查你的邮箱。"
+L["ARMORY_MAIL_VISIT_WARNING2"] = "%1$s (%2$s) 还没有查看过邮箱。请登录检查你的邮箱。"
+L["ARMORY_PAPERDOLL_SHOW_GEMS"] = "点击以显示宝石"
+L["ARMORY_PAPERDOLL_SHOW_RESISTANCES"] = "点击以显示抗性"
+L["ARMORY_SLOT_ITEMLEVELS"] = "你其他角色的物品等级"
+L["ARMORY_TOOLTIP_HINT3"] = "Alt-点击立即显示摘要"
+
+-- Corrections of existing translations.
+L["ARMORY_CHECK_MAIL_MESSAGE"] = "%1$s (%2$s) 的邮箱中的“%3$s”将在 %4$d |4天:天;后过期！"
+L["ARMORY_CMD_FIND_TEXT"] = "在本地数据库中查找信息"
+L["ARMORY_XP_SUMMARY"] = "等级 %1$d (%2$s) 还需 %3$d 经验，%4$s 休息经验"

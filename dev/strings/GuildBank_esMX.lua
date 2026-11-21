@@ -1,0 +1,33 @@
+-- esMX translations for the CurseForge localization of Armory (project 5195, namespace GuildBank).
+-- Only the phrases that were missing or still English. Import as lua_additive_table.
+
+L["ARMORY_CMD_SET_AGBCOUNTMYGUILD_MENUTEXT"] = "Incluir solo la hermandad actual"
+L["ARMORY_CMD_SET_AGBCOUNTMYGUILD_TEXT"] = "incluir cantidades de objetos solo de la hermandad actual"
+L["ARMORY_CMD_SET_AGBCOUNTMYGUILD_TOOLTIP"] = "Si está activado, los totales del banco de hermandad se muestran solo para la hermandad del personaje actual y del seleccionado."
+L["ARMORY_CMD_SET_AGBCOUNTPGB_MENUTEXT"] = "Incluir solo hermandades personales"
+L["ARMORY_CMD_SET_AGBCOUNTPGB_TEXT"] = "incluir cantidades de objetos solo de hermandades personales"
+L["ARMORY_CMD_SET_AGBCOUNTPGB_TOOLTIP"] = "Si está activado, los totales de los bancos de hermandad se muestran solo para las hermandades personales."
+L["ARMORY_CMD_SET_AGBCOUNTXFACTION_MENUTEXT"] = "Incluir todas las facciones en las cantidades"
+L["ARMORY_CMD_SET_AGBCOUNTXFACTION_TEXT"] = "incluir cantidades de objetos de todas las facciones"
+L["ARMORY_CMD_SET_AGBCOUNTXFACTION_TOOLTIP"] = "Si está activado, los totales del banco de hermandad se muestran para todas las facciones; si no, solo para la facción actual."
+L["ARMORY_CMD_SET_AGBFIND_TOOLTIP"] = "Si está activado, también se buscará en el banco de hermandad al consultar la base de datos con '/ar find item|all'."
+L["ARMORY_CMD_SET_AGBINTEGRATE_MENUTEXT"] = "Integrar con el inventario"
+L["ARMORY_CMD_SET_AGBINTEGRATE_TEXT"] = "integrar con el inventario de Armory"
+L["ARMORY_CMD_SET_AGBINTEGRATE_TOOLTIP"] = "Si está activado, el banco de hermandad del personaje seleccionado se agregará como pestaña adicional en la hoja de inventario."
+L["ARMORY_CMD_SET_AGBITEMCOUNT_MENUTEXT"] = "Mostrar cantidades de objetos en descripciones"
+L["ARMORY_CMD_SET_AGBITEMCOUNT_TEXT"] = "mostrar cantidades de objetos en las descripciones"
+L["ARMORY_CMD_SET_AGBITEMCOUNT_TOOLTIP"] = "Si está activado, las descripciones de objetos mostrarán los totales del banco de hermandad."
+L["ARMORY_CMD_SET_AGBUNICOLOR_MENUTEXT"] = "Usar el color de Armory"
+L["ARMORY_CMD_SET_AGBUNICOLOR_TEXT"] = "usar el color de cantidades de objetos de Armory"
+L["ARMORY_CMD_SET_AGBUNICOLOR_TOOLTIP"] = "Si está activado, se usará el mismo color para todas las cantidades de objetos que se muestran en las descripciones."
+L["ARMORY_GUILDBANK_ABORTING"] = "Cancelando..."
+L["ARMORY_GUILDBANK_NO_DATA"] = "No hay datos del banco de hermandad disponibles."
+L["ARMORY_GUILDBANK_NO_TABS"] = "Visita el banco y abre todas las pestañas..."
+L["ARMORY_GUILDBANK_SUBTEXT"] = "Estas opciones te permiten cambiar el comportamiento de Armory Guild Bank."
+L["ARMORY_GUILDBANK_TITLE"] = "Banco de hermandad"
+L["ARMORY_PERSONAL_GUILDBANK"] = "Banco de hermandad personal"
+L["ARMORY_PERSONAL_GUILDBANK_TOOLTIP"] = "Si está activado, el oro del banco de hermandad se incluirá en los totales de oro de los personajes."
+L["BINDING_NAME_ARMORYGUILDBANK_TOGGLE"] = "Mostrar/ocultar Armory Guild Bank"
+
+-- Corrections of existing translations.
+L["ARMORY_CMD_DELETE_GUILD_PARAMS_TEXT"] = "[hermandad] [reino]"
