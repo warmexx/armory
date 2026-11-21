@@ -34,7 +34,7 @@ CLIENTS = {"retail": "_retail_", "forever": "_forever_", "era": "_classic_era_",
 # Addon folders: (folder in the repo, folder in Interface\AddOns). Every client gets both, like
 # the package; the guild bank's TOC keeps it out of Era (## AllowLoadGameType).
 ADDONS = [("", "Armory"), ("ArmoryGuildBank", "ArmoryGuildBank")]
-SKIP_DIRS = {".git", ".release", ".vscode", ".tokensave", ".claude", "dev", "docs", "Libs", "Locales"}
+SKIP_DIRS = {".git", ".release", ".vscode", ".tokensave", ".claude", "dev", "docs", "Libs", "Locales", "_archive"}
 SKIP_FILES = {".gitignore", ".pkgmeta", ".gitattributes"}
 CODE = (".lua", ".xml", ".toc")
 # The translations of every client come from the released addon in Retail (CurseForge project 5195)

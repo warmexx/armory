@@ -42,7 +42,7 @@ def rel(p): return os.path.relpath(p,root)
 supplements=set()
 pairs={}
 for d,dn,fn in os.walk(root):
-    dn[:]=[x for x in dn if x.lower() not in ("libs","locales","dev","docs",".git",".release",".tokensave")]
+    dn[:]=[x for x in dn if x.lower() not in ("libs","locales","dev","docs",".git",".release",".tokensave","_archive")]
     b=os.path.basename(d)
     if b not in FAMILIES: continue
     parent=os.path.dirname(d)

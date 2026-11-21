@@ -1,7 +1,7 @@
 """Vergelijkt Lua- en XML-bestanden tussen versiemappen van Armory.
 
 Gebruik: python -I dev/compare.py [map ...]
-Standaard: _oneforall (Live), _era en _bcc, naast deze repo.
+Standaard: deze repo, _archive/_era en _archive/_bcc.
 
 Per bestand (zonder Libs en Locales) het aantal verschillende regels per paar,
 witruimte, regeleinden en Revision-regels genegeerd. Paden worden zonder
@@ -11,8 +11,8 @@ import difflib
 import os
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SKIP_DIRS = {"libs", "locales", "dev", "docs", ".git", ".release", ".vscode", ".tokensave", ".claude"}
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SKIP_DIRS = {"libs", "locales", "dev", "docs", ".git", ".release", ".vscode", ".tokensave", ".claude", "_archive"}
 EXTS = (".lua", ".xml", ".toc")
 
 
@@ -48,7 +48,7 @@ def ndiff(a, b):
 
 
 def main():
-    names = sys.argv[1:] or ["_oneforall", "_era", "_bcc"]
+    names = sys.argv[1:] or [".", "_archive/_era", "_archive/_bcc"]
     trees = [collect(os.path.join(ROOT, n)) for n in names]
     keys = sorted(set().union(*trees))
     pairs = [(i, j) for i in range(len(names)) for j in range(i + 1, len(names))]

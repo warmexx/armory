@@ -1,7 +1,7 @@
 import os, re, collections
 
 WOW = r"D:\Games\World of Warcraft"
-ARMORY = r"D:\Development\WOW\AddOns\Armory"
+ARMORY = r"D:\Development\WOW\AddOns\Armory\_archive"
 OTHER = {"Cata", "Mists", "Wrath", "TBC", "Vanilla", "Classic", "Standard"}
 SKIP = {".git", "Locales", "Libs", "libs", ".tokensave", ".release", ".vscode", "Artwork"}
 

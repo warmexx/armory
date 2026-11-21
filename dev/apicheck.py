@@ -82,7 +82,7 @@ blizzard_known = set(known)  # without Armory's own names
 # Armory's own files (all of them, any client) and its libs
 own_files = []
 for dp, dns, fns in os.walk(ROOT):
-    dns[:] = [d for d in dns if d not in (".git", "dev", "docs")]
+    dns[:] = [d for d in dns if d not in (".git", "dev", "docs", "_archive")]
     own_files += [os.path.join(dp, fn) for fn in fns if fn.endswith((".lua", ".xml"))]
 for p in own_files:
     t = read(p)
@@ -145,7 +145,7 @@ def method_defs(paths):
 loaded = [q for q in toc_files() if q.endswith(".lua")]
 repo = []
 for d, dn, fn in os.walk(ROOT):
-    dn[:] = [x for x in dn if x.lower() not in ("libs", "dev", "docs", ".git")]
+    dn[:] = [x for x in dn if x.lower() not in ("libs", "dev", "docs", ".git", "_archive")]
     repo += [os.path.join(d, f) for f in fn if f.endswith(".lua")]
 loaded_defs = method_defs(loaded)
 other_defs = method_defs([q for q in repo if q not in set(loaded)]) - loaded_defs
@@ -228,7 +228,7 @@ def global_uses(path):
 loaded_all = toc_files()
 repo_all = []
 for d, dn, fn in os.walk(ROOT):
-    dn[:] = [x for x in dn if x.lower() not in ("libs", "dev", "docs", ".git", ".release")]
+    dn[:] = [x for x in dn if x.lower() not in ("libs", "dev", "docs", ".git", ".release", "_archive")]
     repo_all += [os.path.join(d, f) for f in fn if f.endswith((".lua", ".xml"))]
 not_loaded = [q for q in repo_all if q not in set(loaded_all)]
 loaded_globals = global_defs(loaded_all)

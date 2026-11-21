@@ -1,7 +1,7 @@
 import os, re, collections
 
 BASE = r"D:\Games\World of Warcraft\_forever_\BlizzardInterfaceCode\Interface\AddOns"
-ROOT = r"D:\Development\WOW\AddOns\Armory\_live"
+ROOT = r"D:\Development\WOW\AddOns\Armory\_archive\_live"
 OTHER = {"Cata", "Mists", "Wrath", "TBC", "Vanilla", "Classic", "Standard"}
 ALLOW = {"camelot", "forever", "mainline"}
 
