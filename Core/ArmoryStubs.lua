@@ -483,6 +483,14 @@ function Armory:GetInventoryItem(index)
     end
 end
 
+function Armory:IsMetaActive(unit)
+    for slot = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
+        if ( self:GetCharacterValue("IsMetaActive"..slot, unit) ) then
+            return true;
+        end
+    end
+end
+
 function Armory:GetInventoryItemInfo(index, unit)
     local hasItem, hasCooldown, repairCost = self:GetCharacterValue("InventoryItem"..index, unit);
     local link, tinker, anchor, emptySockets = self:GetCharacterValue("InventoryItemLink"..index, unit);

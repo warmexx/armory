@@ -252,6 +252,35 @@
       </OnLeave>
     </Scripts>
   </Frame>
+  <Frame name="ArmoryGemSocketFrameTemplate" virtual="true">
+    <Size>
+      <AbsDimension x="32" y="29"/>
+    </Size>
+    <Layers>
+      <Layer level="OVERLAY">
+        <FontString inherits="NumberFontNormalSmall" text="X" parentKey="Value">
+          <Anchors>
+            <Anchor point="BOTTOM">
+              <Offset>
+                <AbsDimension x="0" y="3"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnEnter>
+        ArmoryPaperDollGemSocket_OnEnter(self);
+      </OnEnter>
+      <OnLeave>
+        GameTooltip:Hide();
+      </OnLeave>
+      <OnMouseUp>
+        ArmoryPaperDollFrame_ToggleGems();
+      </OnMouseUp>
+    </Scripts>
+  </Frame>
   <Frame name="ArmoryPaperDollTalentFrameTemplate" virtual="true">
     <Size>
       <AbsDimension x="200" y="59"/>
@@ -741,6 +770,56 @@
 										</Anchor>
 									</Anchors>
 								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="ArmorySocketsFrame" hidden="true">
+				<Size>
+					<AbsDimension x="32" y="160"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="ArmoryPaperDollFrame" relativePoint="TOPLEFT" x="282" y="-65"/>
+				</Anchors>
+				<Frames>
+					<Frame name="$parentMeta" inherits="ArmoryGemSocketFrameTemplate">
+						<Anchors>
+							<Anchor point="TOP"/>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture file="Interface\ItemSocketingFrame\UI-EmptySocket-Meta" parentKey="Icon"/>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="$parentRed" inherits="ArmoryGemSocketFrameTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentMeta" relativePoint="BOTTOM"/>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture file="Interface\ItemSocketingFrame\UI-EmptySocket-Red" parentKey="Icon"/>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="$parentYellow" inherits="ArmoryGemSocketFrameTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentRed" relativePoint="BOTTOM"/>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture file="Interface\ItemSocketingFrame\UI-EmptySocket-Yellow" parentKey="Icon"/>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="$parentBlue" inherits="ArmoryGemSocketFrameTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentYellow" relativePoint="BOTTOM"/>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture file="Interface\ItemSocketingFrame\UI-EmptySocket-Blue" parentKey="Icon"/>
 							</Layer>
 						</Layers>
 					</Frame>

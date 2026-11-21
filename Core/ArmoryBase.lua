@@ -963,12 +963,12 @@ function Armory:CharacterSetting(key, unit, ...)
         local realm = self.playerRealm;
         local character = self.player;
 
-        if ( set ) then
-            dbEntry:SetValue(4, "PerCharacter", realm, character, key, ...);
-        end
-
         if (unit ~= "player") then
             realm, character = self:GetPaperDollLastViewed();
+        end
+
+        if ( set ) then
+            dbEntry:SetValue(4, "PerCharacter", realm, character, key, ...);
         end
         return dbEntry:GetValue("PerCharacter", realm, character, key);
     end

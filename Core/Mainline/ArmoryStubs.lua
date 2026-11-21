@@ -303,14 +303,6 @@ function Armory:InRepairMode()
    return self:SetGetCharacterValue("InRepairMode", _G.InRepairMode());
 end
 
-function Armory:IsMetaActive(unit)
-    for slot = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
-        if ( self:GetCharacterValue("IsMetaActive"..slot, unit) ) then
-            return true;
-        end
-    end
-end
-
 function Armory:IsPersistentPet()
     return _G.UnitExists("pet") and _G.UnitCreatureFamily("pet");
 end

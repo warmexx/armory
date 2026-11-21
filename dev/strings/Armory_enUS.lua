@@ -29,3 +29,8 @@ L["ARMORY_GEM_COLOR_PURPLE"] = "Purple"
 L["ARMORY_GEM_COLOR_BLUE"] = "Blue"
 L["ARMORY_GEM_COLOR_GREEN"] = "Green"
 L["ARMORY_GEM_COLOR_META"] = "Meta"
+
+-- Not imported yet.
+L["ARMORY_GEM_COLOR_YELLOW"] = "Yellow"
+L["ARMORY_PAPERDOLL_SHOW_GEMS"] = "Click to show the gems"
+L["ARMORY_PAPERDOLL_SHOW_RESISTANCES"] = "Click to show the resistances"

@@ -313,6 +313,113 @@ function ArmoryPaperDollFrame_SetZone()
     end
 end
 
+-- The gems instead of the resistances (Burning Crusade), counted per color as the requirements of a meta gem count them
+local GEM_FRAMES = { "Meta", "Red", "Yellow", "Blue" };
+local SOCKET_FRAMES = { meta = "Meta", red = "Red", yellow = "Yellow", blue = "Blue" };
+-- by Enum.ItemGemSubclass: purple, green and orange count for both their colors, prismatic for all three
+local GEM_COLORS = {
+    [0] = { "Red" }, [1] = { "Blue" }, [2] = { "Yellow" },
+    [3] = { "Red", "Blue" }, [4] = { "Yellow", "Blue" }, [5] = { "Red", "Yellow" },
+    [8] = { "Red", "Yellow", "Blue" }
+};
+local META = { "Meta" };
+local NO_COLORS = {};
+
+local function AddShowGemsHint(self)
+    GameTooltip:AddLine(ARMORY_PAPERDOLL_SHOW_GEMS, GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b);
+    GameTooltip:Show();
+end
+
+local function AddEmptySockets(slot, ...)
+    local name, frame;
+    for i = 1, select("#", ...) do
+        name = SOCKET_FRAMES[select(i, ...)];
+        if ( name ) then
+            frame = _G["ArmorySocketsFrame"..name];
+            frame.Icon:SetVertexColor(0.8, 0.1, 0.1);
+            table.insert(frame.gems, {slot, RED_FONT_COLOR_CODE..EMPTY..FONT_COLOR_CODE_CLOSE});
+        end
+    end
+end
+
+function ArmoryPaperDollFrame_ToggleGems()
+    Armory:SetConfigPaperDollGems(not Armory:GetConfigPaperDollGems());
+    GameTooltip:Hide();
+    ArmoryPaperDollFrame_UpdateGems();
+end
+
+function ArmoryPaperDollFrame_UpdateGems()
+    if ( not Armory.hasSockets ) then
+        return;
+    end
+
+    local showGems = Armory:GetConfigPaperDollGems();
+    ArmorySocketsFrame:SetShown(showGems);
+    ArmoryResistanceFrame:SetShown(not showGems);
+    if ( not showGems ) then
+        return;
+    end
+
+    local frame;
+    for _, name in ipairs(GEM_FRAMES) do
+        frame = _G["ArmorySocketsFrame"..name];
+        frame.Icon:SetVertexColor(1.0, 1.0, 1.0);
+        frame.count = 0;
+        frame.gems = frame.gems or {};
+        table.wipe(frame.gems);
+    end
+
+    local metaGems = 0;
+    local link, emptySockets, gemName, colors;
+    for slot = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
+        _, _, _, link, _, _, emptySockets = Armory:GetInventoryItemInfo(slot);
+        if ( Armory:GetItemGemString(link) ) then
+            for _, socket in ipairs(Armory:GetSocketInfo(link)) do
+                if ( socket.link ) then
+                    gemName = Armory:GetColorFromLink(socket.link)..socket.gem..FONT_COLOR_CODE_CLOSE;
+                    if ( socket.socketType == "meta" ) then
+                        metaGems = metaGems + 1;
+                        colors = META;
+                    else
+                        colors = GEM_COLORS[select(7, C_Item.GetItemInfoInstant(socket.link))];
+                    end
+                    for _, name in ipairs(colors or NO_COLORS) do
+                        frame = _G["ArmorySocketsFrame"..name];
+                        frame.count = frame.count + 1;
+                        table.insert(frame.gems, {ARMORY_SLOT[slot], gemName});
+                    end
+                end
+            end
+        end
+        if ( emptySockets ) then
+            AddEmptySockets(ARMORY_SLOT[slot], strsplit(":", emptySockets));
+        end
+    end
+
+    if ( metaGems > 0 and not Armory:IsMetaActive() ) then
+        ArmorySocketsFrameMeta.Icon:SetVertexColor(0.8, 0.1, 0.1);
+    end
+
+    for _, name in ipairs(GEM_FRAMES) do
+        frame = _G["ArmorySocketsFrame"..name];
+        frame.Value:SetText(frame.count);
+        frame.tooltip = _G["ARMORY_GEM_COLOR_"..strupper(name)].." "..frame.count;
+    end
+end
+
+function ArmoryPaperDollGemSocket_OnEnter(self)
+    if ( not self.tooltip ) then
+        return;
+    end
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+    GameTooltip:SetText(self.tooltip, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+    for _, gem in ipairs(self.gems) do
+        GameTooltip:AddDoubleLine(gem[2], gem[1], NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+    end
+    GameTooltip:AddLine(ARMORY_PAPERDOLL_SHOW_RESISTANCES, GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b);
+    GameTooltip:Show();
+end
+
 function ArmoryPaperDollFrame_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("UNIT_LEVEL");
@@ -341,6 +448,14 @@ function ArmoryPaperDollFrame_OnLoad(self)
     self:RegisterUnitEvent("UNIT_AURA", "player");
     if ( Armory.isTBC ) then
         self:RegisterEvent("COMBAT_RATING_UPDATE");
+    end
+    if ( Armory.hasSockets ) then
+        self:RegisterEvent("SOCKET_INFO_UPDATE");
+        for i = 1, NUM_RESISTANCE_TYPES do
+            local frame = _G["ArmoryMagicResFrame"..i];
+            frame:SetScript("OnMouseUp", ArmoryPaperDollFrame_ToggleGems);
+            frame:HookScript("OnEnter", AddShowGemsHint);
+        end
     end
 
     ArmoryPaperDollFrame_UpdateVersion();
@@ -386,7 +501,7 @@ function ArmoryPaperDollFrame_OnEvent(self, event, unit)
         Armory:Execute(ArmoryPaperDollFrame_SetZone);
     elseif ( (event == "UNIT_LEVEL" and unit == "player") or event == "SKILL_LINES_CHANGED" or event == "TRIAL_STATUS_UPDATE" or event == "UPDATE_FACTION" ) then
         Armory:Execute(ArmoryPaperDollFrame_UpdateEquippable);
-    elseif ( event == "PLAYER_EQUIPMENT_CHANGED" ) then
+    elseif ( event == "PLAYER_EQUIPMENT_CHANGED" or event == "SOCKET_INFO_UPDATE" ) then
         Armory:Execute(ArmoryPaperDollFrame_UpdateInventory);
     end
 end
@@ -489,6 +604,8 @@ function ArmoryPaperDollFrame_UpdateInventory()
 
     Armory.hasEquipment = true;
     Armory_EQC_Refresh();
+
+    ArmoryPaperDollFrame_UpdateGems();
 end
 
 function ArmoryPaperDollFrame_UpdateHealthBar()

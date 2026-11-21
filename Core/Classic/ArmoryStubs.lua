@@ -242,6 +242,7 @@ end
 function Armory:SetInventoryItemInfo(index)
     local link = _G.GetInventoryItemLink("player", index);
     local hasItem, hasCooldown, repairCost;
+    local emptySockets, activeMeta;
     local invalid;
 
     if ( link ) then
@@ -249,13 +250,18 @@ function Armory:SetInventoryItemInfo(index)
         hasItem, hasCooldown, repairCost = tooltip1:SetInventoryItem("player", index);
         if ( not self:IsValidTooltip(tooltip1) ) then
             invalid = true;
+        elseif ( self.hasSockets ) then
+            emptySockets, activeMeta = self:GetInventoryItemSocketInfo(tooltip1);
         end
         self:ReleaseTooltip(tooltip1);
     end
 
     if ( not invalid ) then
         self:SetCharacterValue("InventoryItem"..index, hasItem, hasCooldown, repairCost);
-        self:SetCharacterValue("InventoryItemLink"..index, link);
+        self:SetCharacterValue("InventoryItemLink"..index, link, nil, nil, emptySockets);
+        if ( self.hasSockets ) then
+            self:SetCharacterValue("IsMetaActive"..index, activeMeta);
+        end
     else
         self:PrintDebug("No data for", ARMORY_SLOT[index], "slot; skipping update")
     end

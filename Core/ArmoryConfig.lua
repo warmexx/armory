@@ -933,6 +933,15 @@ function Armory:GetConfigShowGems()
     return not self:Setting("General", "HideGems");
 end
 
+-- per character shown in the paper doll: the gems instead of the resistances
+function Armory:SetConfigPaperDollGems(on)
+    self:CharacterSetting("PaperDollGems", nil, on or nil);
+end
+
+function Armory:GetConfigPaperDollGems()
+    return self:CharacterSetting("PaperDollGems");
+end
+
 function Armory:SetConfigPerCharacter(on)
     self:Setting("General", "PerCharacter", on);
 end
