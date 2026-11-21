@@ -19,8 +19,9 @@ Your basic layout will be:
     end
     Armory:SelectProfile(currentProfile);
 
-which will respect the faction filter that limits the selectable characters to the
-current realm and faction.
+which will respect the realm filter that limits the selectable characters to the
+current realm and its connected realms, and the faction filter that limits them to
+the current faction.
 
 As an alternative you can also use:
 
@@ -53,7 +54,7 @@ function Armory_GetItemCount(itemid)
         Armory:LoadProfile(currentRealm, character);
         -- only get the count for alts
         if ( not Armory:IsPlayerSelected() ) then
-            for id = BACKPACK_CONTAINER, NUM_TOTAL_EQUIPPED_BAG_SLOTS do
+            for id = BACKPACK_CONTAINER, NUM_TOTAL_EQUIPPED_BAG_SLOTS or NUM_BAG_SLOTS do
                 for index = 1, Armory:GetContainerNumSlots(id) do
                    itemId = (Armory:GetContainerItemLink(id, index) or ""):match("item:(%d+)");
                    if ( itemId == itemid ) then
