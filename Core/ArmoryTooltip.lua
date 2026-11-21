@@ -361,14 +361,15 @@ function Armory:AddSlotItemLevels(tooltip, slotId)
     end
 end
 
-local SHOW_GEMS = Armory.isMainline;
+local SHOW_GEMS = Armory.hasSockets;
 
 local gemInfo, crafters, itemCount, hasSkill, canLearn, candidates;
 local reagents = {};
--- Mainline passes the item id only, Classic also the link from the tooltip hook
-local function EnhanceItemTooltip(tooltip, id, link)
+-- Classic passes the link from the tooltip hook; Mainline the item id, and the link of the
+-- tooltip (itemLink) only for the gems
+local function EnhanceItemTooltip(tooltip, id, link, itemLink)
     local spaceAdded, name;
-    local key = link or id;
+    local key = link or itemLink or id;
 
     if ( not (id and Armory:IsValidTooltip(tooltip)) ) then
         return;
@@ -382,7 +383,7 @@ local function EnhanceItemTooltip(tooltip, id, link)
         candidates = nil;
 
         -- Need the fully qualified link
-        local name, link, _, itemLevel, minLevel, _, subType, _, equipLoc, _, _, itemType, itemSubType = C_Item.GetItemInfo(key);
+        local name, link, _, itemLevel, minLevel, _, subType, _, equipLoc, _, _, itemType, itemSubType = C_Item.GetItemInfo(link or id);
 
         if ( not itemType ) then
             return;
@@ -403,7 +404,7 @@ local function EnhanceItemTooltip(tooltip, id, link)
         elseif ( itemType ~= Enum.ItemClass.Miscellaneous ) then
             if ( SHOW_GEMS and Armory:GetConfigShowGems() ) then
                 local numGems;
-                gemInfo, numGems = Armory:GetSocketInfo(link);
+                gemInfo, numGems = Armory:GetSocketInfo(itemLink or link);
                 if ( numGems == 0 ) then
                     gemInfo = nil;
                 end
@@ -456,7 +457,7 @@ local function EnhanceItemTooltip(tooltip, id, link)
         AddSpacer(tooltip);
         for _, socket in ipairs(gemInfo) do
             if ( socket.link ) then
-                tooltip:AddLine(Armory:GetColorFromLink(socket.link)..socket.gem..FONT_COLOR_CODE_CLOSE.." : "..(socket.gemColor or UNKNOWN));
+                tooltip:AddLine(Armory:GetColorFromLink(socket.link)..socket.gem..FONT_COLOR_CODE_CLOSE..(socket.gemColor and " : "..socket.gemColor or ""));
                 tooltip:AddTexture(socket.texture);
             end
         end
@@ -1071,8 +1072,11 @@ if ( Armory.isClassic ) then
 else
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip, data)
         if ( tooltip == GameTooltip or tooltip == ItemRefTooltip ) then
-            local _, _, id = tooltip:GetItem();
-            pcall(EnhanceItemTooltip, tooltip, id);
+            local _, itemLink, id = tooltip:GetItem();
+            if ( itemLink and issecretvalue(itemLink) ) then
+                itemLink = nil;
+            end
+            pcall(EnhanceItemTooltip, tooltip, id, nil, itemLink);
         end
     end);
 
@@ -1297,7 +1301,7 @@ function Armory:Table2Tooltip(tooltip, t, firstWrap)
                 end
             end
             if ( texture ) then
-                tooltip:AddTexture(texture);
+                tooltip:AddTexture(tonumber(texture) or texture);
             end
         end
     end

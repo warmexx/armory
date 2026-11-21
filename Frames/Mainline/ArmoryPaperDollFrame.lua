@@ -2355,51 +2355,65 @@ function ArmoryGearSetButton_OnEnter(self)
     end
 end
 
-local function AddEmptySockets(frameName, slot, ...)
-    local frame, socketType;
-    for i = 1, select("#", ...) do
-        socketType = select(i, ...);
-        if ( socketType == "meta" ) then
-            frame = _G[frameName.."Meta"];
-        elseif ( socketType == "red" ) then
-            frame = _G[frameName.."Red"];
-        elseif ( socketType == "blue" ) then
-            frame = _G[frameName.."Blue"];
-        elseif ( socketType == "yellow" ) then
-            frame = _G[frameName.."Yellow"];
-        else
-            frame = _G[frameName.."Other"];
+-- Midnight: the sockets are prismatic, so the gems are counted per color, with the Eversong Diamonds and Heliotropes as meta
+-- gems; other gems and empty prismatic sockets aren't shown
+local SOCKET_FRAMES = { "Meta", "Red", "Purple", "Blue", "Green" };
+local COLOR_FRAMES = { META = "Meta", RED = "Red", PURPLE = "Purple", BLUE = "Blue", GREEN = "Green" };
+
+local colorIcons;
+local function GetColorIcons()
+    if ( not colorIcons ) then
+        colorIcons = {};
+        local ids = {};
+        for itemId, color in pairs(Armory.gemColors) do
+            if ( not ids[color] or itemId < ids[color] ) then
+                ids[color] = itemId;
+            end
         end
-        frame.Icon:SetVertexColor(0.8, 0.1, 0.1);
-        frame.count = frame.count + 1;
-        frame.empty = frame.empty + 1;
-        table.insert(frame.gems, {slot, RED_FONT_COLOR_CODE..EMPTY..FONT_COLOR_CODE_CLOSE});
+        for color, itemId in pairs(ids) do
+            colorIcons[COLOR_FRAMES[color]] = C_Item.GetItemIconByID(itemId);
+        end
+    end
+    return colorIcons;
+end
+
+local function AddEmptySockets(frameName, slot, ...)
+    local frame;
+    for i = 1, select("#", ...) do
+        if ( select(i, ...) == "meta" ) then
+            frame = _G[frameName.."Meta"];
+            frame.Icon:SetVertexColor(0.8, 0.1, 0.1);
+            frame.count = frame.count + 1;
+            frame.empty = frame.empty + 1;
+            table.insert(frame.gems, {slot, RED_FONT_COLOR_CODE..EMPTY..FONT_COLOR_CODE_CLOSE});
+        end
     end
 end
 
-local socketTypes = { "Red", "Blue", "Yellow", "Meta", "Other" };
-local gemColors = {};
 function ArmoryPaperDoll_UpdateSockets(overlay)
     local suffix = overlay and "Overlay" or "";
     local frameName = "ArmorySockets"..suffix.."Frame";
+    local icons = GetColorIcons();
     local frame;
 
-    for _, socketType in ipairs(socketTypes) do
-        frame = _G[frameName..socketType];
+    for _, name in ipairs(SOCKET_FRAMES) do
+        frame = _G[frameName..name];
+        if ( icons[name] ) then
+            frame.Icon:SetTexture(icons[name]);
+            frame.Icon:ClearAllPoints();
+            frame.Icon:SetPoint("CENTER");
+            frame.Icon:SetSize(24, 24);
+        end
         frame.Icon:SetVertexColor(1.0, 1.0, 1.0);
         frame.count = 0;
         frame.empty = 0;
         frame.tooltip = nil;
-        frame.tooltip2 = nil;
         frame.tooltipSubText = nil;
         if ( not frame.gems ) then
             frame.gems = {};
         else
             table.wipe(frame.gems);
         end
-    end
-    for color in pairs(gemColors) do
-        gemColors[color] = 0;
     end
 
     local unit;
@@ -2408,29 +2422,21 @@ function ArmoryPaperDoll_UpdateSockets(overlay)
     end
 
     local isMetaActive = Armory:IsMetaActive(unit);
-    local emptySockets, gemInfo, gemName, gemColor, socketType;
+    local metaGems = 0;
+    local emptySockets, gemInfo, gemName, name;
     local link, tooltip, text;
     for slot = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
         if ( slot ~= ARMORY_SLOTID.ShirtSlot and slot ~= ARMORY_SLOTID.TabardSlot ) then
              _, _, _, link, _, _, emptySockets = Armory:GetInventoryItemInfo(slot, unit);
-
-            if ( not link and slot == ARMORY_SLOTID.HeadSlot ) then
-                _G[frameName.."Meta"].count = -1;
-            end
 
             if ( Armory:GetItemGemString(link) ) then
                 gemInfo = Armory:GetSocketInfo(link);
                 for _, socket in ipairs(gemInfo) do
                     if ( socket.link ) then
                         gemName = Armory:GetColorFromLink(socket.link)..socket.gem..FONT_COLOR_CODE_CLOSE;
-                        gemColor = (socket.gemColor or UNKNOWN);
-                        _, _, socketType = strsplit("-", socket.texture);
-                        if ( not socketType ) then
-                            socketType = "Other";
-                        end
-                        frame = _G[frameName..socketType] or _G[frameName.."Other"];
-                        frame.count = frame.count + 1;
-                        if ( socketType == "Meta" ) then
+                        if ( socket.socketType == "meta" ) then
+                            frame = _G[frameName.."Meta"];
+                            metaGems = metaGems + 1;
                             tooltip = Armory:AllocateTooltip();
                             tooltip:SetHyperlink(socket.link);
                             text = Armory:Tooltip2String(tooltip);
@@ -2439,14 +2445,13 @@ function ArmoryPaperDoll_UpdateSockets(overlay)
                                 frame.tooltipSubText = (frame.tooltipSubText and frame.tooltipSubText.."\n" or "")..requirement;
                             end
                         else
-                            gemName = gemColor.." : "..gemName;
-                            if ( not gemColors[gemColor] ) then
-                                gemColors[gemColor] = 1;
-                            else
-                                gemColors[gemColor] = gemColors[gemColor] + 1;
-                            end
+                            name = COLOR_FRAMES[Armory.gemColors[C_Item.GetItemInfoInstant(socket.link)]];
+                            frame = name and _G[frameName..name];
                         end
-                        table.insert(frame.gems, {ARMORY_SLOT[slot], gemName});
+                        if ( frame ) then
+                            frame.count = frame.count + 1;
+                            table.insert(frame.gems, {ARMORY_SLOT[slot], gemName});
+                        end
                     end
                 end
             end
@@ -2458,35 +2463,19 @@ function ArmoryPaperDoll_UpdateSockets(overlay)
     end
 
     frame = _G[frameName.."Meta"];
-    if ( isMetaActive or frame.count == -1 or frame.count + frame.empty == 0 ) then
-        frame.Icon:SetVertexColor(1.0, 1.0, 1.0);
-    elseif ( frame.empty == 0 ) then
+    if ( metaGems > 0 and not isMetaActive and frame.empty == 0 ) then
         frame.Icon:SetVertexColor(0.8, 0.1, 0.1);
     end
 
-    for color, count in pairs(gemColors) do
-        if ( count > 0 ) then
-            frame.tooltip2 = (frame.tooltip2 and frame.tooltip2..", " or "")..format("%s: %d", color, count);
-        end
-    end
-
-    for _, socketType in ipairs(socketTypes) do
-        frame = _G[frameName..socketType];
-        if ( frame.count == -1 ) then
-            frame.Value:SetText("X");
+    for _, name in ipairs(SOCKET_FRAMES) do
+        frame = _G[frameName..name];
+        frame.Value:SetText(frame.count);
+        if ( name == "Meta" ) then
+            frame.tooltip = EMPTY_SOCKET_META;
         else
-            frame.Value:SetText(frame.count);
+            frame.tooltip = _G["ARMORY_GEM_COLOR_"..strupper(name)];
         end
-        if ( socketType == "Other" ) then
-            frame.tooltip = OTHER;
-        else
-            frame.tooltip = _G["EMPTY_SOCKET_"..strupper(socketType)];
-        end
-        if ( frame.count == -1 ) then
-            frame.tooltip = frame.tooltip.." "..NOT_APPLICABLE;
-        else
-            frame.tooltip = frame.tooltip.." "..frame.count;
-        end
+        frame.tooltip = frame.tooltip.." "..frame.count;
     end
 end
 

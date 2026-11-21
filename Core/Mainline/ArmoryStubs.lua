@@ -304,7 +304,11 @@ function Armory:InRepairMode()
 end
 
 function Armory:IsMetaActive(unit)
-    return self:GetCharacterValue("IsMetaActive", unit);
+    for slot = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
+        if ( self:GetCharacterValue("IsMetaActive"..slot, unit) ) then
+            return true;
+        end
+    end
 end
 
 function Armory:IsPersistentPet()
@@ -364,9 +368,8 @@ function Armory:SetInventoryItemInfo(index)
         self:SetCharacterValue("InventoryItem"..index, hasItem, hasCooldown, repairCost);
         self:SetCharacterValue("InventoryItemLink"..index, link, tinker, anchor, emptySockets);
 
-        if ( index == ARMORY_SLOTID.HeadSlot ) then
-            self:SetCharacterValue("IsMetaActive", activeMeta);
-        end
+        -- the meta socket used to be on the head only; in Midnight it's on the neck
+        self:SetCharacterValue("IsMetaActive"..index, activeMeta);
         -- not really needed but may be useful for others
         self:SetCharacterValue("InventoryItemGems"..index, self:GetItemGemString(link));
     else

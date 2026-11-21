@@ -3,6 +3,12 @@ The project page can be found on https://www.curseforge.com/wow/addons/armory.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+## v20.0.0-beta4
+- The gems in item tooltips show up again, with the color of a Midnight gem instead of its stat type (Retail)
+- The sockets in the paper doll count your gems per color of Midnight (red, purple, blue and green) instead of the old socket colors, which matters for the Eversong Diamonds. The Eversong Diamonds and Heliotropes count as meta gems, and the sockets that bonuses add to an item count as well (Retail)
+- Fixes the gem icons missing in the tooltip of an item in the paper doll that has an engineering tinker (Retail)
+- Item tooltips show the gems and their color in Burning Crusade Anniversary as well
+
 ## v20.0.0-beta3
 - Fixes Armory being blamed for blocking the use of a bag item, which happened while item comparison was on. Armory's comparison with Alt now shows up next to the game's comparison instead of replacing it
 - The guild bank is stored while you use it instead of when you close it, so Armory no longer interferes with closing the game's guild bank
@@ -25,7 +31,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - Fixes the check marks in the menu of Armory's icon disappearing while the menu is open
 
 ## v20.0.0-beta1
-- One Armory for all versions of World of Warcraft: Retail, WoW Forever, Classic Era and Burning Crusade Anniversary now share one addon and one project page
+- One Armory for four versions of World of Warcraft: Retail, WoW Forever, Classic Era and Burning Crusade Anniversary now share one addon and one project page
 - Shows the paper doll in the Classic Era layout with Forever's stats, the talents with both specs of dual spec, the skills, the happiness and loyalty of your pets (also in the stable), the PvP frame with the PvP rank and honor, the achievements and statistics, and the Legacy trees as a third tab of the achievements frame (WoW Forever)
 - Characters are stored under their name and surname, so two of your characters with the same first name are kept apart (WoW Forever)
 - Leaves your own realm out of the names in the mail and cooldown messages in the chat
@@ -79,7 +85,7 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - Removes the support for oGlow, EnhTooltip, ManyItemTooltips, LinkWrangler and GearScore (Retail)
 
 ## Earlier versions
-Armory has been around since 2007. Until v20.0.0 every version of World of Warcraft had its own Armory:
+Armory has been around since 2007. Until v20.0.0 each of these versions of World of Warcraft had its own Armory:
 - Retail up to v19.4.4, on https://www.curseforge.com/wow/addons/armory
 - Classic Era up to v1.17.0, on https://www.curseforge.com/wow/addons/armory-classic
 - Burning Crusade Classic and Anniversary up to v3.0.0, on https://www.curseforge.com/wow/addons/armory-bcc

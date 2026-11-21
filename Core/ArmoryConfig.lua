@@ -599,7 +599,6 @@ if ( Armory.isClassic ) then
         "ARMORY_CMD_SET_SHOWACHIEVEMENTS",
         "ARMORY_CMD_SET_USEINPROGRESSCOLOR",
         "ARMORY_CMD_SET_SHOWGEARSETS",
-        "ARMORY_CMD_SET_SHOWGEMS",
         "ARMORY_CMD_SET_USEOVERLAY",
         "ARMORY_CMD_SET_USEMAZIEL",
     };
@@ -607,6 +606,9 @@ else
     unavailableOptions = {
         "ARMORY_CMD_SET_EXTENDEDTRADE",
     };
+end
+if ( not Armory.hasSockets ) then
+    table.insert(unavailableOptions, "ARMORY_CMD_SET_SHOWGEMS");
 end
 for _, key in ipairs(unavailableOptions) do
     Armory.options[key] = nil;

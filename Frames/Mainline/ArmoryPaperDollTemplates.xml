@@ -183,8 +183,8 @@
       <AbsDimension x="32" y="30"/>
     </Size>
     <Layers>
-      <Layer level="BACKGROUND">
-        <FontString name="$parentText" inherits="GameFontHighlightSmall" text="X" parentKey="Value">
+      <Layer level="OVERLAY">
+        <FontString name="$parentText" inherits="NumberFontNormalSmall" text="X" parentKey="Value">
           <Anchors>
             <Anchor point="BOTTOM">
               <Offset>
@@ -405,7 +405,7 @@
   </Frame>
   <Frame name="ArmorySocketsFrameTemplate" virtual="true">
     <Size>
-      <AbsDimension x="32" y="160"/>
+      <AbsDimension x="32" y="150"/>
     </Size>
     <Frames>
       <Frame name="$parentMeta" inherits="ArmorySocketFrameTemplate">
@@ -418,29 +418,9 @@
           </Layer>
         </Layers>
       </Frame>
-      <Frame name="$parentBlue" inherits="ArmorySocketFrameTemplate">
-        <Anchors>
-          <Anchor point="TOP" relativeTo="$parentMeta" relativePoint="BOTTOM"/>
-        </Anchors>
-        <Layers>
-          <Layer level="BACKGROUND">
-            <Texture file="Interface\ItemSocketingFrame\UI-EmptySocket-Blue" parentKey="Icon" />
-          </Layer>
-        </Layers>
-      </Frame>
-      <Frame name="$parentYellow" inherits="ArmorySocketFrameTemplate">
-        <Anchors>
-          <Anchor point="TOP" relativeTo="$parentBlue" relativePoint="BOTTOM"/>
-        </Anchors>
-        <Layers>
-          <Layer level="BACKGROUND">
-            <Texture file="Interface\ItemSocketingFrame\UI-EmptySocket-Yellow" parentKey="Icon" />
-          </Layer>
-        </Layers>
-      </Frame>
       <Frame name="$parentRed" inherits="ArmorySocketFrameTemplate">
         <Anchors>
-          <Anchor point="TOP" relativeTo="$parentYellow" relativePoint="BOTTOM"/>
+          <Anchor point="TOP" relativeTo="$parentMeta" relativePoint="BOTTOM"/>
         </Anchors>
         <Layers>
           <Layer level="BACKGROUND">
@@ -448,9 +428,29 @@
           </Layer>
         </Layers>
       </Frame>
-      <Frame name="$parentOther" inherits="ArmorySocketFrameTemplate">
+      <Frame name="$parentPurple" inherits="ArmorySocketFrameTemplate">
         <Anchors>
           <Anchor point="TOP" relativeTo="$parentRed" relativePoint="BOTTOM"/>
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture file="Interface\ItemSocketingFrame\UI-EmptySocket" parentKey="Icon" />
+          </Layer>
+        </Layers>
+      </Frame>
+      <Frame name="$parentBlue" inherits="ArmorySocketFrameTemplate">
+        <Anchors>
+          <Anchor point="TOP" relativeTo="$parentPurple" relativePoint="BOTTOM"/>
+        </Anchors>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture file="Interface\ItemSocketingFrame\UI-EmptySocket-Blue" parentKey="Icon" />
+          </Layer>
+        </Layers>
+      </Frame>
+      <Frame name="$parentGreen" inherits="ArmorySocketFrameTemplate">
+        <Anchors>
+          <Anchor point="TOP" relativeTo="$parentBlue" relativePoint="BOTTOM"/>
         </Anchors>
         <Layers>
           <Layer level="BACKGROUND">

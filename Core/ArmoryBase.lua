@@ -56,6 +56,7 @@ if ( not Armory ) then
         isClassic = isVanilla or isTBC,
         isVanilla = isVanilla,
         isTBC = isTBC,
+        hasSockets = isRetail or isTBC,
     };
 end
 
@@ -2073,85 +2074,108 @@ function Armory:GetItemGemString(link)
     return gemString;
 end
 
+local function GetLinkWithoutGems(link)
+    return (link:gsub("(item:[-%d]+:[^:|]*):[^:|]*:[^:|]*:[^:|]*:[^:|]*", "%1::::", 1));
+end
+
+local function HasGem(link, index)
+    local gemId = select(index, link:match("item:[-%d]+:[^:|]*:([^:|]*):([^:|]*):([^:|]*):([^:|]*)"));
+    return gemId and gemId ~= "" and gemId ~= "0";
+end
+
+-- The socket types of an item ("meta", "red", "prismatic", ...) by socket index. Mainline reads them
+-- from the tooltip data of the link without gems, which also has the sockets that bonus ids add;
+-- Classic from the empty socket textures of the plain item.
+local socketTypes = {};
+local function GetSocketTypes(link)
+    table.wipe(socketTypes);
+    if ( C_TooltipInfo and C_TooltipInfo.GetHyperlink ) then
+        local data = C_TooltipInfo.GetHyperlink(GetLinkWithoutGems(link));
+        if ( data and data.lines ) then
+            for _, line in ipairs(data.lines) do
+                if ( line.type == Enum.TooltipDataLineType.GemSocket and line.socketType ) then
+                    table.insert(socketTypes, strlower(line.socketType));
+                end
+            end
+        end
+    else
+        local tooltip = Armory:AllocateTooltip();
+        Armory:SetHyperlink(tooltip, "item:"..Armory:GetQualifiedItemId(link));
+        local icon;
+        for i = 1, 4 do
+            icon = _G[tooltip:GetName().."Texture"..i];
+            if ( icon and icon:IsShown() ) then
+                socketTypes[i] = strlower(icon:GetTexture() or ""):match("ui%-emptysocket%-(.+)");
+            end
+        end
+        Armory:ReleaseTooltip(tooltip);
+    end
+    return socketTypes;
+end
+
 function Armory:GetInventoryItemSocketInfo(tooltip)
     local emptySockets, activeMeta;
 
     local _, link = self:GetItemFromTooltip(tooltip);
-    local itemId = self:GetItemId(link);
 
-    if ( itemId and C_Item.IsEquippableItem(link) ) then
-        local icon, texture, socketType;
-
-        local itemTooltip = self:AllocateTooltip();
-        self:SetHyperlink(itemTooltip, "item:"..itemId);
+    if ( self:GetItemId(link) and C_Item.IsEquippableItem(link) ) then
+        local types = GetSocketTypes(link);
         for i = 1, 4 do
-            icon = _G[itemTooltip:GetName().."Texture"..i];
-            if ( icon and icon:IsShown() ) then
-                texture = strlower(icon:GetTexture() or "");
-                socketType = texture:match("ui%-emptysocket%-(.+)");
-                if ( socketType == "meta" ) then
-                    local _, gemLink = C_Item.GetItemGem(link, i);
-                    if ( gemLink ) then
-                        local gemTooltip = self:AllocateTooltip();
-                        gemTooltip:SetHyperlink(gemLink);
-                        local text = self:Tooltip2String(gemTooltip);
-                        self:ReleaseTooltip(gemTooltip);
-                        if ( not text:find("|cff808080") ) then
-                            activeMeta = true;
-                        end
+            local socketType = types[i];
+            if ( not socketType ) then
+                -- no socket
+            elseif ( not HasGem(link, i) ) then
+                emptySockets = (emptySockets and emptySockets..":" or "")..socketType;
+            elseif ( socketType == "meta" ) then
+                local _, gemLink = C_Item.GetItemGem(link, i);
+                if ( gemLink ) then
+                    local gemTooltip = self:AllocateTooltip();
+                    gemTooltip:SetHyperlink(gemLink);
+                    local text = self:Tooltip2String(gemTooltip);
+                    self:ReleaseTooltip(gemTooltip);
+                    if ( not text:find("|cff808080") ) then
+                        activeMeta = true;
                     end
                 end
             end
-
-            icon = _G[tooltip:GetName().."Texture"..i];
-            if ( icon and icon:IsShown() ) then
-                texture = strlower(icon:GetTexture() or "");
-                socketType = texture:match("ui%-emptysocket%-(.+)");
-                if ( socketType ) then
-                    emptySockets = (emptySockets and emptySockets..":" or "")..socketType;
-                end
-            end
         end
-        self:ReleaseTooltip(itemTooltip);
     end
 
     return emptySockets, activeMeta;
 end
 
+-- Classic: the item subclass of a gem is its color; Retail: a stat, so the color comes from Armory.gemColors
+local function GetGemColor(gemLink)
+    if ( Armory.gemColors ) then
+        local color = Armory.gemColors[C_Item.GetItemInfoInstant(gemLink)];
+        return color and color ~= "META" and _G["ARMORY_GEM_COLOR_"..color] or nil;
+    elseif ( Armory.isClassic ) then
+        return select(7, C_Item.GetItemInfo(gemLink));
+    end
+end
+
 local sockets = { {}, {}, {}, {} };
 function Armory:GetSocketInfo(link)
     local numGems = 0;
-    if ( link ) then
-        local itemId = self:GetQualifiedItemId(link);
-        if ( itemId and C_Item.IsEquippableItem(link) ) then
-            local tooltip = self:AllocateTooltip();
-            self:SetHyperlink(tooltip, "item:"..itemId);
+    if ( link and self:GetItemId(link) and C_Item.IsEquippableItem(link) ) then
+        local types = GetSocketTypes(link);
+        local gemName, gemLink;
+        for i = 1, 4 do
+            gemName, gemLink = C_Item.GetItemGem(link, i);
 
-            local gemName, gemLink, icon, gemColor;
-            for i = 1, 4 do
-                gemName, gemLink = C_Item.GetItemGem(link, i);
-                icon = _G[tooltip:GetName().."Texture"..i];
-                if ( gemLink ) then
-                    _, _, _, _, _, _, gemColor = C_Item.GetItemInfo(gemLink);
-                else
-                    gemColor = nil;
-                end
-
-                sockets[i].gem = gemName;
-                sockets[i].link = gemLink;
-                sockets[i].gemColor = gemColor;
-                if ( icon and icon:IsShown() and icon:GetTexture() ) then
-                    sockets[i].texture = icon:GetTexture();
-                else
-                    sockets[i].texture = "Interface\\ItemSocketingFrame\\UI-EmptySocket";
-                end
-
-                if ( gemName ) then
-                    numGems = numGems + 1;
-                end
+            sockets[i].gem = gemName;
+            sockets[i].link = gemLink;
+            sockets[i].gemColor = gemLink and GetGemColor(gemLink);
+            sockets[i].socketType = types[i];
+            if ( types[i] ) then
+                sockets[i].texture = "Interface\\ItemSocketingFrame\\UI-EmptySocket-"..types[i];
+            else
+                sockets[i].texture = "Interface\\ItemSocketingFrame\\UI-EmptySocket";
             end
 
-            self:ReleaseTooltip(tooltip);
+            if ( gemName ) then
+                numGems = numGems + 1;
+            end
         end
     end
     return sockets, numGems;

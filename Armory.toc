@@ -27,6 +27,7 @@ Libs\LibBase64-1.0\LibBase64-1.0.lua [AllowLoadGameType classic]
 Locales.xml
 Core.xml
 Core_Mainline.xml [AllowLoadGameType mainline]
+Core\Mainline\ArmoryGemColors.lua [AllowLoadGameType standard]
 Core\Forever\ArmoryStubs.lua [AllowLoadGameType mainline] [ExcludeLoadGameType standard]
 Core\ArmorySkills.lua [AllowLoadGameType mainline] [ExcludeLoadGameType standard]
 Core\Forever\ArmoryLegacy.lua [AllowLoadGameType mainline] [ExcludeLoadGameType standard]
