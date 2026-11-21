@@ -1,9 +1,15 @@
 ## Interface: 120105, 16001, 20506
 ## Title: ArmoryGuildBank
-## Title-deDE: ArmoryGuildBank [Armory Gildenbank]
-## Title-esES: ArmoryGuildBank [Banco de Hermandad]
-## Title-frFR: ArmoryGuildBank [Banque de Guilde]
-## Title-koKR: ArmoryGuildBank [길드은행 정보 열람]
+## Title-deDE: ArmoryGuildBank [Gildenbank]
+## Title-esES: ArmoryGuildBank [Banco de hermandad]
+## Title-esMX: ArmoryGuildBank [Banco de hermandad]
+## Title-frFR: ArmoryGuildBank [Banque de guilde]
+## Title-itIT: ArmoryGuildBank [Banca di gilda]
+## Title-koKR: ArmoryGuildBank [길드 은행 정보 열람]
+## Title-ptBR: ArmoryGuildBank [Banco da guilda]
+## Title-ruRU: ArmoryGuildBank [Гильдейский банк]
+## Title-zhCN: ArmoryGuildBank [公会银行]
+## Title-zhTW: ArmoryGuildBank [公會銀行]
 ## Version: @project-version@
 ## Notes: Provides guild bank information to Armory users
 ## Notes-deDE: Ermöglicht Gildenbankinformationen für Armorynutzer
