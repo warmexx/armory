@@ -24,8 +24,6 @@ L["ARMORY_CMD_SET_SHOWSLOTITEMLEVELS_TEXT"] = "show item level of other characte
 L["ARMORY_CMD_SET_SHOWSLOTITEMLEVELS_MENUTEXT"] = "Show item level of other characters"
 L["ARMORY_CMD_SET_SHOWSLOTITEMLEVELS_TOOLTIP"] = "If enabled, the tooltip of an equipment slot in the paper doll lists the item level of your other characters in that slot. Armor slots only list characters that wear the same armor type."
 L["ARMORY_SLOT_ITEMLEVELS"] = "Item level of your other characters"
-
--- Not imported yet.
 L["ARMORY_GEM_COLOR_RED"] = "Red"
 L["ARMORY_GEM_COLOR_PURPLE"] = "Purple"
 L["ARMORY_GEM_COLOR_BLUE"] = "Blue"
