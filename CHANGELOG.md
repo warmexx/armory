@@ -9,6 +9,8 @@ Thanks for using Armory. You can show your appreciation and support future devel
 - Fixes the gem icons missing in the tooltip of an item in the paper doll that has an engineering tinker (Retail)
 - Item tooltips show the gems and their color in Burning Crusade Anniversary as well
 - A click on the resistances in the paper doll shows your gems instead, counted per color as the requirements of a meta gem count them, with a warning when the meta gem isn't active; Armory remembers the choice per character (Burning Crusade Anniversary)
+- Armory and ArmoryGuildBank are translated into all languages of the game, now also Italian, Brazilian Portuguese, Latin American Spanish and Traditional Chinese, and have a translated name and description in the addon list
+- Fixes the number of days missing from the mail expiration warnings in most languages, and other errors in the existing translations
 
 ## v20.0.0-beta3
 - Fixes Armory being blamed for blocking the use of a bag item, which happened while item comparison was on. Armory's comparison with Alt now shows up next to the game's comparison instead of replacing it
