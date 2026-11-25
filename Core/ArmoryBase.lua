@@ -381,7 +381,7 @@ end
 
 function Armory:ShowIcon(force)
     if ( force or self:GetConfigShowMinimap() ) then
-        if ( not force and self:GetConfigHideMinimapIfToolbar() and (C_AddOns.IsAddOnLoaded("FuBar") or C_AddOns.IsAddOnLoaded("TitanClassic")) ) then
+        if ( not force and self:GetConfigHideMinimapIfToolbar() and (C_AddOns.IsAddOnLoaded("FuBar") or C_AddOns.IsAddOnLoaded("Titan")) ) then
             ShowIcon(false);
         else
             self:MoveIconToPosition();

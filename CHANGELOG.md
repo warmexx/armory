@@ -3,6 +3,9 @@ The project page can be found on https://www.curseforge.com/wow/addons/armory.
 
 Thanks for using Armory. You can show your appreciation and support future development by donating!
 
+## v20.0.1
+- Fixes hiding the minimap button when Titan Panel is loaded, which no longer worked since Titan Panel's restructuring
+
 ## v20.0.0
 - One Armory for four versions of World of Warcraft: Retail, WoW Forever, Classic Era and Burning Crusade Anniversary now share one addon and one project page
 - Shows the paper doll in the Classic Era layout with Forever's stats, the talents with both specs of dual spec, the skills, the happiness and loyalty of your pets (also in the stable), the PvP frame with the PvP rank and honor, the achievements and statistics, and the Legacy trees as a third tab of the achievements frame (WoW Forever)
